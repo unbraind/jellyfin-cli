@@ -1,0 +1,213 @@
+import { Command } from 'commander';
+import { createApiClient, handleError } from './utils.js';
+import { toon } from '../formatters/index.js';
+
+export function createSessionsCommand(): Command {
+  const cmd = new Command('sessions');
+
+  cmd
+    .command('list')
+    .description('List all active sessions')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const sessions = await client.getSessions();
+        console.log(toon.formatSessions(sessions));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('get <sessionId>')
+    .description('Get session by ID')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const session = await client.getSessionById(sessionId);
+        console.log(toon.formatSession(session));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('play')
+    .description('Send play command to session')
+    .argument('<sessionId>', 'Session ID')
+    .argument('<itemIds...>', 'Item IDs to play')
+    .option('--next', 'Add to play next')
+    .option('--last', 'Add to play last')
+    .option('--shuffle', 'Shuffle and play')
+    .option('--position <ticks>', 'Start position in ticks')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, itemIds, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        let playCommand: 'PlayNow' | 'PlayNext' | 'PlayLast' | 'PlayInstantMix' | 'PlayShuffle' = 'PlayNow';
+        if (options.next) playCommand = 'PlayNext';
+        else if (options.last) playCommand = 'PlayLast';
+        else if (options.shuffle) playCommand = 'PlayShuffle';
+
+        await client.playCommand(sessionId, {
+          itemIds,
+          playCommand,
+          startPositionTicks: options.position ? parseInt(options.position, 10) : undefined,
+        });
+        console.log(`type: message\ndata:\n  message: Play command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('pause <sessionId>')
+    .description('Pause playback')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'Pause');
+        console.log(`type: message\ndata:\n  message: Pause command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('unpause <sessionId>')
+    .description('Resume playback')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'Unpause');
+        console.log(`type: message\ndata:\n  message: Unpause command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('stop <sessionId>')
+    .description('Stop playback')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'Stop');
+        console.log(`type: message\ndata:\n  message: Stop command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('next <sessionId>')
+    .description('Skip to next track')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'NextTrack');
+        console.log(`type: message\ndata:\n  message: Next track command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('previous <sessionId>')
+    .description('Go to previous track')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'PreviousTrack');
+        console.log(`type: message\ndata:\n  message: Previous track command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('seek <sessionId> <ticks>')
+    .description('Seek to position (in ticks)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, ticks, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.playstateCommand(sessionId, 'Seek', { seekPositionTicks: parseInt(ticks, 10) });
+        console.log(`type: message\ndata:\n  message: Seek command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('mute <sessionId>')
+    .description('Mute audio')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.sendSystemCommand(sessionId, 'Mute');
+        console.log(`type: message\ndata:\n  message: Mute command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('unmute <sessionId>')
+    .description('Unmute audio')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.sendSystemCommand(sessionId, 'Unmute');
+        console.log(`type: message\ndata:\n  message: Unmute command sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('volume <sessionId> <level>')
+    .description('Set volume level (0-100)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, level, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.sendSystemCommand(sessionId, 'SetVolume');
+        console.log(`type: message\ndata:\n  message: Volume set to ${level}\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('message <sessionId>')
+    .description('Send message to session')
+    .requiredOption('--header <text>', 'Message header')
+    .requiredOption('--text <text>', 'Message text')
+    .option('--timeout <ms>', 'Message timeout in ms')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.sendMessageCommand(sessionId, {
+          header: options.header,
+          text: options.text,
+          timeoutMs: options.timeout ? parseInt(options.timeout, 10) : undefined,
+        });
+        console.log(`type: message\ndata:\n  message: Message sent\n  success: true`);
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  return cmd;
+}
