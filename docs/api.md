@@ -1509,3 +1509,309 @@ jf environment storage
 ```
 
 Output type: `storage_info`
+
+## tvshows
+
+TV Shows commands.
+
+### tvshows episodes
+
+Get episodes for a TV series.
+
+```bash
+jf tvshows episodes <seriesId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--season <number>` | Filter by season number |
+| `--season-id <id>` | Filter by season ID |
+| `--limit <number>` | Limit (default: 50) |
+| `--offset <number>` | Offset (default: 0) |
+| `--missing` | Include missing episodes |
+| `--sort <field>` | Sort field |
+
+Output type: `items`
+
+### tvshows seasons
+
+Get seasons for a TV series.
+
+```bash
+jf tvshows seasons <seriesId> [--specials]
+```
+
+Output type: `seasons`
+
+### tvshows next-up
+
+Get next up episodes.
+
+```bash
+jf tvshows next-up [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--series <id>` | Filter by series ID |
+| `--parent <id>` | Parent ID |
+| `--limit <number>` | Limit (default: 25) |
+
+Output type: `items`
+
+### tvshows upcoming
+
+Get upcoming episodes.
+
+```bash
+jf tvshows upcoming [--parent <id>] [--limit <number>]
+```
+
+Output type: `items`
+
+## packages
+
+Package management commands.
+
+### packages list
+
+List available packages (plugins).
+
+```bash
+jf packages list
+```
+
+Output type: `packages`
+
+### packages get
+
+Get package details.
+
+```bash
+jf packages get <packageId>
+```
+
+Output type: `package`
+
+### packages install
+
+Install a package.
+
+```bash
+jf packages install <packageId> [--version <version>] [--repository <url>]
+```
+
+### packages cancel
+
+Cancel a package installation.
+
+```bash
+jf packages cancel <installationId>
+```
+
+### packages installing
+
+List currently installing packages.
+
+```bash
+jf packages installing
+```
+
+Output type: `installing_packages`
+
+### packages repositories
+
+List plugin repositories.
+
+```bash
+jf packages repositories
+```
+
+Output type: `repositories`
+
+## images
+
+Image management commands.
+
+### images list
+
+List images for an item.
+
+```bash
+jf images list <itemId>
+```
+
+Output type: `item_images`
+
+### images url
+
+Get image URL.
+
+```bash
+jf images url <itemId> <imageType> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--max-width <pixels>` | Max width |
+| `--max-height <pixels>` | Max height |
+| `--quality <number>` | Quality (0-100) |
+| `--index <number>` | Image index |
+
+Output type: `image_url`
+
+### images delete
+
+Delete an image from an item.
+
+```bash
+jf images delete <itemId> <imageType> [--index <number>] --force
+```
+
+### images user
+
+Get user profile image URL.
+
+```bash
+jf images user <userId> [--max-width <pixels>] [--max-height <pixels>]
+```
+
+Output type: `user_image_url`
+
+### images delete-user
+
+Delete user profile image.
+
+```bash
+jf images delete-user <userId> --force
+```
+
+## suggestions
+
+Content suggestions commands.
+
+### suggestions get
+
+Get content suggestions.
+
+```bash
+jf suggestions get [--parent <id>] [--limit <number>]
+```
+
+Output type: `items`
+
+## years
+
+Browse content by year.
+
+### years list
+
+List all years.
+
+```bash
+jf years list [--parent <id>] [--limit <number>] [--sort <field>] [--order <direction>]
+```
+
+Output type: `years`
+
+### years get
+
+Get items for a specific year.
+
+```bash
+jf years get <year>
+```
+
+Output type: `item`
+
+## music-genres
+
+Music genre commands.
+
+### music-genres list
+
+List all music genres.
+
+```bash
+jf music-genres list [--parent <id>] [--limit <number>]
+```
+
+Output type: `items`
+
+### music-genres get
+
+Get music genre by name.
+
+```bash
+jf music-genres get <name>
+```
+
+Output type: `item`
+
+## trickplay
+
+Trickplay (video scrubbing preview) commands.
+
+### trickplay hls-url
+
+Get trickplay HLS playlist URL.
+
+```bash
+jf trickplay hls-url <itemId> <width> [--media-source <id>]
+```
+
+Output type: `trickplay_hls_url`
+
+### trickplay tile-url
+
+Get trickplay tile image URL.
+
+```bash
+jf trickplay tile-url <itemId> <width> <index> [--media-source <id>]
+```
+
+Output type: `trickplay_tile_url`
+
+## channels
+
+Channel commands.
+
+### channels list
+
+List all channels.
+
+```bash
+jf channels list [--limit <number>] [--supports-latest]
+```
+
+Output type: `items`
+
+### channels features
+
+Get channel features (all or for specific channel).
+
+```bash
+jf channels features [channelId]
+```
+
+Output type: `channel_features`
+
+### channels items
+
+Get items from a channel.
+
+```bash
+jf channels items <channelId> [--folder <id>] [--limit <number>] [--offset <number>] [--sort <field>] [--order <direction>]
+```
+
+Output type: `items`
+
+### channels latest
+
+Get latest items from a channel.
+
+```bash
+jf channels latest <channelId> [--limit <number>]
+```
+
+Output type: `items`

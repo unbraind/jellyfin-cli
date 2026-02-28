@@ -356,6 +356,55 @@ jf system info --format raw
 - `jf environment log <name>` - Get log file content
 - `jf environment storage` - Get storage info
 
+### TV Shows
+
+- `jf tvshows episodes <seriesId>` - Get episodes for a series
+- `jf tvshows seasons <seriesId>` - Get seasons for a series
+- `jf tvshows next-up` - Get next up episodes
+- `jf tvshows upcoming` - Get upcoming episodes
+
+### Packages
+
+- `jf packages list` - List available packages
+- `jf packages get <packageId>` - Get package details
+- `jf packages install <packageId>` - Install a package
+- `jf packages cancel <installationId>` - Cancel installation
+- `jf packages installing` - List installing packages
+- `jf packages repositories` - List plugin repositories
+
+### Images
+
+- `jf images list <itemId>` - List item images
+- `jf images url <itemId> <type>` - Get image URL
+- `jf images delete <itemId> <type>` - Delete image
+- `jf images user <userId>` - Get user profile image URL
+
+### Suggestions
+
+- `jf suggestions get` - Get content suggestions
+
+### Years
+
+- `jf years list` - List all years
+- `jf years get <year>` - Get items for a year
+
+### Music Genres
+
+- `jf music-genres list` - List all music genres
+- `jf music-genres get <name>` - Get music genre by name
+
+### Trickplay
+
+- `jf trickplay hls-url <itemId> <width>` - Get trickplay HLS playlist URL
+- `jf trickplay tile-url <itemId> <width> <index>` - Get trickplay tile image URL
+
+### Channels
+
+- `jf channels list` - List all channels
+- `jf channels features [channelId]` - Get channel features
+- `jf channels items <channelId>` - Get channel items
+- `jf channels latest <channelId>` - Get latest channel items
+
 ## Agent/LLM Optimization
 
 This CLI is designed to be easily used by AI agents and LLMs:

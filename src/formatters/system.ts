@@ -1,12 +1,17 @@
 import type { SystemInfo, UserDto, JellyfinConfig } from '../types/index.js';
 import { formatToon } from './base.js';
 
+function sanitizeUrl(url: string | undefined): string | undefined {
+  if (!url) return url;
+  return url.replace(/^https?:\/\/https?:\/\//, 'http://').replace(/^http:\/\/https?:\/\//, 'https://');
+}
+
 export function formatSystemInfo(info: SystemInfo): string {
   const simplified = {
     name: info.ServerName,
     version: info.Version,
     id: info.Id,
-    local_address: info.LocalAddress,
+    local_address: sanitizeUrl(info.LocalAddress),
     operating_system: info.OperatingSystem,
     has_pending_restart: info.HasPendingRestart,
     can_self_restart: info.CanSelfRestart,

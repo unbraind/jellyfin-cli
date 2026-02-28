@@ -29,6 +29,14 @@ import {
   createMediaCommand,
   createLocalizationCommand,
   createEnvironmentCommand,
+  createTvshowsCommand,
+  createPackagesCommand,
+  createImagesCommand,
+  createSuggestionsCommand,
+  createYearsCommand,
+  createMusicGenresCommand,
+  createTrickplayCommand,
+  createChannelsCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -70,5 +78,13 @@ program.addCommand(createSubtitlesCommand());
 program.addCommand(createMediaCommand());
 program.addCommand(createLocalizationCommand());
 program.addCommand(createEnvironmentCommand());
+program.addCommand(createTvshowsCommand());
+program.addCommand(createPackagesCommand());
+program.addCommand(createImagesCommand());
+program.addCommand(createSuggestionsCommand());
+program.addCommand(createYearsCommand());
+program.addCommand(createMusicGenresCommand());
+program.addCommand(createTrickplayCommand());
+program.addCommand(createChannelsCommand());
 
 program.parse();
