@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
-import { getConfig, saveConfig, getSettingsPath } from '../utils/config.js';
+import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, deleteServer, writeSettingsFile } from '../utils/config.js';
 import { formatSuccess, formatError, toon } from '../formatters/index.js';
 import type { OutputFormat } from '../types/index.js';
 
@@ -16,7 +16,7 @@ export function createConfigCommand(): Command {
     .option('-u, --username <username>', 'Username')
     .option('-p, --password <password>', 'Password')
     .option('--user-id <id>', 'User ID')
-    .option('-f, --format <format>', 'Default output format (toon, json, table, raw)')
+    .option('-o, --output-format <format>', 'Default output format (toon, json, table, raw)')
     .option('--timeout <ms>', 'Request timeout in milliseconds')
     .option('--name <name>', 'Server name for this config')
     .option('--default', 'Set as default server')
@@ -24,7 +24,7 @@ export function createConfigCommand(): Command {
       const config = getConfig(options.name);
       const format = config.outputFormat ?? 'toon';
 
-      if (!options.server && !options.apiKey && !options.username && !options.password && !options.userId && !options.format && !options.timeout) {
+      if (!options.server && !options.apiKey && !options.username && !options.password && !options.userId && !options.outputFormat && !options.timeout) {
         console.error(formatError('No configuration values provided', format));
         process.exit(1);
       }
@@ -35,7 +35,7 @@ export function createConfigCommand(): Command {
         username: options.username ?? config.username,
         password: options.password ?? config.password,
         userId: options.userId ?? config.userId,
-        outputFormat: (options.format as OutputFormat) ?? config.outputFormat,
+        outputFormat: (options.outputFormat as OutputFormat) ?? config.outputFormat,
         timeout: options.timeout ? parseInt(options.timeout, 10) : config.timeout,
       };
 
@@ -80,9 +80,52 @@ export function createConfigCommand(): Command {
     .command('list')
     .description('List all configured servers')
     .action(() => {
-      const { listServers } = require('../utils/config.js');
       const servers = listServers();
       console.log(toon.formatServers(servers));
+    });
+
+  cmd
+    .command('use <name>')
+    .description('Switch to a named server configuration')
+    .action((name) => {
+      const success = setCurrentServer(name);
+      if (success) {
+        console.log(toon.formatMessage(`Switched to server: ${name}`, true));
+      } else {
+        console.error(formatError(`Server '${name}' not found`, 'toon'));
+        process.exit(1);
+      }
+    });
+
+  cmd
+    .command('delete <name>')
+    .description('Delete a server configuration')
+    .option('--force', 'Skip confirmation')
+    .action((name, options) => {
+      if (!options.force) {
+        console.error('Use --force to confirm deletion');
+        process.exit(1);
+      }
+      const success = deleteServer(name);
+      if (success) {
+        console.log(toon.formatMessage(`Server '${name}' deleted`, true));
+      } else {
+        console.error(formatError(`Server '${name}' not found`, 'toon'));
+        process.exit(1);
+      }
+    });
+
+  cmd
+    .command('reset')
+    .description('Reset all configuration (clear settings file)')
+    .option('--force', 'Skip confirmation')
+    .action((options) => {
+      if (!options.force) {
+        console.error('Use --force to confirm reset');
+        process.exit(1);
+      }
+      writeSettingsFile({});
+      console.log(toon.formatMessage('Configuration reset', true));
     });
 
   cmd

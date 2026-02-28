@@ -95,6 +95,9 @@ The CLI supports multiple output formats:
 - `jf config get` - Display current configuration
 - `jf config path` - Show configuration file path
 - `jf config list` - List all configured servers
+- `jf config use <name>` - Switch to a named server configuration
+- `jf config delete <name> --force` - Delete a server configuration
+- `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
 
 ### System

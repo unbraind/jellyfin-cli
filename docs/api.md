@@ -69,6 +69,74 @@ jf config set [options]
 | `-u, --username <username>` | Username |
 | `-p, --password <password>` | Password |
 | `--user-id <id>` | User ID |
+| `-o, --output-format <format>` | Default output format (toon, json, table, raw) |
+| `--timeout <ms>` | Request timeout |
+| `--name <name>` | Server name |
+| `--default` | Set as default server |
+
+### config get
+
+Display current configuration.
+
+```bash
+jf config get [--name <name>]
+```
+
+### config path
+
+Show configuration file path.
+
+```bash
+jf config path
+```
+
+### config list
+
+List all configured servers.
+
+```bash
+jf config list
+```
+
+### config use
+
+Switch to a named server configuration.
+
+```bash
+jf config use <name>
+```
+
+### config delete
+
+Delete a server configuration.
+
+```bash
+jf config delete <name> --force
+```
+
+### config reset
+
+Reset all configuration (clear settings file).
+
+```bash
+jf config reset --force
+```
+
+### config test
+
+Test connection to Jellyfin server.
+
+```bash
+jf config test [--name <name>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `-s, --server <url>` | Jellyfin server URL |
+| `-k, --api-key <key>` | API key |
+| `-u, --username <username>` | Username |
+| `-p, --password <password>` | Password |
+| `--user-id <id>` | User ID |
 | `-f, --format <format>` | Default output format |
 | `--timeout <ms>` | Request timeout |
 | `--name <name>` | Server name |

@@ -46,6 +46,8 @@ function writeSettingsFile(settings: SettingsFile): void {
   writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
 }
 
+export { writeSettingsFile };
+
 function getEnvConfig(): Partial<JellyfinConfig> {
   const config: Partial<JellyfinConfig> = {};
   
