@@ -195,6 +195,16 @@ jf users me [-f format]
 
 Output type: `user`
 
+### users by-name
+
+Get user by username.
+
+```bash
+jf users by-name <username> [-f format]
+```
+
+Output type: `user`
+
 ## items
 
 Item commands.
@@ -351,6 +361,45 @@ jf items stream-url <itemId> [options]
 | `--subtitle-stream <index>` | Subtitle stream index |
 | `--max-bitrate <bps>` | Max streaming bitrate |
 
+### items audio-url
+
+Get audio stream URL.
+
+```bash
+jf items audio-url <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--media-source <id>` | Media source ID |
+| `--audio-stream <index>` | Audio stream index |
+| `--max-bitrate <bps>` | Max streaming bitrate |
+
+### items image-url
+
+Get image URL for an item.
+
+```bash
+jf items image-url <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--max-width <pixels>` | Max width |
+| `--max-height <pixels>` | Max height |
+
+### items subtitle-url
+
+Get subtitle URL.
+
+```bash
+jf items subtitle-url <itemId> <mediaSourceId> <streamIndex> [--format-type <format>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--format-type <format>` | Subtitle format (srt, vtt, ass) |
+
 ### items refresh
 
 Refresh item metadata.
@@ -474,6 +523,14 @@ Unmute audio.
 
 ```bash
 jf sessions unmute <sessionId>
+```
+
+### sessions volume
+
+Set volume level.
+
+```bash
+jf sessions volume <sessionId> <level>
 ```
 
 ### sessions message
@@ -621,6 +678,76 @@ Remove rating from item.
 ```bash
 jf userdata unrate <itemId> [--user <userId>]
 ```
+
+## favorites
+
+Favorites commands.
+
+### favorites list
+
+List favorite items.
+
+```bash
+jf favorites list [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--types <types>` | Item types (comma-separated) |
+| `--limit <number>` | Limit (default: 50) |
+| `--offset <number>` | Offset (default: 0) |
+
+Output type: `items`
+
+### favorites add
+
+Add item to favorites.
+
+```bash
+jf favorites add <itemId> [--user <userId>]
+```
+
+### favorites remove
+
+Remove item from favorites.
+
+```bash
+jf favorites remove <itemId> [--user <userId>]
+```
+
+## collections
+
+Collection commands.
+
+### collections list
+
+List all collections (box sets).
+
+```bash
+jf collections list [--limit <number>]
+```
+
+Output type: `items`
+
+### collections get
+
+Get collection details.
+
+```bash
+jf collections get <collectionId>
+```
+
+Output type: `item`
+
+### collections items
+
+List items in a collection.
+
+```bash
+jf collections items <collectionId> [--limit <number>]
+```
+
+Output type: `items`
 
 ## tasks
 

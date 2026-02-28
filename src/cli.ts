@@ -20,6 +20,8 @@ import {
   createStatsCommand,
   createApikeysCommand,
   createNotificationsCommand,
+  createCollectionsCommand,
+  createFavoritesCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -52,5 +54,7 @@ program.addCommand(createBrandingCommand());
 program.addCommand(createStatsCommand());
 program.addCommand(createApikeysCommand());
 program.addCommand(createNotificationsCommand());
+program.addCommand(createCollectionsCommand());
+program.addCommand(createFavoritesCommand());
 
 program.parse();

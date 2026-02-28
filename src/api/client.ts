@@ -448,21 +448,41 @@ export class JellyfinApiClient extends ApiClientBase {
 
   getStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string {
     const queryParams = { ...params, userId: this.userId };
-    return `${this.baseUrl}/Videos/${itemId}/stream${buildQueryString(queryParams as Record<string, unknown>)}`;
+    return `${this.baseUrl}/Videos/${itemId}/stream${this.buildQueryString(queryParams as Record<string, unknown>)}`;
   }
 
   getAudioStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number }): string {
     const queryParams = { ...params, userId: this.userId };
-    return `${this.baseUrl}/Audio/${itemId}/stream${buildQueryString(queryParams as Record<string, unknown>)}`;
+    return `${this.baseUrl}/Audio/${itemId}/stream${this.buildQueryString(queryParams as Record<string, unknown>)}`;
   }
 
   getSubtitleUrl(itemId: string, mediaSourceId: string, streamIndex: number, format?: string): string {
     const params = { mediaSourceId, streamIndex, format, userId: this.userId };
-    return `${this.baseUrl}/Videos/${itemId}/${mediaSourceId}/Subtitles/${streamIndex}/Stream.${format ?? 'srt'}${buildQueryString(params as Record<string, unknown>)}`;
+    return `${this.baseUrl}/Videos/${itemId}/${mediaSourceId}/Subtitles/${streamIndex}/Stream.${format ?? 'srt'}${this.buildQueryString(params as Record<string, unknown>)}`;
   }
 
   getThumbUrl(itemId: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    return `${this.baseUrl}/Items/${itemId}/Images/Primary${buildQueryString(params as Record<string, unknown>)}`;
+    return `${this.baseUrl}/Items/${itemId}/Images/Primary${this.buildQueryString(params as Record<string, unknown>)}`;
+  }
+
+  private buildQueryString(params: Record<string, unknown>): string {
+    const searchParams = new URLSearchParams();
+    for (const [key, value] of Object.entries(params)) {
+      if (value === undefined || value === null) {
+        continue;
+      }
+      if (Array.isArray(value)) {
+        for (const item of value) {
+          if (item !== undefined && item !== null) {
+            searchParams.append(key, String(item));
+          }
+        }
+      } else {
+        searchParams.append(key, String(value));
+      }
+    }
+    const qs = searchParams.toString();
+    return qs ? `?${qs}` : '';
   }
 }
 

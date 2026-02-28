@@ -2,15 +2,22 @@ node_modules/
 dist/
 *.log
 .DS_Store
-.env
-.env.*
 *.tsbuildinfo
 coverage/
 .nyc_output/
 
+.env
+.env.*
+.env.local
+.env.*.local
+*.env
+
+settings.json
 *.settings.json
 *.credentials.json
 *.auth.json
+*.secrets.json
+*.api-keys.json
 
 !.env.example
 !settings.example.json
@@ -19,5 +26,8 @@ coverage/
 .vscode/
 *.swp
 *.swo
+*~
 
 .tool-output/
+test-results/
+.tmp/

@@ -1,33 +1,33 @@
-# Jellyfin CLI
+# Jellyfin CLI Documentation
 
-An agent-optimized CLI tool for interacting with the Jellyfin API.
+## Overview
 
-> **Package Manager**: This project uses [Bun](https://bun.sh) as its package manager and build tool.
+jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin media server API. It outputs structured data in the Toon format (YAML-based) by default, making it easy for LLMs to parse.
 
 ## Installation
 
 ```bash
-# Install Bun if you haven't already
-curl -fsSL https://bun.sh/install | bash
-
-# Install the CLI globally
-bun install -g jellyfin-cli
-
-# Or clone and build from source
-git clone https://github.com/unbraind/jellyfin-cli.git
-cd jellyfin-cli
+# Install dependencies
 bun install
+
+# Build the CLI
 bun run build
+
+# Run the CLI
+./dist/cli.js --help
+
+# Or install globally
+bun install -g .
 ```
 
 ## Quick Start
 
 ```bash
-# Configure connection
-jf config set --server http://your-server:8096 --api-key YOUR_API_KEY
+# Quick setup with server URL and API key
+jf setup --server http://your-server:8096 --api-key YOUR_API_KEY
 
 # Or use username/password authentication
-jf config set --server http://your-server:8096 --username your-user --password your-password
+jf setup --server http://your-server:8096 --username your-user --password your-password
 
 # Test connection
 jf config test
@@ -59,7 +59,7 @@ jf sessions play SESSION_ID ITEM_ID
 
 ### Configuration File
 
-Settings are stored in `~/.jellyfin-cli/settings.json`. This file should not be committed to version control.
+Settings are stored in `~/.jellyfin-cli/settings.json`.
 
 ```bash
 # View current configuration
@@ -77,54 +77,20 @@ jf config set --server URL --api-key KEY
 
 ## Output Formats
 
-The CLI supports multiple output formats optimized for different use cases:
+The CLI supports multiple output formats:
 
-### Toon (Default)
-
-The default format is optimized for LLM/agent consumption using YAML:
-
-```yaml
-type: items
-data:
-  - id: abc123
-    name: The Matrix
-    type: Movie
-    year: 1999
-    rating: 8.7
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
-```
-
-### JSON
-
-Standard JSON output for programmatic processing:
-
-```bash
-jf items list --format json
-```
-
-### Table
-
-Human-readable table format:
-
-```bash
-jf users list --format table
-```
-
-### Raw
-
-Raw output without formatting:
-
-```bash
-jf system info --format raw
-```
+- **toon** (default): YAML-based format optimized for LLMs
+- **json**: Standard JSON output
+- **table**: Human-readable table format
+- **raw**: Raw output without formatting
 
 ## Commands
 
-### Configuration
+### Setup & Configuration
 
+- `jf setup` - Interactive setup wizard
+- `jf setup status` - Check setup status
+- `jf setup env` - Show environment variables
 - `jf config set` - Set configuration values
 - `jf config get` - Display current configuration
 - `jf config path` - Show configuration file path
@@ -144,6 +110,7 @@ jf system info --format raw
 - `jf users list` - List all users
 - `jf users get <userId>` - Get user by ID
 - `jf users me` - Get current user info
+- `jf users by-name <username>` - Get user by username
 
 ### Items
 
@@ -153,6 +120,17 @@ jf system info --format raw
 - `jf items resume` - Get resume items
 - `jf items search <term>` - Search for items
 - `jf items similar <itemId>` - Get similar items
+- `jf items intros <itemId>` - Get intro videos
+- `jf items chapters <itemId>` - Get chapters
+- `jf items special-features <itemId>` - Get special features
+- `jf items trailers <itemId>` - Get local trailers
+- `jf items ancestors <itemId>` - Get parent items
+- `jf items parts <itemId>` - Get additional parts
+- `jf items playback-info <itemId>` - Get playback info
+- `jf items stream-url <itemId>` - Get video stream URL
+- `jf items audio-url <itemId>` - Get audio stream URL
+- `jf items image-url <itemId>` - Get image URL
+- `jf items subtitle-url <itemId> <mediaSourceId> <streamIndex>` - Get subtitle URL
 - `jf items refresh <itemId>` - Refresh item metadata
 - `jf items delete <itemId>` - Delete an item
 
@@ -169,6 +147,7 @@ jf system info --format raw
 - `jf sessions seek <sessionId> <ticks>` - Seek to position
 - `jf sessions mute <sessionId>` - Mute audio
 - `jf sessions unmute <sessionId>` - Unmute audio
+- `jf sessions volume <sessionId> <level>` - Set volume level
 - `jf sessions message <sessionId>` - Send message
 
 ### Library
@@ -190,6 +169,18 @@ jf system info --format raw
 - `jf userdata like <itemId>` - Like an item
 - `jf userdata dislike <itemId>` - Dislike an item
 - `jf userdata unrate <itemId>` - Remove rating
+
+### Favorites
+
+- `jf favorites list` - List favorite items
+- `jf favorites add <itemId>` - Add to favorites
+- `jf favorites remove <itemId>` - Remove from favorites
+
+### Collections
+
+- `jf collections list` - List all collections
+- `jf collections get <collectionId>` - Get collection details
+- `jf collections items <collectionId>` - List items in collection
 
 ### Tasks
 
@@ -219,33 +210,51 @@ jf system info --format raw
 - `jf discover recommendations` - Get recommendations
 - `jf discover mix <itemId>` - Get instant mix
 
+### Plugins
+
+- `jf plugins list` - List all plugins
+- `jf plugins get <pluginId>` - Get plugin details
+- `jf plugins config <pluginId>` - Get plugin configuration
+- `jf plugins uninstall <pluginId>` - Uninstall a plugin
+
+### Devices
+
+- `jf devices list` - List all devices
+- `jf devices get <deviceId>` - Get device details
+- `jf devices rename <deviceId> <name>` - Rename device
+- `jf devices delete <deviceId>` - Delete device
+
+### Branding
+
+- `jf branding get` - Get branding configuration
+
+### Statistics
+
+- `jf stats counts` - Get library item counts
+
+### API Keys
+
+- `jf apikeys list` - List all API keys
+- `jf apikeys create <app>` - Create new API key
+- `jf apikeys delete <key>` - Delete API key
+
+### Notifications
+
+- `jf notifications types` - List notification types
+- `jf notifications list` - List user notifications
+- `jf notifications send` - Send admin notification
+
 ## Agent/LLM Optimization
 
-This CLI is designed to be easily used by AI agents and LLMs:
+This CLI is designed for AI agent integration:
 
-1. **Structured Output**: The default `toon` format provides consistent, parseable YAML output
-2. **Type Information**: Every output includes a `type` field indicating the data structure
-3. **Metadata**: Output includes timestamp, format version, and other metadata
-4. **Error Handling**: Errors are returned in a consistent format
-5. **No Interactive Prompts**: All inputs are via command-line arguments
-
-### Example Agent Integration
-
-```javascript
-// Execute command and parse output
-const result = await exec('jf items search "matrix" --format toon');
-const data = yaml.parse(result);
-
-if (data.type === 'search_result') {
-  for (const hint of data.data.hints) {
-    console.log(`${hint.name} (${hint.type})`);
-  }
-}
-```
+1. **Structured Output**: Default `toon` format provides consistent YAML output
+2. **Type Information**: Every output includes a `type` field
+3. **Metadata**: Includes timestamp, format version
+4. **Error Handling**: Errors in consistent format
+5. **No Interactive Prompts**: All inputs via command-line arguments
 
 ## Development
-
-This project uses [Bun](https://bun.sh) for package management, testing, and building.
 
 ```bash
 # Install dependencies

@@ -16,3 +16,5 @@ export { createBrandingCommand } from './branding.js';
 export { createStatsCommand } from './stats.js';
 export { createApikeysCommand } from './apikeys.js';
 export { createNotificationsCommand } from './notifications.js';
+export { createCollectionsCommand } from './collections.js';
+export { createFavoritesCommand } from './favorites.js';

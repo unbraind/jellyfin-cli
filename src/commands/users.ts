@@ -47,5 +47,24 @@ export function createUsersCommand(): Command {
       }
     });
 
+  cmd
+    .command('by-name <username>')
+    .description('Get user by username')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (username, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const users = await client.getUsers();
+        const user = users.find((u) => u.Name?.toLowerCase() === username.toLowerCase());
+        if (!user) {
+          console.error(toon.formatError(`User '${username}' not found`));
+          process.exit(1);
+        }
+        console.log(toon.formatUser(user));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

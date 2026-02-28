@@ -118,12 +118,34 @@ export function createItemsCommand(): Command {
       try { const info = await client.getPlaybackInfo(itemId); console.log(toon.formatToon({ play_session_id: info.playSessionId, media_sources: (info.mediaSources ?? []).map((s) => ({ id: s.Id, name: s.Name, container: s.Container, supports_direct_play: s.SupportsDirectPlay, supports_direct_stream: s.SupportsDirectStream, supports_transcoding: s.SupportsTranscoding })) }, 'playback_info')); } catch (err) { handleError(err, format); }
     });
 
-  cmd.command('stream-url <itemId>').description('Get stream URL').option('-f, --format <format>', 'Output format')
+  cmd.command('stream-url <itemId>').description('Get video stream URL').option('-f, --format <format>', 'Output format')
     .option('--media-source <id>', 'Media source ID').option('--audio-stream <index>', 'Audio stream index')
     .option('--subtitle-stream <index>', 'Subtitle stream index').option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
       try { const url = client.getStreamUrl(itemId, { mediaSourceId: options.mediaSource, audioStreamIndex: options.audioStream ? parseInt(options.audioStream, 10) : undefined, subtitleStreamIndex: options.subtitleStream ? parseInt(options.subtitleStream, 10) : undefined, maxStreamingBitrate: options.maxBitrate ? parseInt(options.maxBitrate, 10) : undefined }); console.log(toon.formatToon({ url, item_id: itemId }, 'stream_url')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('audio-url <itemId>').description('Get audio stream URL').option('-f, --format <format>', 'Output format')
+    .option('--media-source <id>', 'Media source ID').option('--audio-stream <index>', 'Audio stream index')
+    .option('--max-bitrate <bps>', 'Max streaming bitrate')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const url = client.getAudioStreamUrl(itemId, { mediaSourceId: options.mediaSource, audioStreamIndex: options.audioStream ? parseInt(options.audioStream, 10) : undefined, maxStreamingBitrate: options.maxBitrate ? parseInt(options.maxBitrate, 10) : undefined }); console.log(toon.formatToon({ url, item_id: itemId }, 'audio_url')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('image-url <itemId>').description('Get image URL for item').option('-f, --format <format>', 'Output format')
+    .option('--max-width <pixels>', 'Max width').option('--max-height <pixels>', 'Max height')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const url = client.getThumbUrl(itemId, { maxWidth: options.maxWidth ? parseInt(options.maxWidth, 10) : undefined, maxHeight: options.maxHeight ? parseInt(options.maxHeight, 10) : undefined }); console.log(toon.formatToon({ url, item_id: itemId }, 'image_url')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('subtitle-url <itemId> <mediaSourceId> <streamIndex>').description('Get subtitle URL').option('-f, --format <format>', 'Output format')
+    .option('--format-type <format>', 'Subtitle format (srt, vtt, ass)', 'srt')
+    .action(async (itemId, mediaSourceId, streamIndex, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const url = client.getSubtitleUrl(itemId, mediaSourceId, parseInt(streamIndex, 10), options.formatType); console.log(toon.formatToon({ url, item_id: itemId, stream_index: streamIndex }, 'subtitle_url')); } catch (err) { handleError(err, format); }
     });
 
   cmd.command('refresh <itemId>').description('Refresh item metadata').option('-f, --format <format>', 'Output format')

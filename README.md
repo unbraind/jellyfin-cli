@@ -56,6 +56,9 @@ jf sessions play SESSION_ID ITEM_ID
 - **Plugin Management**: List, configure, and manage plugins
 - **Device Management**: View and manage connected devices
 - **Statistics**: View library statistics and item counts
+- **Collections**: Manage box sets and collections
+- **Favorites**: Quick access to favorite items
+- **Streaming URLs**: Get direct URLs for video, audio, and subtitles
 
 ## Configuration
 
@@ -161,6 +164,7 @@ jf system info --format raw
 - `jf users list` - List all users
 - `jf users get <userId>` - Get user by ID
 - `jf users me` - Get current user info
+- `jf users by-name <username>` - Get user by username
 
 ### Items
 
@@ -177,7 +181,10 @@ jf system info --format raw
 - `jf items ancestors <itemId>` - Get parent items
 - `jf items parts <itemId>` - Get additional parts
 - `jf items playback-info <itemId>` - Get playback info
-- `jf items stream-url <itemId>` - Get stream URL
+- `jf items stream-url <itemId>` - Get video stream URL
+- `jf items audio-url <itemId>` - Get audio stream URL
+- `jf items image-url <itemId>` - Get image URL
+- `jf items subtitle-url <itemId> <mediaSourceId> <streamIndex>` - Get subtitle URL
 - `jf items refresh <itemId>` - Refresh item metadata
 - `jf items delete <itemId>` - Delete an item
 
@@ -194,6 +201,7 @@ jf system info --format raw
 - `jf sessions seek <sessionId> <ticks>` - Seek to position
 - `jf sessions mute <sessionId>` - Mute audio
 - `jf sessions unmute <sessionId>` - Unmute audio
+- `jf sessions volume <sessionId> <level>` - Set volume level
 - `jf sessions message <sessionId>` - Send message
 
 ### Library
@@ -215,6 +223,18 @@ jf system info --format raw
 - `jf userdata like <itemId>` - Like an item
 - `jf userdata dislike <itemId>` - Dislike an item
 - `jf userdata unrate <itemId>` - Remove rating
+
+### Favorites
+
+- `jf favorites list` - List favorite items
+- `jf favorites add <itemId>` - Add to favorites
+- `jf favorites remove <itemId>` - Remove from favorites
+
+### Collections
+
+- `jf collections list` - List all collections
+- `jf collections get <collectionId>` - Get collection details
+- `jf collections items <collectionId>` - List items in collection
 
 ### Tasks
 
