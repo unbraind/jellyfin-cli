@@ -10,9 +10,41 @@ export type { PlaybackProgressInfo, PlayMethod, PlaybackStopInfo } from './playb
 export type { SearchHint, SearchResult, QueryResult, ItemsQueryParams, ApiError } from './common.js';
 export type { LiveTvInfo, LiveTvServiceInfo, PlaylistCreationResult, RecommendationDto, RecommendationType, SimilarItemResult } from './media.js';
 
-export { InstallationInfo } from './plugins.js';
 export type { PluginInfo, PluginStatus, PluginStatusInfo, RepositoryInfo, PluginInstallationCancelled } from './plugins.js';
 export type { DeviceInfo, DeviceCapabilities, DeviceOptions } from './devices.js';
 export type { BrandingOptions, ServerConfiguration, ServerEndpoints, ItemCounts } from './server.js';
 export type { ApiKeyInfo, ApiKeyCreation } from './apikeys.js';
 export type { NotificationTypeInfo, NotificationOption, NotificationResult, Notification, NotificationLevel } from './notifications.js';
+
+export type {
+  QuickConnectResult,
+  SyncPlayGroup,
+  SyncPlayParticipant,
+  MediaSegment,
+  LyricsInfo,
+  LyricsMetadata,
+  LyricLine,
+  BackupInfo,
+  DisplayPreferences,
+  LocalizationOption,
+  CountryInfo,
+  CultureDto,
+  VirtualFolderInfo,
+  QueryFilters,
+  EnvironmentInfo,
+  DriveInfo,
+  NetworkShare,
+  RemoteImageInfo,
+  RemoteSubtitleInfo,
+  ExternalIdInfo,
+  ThemeMediaResult,
+  ThemeMediaInfo,
+  HlsPlaylistInfo,
+  CreateUserDto,
+  UpdateUserPasswordDto,
+  UploadSubtitleDto,
+  CreateUserResult,
+  LibraryOptions as ExtendedLibraryOptions,
+  TypeOption,
+  ImageOption as ExtendedImageOption,
+} from './extended.js';

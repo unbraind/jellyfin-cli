@@ -22,6 +22,13 @@ import {
   createNotificationsCommand,
   createCollectionsCommand,
   createFavoritesCommand,
+  createSyncPlayCommand,
+  createQuickConnectCommand,
+  createBackupCommand,
+  createSubtitlesCommand,
+  createMediaCommand,
+  createLocalizationCommand,
+  createEnvironmentCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -56,5 +63,12 @@ program.addCommand(createApikeysCommand());
 program.addCommand(createNotificationsCommand());
 program.addCommand(createCollectionsCommand());
 program.addCommand(createFavoritesCommand());
+program.addCommand(createSyncPlayCommand());
+program.addCommand(createQuickConnectCommand());
+program.addCommand(createBackupCommand());
+program.addCommand(createSubtitlesCommand());
+program.addCommand(createMediaCommand());
+program.addCommand(createLocalizationCommand());
+program.addCommand(createEnvironmentCommand());
 
 program.parse();

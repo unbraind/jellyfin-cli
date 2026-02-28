@@ -21,26 +21,28 @@ export function formatOutput(data: unknown, format: OutputFormat, typeHint?: str
 }
 
 function formatTable(data: unknown): string {
-  if (!Array.isArray(data)) {
-    if (typeof data === 'object' && data !== null) {
-      const obj = data as Record<string, unknown>;
-      if ('Items' in obj && Array.isArray(obj.Items)) {
-        data = obj.Items;
-      } else {
-        return Object.entries(obj)
-          .map(([key, value]) => `${key}: ${formatValue(value)}`)
-          .join('\n');
-      }
+  let tableData: unknown[] = [];
+  
+  if (Array.isArray(data)) {
+    tableData = data;
+  } else if (typeof data === 'object' && data !== null) {
+    const obj = data as Record<string, unknown>;
+    if ('Items' in obj && Array.isArray(obj.Items)) {
+      tableData = obj.Items;
     } else {
-      return String(data);
+      return Object.entries(obj)
+        .map(([key, value]) => `${key}: ${formatValue(value)}`)
+        .join('\n');
     }
+  } else {
+    return String(data);
   }
 
-  if (data.length === 0) {
+  if (tableData.length === 0) {
     return 'No items';
   }
 
-  const items = data as unknown[];
+  const items = tableData;
   if (typeof items[0] !== 'object' || items[0] === null) {
     return items.map((item) => String(item)).join('\n');
   }

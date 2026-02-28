@@ -301,6 +301,61 @@ jf system info --format raw
 - `jf notifications list` - List user notifications
 - `jf notifications send` - Send admin notification
 
+### SyncPlay
+
+- `jf syncplay list` - List SyncPlay groups
+- `jf syncplay join <groupId>` - Join a group
+- `jf syncplay leave` - Leave group
+- `jf syncplay pause` - Pause group playback
+- `jf syncplay unpause` - Resume group playback
+- `jf syncplay stop` - Stop group playback
+
+### Quick Connect
+
+- `jf quickconnect status` - Check if Quick Connect is enabled
+- `jf quickconnect init` - Initialize Quick Connect
+- `jf quickconnect check <secret>` - Check connection status
+- `jf quickconnect authorize <code>` - Authorize request
+
+### Backup
+
+- `jf backup list` - List backups
+- `jf backup create` - Create a backup
+- `jf backup restore <path>` - Restore from backup
+- `jf backup delete <path>` - Delete backup
+
+### Subtitles
+
+- `jf subtitles search <itemId> <language>` - Search remote subtitles
+- `jf subtitles download <itemId> <subtitleId>` - Download subtitle
+- `jf subtitles delete <itemId> <index>` - Delete subtitle track
+- `jf subtitles providers` - List subtitle providers
+
+### Media
+
+- `jf media segments <itemId>` - Get media segments
+- `jf media lyrics <itemId>` - Get lyrics
+- `jf media theme-songs <itemId>` - Get theme songs
+- `jf media theme-videos <itemId>` - Get theme videos
+- `jf media external-ids <itemId>` - Get external IDs
+- `jf media remote-images <itemId>` - Get remote images
+- `jf media download-image <itemId>` - Download remote image
+- `jf media hls-url <itemId>` - Get HLS playlist URL
+
+### Localization
+
+- `jf localization options` - Get localization options
+- `jf localization countries` - Get countries
+- `jf localization cultures` - Get cultures/languages
+- `jf localization ratings` - Get rating systems
+
+### Environment
+
+- `jf environment drives` - Get available drives
+- `jf environment logs` - Get log files
+- `jf environment log <name>` - Get log file content
+- `jf environment storage` - Get storage info
+
 ## Agent/LLM Optimization
 
 This CLI is designed to be easily used by AI agents and LLMs:

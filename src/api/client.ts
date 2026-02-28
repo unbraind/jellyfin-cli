@@ -1,5 +1,48 @@
-import type { JellyfinConfig, SystemInfo, UserDto, BaseItemDto, SessionInfo, QueryResult, SearchResult, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo, PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult, LiveTvInfo, PlaylistCreationResult, RecommendationDto, SimilarItemResult } from '../types/index.js';
-import type { PluginInfo, DeviceInfo, BrandingOptions, ServerConfiguration, ItemCounts, ApiKeyInfo, NotificationTypeInfo, NotificationResult } from '../types/index.js';
+import type {
+  JellyfinConfig,
+  SystemInfo,
+  UserDto,
+  BaseItemDto,
+  SessionInfo,
+  QueryResult,
+  SearchResult,
+  ItemsQueryParams,
+  LibraryVirtualFolder,
+  ScheduledTaskInfo,
+  PlaybackProgressInfo,
+  PlaybackStopInfo,
+  ActivityLogQueryResult,
+  LiveTvInfo,
+  PlaylistCreationResult,
+  RecommendationDto,
+  SimilarItemResult,
+  PluginInfo,
+  DeviceInfo,
+  BrandingOptions,
+  ServerConfiguration,
+  ItemCounts,
+  ApiKeyInfo,
+  NotificationTypeInfo,
+  NotificationResult,
+  CreateUserDto,
+  UpdateUserPasswordDto,
+  QuickConnectResult,
+  DisplayPreferences,
+  VirtualFolderInfo,
+  QueryFilters,
+  RemoteImageInfo,
+  ExternalIdInfo,
+  ThemeMediaResult,
+  SyncPlayGroup,
+  RemoteSubtitleInfo,
+  MediaSegment,
+  LyricsInfo,
+  UploadSubtitleDto,
+  LocalizationOption,
+  CountryInfo,
+  CultureDto,
+  BackupInfo,
+} from '../types/index.js';
 import { ApiClientBase } from './base.js';
 import { JellyfinApiError, ChapterInfo, PlaybackInfoResponse } from './types.js';
 
@@ -43,6 +86,50 @@ export class JellyfinApiClient extends ApiClientBase {
       throw new JellyfinApiError('No user ID set');
     }
     return this.getUserById(this.userId);
+  }
+
+  async createUser(user: CreateUserDto): Promise<{ Id?: string; Name?: string; ServerId?: string }> {
+    return this.request<{ Id?: string; Name?: string; ServerId?: string }>('POST', '/Users/New', undefined, user);
+  }
+
+  async updateUser(userId: string, user: Partial<UserDto>): Promise<void> {
+    await this.request<void>('POST', `/Users/${userId}`, undefined, user);
+  }
+
+  async deleteUser(userId: string): Promise<void> {
+    await this.request<void>('DELETE', `/Users/${userId}`);
+  }
+
+  async updateUserPassword(userId: string, password: UpdateUserPasswordDto): Promise<void> {
+    await this.request<void>('POST', '/Users/Password', { userId }, password);
+  }
+
+  async updateUserPolicy(userId: string, policy: Record<string, unknown>): Promise<void> {
+    await this.request<void>('POST', `/Users/${userId}/Policy`, undefined, policy);
+  }
+
+  async getDisplayPreferences(displayPreferencesId: string, userId?: string, client?: string): Promise<DisplayPreferences> {
+    return this.request<DisplayPreferences>('GET', `/DisplayPreferences/${displayPreferencesId}`, { userId, client });
+  }
+
+  async updateDisplayPreferences(displayPreferencesId: string, prefs: DisplayPreferences, userId?: string, client?: string): Promise<void> {
+    await this.request<void>('POST', `/DisplayPreferences/${displayPreferencesId}`, { userId, client }, prefs);
+  }
+
+  async quickConnectInitiate(): Promise<QuickConnectResult> {
+    return this.request<QuickConnectResult>('POST', '/QuickConnect/Initiate');
+  }
+
+  async quickConnectConnect(secret: string): Promise<QuickConnectResult> {
+    return this.request<QuickConnectResult>('GET', '/QuickConnect/Connect', { secret });
+  }
+
+  async quickConnectAuthorize(code: string, userId?: string): Promise<boolean> {
+    return this.request<boolean>('POST', '/QuickConnect/Authorize', { code, userId });
+  }
+
+  async quickConnectEnabled(): Promise<boolean> {
+    return this.request<boolean>('GET', '/QuickConnect/Enabled');
   }
 
   async getItems(params?: ItemsQueryParams & { userId?: string }): Promise<QueryResult<BaseItemDto>> {
@@ -112,6 +199,10 @@ export class JellyfinApiClient extends ApiClientBase {
     await this.request<void>('POST', `/Sessions/${sessionId}/System/${command}`);
   }
 
+  async setVolume(sessionId: string, level: number): Promise<void> {
+    await this.request<void>('POST', `/Sessions/${sessionId}/System/SetVolume`, { volume: level });
+  }
+
   async reportPlaybackStart(info: PlaybackProgressInfo): Promise<void> {
     await this.request<void>('POST', '/Sessions/Playing', undefined, info);
   }
@@ -126,6 +217,10 @@ export class JellyfinApiClient extends ApiClientBase {
 
   async getLibraries(): Promise<LibraryVirtualFolder[]> {
     return this.request<LibraryVirtualFolder[]>('GET', '/Library/VirtualFolders');
+  }
+
+  async getVirtualFolders(): Promise<VirtualFolderInfo[]> {
+    return this.request<VirtualFolderInfo[]>('GET', '/Library/VirtualFolders');
   }
 
   async refreshLibrary(params?: { recursive?: boolean; metadataRefreshMode?: string; replaceAllMetadata?: boolean; replaceAllImages?: boolean }): Promise<void> {
@@ -265,60 +360,52 @@ export class JellyfinApiClient extends ApiClientBase {
     return this.request<QueryResult<BaseItemDto>>('GET', `/Playlists/${playlistId}/Items`, { ...params, userId });
   }
 
-  async markFavorite(itemId: string, userId?: string): Promise<UserItemData> {
+  async markFavorite(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('POST', `/Users/${uid}/FavoriteItems/${itemId}`);
+    return this.request<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }>('POST', `/Users/${uid}/FavoriteItems/${itemId}`);
   }
 
-  async unmarkFavorite(itemId: string, userId?: string): Promise<UserItemData> {
+  async unmarkFavorite(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('DELETE', `/Users/${uid}/FavoriteItems/${itemId}`);
+    return this.request<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }>('DELETE', `/Users/${uid}/FavoriteItems/${itemId}`);
   }
 
-  async markPlayed(itemId: string, userId?: string, datePlayed?: string): Promise<UserItemData> {
+  async markPlayed(itemId: string, userId?: string, datePlayed?: string): Promise<{ Played?: boolean; PlayCount?: number }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('POST', `/Users/${uid}/PlayedItems/${itemId}`, { datePlayed });
+    return this.request<{ Played?: boolean; PlayCount?: number }>('POST', `/Users/${uid}/PlayedItems/${itemId}`, { datePlayed });
   }
 
-  async unmarkPlayed(itemId: string, userId?: string): Promise<UserItemData> {
+  async unmarkPlayed(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('DELETE', `/Users/${uid}/PlayedItems/${itemId}`);
+    return this.request<{ Played?: boolean; PlayCount?: number }>('DELETE', `/Users/${uid}/PlayedItems/${itemId}`);
   }
 
-  async updateUserItemRating(itemId: string, userId?: string, likes?: boolean): Promise<UserItemData> {
+  async updateUserItemRating(itemId: string, userId?: string, likes?: boolean): Promise<{ Played?: boolean; PlayCount?: number }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('POST', `/Users/${uid}/Items/${itemId}/Rating`, { likes });
+    return this.request<{ Played?: boolean; PlayCount?: number }>('POST', `/Users/${uid}/Items/${itemId}/Rating`, { likes });
   }
 
-  async deleteUserItemRating(itemId: string, userId?: string): Promise<UserItemData> {
+  async deleteUserItemRating(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number }> {
     const uid = userId ?? this.userId;
     if (!uid) {
       throw new JellyfinApiError('User ID required');
     }
-    return this.request<UserItemData>('DELETE', `/Users/${uid}/Items/${itemId}/Rating`);
-  }
-
-  async getSubtitles(itemId: string): Promise<BaseItemDto[]> {
-    return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/Subtitles`);
-  }
-
-  async downloadSubtitle(itemId: string, mediaSourceId: string, streamIndex: number): Promise<void> {
-    await this.request<void>('POST', `/Items/${itemId}/Subtitles/${streamIndex}`, { mediaSourceId });
+    return this.request<{ Played?: boolean; PlayCount?: number }>('DELETE', `/Users/${uid}/Items/${itemId}/Rating`);
   }
 
   async getHealth(): Promise<string> {
@@ -362,7 +449,7 @@ export class JellyfinApiClient extends ApiClientBase {
   }
 
   async deleteDevice(deviceId: string): Promise<void> {
-    await this.request<void>('DELETE', `/Devices/${deviceId}`);
+    await this.request<void>('DELETE', '/Devices', { id: deviceId });
   }
 
   async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> {
@@ -465,6 +552,141 @@ export class JellyfinApiClient extends ApiClientBase {
     return `${this.baseUrl}/Items/${itemId}/Images/Primary${this.buildQueryString(params as Record<string, unknown>)}`;
   }
 
+  getHlsMasterPlaylistUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string {
+    const queryParams = { ...params, userId: this.userId };
+    return `${this.baseUrl}/Videos/${itemId}/master.m3u8${this.buildQueryString(queryParams as Record<string, unknown>)}`;
+  }
+
+  async getQueryFilters(params?: { userId?: string; parentId?: string; includeItemTypes?: string[] }): Promise<QueryFilters> {
+    return this.request<QueryFilters>('GET', '/Items/Filters', params as Record<string, unknown>);
+  }
+
+  async getThemeSongs(itemId: string, userId?: string, inheritFromParent?: boolean): Promise<ThemeMediaResult> {
+    return this.request<ThemeMediaResult>('GET', `/Items/${itemId}/ThemeSongs`, { userId, inheritFromParent });
+  }
+
+  async getThemeVideos(itemId: string, userId?: string, inheritFromParent?: boolean): Promise<ThemeMediaResult> {
+    return this.request<ThemeMediaResult>('GET', `/Items/${itemId}/ThemeVideos`, { userId, inheritFromParent });
+  }
+
+  async getRemoteImages(itemId: string, params?: { type?: string; startIndex?: number; limit?: number }): Promise<{ Images?: RemoteImageInfo[]; TotalRecordCount?: number; Providers?: string[] }> {
+    return this.request<{ Images?: RemoteImageInfo[]; TotalRecordCount?: number; Providers?: string[] }>('GET', `/Items/${itemId}/RemoteImages`, params);
+  }
+
+  async downloadRemoteImage(itemId: string, params?: { type?: string; imageUrl?: string }): Promise<void> {
+    await this.request<void>('POST', `/Items/${itemId}/RemoteImages/Download`, params);
+  }
+
+  async getExternalIdInfos(itemId: string): Promise<ExternalIdInfo[]> {
+    return this.request<ExternalIdInfo[]>('GET', `/Items/${itemId}/ExternalIdInfos`);
+  }
+
+  async searchRemoteSubtitles(itemId: string, language: string, isPerfectMatch?: boolean): Promise<RemoteSubtitleInfo[]> {
+    return this.request<RemoteSubtitleInfo[]>('GET', `/Items/${itemId}/RemoteSearch/Subtitles/${language}`, { isPerfectMatch });
+  }
+
+  async downloadRemoteSubtitle(itemId: string, subtitleId: string): Promise<void> {
+    await this.request<void>('POST', `/Items/${itemId}/RemoteSearch/Subtitles/${subtitleId}`);
+  }
+
+  async uploadSubtitle(itemId: string, subtitle: UploadSubtitleDto): Promise<void> {
+    await this.request<void>('POST', `/Videos/${itemId}/Subtitles`, undefined, subtitle);
+  }
+
+  async deleteSubtitle(itemId: string, index: number): Promise<void> {
+    await this.request<void>('DELETE', `/Videos/${itemId}/Subtitles/${index}`);
+  }
+
+  async getSubtitleProviders(): Promise<{ Name?: string | null }[]> {
+    return this.request<{ Name?: string | null }[]>('GET', '/Providers/Subtitles/Subtitles');
+  }
+
+  async getMediaSegments(itemId: string): Promise<MediaSegment[]> {
+    return this.request<MediaSegment[]>('GET', `/MediaSegments/${itemId}`);
+  }
+
+  async getLyrics(itemId: string): Promise<LyricsInfo> {
+    return this.request<LyricsInfo>('GET', `/Audio/${itemId}/Lyrics`);
+  }
+
+  async getSyncPlayGroups(): Promise<SyncPlayGroup[]> {
+    return this.request<SyncPlayGroup[]>('GET', '/SyncPlay/List');
+  }
+
+  async syncPlayJoin(groupId: string): Promise<void> {
+    await this.request<void>('POST', '/SyncPlay/Join', undefined, { GroupId: groupId });
+  }
+
+  async syncPlayLeave(): Promise<void> {
+    await this.request<void>('POST', '/SyncPlay/Leave');
+  }
+
+  async syncPlayPause(): Promise<void> {
+    await this.request<void>('POST', '/SyncPlay/Pause');
+  }
+
+  async syncPlayUnpause(): Promise<void> {
+    await this.request<void>('POST', '/SyncPlay/Unpause');
+  }
+
+  async syncPlayStop(): Promise<void> {
+    await this.request<void>('POST', '/SyncPlay/Stop');
+  }
+
+  async getLocalizationOptions(): Promise<LocalizationOption[]> {
+    return this.request<LocalizationOption[]>('GET', '/Localization/Options');
+  }
+
+  async getCountries(): Promise<CountryInfo[]> {
+    return this.request<CountryInfo[]>('GET', '/Localization/Countries');
+  }
+
+  async getCultures(): Promise<CultureDto[]> {
+    return this.request<CultureDto[]>('GET', '/Localization/Cultures');
+  }
+
+  async getRatingSystems(): Promise<{ Name?: string; CountryCode?: string }[]> {
+    return this.request<{ Name?: string; CountryCode?: string }[]>('GET', '/Localization/RatingSystems');
+  }
+
+  async getSystemStorageInfo(): Promise<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }> {
+    return this.request<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }>('GET', '/System/Info/Storage');
+  }
+
+  async getSystemLogs(): Promise<{ Name?: string; DateCreated?: string; Size?: number }[]> {
+    return this.request<{ Name?: string; DateCreated?: string; Size?: number }[]>('GET', '/System/Logs');
+  }
+
+  async getSystemLogFile(name: string): Promise<string> {
+    const response = await fetch(`${this.baseUrl}/System/Logs/Log?name=${encodeURIComponent(name)}`, {
+      headers: { 'X-Emby-Token': this.apiKey ?? '' },
+    });
+    if (!response.ok) {
+      throw new JellyfinApiError(`Failed to get log file: ${response.status}`, response.status);
+    }
+    return response.text();
+  }
+
+  async getDrives(): Promise<{ Name?: string; Path?: string }[]> {
+    return this.request<{ Name?: string; Path?: string }[]>('GET', '/Environment/Drives');
+  }
+
+  async getBackups(): Promise<BackupInfo[]> {
+    return this.request<BackupInfo[]>('GET', '/Backup');
+  }
+
+  async createBackup(): Promise<void> {
+    await this.request<void>('POST', '/Backup');
+  }
+
+  async restoreBackup(backupPath: string): Promise<void> {
+    await this.request<void>('POST', `/Backup/${encodeURIComponent(backupPath)}`);
+  }
+
+  async deleteBackup(backupPath: string): Promise<void> {
+    await this.request<void>('DELETE', `/Backup/${encodeURIComponent(backupPath)}`);
+  }
+
   private buildQueryString(params: Record<string, unknown>): string {
     const searchParams = new URLSearchParams();
     for (const [key, value] of Object.entries(params)) {
@@ -484,12 +706,4 @@ export class JellyfinApiClient extends ApiClientBase {
     const qs = searchParams.toString();
     return qs ? `?${qs}` : '';
   }
-}
-
-interface UserItemData {
-  Played?: boolean;
-  PlayCount?: number;
-  IsFavorite?: boolean;
-  PlaybackPositionTicks?: number;
-  LastPlayedDate?: string | null;
 }

@@ -1165,3 +1165,347 @@ Send admin notification.
 ```bash
 jf notifications send --name <name> [--description <text>] [--url <url>] [--level <level>]
 ```
+
+## syncplay
+
+SyncPlay commands for synchronized playback.
+
+### syncplay list
+
+List SyncPlay groups.
+
+```bash
+jf syncplay list
+```
+
+Output type: `syncplay_groups`
+
+### syncplay join
+
+Join a SyncPlay group.
+
+```bash
+jf syncplay join <groupId>
+```
+
+### syncplay leave
+
+Leave current SyncPlay group.
+
+```bash
+jf syncplay leave
+```
+
+### syncplay pause
+
+Pause SyncPlay group playback.
+
+```bash
+jf syncplay pause
+```
+
+### syncplay unpause
+
+Resume SyncPlay group playback.
+
+```bash
+jf syncplay unpause
+```
+
+### syncplay stop
+
+Stop SyncPlay group playback.
+
+```bash
+jf syncplay stop
+```
+
+## quickconnect
+
+Quick Connect authentication commands.
+
+### quickconnect status
+
+Check if Quick Connect is enabled.
+
+```bash
+jf quickconnect status
+```
+
+Output type: `quickconnect_status`
+
+### quickconnect init
+
+Initialize Quick Connect.
+
+```bash
+jf quickconnect init
+```
+
+Output type: `quickconnect_init`
+
+### quickconnect check
+
+Check Quick Connect status.
+
+```bash
+jf quickconnect check <secret>
+```
+
+Output type: `quickconnect_status`
+
+### quickconnect authorize
+
+Authorize Quick Connect request.
+
+```bash
+jf quickconnect authorize <code> [--user <userId>]
+```
+
+## backup
+
+Backup management commands.
+
+### backup list
+
+List available backups.
+
+```bash
+jf backup list
+```
+
+Output type: `backups`
+
+### backup create
+
+Create a backup.
+
+```bash
+jf backup create
+```
+
+### backup restore
+
+Restore from a backup.
+
+```bash
+jf backup restore <backupPath>
+```
+
+### backup delete
+
+Delete a backup.
+
+```bash
+jf backup delete <backupPath> --force
+```
+
+## subtitles
+
+Subtitle management commands.
+
+### subtitles search
+
+Search for remote subtitles.
+
+```bash
+jf subtitles search <itemId> <language> [--perfect]
+```
+
+Output type: `subtitles`
+
+### subtitles download
+
+Download a remote subtitle.
+
+```bash
+jf subtitles download <itemId> <subtitleId>
+```
+
+### subtitles delete
+
+Delete a subtitle track.
+
+```bash
+jf subtitles delete <itemId> <index> --force
+```
+
+### subtitles providers
+
+List subtitle providers.
+
+```bash
+jf subtitles providers
+```
+
+Output type: `subtitle_providers`
+
+## media
+
+Media commands for segments, lyrics, and more.
+
+### media segments
+
+Get media segments for an item.
+
+```bash
+jf media segments <itemId>
+```
+
+Output type: `media_segments`
+
+### media lyrics
+
+Get lyrics for an audio item.
+
+```bash
+jf media lyrics <itemId>
+```
+
+Output type: `lyrics`
+
+### media theme-songs
+
+Get theme songs for an item.
+
+```bash
+jf media theme-songs <itemId> [--inherit]
+```
+
+Output type: `theme_songs`
+
+### media theme-videos
+
+Get theme videos for an item.
+
+```bash
+jf media theme-videos <itemId> [--inherit]
+```
+
+Output type: `theme_videos`
+
+### media external-ids
+
+Get external ID info for an item.
+
+```bash
+jf media external-ids <itemId>
+```
+
+Output type: `external_ids`
+
+### media remote-images
+
+Get available remote images for an item.
+
+```bash
+jf media remote-images <itemId> [--type <type>] [--limit <number>]
+```
+
+Output type: `remote_images`
+
+### media download-image
+
+Download a remote image to an item.
+
+```bash
+jf media download-image <itemId> [--type <type>] [--url <url>]
+```
+
+### media hls-url
+
+Get HLS master playlist URL.
+
+```bash
+jf media hls-url <itemId> [--media-source <id>] [--audio-stream <index>] [--subtitle-stream <index>] [--max-bitrate <bps>]
+```
+
+Output type: `hls_url`
+
+## localization
+
+Localization commands.
+
+### localization options
+
+Get localization options.
+
+```bash
+jf localization options
+```
+
+Output type: `localization_options`
+
+### localization countries
+
+Get available countries.
+
+```bash
+jf localization countries
+```
+
+Output type: `countries`
+
+### localization cultures
+
+Get available cultures/languages.
+
+```bash
+jf localization cultures
+```
+
+Output type: `cultures`
+
+### localization ratings
+
+Get parental rating systems.
+
+```bash
+jf localization ratings
+```
+
+Output type: `rating_systems`
+
+## environment
+
+Environment and system info commands.
+
+### environment drives
+
+Get available drives.
+
+```bash
+jf environment drives
+```
+
+Output type: `drives`
+
+### environment logs
+
+Get list of log files.
+
+```bash
+jf environment logs
+```
+
+Output type: `log_files`
+
+### environment log
+
+Get log file content.
+
+```bash
+jf environment log <name> [--lines <number>]
+```
+
+Output type: `log_content`
+
+### environment storage
+
+Get system storage info.
+
+```bash
+jf environment storage
+```
+
+Output type: `storage_info`
