@@ -9,16 +9,16 @@
     "jf": "./dist/cli.js"
   },
   "scripts": {
-    "build": "tsc",
+    "build": "bun build src/cli.ts --outdir dist --target node",
+    "build:tsc": "tsc",
     "start": "node dist/cli.js",
-    "dev": "tsx src/cli.ts",
-    "test": "vitest run",
-    "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage",
+    "dev": "bun run src/cli.ts",
+    "test": "bun test",
+    "test:coverage": "bun test --coverage",
     "lint": "eslint src tests --ext .ts",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
-    "prepublishOnly": "npm run clean && npm run build"
+    "prepublishOnly": "bun run clean && bun run build"
   },
   "keywords": [
     "jellyfin",

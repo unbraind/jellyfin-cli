@@ -2,10 +2,22 @@
 
 An agent-optimized CLI tool for interacting with the Jellyfin API.
 
+> **Package Manager**: This project uses [Bun](https://bun.sh) as its package manager and build tool.
+
 ## Installation
 
 ```bash
-npm install -g jellyfin-cli
+# Install Bun if you haven't already
+curl -fsSL https://bun.sh/install | bash
+
+# Install the CLI globally
+bun install -g jellyfin-cli
+
+# Or clone and build from source
+git clone https://github.com/unbraind/jellyfin-cli.git
+cd jellyfin-cli
+bun install
+bun run build
 ```
 
 ## Quick Start
@@ -233,24 +245,29 @@ if (data.type === 'search_result') {
 
 ## Development
 
+This project uses [Bun](https://bun.sh) for package management, testing, and building.
+
 ```bash
 # Install dependencies
-npm install
+bun install
 
 # Build
-npm run build
+bun run build
 
-# Test
-npm test
+# Run in development mode
+bun run dev
 
-# Test with coverage
-npm run test:coverage
+# Run tests
+bun test
+
+# Run tests with coverage
+bun run test:coverage
 
 # Type check
-npm run typecheck
+bun run typecheck
 
 # Lint
-npm run lint
+bun run lint
 ```
 
 ## License
