@@ -1,115 +1,14 @@
 import type { JellyfinConfig, SystemInfo, UserDto, BaseItemDto, SessionInfo, QueryResult, SearchResult, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo, PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult, LiveTvInfo, PlaylistCreationResult, RecommendationDto, SimilarItemResult } from '../types/index.js';
+import type { PluginInfo, DeviceInfo, BrandingOptions, ServerConfiguration, ItemCounts, ApiKeyInfo, NotificationTypeInfo, NotificationResult } from '../types/index.js';
+import { ApiClientBase } from './base.js';
+import { JellyfinApiError, ChapterInfo, PlaybackInfoResponse } from './types.js';
 
-export class JellyfinApiError extends Error {
-  constructor(
-    message: string,
-    public statusCode?: number,
-    public details?: unknown
-  ) {
-    super(message);
-    this.name = 'JellyfinApiError';
-  }
-}
+export { JellyfinApiError } from './types.js';
+export type { ChapterInfo, PlaybackInfoResponse } from './types.js';
 
-function buildQueryString(params: Record<string, unknown>): string {
-  const searchParams = new URLSearchParams();
-  for (const [key, value] of Object.entries(params)) {
-    if (value === undefined || value === null) {
-      continue;
-    }
-    if (Array.isArray(value)) {
-      for (const item of value) {
-        if (item !== undefined && item !== null) {
-          searchParams.append(key, String(item));
-        }
-      }
-    } else {
-      searchParams.append(key, String(value));
-    }
-  }
-  const qs = searchParams.toString();
-  return qs ? `?${qs}` : '';
-}
-
-export class JellyfinApiClient {
-  private baseUrl: string;
-  private apiKey?: string;
-  private userId?: string;
-  private timeout: number;
-
+export class JellyfinApiClient extends ApiClientBase {
   constructor(config: JellyfinConfig) {
-    this.baseUrl = config.serverUrl.replace(/\/$/, '');
-    this.apiKey = config.apiKey;
-    this.userId = config.userId;
-    this.timeout = config.timeout ?? 30000;
-  }
-
-  setUserId(userId: string): void {
-    this.userId = userId;
-  }
-
-  getUserId(): string | undefined {
-    return this.userId;
-  }
-
-  private async request<T>(
-    method: string,
-    path: string,
-    params?: Record<string, unknown>,
-    body?: unknown
-  ): Promise<T> {
-    const url = `${this.baseUrl}${path}${params ? buildQueryString(params) : ''}`;
-    
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-    
-    if (this.apiKey) {
-      headers['X-Emby-Token'] = this.apiKey;
-    }
-
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), this.timeout);
-
-    try {
-      const response = await fetch(url, {
-        method,
-        headers,
-        body: body ? JSON.stringify(body) : undefined,
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        let errorDetails: unknown;
-        try {
-          errorDetails = await response.json();
-        } catch {
-          errorDetails = await response.text();
-        }
-        throw new JellyfinApiError(
-          `API request failed: ${response.status} ${response.statusText}`,
-          response.status,
-          errorDetails
-        );
-      }
-
-      if (response.status === 204) {
-        return undefined as T;
-      }
-
-      return response.json() as Promise<T>;
-    } catch (error) {
-      clearTimeout(timeoutId);
-      if (error instanceof JellyfinApiError) {
-        throw error;
-      }
-      if (error instanceof Error) {
-        throw new JellyfinApiError(error.message, undefined, error);
-      }
-      throw new JellyfinApiError('Unknown error occurred');
-    }
+    super(config);
   }
 
   async authenticate(username: string, password: string): Promise<UserDto> {
@@ -434,8 +333,136 @@ export class JellyfinApiClient {
     await this.request<void>('POST', '/System/Shutdown');
   }
 
-  getBackendUrl(): string {
-    return this.baseUrl;
+  async getPlugins(): Promise<PluginInfo[]> {
+    return this.request<PluginInfo[]>('GET', '/Plugins');
+  }
+
+  async getPlugin(pluginId: string): Promise<PluginInfo> {
+    return this.request<PluginInfo>('GET', `/Plugins/${pluginId}`);
+  }
+
+  async uninstallPlugin(pluginId: string): Promise<void> {
+    await this.request<void>('DELETE', `/Plugins/${pluginId}`);
+  }
+
+  async getPluginConfiguration(pluginId: string): Promise<Record<string, unknown>> {
+    return this.request<Record<string, unknown>>('GET', `/Plugins/${pluginId}/Configuration`);
+  }
+
+  async updatePluginConfiguration(pluginId: string, config: Record<string, unknown>): Promise<void> {
+    await this.request<void>('POST', `/Plugins/${pluginId}/Configuration`, undefined, config);
+  }
+
+  async getDevices(): Promise<QueryResult<DeviceInfo>> {
+    return this.request<QueryResult<DeviceInfo>>('GET', '/Devices');
+  }
+
+  async getDevice(deviceId: string): Promise<DeviceInfo> {
+    return this.request<DeviceInfo>('GET', `/Devices/${deviceId}`);
+  }
+
+  async deleteDevice(deviceId: string): Promise<void> {
+    await this.request<void>('DELETE', `/Devices/${deviceId}`);
+  }
+
+  async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> {
+    await this.request<void>('POST', `/Devices/Options`, undefined, { Id: deviceId, ...options });
+  }
+
+  async getBranding(): Promise<BrandingOptions> {
+    return this.request<BrandingOptions>('GET', '/Branding/Configuration');
+  }
+
+  async getServerConfiguration(): Promise<ServerConfiguration> {
+    return this.request<ServerConfiguration>('GET', '/System/Configuration');
+  }
+
+  async updateServerConfiguration(config: Partial<ServerConfiguration>): Promise<void> {
+    await this.request<void>('POST', '/System/Configuration', undefined, config);
+  }
+
+  async getItemCounts(): Promise<ItemCounts> {
+    return this.request<ItemCounts>('GET', '/Items/Counts');
+  }
+
+  async getApiKeys(): Promise<ApiKeyInfo[]> {
+    return this.request<ApiKeyInfo[]>('GET', '/ApiKey');
+  }
+
+  async createApiKey(app: string): Promise<ApiKeyInfo> {
+    return this.request<ApiKeyInfo>('POST', '/ApiKey', { app });
+  }
+
+  async deleteApiKey(key: string): Promise<void> {
+    await this.request<void>('DELETE', '/ApiKey', { key });
+  }
+
+  async getNotificationTypes(): Promise<NotificationTypeInfo[]> {
+    return this.request<NotificationTypeInfo[]>('GET', '/Notifications/Types');
+  }
+
+  async getNotifications(userId?: string): Promise<NotificationResult> {
+    const uid = userId ?? this.userId;
+    if (!uid) {
+      throw new JellyfinApiError('User ID required');
+    }
+    return this.request<NotificationResult>('GET', `/Notifications/${uid}`);
+  }
+
+  async sendAdminNotification(params: { name: string; description?: string; url?: string; level?: string; userIds?: string[] }): Promise<void> {
+    await this.request<void>('POST', '/Notifications/Admin', params);
+  }
+
+  async getIntros(itemId: string): Promise<BaseItemDto[]> {
+    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/Intros`);
+  }
+
+  async getAdditionalParts(itemId: string): Promise<QueryResult<BaseItemDto>> {
+    return this.request<QueryResult<BaseItemDto>>('GET', `/Videos/${itemId}/AdditionalParts`);
+  }
+
+  async getChapters(itemId: string): Promise<ChapterInfo[]> {
+    return this.request<ChapterInfo[]>('GET', `/Items/${itemId}/Chapters`);
+  }
+
+  async getSpecialFeatures(itemId: string): Promise<BaseItemDto[]> {
+    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/SpecialFeatures`);
+  }
+
+  async getLocalTrailers(itemId: string): Promise<BaseItemDto[]> {
+    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/LocalTrailers`);
+  }
+
+  async getAncestors(itemId: string): Promise<BaseItemDto[]> {
+    return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/Ancestors`);
+  }
+
+  async getItemsByPath(path: string): Promise<BaseItemDto[]> {
+    return this.request<BaseItemDto[]>('GET', '/Items/ByPath', { path });
+  }
+
+  async getPlaybackInfo(itemId: string, userId?: string): Promise<PlaybackInfoResponse> {
+    const uid = userId ?? this.userId;
+    return this.request<PlaybackInfoResponse>('GET', `/Items/${itemId}/PlaybackInfo`, { userId: uid });
+  }
+
+  getStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string {
+    const queryParams = { ...params, userId: this.userId };
+    return `${this.baseUrl}/Videos/${itemId}/stream${buildQueryString(queryParams as Record<string, unknown>)}`;
+  }
+
+  getAudioStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number }): string {
+    const queryParams = { ...params, userId: this.userId };
+    return `${this.baseUrl}/Audio/${itemId}/stream${buildQueryString(queryParams as Record<string, unknown>)}`;
+  }
+
+  getSubtitleUrl(itemId: string, mediaSourceId: string, streamIndex: number, format?: string): string {
+    const params = { mediaSourceId, streamIndex, format, userId: this.userId };
+    return `${this.baseUrl}/Videos/${itemId}/${mediaSourceId}/Subtitles/${streamIndex}/Stream.${format ?? 'srt'}${buildQueryString(params as Record<string, unknown>)}`;
+  }
+
+  getThumbUrl(itemId: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
+    return `${this.baseUrl}/Items/${itemId}/Images/Primary${buildQueryString(params as Record<string, unknown>)}`;
   }
 }
 

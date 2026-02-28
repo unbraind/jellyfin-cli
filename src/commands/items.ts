@@ -6,9 +6,7 @@ import type { ItemsQueryParams } from '../types/index.js';
 export function createItemsCommand(): Command {
   const cmd = new Command('items');
 
-  cmd
-    .command('list')
-    .description('List items')
+  cmd.command('list').description('List items')
     .option('-f, --format <format>', 'Output format')
     .option('--parent <id>', 'Parent ID')
     .option('--types <types>', 'Item types (comma-separated)')
@@ -18,7 +16,7 @@ export function createItemsCommand(): Command {
     .option('--limit <number>', 'Limit', '50')
     .option('--offset <number>', 'Offset', '0')
     .option('--sort <field>', 'Sort field')
-    .option('--order <direction>', 'Sort order (Ascending/Descending)')
+    .option('--order <direction>', 'Sort order')
     .option('--recursive', 'Recursive search')
     .option('--favorites', 'Show only favorites')
     .option('--played', 'Show only played items')
@@ -42,138 +40,104 @@ export function createItemsCommand(): Command {
         };
         const result = await client.getItems(params);
         console.log(toon.formatItems(result.Items ?? []));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('get <itemId>')
-    .description('Get item by ID')
-    .option('-f, --format <format>', 'Output format')
+  cmd.command('get <itemId>').description('Get item by ID').option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        const item = await client.getItem(itemId);
-        console.log(toon.formatItem(item));
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { console.log(toon.formatItem(await client.getItem(itemId))); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('latest')
-    .description('Get latest items')
-    .option('-f, --format <format>', 'Output format')
-    .option('--parent <id>', 'Parent ID')
-    .option('--limit <number>', 'Limit', '20')
+  cmd.command('latest').description('Get latest items').option('-f, --format <format>', 'Output format')
+    .option('--parent <id>', 'Parent ID').option('--limit <number>', 'Limit', '20')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        const items = await client.getLatestItems({
-          parentId: options.parent,
-          limit: parseInt(options.limit, 10),
-        });
-        console.log(toon.formatItems(items));
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { console.log(toon.formatItems(await client.getLatestItems({ parentId: options.parent, limit: parseInt(options.limit ?? '20', 10) }))); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('resume')
-    .description('Get resume items')
-    .option('-f, --format <format>', 'Output format')
-    .option('--parent <id>', 'Parent ID')
-    .option('--limit <number>', 'Limit', '20')
+  cmd.command('resume').description('Get resume items').option('-f, --format <format>', 'Output format')
+    .option('--parent <id>', 'Parent ID').option('--limit <number>', 'Limit', '20')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        const result = await client.getResumeItems({
-          parentId: options.parent,
-          limit: parseInt(options.limit, 10),
-        });
-        console.log(toon.formatItems(result.Items ?? []));
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { const r = await client.getResumeItems({ parentId: options.parent, limit: parseInt(options.limit ?? '20', 10) }); console.log(toon.formatItems(r.Items ?? [])); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('search <term>')
-    .description('Search for items')
-    .option('-f, --format <format>', 'Output format')
-    .option('--limit <number>', 'Limit', '20')
-    .option('--types <types>', 'Item types (comma-separated)')
+  cmd.command('search <term>').description('Search for items').option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '20').option('--types <types>', 'Item types (comma-separated)')
     .action(async (term, options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        const result = await client.getSearchHints({
-          searchTerm: term,
-          limit: parseInt(options.limit, 10),
-          includeItemTypes: options.types?.split(','),
-        });
-        console.log(toon.formatSearchResult(result));
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { console.log(toon.formatSearchResult(await client.getSearchHints({ searchTerm: term, limit: parseInt(options.limit ?? '20', 10), includeItemTypes: options.types?.split(',') }))); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('similar <itemId>')
-    .description('Get similar items')
-    .option('-f, --format <format>', 'Output format')
-    .option('--limit <number>', 'Limit', '20')
+  cmd.command('similar <itemId>').description('Get similar items').option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '20')
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        const result = await client.getSimilarItems(itemId, {
-          limit: parseInt(options.limit, 10),
-        });
-        console.log(toon.formatItems(result.Items ?? []));
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { const r = await client.getSimilarItems(itemId, { limit: parseInt(options.limit ?? '20', 10) }); console.log(toon.formatItems(r.Items ?? [])); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('refresh <itemId>')
-    .description('Refresh item metadata')
-    .option('-f, --format <format>', 'Output format')
-    .option('--recursive', 'Refresh recursively')
-    .option('--replace-metadata', 'Replace all metadata')
-    .option('--replace-images', 'Replace all images')
+  cmd.command('intros <itemId>').description('Get intro videos').option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
-      try {
-        await client.refreshItem(itemId, {
-          recursive: options.recursive,
-          replaceAllMetadata: options.replaceMetadata,
-          replaceAllImages: options.replaceImages,
-        });
-        console.log(`type: message\ndata:\n  message: Refresh initiated for item ${itemId}\n  success: true`);
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { console.log(toon.formatItems(await client.getIntros(itemId))); } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('delete <itemId>')
-    .description('Delete an item')
-    .option('-f, --format <format>', 'Output format')
-    .option('--force', 'Skip confirmation')
+  cmd.command('chapters <itemId>').description('Get chapters').option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
-      if (!options.force) {
-        console.error('Use --force to confirm deletion');
-        process.exit(1);
-      }
-      try {
-        await client.deleteItem(itemId);
-        console.log(`type: message\ndata:\n  message: Item ${itemId} deleted\n  success: true`);
-      } catch (err) {
-        handleError(err, format);
-      }
+      try { const chapters = await client.getChapters(itemId); console.log(toon.formatToon(chapters.map((c, i) => ({ index: i, name: c.name, start_position_ticks: c.startPositionTicks, has_image: !!c.imageTag })), 'chapters')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('special-features <itemId>').description('Get special features').option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { console.log(toon.formatItems(await client.getSpecialFeatures(itemId))); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('trailers <itemId>').description('Get local trailers').option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { console.log(toon.formatItems(await client.getLocalTrailers(itemId))); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('ancestors <itemId>').description('Get parent items').option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { console.log(toon.formatItems(await client.getAncestors(itemId))); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('parts <itemId>').description('Get additional parts').option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const r = await client.getAdditionalParts(itemId); console.log(toon.formatItems(r.Items ?? [])); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('playback-info <itemId>').description('Get playback info').option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const info = await client.getPlaybackInfo(itemId); console.log(toon.formatToon({ play_session_id: info.playSessionId, media_sources: (info.mediaSources ?? []).map((s) => ({ id: s.Id, name: s.Name, container: s.Container, supports_direct_play: s.SupportsDirectPlay, supports_direct_stream: s.SupportsDirectStream, supports_transcoding: s.SupportsTranscoding })) }, 'playback_info')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('stream-url <itemId>').description('Get stream URL').option('-f, --format <format>', 'Output format')
+    .option('--media-source <id>', 'Media source ID').option('--audio-stream <index>', 'Audio stream index')
+    .option('--subtitle-stream <index>', 'Subtitle stream index').option('--max-bitrate <bps>', 'Max streaming bitrate')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { const url = client.getStreamUrl(itemId, { mediaSourceId: options.mediaSource, audioStreamIndex: options.audioStream ? parseInt(options.audioStream, 10) : undefined, subtitleStreamIndex: options.subtitleStream ? parseInt(options.subtitleStream, 10) : undefined, maxStreamingBitrate: options.maxBitrate ? parseInt(options.maxBitrate, 10) : undefined }); console.log(toon.formatToon({ url, item_id: itemId }, 'stream_url')); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('refresh <itemId>').description('Refresh item metadata').option('-f, --format <format>', 'Output format')
+    .option('--recursive', 'Refresh recursively').option('--replace-metadata', 'Replace all metadata').option('--replace-images', 'Replace all images')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try { await client.refreshItem(itemId, { recursive: options.recursive, replaceAllMetadata: options.replaceMetadata, replaceAllImages: options.replaceImages }); console.log(toon.formatMessage(`Refresh initiated for item ${itemId}`, true)); } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('delete <itemId>').description('Delete an item').option('-f, --format <format>', 'Output format').option('--force', 'Skip confirmation')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      if (!options.force) { console.error('Use --force to confirm deletion'); process.exit(1); }
+      try { await client.deleteItem(itemId); console.log(toon.formatMessage(`Item ${itemId} deleted`, true)); } catch (err) { handleError(err, format); }
     });
 
   return cmd;

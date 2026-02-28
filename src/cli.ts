@@ -13,6 +13,13 @@ import {
   createPlaylistsCommand,
   createLivetvCommand,
   createDiscoverCommand,
+  createSetupCommand,
+  createPluginsCommand,
+  createDevicesCommand,
+  createBrandingCommand,
+  createStatsCommand,
+  createApikeysCommand,
+  createNotificationsCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -27,6 +34,7 @@ program
   .option('-f, --format <format>', 'Output format (toon, json, table, raw)', 'toon')
   .option('-s, --server <name>', 'Server name from config');
 
+program.addCommand(createSetupCommand());
 program.addCommand(createConfigCommand());
 program.addCommand(createSystemCommand());
 program.addCommand(createUsersCommand());
@@ -38,5 +46,11 @@ program.addCommand(createTasksCommand());
 program.addCommand(createPlaylistsCommand());
 program.addCommand(createLivetvCommand());
 program.addCommand(createDiscoverCommand());
+program.addCommand(createPluginsCommand());
+program.addCommand(createDevicesCommand());
+program.addCommand(createBrandingCommand());
+program.addCommand(createStatsCommand());
+program.addCommand(createApikeysCommand());
+program.addCommand(createNotificationsCommand());
 
 program.parse();

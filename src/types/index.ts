@@ -75,14 +75,12 @@ export interface SystemInfo {
   HasUpdateAvailable?: boolean;
 }
 
-export interface InstallationInfo {
-  Id?: string | null;
-  Name?: string | null;
-  Version?: string | null;
-  Changelog?: string | null;
-  SourceUrl?: string | null;
-  Guid?: string | null;
-}
+export { InstallationInfo } from './plugins.js';
+export { PluginInfo, PluginStatus, PluginStatusInfo, RepositoryInfo, InstallationStatus, PluginInstallationCancelled } from './plugins.js';
+export { DeviceInfo, DeviceCapabilities, DeviceOptions } from './devices.js';
+export { BrandingOptions, ServerConfiguration, ServerEndpoints, ItemCounts } from './server.js';
+export { ApiKeyInfo, ApiKeyCreation } from './apikeys.js';
+export { NotificationTypeInfo, NotificationOption, NotificationResult, Notification, NotificationLevel } from './notifications.js';
 
 export interface BaseItemDto {
   Name?: string | null;

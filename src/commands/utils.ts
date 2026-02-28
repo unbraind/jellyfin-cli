@@ -32,6 +32,17 @@ export async function createApiClient(options: { format?: string; server?: strin
       console.error(`Authentication failed: ${message}`);
       process.exit(1);
     }
+  } else if (config.apiKey && !config.userId) {
+    try {
+      const users = await client.getUsers();
+      const adminUser = users.find((u) => u.Policy?.IsAdministrator);
+      const userId = adminUser?.Id ?? users[0]?.Id;
+      if (userId) {
+        client.setUserId(userId);
+      }
+    } catch {
+      // Ignore errors when fetching users
+    }
   }
 
   return { client, format, config };

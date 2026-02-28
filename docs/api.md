@@ -11,6 +11,45 @@ This document provides detailed information about the Jellyfin CLI commands and 
 | `-v, --version` | Show version number |
 | `-h, --help` | Show help |
 
+## setup
+
+Interactive setup wizard for configuring the CLI.
+
+### setup
+
+Configure the CLI with server URL and credentials.
+
+```bash
+jf setup [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--server <url>` | Jellyfin server URL |
+| `--api-key <key>` | API key |
+| `--username <username>` | Username |
+| `--password <password>` | Password |
+| `--name <name>` | Server name for this config |
+| `--default` | Set as default server |
+
+### setup status
+
+Check current setup status.
+
+```bash
+jf setup status
+```
+
+Output type: `setup_status`
+
+### setup env
+
+Show environment variable names for configuration.
+
+```bash
+jf setup env
+```
+
 ## config
 
 Manage CLI configuration.
@@ -178,7 +217,7 @@ jf items list [options]
 | `--limit <number>` | Limit (default: 50) |
 | `--offset <number>` | Offset (default: 0) |
 | `--sort <field>` | Sort field |
-| `--order <direction>` | Sort order (Ascending/Descending) |
+| `--order <direction>` | Sort order |
 | `--recursive` | Recursive search |
 | `--favorites` | Show only favorites |
 | `--played` | Show only played items |
@@ -240,6 +279,77 @@ jf items similar <itemId> [--limit <number>]
 ```
 
 Output type: `items`
+
+### items intros
+
+Get intro videos for an item.
+
+```bash
+jf items intros <itemId>
+```
+
+### items chapters
+
+Get chapters for an item.
+
+```bash
+jf items chapters <itemId>
+```
+
+### items special-features
+
+Get special features for an item.
+
+```bash
+jf items special-features <itemId>
+```
+
+### items trailers
+
+Get local trailers for an item.
+
+```bash
+jf items trailers <itemId>
+```
+
+### items ancestors
+
+Get parent items (ancestors) for an item.
+
+```bash
+jf items ancestors <itemId>
+```
+
+### items parts
+
+Get additional parts for a video.
+
+```bash
+jf items parts <itemId>
+```
+
+### items playback-info
+
+Get playback information for an item.
+
+```bash
+jf items playback-info <itemId>
+```
+
+### items stream-url
+
+Get stream URL for a video.
+
+```bash
+jf items stream-url <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--media-source <id>` | Media source ID |
+| `--audio-stream <index>` | Audio stream index |
+| `--subtitle-stream <index>` | Subtitle stream index |
+| `--max-bitrate <bps>` | Max streaming bitrate |
 
 ### items refresh
 
@@ -686,3 +796,177 @@ jf discover mix <itemId> [--limit <number>]
 ```
 
 Output type: `items`
+
+## plugins
+
+Plugin management commands.
+
+### plugins list
+
+List all installed plugins.
+
+```bash
+jf plugins list
+```
+
+Output type: `plugins`
+
+### plugins get
+
+Get plugin details.
+
+```bash
+jf plugins get <pluginId>
+```
+
+Output type: `plugin`
+
+### plugins config
+
+Get plugin configuration.
+
+```bash
+jf plugins config <pluginId>
+```
+
+Output type: `plugin_config`
+
+### plugins uninstall
+
+Uninstall a plugin.
+
+```bash
+jf plugins uninstall <pluginId> --force
+```
+
+## devices
+
+Device management commands.
+
+### devices list
+
+List all devices.
+
+```bash
+jf devices list
+```
+
+Output type: `devices`
+
+### devices get
+
+Get device details.
+
+```bash
+jf devices get <deviceId>
+```
+
+Output type: `device`
+
+### devices rename
+
+Set custom device name.
+
+```bash
+jf devices rename <deviceId> <name>
+```
+
+### devices delete
+
+Delete a device.
+
+```bash
+jf devices delete <deviceId> --force
+```
+
+## branding
+
+Branding commands.
+
+### branding get
+
+Get branding configuration.
+
+```bash
+jf branding get
+```
+
+Output type: `branding`
+
+## stats
+
+Statistics commands.
+
+### stats counts
+
+Get library item counts.
+
+```bash
+jf stats counts
+```
+
+Output type: `item_counts`
+
+## apikeys
+
+API key management commands.
+
+### apikeys list
+
+List all API keys.
+
+```bash
+jf apikeys list
+```
+
+Output type: `api_keys`
+
+### apikeys create
+
+Create a new API key.
+
+```bash
+jf apikeys create <app>
+```
+
+Output type: `api_key`
+
+### apikeys delete
+
+Delete an API key.
+
+```bash
+jf apikeys delete <key> --force
+```
+
+## notifications
+
+Notification commands.
+
+### notifications types
+
+List notification types.
+
+```bash
+jf notifications types
+```
+
+Output type: `notification_types`
+
+### notifications list
+
+List user notifications.
+
+```bash
+jf notifications list [--user <userId>]
+```
+
+Output type: `notifications`
+
+### notifications send
+
+Send admin notification.
+
+```bash
+jf notifications send --name <name> [--description <text>] [--url <url>] [--level <level>]
+```

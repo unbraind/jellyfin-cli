@@ -4,6 +4,20 @@ import { JellyfinApiClient, JellyfinApiError } from '../../src/api/client.js';
 const mockFetch = vi.fn();
 global.fetch = mockFetch;
 
+function createMockResponse(data: unknown, options: { ok?: boolean; status?: number; contentType?: string } = {}) {
+  const { ok = true, status = 200, contentType = 'application/json' } = options;
+  return {
+    ok,
+    status,
+    statusText: status === 200 ? 'OK' : 'Error',
+    headers: {
+      get: (name: string) => name === 'content-type' ? contentType : null,
+    },
+    json: () => Promise.resolve(data),
+    text: () => Promise.resolve(typeof data === 'string' ? data : JSON.stringify(data)),
+  };
+}
+
 describe('JellyfinApiClient', () => {
   let client: JellyfinApiClient;
 
@@ -52,10 +66,7 @@ describe('JellyfinApiClient', () => {
 
   describe('request', () => {
     it('should make a GET request with correct headers', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve({ test: 'data' }),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse({ test: 'data' }));
 
       const result = await client.getPublicSystemInfo();
       expect(mockFetch).toHaveBeenCalledWith(
@@ -73,6 +84,8 @@ describe('JellyfinApiClient', () => {
       mockFetch.mockResolvedValueOnce({
         ok: true,
         status: 204,
+        headers: { get: () => null },
+        text: () => Promise.resolve(''),
       });
 
       await client.restartServer();
@@ -84,7 +97,8 @@ describe('JellyfinApiClient', () => {
         ok: false,
         status: 404,
         statusText: 'Not Found',
-        json: () => Promise.resolve({ error: 'Not found' }),
+        headers: { get: () => null },
+        text: () => Promise.resolve(JSON.stringify({ error: 'Not found' })),
       });
 
       await expect(client.getPublicSystemInfo()).rejects.toThrow(JellyfinApiError);
@@ -100,10 +114,7 @@ describe('JellyfinApiClient', () => {
   describe('getPublicSystemInfo', () => {
     it('should fetch public system info', async () => {
       const mockInfo = { ServerName: 'Test Server', Version: '10.8.0' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockInfo),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockInfo));
 
       const result = await client.getPublicSystemInfo();
       expect(result).toEqual(mockInfo);
@@ -113,10 +124,7 @@ describe('JellyfinApiClient', () => {
   describe('getUsers', () => {
     it('should fetch all users', async () => {
       const mockUsers = [{ Id: '1', Name: 'User1' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockUsers),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockUsers));
 
       const result = await client.getUsers();
       expect(result).toEqual(mockUsers);
@@ -126,10 +134,7 @@ describe('JellyfinApiClient', () => {
   describe('getUserById', () => {
     it('should fetch user by ID', async () => {
       const mockUser = { Id: 'user-1', Name: 'User1' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockUser),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockUser));
 
       const result = await client.getUserById('user-1');
       expect(result).toEqual(mockUser);
@@ -144,10 +149,7 @@ describe('JellyfinApiClient', () => {
 
     it('should fetch current user', async () => {
       const mockUser = { Id: 'test-user-id', Name: 'Test User' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockUser),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockUser));
 
       const result = await client.getCurrentUser();
       expect(result).toEqual(mockUser);
@@ -157,10 +159,7 @@ describe('JellyfinApiClient', () => {
   describe('getItems', () => {
     it('should fetch items with user ID', async () => {
       const mockItems = { Items: [], TotalRecordCount: 0 };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockItems),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockItems));
 
       const result = await client.getItems();
       expect(result).toEqual(mockItems);
@@ -170,10 +169,7 @@ describe('JellyfinApiClient', () => {
   describe('getItem', () => {
     it('should fetch item by ID', async () => {
       const mockItem = { Id: 'item-1', Name: 'Test Item' };
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockItem),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockItem));
 
       const result = await client.getItem('item-1');
       expect(result).toEqual(mockItem);
@@ -183,10 +179,7 @@ describe('JellyfinApiClient', () => {
   describe('getSessions', () => {
     it('should fetch all sessions', async () => {
       const mockSessions = [{ Id: 'session-1', UserName: 'User1' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockSessions),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockSessions));
 
       const result = await client.getSessions();
       expect(result).toEqual(mockSessions);
@@ -196,10 +189,7 @@ describe('JellyfinApiClient', () => {
   describe('getLibraries', () => {
     it('should fetch all libraries', async () => {
       const mockLibraries = [{ Name: 'Movies', ItemId: 'lib-1' }];
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve(mockLibraries),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockLibraries));
 
       const result = await client.getLibraries();
       expect(result).toEqual(mockLibraries);
@@ -208,10 +198,7 @@ describe('JellyfinApiClient', () => {
 
   describe('getHealth', () => {
     it('should fetch health status', async () => {
-      mockFetch.mockResolvedValueOnce({
-        ok: true,
-        json: () => Promise.resolve('Healthy'),
-      });
+      mockFetch.mockResolvedValueOnce(createMockResponse('Healthy'));
 
       const result = await client.getHealth();
       expect(result).toBe('Healthy');
