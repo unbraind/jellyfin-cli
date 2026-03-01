@@ -162,5 +162,22 @@ export function createItemsCommand(): Command {
       try { await client.deleteItem(itemId); console.log(toon.formatMessage(`Item ${itemId} deleted`, true)); } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('filters').description('Get available query filters').option('-f, --format <format>', 'Output format')
+    .option('--parent <id>', 'Parent ID').option('--types <types>', 'Item types (comma-separated)')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const filters = await client.getQueryFilters({ parentId: options.parent, includeItemTypes: options.types?.split(',') });
+        console.log(toon.formatToon({
+          genres: filters.Genres ?? [],
+          studios: filters.Studios ?? [],
+          tags: filters.Tags ?? [],
+          years: filters.Years ?? [],
+          official_ratings: filters.OfficialRatings ?? [],
+          persons: filters.Persons ?? [],
+        }, 'filters'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }
