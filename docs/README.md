@@ -184,6 +184,9 @@ The CLI supports multiple output formats:
 - `jf collections list` - List all collections
 - `jf collections get <collectionId>` - Get collection details
 - `jf collections items <collectionId>` - List items in collection
+- `jf collections create <name>` - Create a new collection
+- `jf collections add <collectionId> <itemIds...>` - Add items to collection
+- `jf collections remove <collectionId> <itemIds...>` - Remove items from collection
 
 ### Tasks
 
@@ -191,6 +194,9 @@ The CLI supports multiple output formats:
 - `jf tasks get <taskId>` - Get task by ID
 - `jf tasks run <taskId>` - Start a task
 - `jf tasks stop <taskId>` - Stop a running task
+- `jf tasks triggers <taskId>` - List task triggers
+- `jf tasks add-trigger <taskId>` - Add a task trigger
+- `jf tasks delete-trigger <taskId> <triggerId>` - Delete a task trigger
 
 ### Playlists
 
@@ -198,6 +204,7 @@ The CLI supports multiple output formats:
 - `jf playlists add <playlistId> <itemIds...>` - Add items
 - `jf playlists remove <playlistId> <entryIds...>` - Remove items
 - `jf playlists items <playlistId>` - List playlist items
+- `jf playlists delete <playlistId>` - Delete a playlist
 
 ### Live TV
 
@@ -207,6 +214,11 @@ The CLI supports multiple output formats:
 - `jf livetv recordings` - List recordings
 - `jf livetv timers` - List timers
 - `jf livetv timer <timerId>` - Get timer by ID
+- `jf livetv create-timer` - Create a timer
+- `jf livetv delete-timer <timerId>` - Delete a timer
+- `jf livetv series-timers` - List series timers
+- `jf livetv series-timer <id>` - Get series timer by ID
+- `jf livetv delete-series-timer <id>` - Delete a series timer
 
 ### Discover
 

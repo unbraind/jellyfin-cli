@@ -1,7 +1,7 @@
 export type { JellyfinConfig, OutputFormat } from './config.js';
-export type { UserDto, UserConfiguration, UserPolicy, SubtitlePlaybackMode, UserItemData } from './user.js';
+export type { UserDto, UserConfiguration, UserPolicy, SubtitlePlaybackMode } from './user.js';
 export type { SystemInfo, InstallationInfo, InstallationStatus, ActivityLogEntry, LogLevel, ActivityLogQueryResult } from './system.js';
-export type { BaseItemDto, ImageBlurHashes, LocationType, PlayAccess, ExternalUrl, MediaSourceInfo, MediaStream, MediaStreamProtocol, MediaSourceType, MediaStreamType, GenreDto, StudioDto, PersonInfo, NameIdPair } from './items.js';
+export type { BaseItemDto, ImageBlurHashes, LocationType, PlayAccess, ExternalUrl, MediaSourceInfo, MediaStream, MediaStreamProtocol, MediaSourceType, MediaStreamType, GenreDto, StudioDto, PersonInfo, NameIdPair, UserItemData } from './items.js';
 export type { SessionInfo, PlayerStateInfo, RepeatMode, PlaybackOrder, SessionUserInfo, ClientCapabilities, DeviceProfile, DirectPlayProfile, TranscodingProfile, ContainerProfile, CodecProfile, CodecType, ProfileCondition, ProfileConditionType, ProfileConditionValue, SubtitleProfile, QueueItem } from './sessions.js';
 export type { DlnaProfileType, TranscodeSeekInfo, EncodingContext, SubtitleDeliveryMethod } from './profiles.js';
 export type { LibraryVirtualFolder, LibraryOptions, AllowEmbeddedSubtitles, MediaPathInfo, TypeOptions, ImageOption, ImageType } from './library.js';

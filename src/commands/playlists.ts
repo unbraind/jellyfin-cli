@@ -19,7 +19,7 @@ export function createPlaylistsCommand(): Command {
           ids: options.items?.split(','),
           mediaType: options.mediaType,
         });
-        console.log(`type: playlist\ndata:\n  id: ${result.Id}\n  name: ${result.Name}\n  success: true`);
+        console.log(toon.formatMessage('Playlist created', { id: result.Id, name: result.Name }));
       } catch (err) {
         handleError(err, format);
       }
@@ -33,7 +33,7 @@ export function createPlaylistsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.addToPlaylist(playlistId, itemIds);
-        console.log(`type: message\ndata:\n  message: Items added to playlist\n  success: true`);
+        console.log(toon.formatMessage('Items added to playlist'));
       } catch (err) {
         handleError(err, format);
       }
@@ -47,7 +47,7 @@ export function createPlaylistsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.removeFromPlaylist(playlistId, entryIds);
-        console.log(`type: message\ndata:\n  message: Items removed from playlist\n  success: true`);
+        console.log(toon.formatMessage('Items removed from playlist'));
       } catch (err) {
         handleError(err, format);
       }
@@ -67,6 +67,20 @@ export function createPlaylistsCommand(): Command {
           startIndex: parseInt(options.offset, 10),
         });
         console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('delete <playlistId>')
+    .description('Delete a playlist')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.deletePlaylist(playlistId);
+        console.log(toon.formatMessage('Playlist deleted'));
       } catch (err) {
         handleError(err, format);
       }

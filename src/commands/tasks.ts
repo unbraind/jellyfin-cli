@@ -42,7 +42,7 @@ export function createTasksCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.startTask(taskId);
-        console.log(`type: message\ndata:\n  message: Task started\n  success: true`);
+        console.log(toon.formatMessage('Task started'));
       } catch (err) {
         handleError(err, format);
       }
@@ -56,7 +56,58 @@ export function createTasksCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.stopTask(taskId);
-        console.log(`type: message\ndata:\n  message: Task stopped\n  success: true`);
+        console.log(toon.formatMessage('Task stopped'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('triggers <taskId>')
+    .description('List task triggers')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (taskId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const triggers = await client.getTaskTriggers(taskId);
+        console.log(toon.formatTaskTriggers(triggers));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('add-trigger <taskId>')
+    .description('Add a task trigger')
+    .option('-f, --format <format>', 'Output format')
+    .requiredOption('--type <type>', 'Trigger type (DailyTrigger, WeeklyTrigger, IntervalTrigger, StartupTrigger)')
+    .option('--interval <ticks>', 'Interval in ticks (for IntervalTrigger)')
+    .option('--time <ticks>', 'Time of day in ticks (for DailyTrigger/WeeklyTrigger)')
+    .option('--days <days>', 'Days of week (comma-separated, for WeeklyTrigger)')
+    .action(async (taskId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.createTaskTrigger(taskId, {
+          type: options.type,
+          intervalTicks: options.interval ? parseInt(options.interval, 10) : undefined,
+          timeOfDayTicks: options.time ? parseInt(options.time, 10) : undefined,
+          dayOfWeek: options.days?.split(','),
+        });
+        console.log(toon.formatMessage('Task trigger added'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('delete-trigger <taskId> <triggerId>')
+    .description('Delete a task trigger')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (taskId, triggerId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.deleteTaskTrigger(taskId, triggerId);
+        console.log(toon.formatMessage('Task trigger deleted'));
       } catch (err) {
         handleError(err, format);
       }

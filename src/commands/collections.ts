@@ -57,5 +57,53 @@ export function createCollectionsCommand(): Command {
       }
     });
 
+  cmd
+    .command('create <name>')
+    .description('Create a new collection')
+    .option('-f, --format <format>', 'Output format')
+    .option('--items <ids>', 'Item IDs to add (comma-separated)')
+    .option('--parent <id>', 'Parent folder ID')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.createCollection({
+          name,
+          ids: options.items?.split(',').map((id: string) => id.trim()),
+          parentId: options.parent,
+        });
+        console.log(toon.formatMessage('Collection created', { id: result.Id }));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('add <collectionId> <itemIds...>')
+    .description('Add items to a collection')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (collectionId, itemIds, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.addToCollection(collectionId, itemIds);
+        console.log(toon.formatMessage('Items added to collection'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('remove <collectionId> <itemIds...>')
+    .description('Remove items from a collection')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (collectionId, itemIds, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.removeFromCollection(collectionId, itemIds);
+        console.log(toon.formatMessage('Items removed from collection'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

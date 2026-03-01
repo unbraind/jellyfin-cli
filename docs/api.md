@@ -142,39 +142,7 @@ jf config test [--name <name>]
 | `--name <name>` | Server name |
 | `--default` | Set as default server |
 
-### config get
 
-Display current configuration.
-
-```bash
-jf config get [--name <name>]
-```
-
-### config path
-
-Show configuration file path.
-
-```bash
-jf config path
-```
-
-### config list
-
-List all configured servers.
-
-```bash
-jf config list
-```
-
-### config test
-
-Test connection to Jellyfin server.
-
-```bash
-jf config test [--name <name>]
-```
-
-## system
 
 System commands.
 
@@ -1815,3 +1783,345 @@ jf channels latest <channelId> [--limit <number>]
 ```
 
 Output type: `items`
+
+## collections
+
+Collection commands.
+
+### collections list
+
+List all collections (box sets).
+
+```bash
+jf collections list [--limit <number>]
+```
+
+Output type: `items`
+
+### collections get
+
+Get collection details.
+
+```bash
+jf collections get <collectionId>
+```
+
+Output type: `item`
+
+### collections items
+
+List items in a collection.
+
+```bash
+jf collections items <collectionId> [--limit <number>]
+```
+
+Output type: `items`
+
+### collections create
+
+Create a new collection.
+
+```bash
+jf collections create <name> [--items <ids>] [--parent <id>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--items <ids>` | Item IDs to add (comma-separated) |
+| `--parent <id>` | Parent folder ID |
+
+Output type: `message`
+
+### collections add
+
+Add items to a collection.
+
+```bash
+jf collections add <collectionId> <itemIds...>
+```
+
+Output type: `message`
+
+### collections remove
+
+Remove items from a collection.
+
+```bash
+jf collections remove <collectionId> <itemIds...>
+```
+
+Output type: `message`
+
+## livetv
+
+Live TV commands.
+
+### livetv info
+
+Get Live TV info.
+
+```bash
+jf livetv info
+```
+
+Output type: `live_tv_info`
+
+### livetv channels
+
+List Live TV channels.
+
+```bash
+jf livetv channels [--limit <number>] [--offset <number>]
+```
+
+Output type: `items`
+
+### livetv programs
+
+List Live TV programs.
+
+```bash
+jf livetv programs [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--channel <id>` | Channel ID |
+| `--limit <number>` | Limit |
+| `--offset <number>` | Offset |
+| `--min-date <date>` | Minimum start date |
+| `--max-date <date>` | Maximum start date |
+| `--aired` | Only show programs that have aired |
+
+Output type: `items`
+
+### livetv recordings
+
+List Live TV recordings.
+
+```bash
+jf livetv recordings [--limit <number>] [--offset <number>]
+```
+
+Output type: `items`
+
+### livetv timers
+
+List Live TV timers.
+
+```bash
+jf livetv timers [--channel <id>]
+```
+
+Output type: `items`
+
+### livetv timer
+
+Get Live TV timer by ID.
+
+```bash
+jf livetv timer <timerId>
+```
+
+Output type: `item`
+
+### livetv create-timer
+
+Create a Live TV timer.
+
+```bash
+jf livetv create-timer --channel <id> --name <name> --start <date> --end <date> [--program <id>] [--pre-padding <seconds>] [--post-padding <seconds>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--channel <id>` | Channel ID (required) |
+| `--name <name>` | Timer name (required) |
+| `--start <date>` | Start date in ISO format (required) |
+| `--end <date>` | End date in ISO format (required) |
+| `--program <id>` | Program ID |
+| `--pre-padding <seconds>` | Pre-padding seconds (default: 60) |
+| `--post-padding <seconds>` | Post-padding seconds (default: 300) |
+
+Output type: `message`
+
+### livetv delete-timer
+
+Delete a Live TV timer.
+
+```bash
+jf livetv delete-timer <timerId>
+```
+
+Output type: `message`
+
+### livetv series-timers
+
+List Live TV series timers.
+
+```bash
+jf livetv series-timers
+```
+
+Output type: `items`
+
+### livetv series-timer
+
+Get Live TV series timer by ID.
+
+```bash
+jf livetv series-timer <id>
+```
+
+Output type: `item`
+
+### livetv delete-series-timer
+
+Delete a Live TV series timer.
+
+```bash
+jf livetv delete-series-timer <id>
+```
+
+Output type: `message`
+
+## playlists
+
+Playlist commands.
+
+### playlists create
+
+Create a new playlist.
+
+```bash
+jf playlists create <name> [--items <ids>] [--media-type <type>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--items <ids>` | Initial item IDs (comma-separated) |
+| `--media-type <type>` | Media type |
+
+Output type: `message`
+
+### playlists add
+
+Add items to a playlist.
+
+```bash
+jf playlists add <playlistId> <itemIds...>
+```
+
+Output type: `message`
+
+### playlists remove
+
+Remove items from a playlist.
+
+```bash
+jf playlists remove <playlistId> <entryIds...>
+```
+
+Output type: `message`
+
+### playlists items
+
+List items in a playlist.
+
+```bash
+jf playlists items <playlistId> [--limit <number>] [--offset <number>]
+```
+
+Output type: `items`
+
+### playlists delete
+
+Delete a playlist.
+
+```bash
+jf playlists delete <playlistId>
+```
+
+Output type: `message`
+
+## tasks
+
+Scheduled task commands.
+
+### tasks list
+
+List all scheduled tasks.
+
+```bash
+jf tasks list [--hidden]
+```
+
+Output type: `tasks`
+
+### tasks get
+
+Get task by ID.
+
+```bash
+jf tasks get <taskId>
+```
+
+Output type: `task`
+
+### tasks run
+
+Start a scheduled task.
+
+```bash
+jf tasks run <taskId>
+```
+
+Output type: `message`
+
+### tasks stop
+
+Stop a running task.
+
+```bash
+jf tasks stop <taskId>
+```
+
+Output type: `message`
+
+### tasks triggers
+
+List task triggers.
+
+```bash
+jf tasks triggers <taskId>
+```
+
+Output type: `task_triggers`
+
+### tasks add-trigger
+
+Add a task trigger.
+
+```bash
+jf tasks add-trigger <taskId> --type <type> [--interval <ticks>] [--time <ticks>] [--days <days>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--type <type>` | Trigger type (DailyTrigger, WeeklyTrigger, IntervalTrigger, StartupTrigger) |
+| `--interval <ticks>` | Interval in ticks (for IntervalTrigger) |
+| `--time <ticks>` | Time of day in ticks (for DailyTrigger/WeeklyTrigger) |
+| `--days <days>` | Days of week (comma-separated, for WeeklyTrigger) |
+
+Output type: `message`
+
+### tasks delete-trigger
+
+Delete a task trigger.
+
+```bash
+jf tasks delete-trigger <taskId> <triggerId>
+```
+
+Output type: `message`

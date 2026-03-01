@@ -44,13 +44,3 @@ export interface UserPolicy {
 }
 
 export type SubtitlePlaybackMode = 'Default' | 'Always' | 'OnlyForced' | 'None' | 'Smart';
-
-export interface UserItemData {
-  PlaybackPositionTicks?: number | null;
-  PlayCount?: number | null;
-  IsFavorite?: boolean;
-  Played?: boolean;
-  Key?: string | null;
-  LastPlayedDate?: string | null;
-  UnplayedItemCount?: number | null;
-}

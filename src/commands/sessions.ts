@@ -181,8 +181,12 @@ export function createSessionsCommand(): Command {
     .action(async (sessionId, level, options) => {
       const { client, format } = await createApiClient(options);
       try {
-        await client.sendSystemCommand(sessionId, 'SetVolume');
-        console.log(`type: message\ndata:\n  message: Volume set to ${level}\n  success: true`);
+        const volumeLevel = parseInt(level, 10);
+        if (Number.isNaN(volumeLevel) || volumeLevel < 0 || volumeLevel > 100) {
+          throw new Error('Volume level must be a number between 0 and 100');
+        }
+        await client.setVolume(sessionId, volumeLevel);
+        console.log(`type: message\ndata:\n  message: Volume set to ${volumeLevel}\n  success: true`);
       } catch (err) {
         handleError(err, format);
       }

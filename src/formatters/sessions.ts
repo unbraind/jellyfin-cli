@@ -122,3 +122,14 @@ export function formatTask(task: ScheduledTaskInfo): string {
   };
   return formatToon(simplified, 'task');
 }
+
+export function formatTaskTriggers(triggers: { Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]): string {
+  const simplified = triggers.map((t) => ({
+    id: t.Id,
+    type: t.Type,
+    interval_ticks: t.IntervalTicks,
+    time_of_day_ticks: t.TimeOfDayTicks,
+    day_of_week: t.DayOfWeek,
+  }));
+  return formatToon(simplified, 'task_triggers');
+}
