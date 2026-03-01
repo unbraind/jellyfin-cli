@@ -425,6 +425,12 @@ jf system info --format raw
 - `jf channels items <channelId>` - Get channel items
 - `jf channels latest <channelId>` - Get latest channel items
 
+### Schema (Agent/LLM Optimization)
+
+- `jf schema` - Output JSON schema for all Toon format types
+- `jf schema <type>` - Output JSON schema for a specific type
+- `jf schema list` - List all available output types
+
 ## Agent/LLM Optimization
 
 This CLI is designed to be easily used by AI agents and LLMs:

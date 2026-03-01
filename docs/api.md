@@ -2125,3 +2125,39 @@ jf tasks delete-trigger <taskId> <triggerId>
 ```
 
 Output type: `message`
+
+## schema
+
+JSON Schema commands for LLM/Agent integration.
+
+### schema
+
+Output JSON schema for all Toon format types.
+
+```bash
+jf schema [--format <format>]
+```
+
+Output type: `schema`
+
+### schema list
+
+List all available output types.
+
+```bash
+jf schema list
+```
+
+Output type: `output_types`
+
+### schema <type>
+
+Output JSON schema for a specific output type.
+
+```bash
+jf schema <type>
+```
+
+Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `item`, `sessions`, `session`, `libraries`, `tasks`, `search_result`, `plugins`, `config`
+
+Output type: `schema`
