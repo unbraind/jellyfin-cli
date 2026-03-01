@@ -56,7 +56,7 @@ export function createSessionsCommand(): Command {
           playCommand,
           startPositionTicks: options.position ? parseInt(options.position, 10) : undefined,
         });
-        console.log(`type: message\ndata:\n  message: Play command sent\n  success: true`);
+        console.log(toon.formatMessage('Play command sent'));
       } catch (err) {
         handleError(err, format);
       }
@@ -70,7 +70,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'Pause');
-        console.log(`type: message\ndata:\n  message: Pause command sent\n  success: true`);
+        console.log(toon.formatMessage('Paused'));
       } catch (err) {
         handleError(err, format);
       }
@@ -84,7 +84,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'Unpause');
-        console.log(`type: message\ndata:\n  message: Unpause command sent\n  success: true`);
+        console.log(toon.formatMessage('Unpaused'));
       } catch (err) {
         handleError(err, format);
       }
@@ -98,7 +98,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'Stop');
-        console.log(`type: message\ndata:\n  message: Stop command sent\n  success: true`);
+        console.log(toon.formatMessage('Stopped'));
       } catch (err) {
         handleError(err, format);
       }
@@ -112,7 +112,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'NextTrack');
-        console.log(`type: message\ndata:\n  message: Next track command sent\n  success: true`);
+        console.log(toon.formatMessage('Next track'));
       } catch (err) {
         handleError(err, format);
       }
@@ -126,7 +126,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'PreviousTrack');
-        console.log(`type: message\ndata:\n  message: Previous track command sent\n  success: true`);
+        console.log(toon.formatMessage('Previous track'));
       } catch (err) {
         handleError(err, format);
       }
@@ -140,7 +140,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.playstateCommand(sessionId, 'Seek', { seekPositionTicks: parseInt(ticks, 10) });
-        console.log(`type: message\ndata:\n  message: Seek command sent\n  success: true`);
+        console.log(toon.formatMessage('Seeked'));
       } catch (err) {
         handleError(err, format);
       }
@@ -154,7 +154,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.sendSystemCommand(sessionId, 'Mute');
-        console.log(`type: message\ndata:\n  message: Mute command sent\n  success: true`);
+        console.log(toon.formatMessage('Muted'));
       } catch (err) {
         handleError(err, format);
       }
@@ -168,7 +168,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.sendSystemCommand(sessionId, 'Unmute');
-        console.log(`type: message\ndata:\n  message: Unmute command sent\n  success: true`);
+        console.log(toon.formatMessage('Unmuted'));
       } catch (err) {
         handleError(err, format);
       }
@@ -186,7 +186,7 @@ export function createSessionsCommand(): Command {
           throw new Error('Volume level must be a number between 0 and 100');
         }
         await client.setVolume(sessionId, volumeLevel);
-        console.log(`type: message\ndata:\n  message: Volume set to ${volumeLevel}\n  success: true`);
+        console.log(toon.formatMessage(`Volume: ${volumeLevel}`));
       } catch (err) {
         handleError(err, format);
       }
@@ -207,7 +207,7 @@ export function createSessionsCommand(): Command {
           text: options.text,
           timeoutMs: options.timeout ? parseInt(options.timeout, 10) : undefined,
         });
-        console.log(`type: message\ndata:\n  message: Message sent\n  success: true`);
+        console.log(toon.formatMessage('Message sent'));
       } catch (err) {
         handleError(err, format);
       }

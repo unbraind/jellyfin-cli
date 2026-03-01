@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
+import { toon } from '../formatters/index.js';
 
 export function createUserDataCommand(): Command {
   const cmd = new Command('userdata');
@@ -13,7 +14,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.markFavorite(itemId, options.user);
-        console.log(`type: message\ndata:\n  message: Item marked as favorite\n  success: true`);
+        console.log(toon.formatMessage('Favorited'));
       } catch (err) {
         handleError(err, format);
       }
@@ -28,7 +29,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.unmarkFavorite(itemId, options.user);
-        console.log(`type: message\ndata:\n  message: Item removed from favorites\n  success: true`);
+        console.log(toon.formatMessage('Unfavorited'));
       } catch (err) {
         handleError(err, format);
       }
@@ -44,7 +45,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.markPlayed(itemId, options.user, options.date);
-        console.log(`type: message\ndata:\n  message: Item marked as played\n  success: true`);
+        console.log(toon.formatMessage('Marked played'));
       } catch (err) {
         handleError(err, format);
       }
@@ -59,7 +60,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.unmarkPlayed(itemId, options.user);
-        console.log(`type: message\ndata:\n  message: Item marked as unplayed\n  success: true`);
+        console.log(toon.formatMessage('Marked unplayed'));
       } catch (err) {
         handleError(err, format);
       }
@@ -74,7 +75,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.updateUserItemRating(itemId, options.user, true);
-        console.log(`type: message\ndata:\n  message: Item liked\n  success: true`);
+        console.log(toon.formatMessage('Liked'));
       } catch (err) {
         handleError(err, format);
       }
@@ -89,7 +90,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.updateUserItemRating(itemId, options.user, false);
-        console.log(`type: message\ndata:\n  message: Item disliked\n  success: true`);
+        console.log(toon.formatMessage('Disliked'));
       } catch (err) {
         handleError(err, format);
       }
@@ -104,7 +105,7 @@ export function createUserDataCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.deleteUserItemRating(itemId, options.user);
-        console.log(`type: message\ndata:\n  message: Item rating removed\n  success: true`);
+        console.log(toon.formatMessage('Rating removed'));
       } catch (err) {
         handleError(err, format);
       }

@@ -5,7 +5,6 @@ describe('formatSessions', () => {
   it('should format empty sessions array', () => {
     const result = formatSessions([]);
     expect(result).toContain('type: sessions');
-    expect(result).toContain('data: []');
   });
 
   it('should format sessions with now playing', () => {

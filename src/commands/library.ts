@@ -34,7 +34,7 @@ export function createLibraryCommand(): Command {
           replaceAllMetadata: options.replaceMetadata,
           replaceAllImages: options.replaceImages,
         });
-        console.log(`type: message\ndata:\n  message: Library refresh initiated\n  success: true`);
+        console.log(toon.formatMessage('Refresh started'));
       } catch (err) {
         handleError(err, format);
       }

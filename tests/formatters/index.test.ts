@@ -77,8 +77,8 @@ describe('formatSuccess', () => {
 
   it('should format as toon', () => {
     const result = formatSuccess('Operation completed', 'toon');
-    expect(result).toContain('message:');
-    expect(result).toContain('success:');
+    expect(result).toContain('msg:');
+    expect(result).toContain('Operation completed');
   });
 });
 
@@ -103,7 +103,7 @@ describe('formatError', () => {
 
   it('should format error as toon', () => {
     const result = formatError('Something went wrong', 'toon', 500, { detail: 'info' });
-    expect(result).toContain('error:');
+    expect(result).toContain('err:');
     expect(result).toContain('Something went wrong');
   });
 });

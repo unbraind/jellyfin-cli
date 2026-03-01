@@ -28,13 +28,13 @@ describe('toon formatters', () => {
 
     it('should format string output', () => {
       const result = formatToon('Hello World');
-      expect(result).toContain('type: message');
+      expect(result).toContain('type: msg');
       expect(result).toContain('Hello World');
     });
 
     it('should format number output', () => {
       const result = formatToon(42);
-      expect(result).toContain('type: value');
+      expect(result).toContain('type: val');
       expect(result).toContain('42');
     });
 
@@ -62,7 +62,7 @@ describe('toon formatters', () => {
         WebSocketPortNumber: 8096,
       };
       const result = formatSystemInfo(info);
-      expect(result).toContain('type: system_info');
+      expect(result).toContain('type: sys');
       expect(result).toContain('Test Server');
       expect(result).toContain('10.8.0');
     });
@@ -163,8 +163,8 @@ describe('toon formatters', () => {
         StartIndex: 0,
       };
       const formatted = formatQueryResult(result);
-      expect(formatted).toContain('type: query_result');
-      expect(formatted).toContain('total_count: 1');
+      expect(formatted).toContain('type: items');
+      expect(formatted).toContain('total: 1');
     });
   });
 
@@ -175,7 +175,7 @@ describe('toon formatters', () => {
         TotalRecordCount: 1,
       };
       const formatted = formatSearchResult(result);
-      expect(formatted).toContain('type: search_result');
+      expect(formatted).toContain('type: search');
       expect(formatted).toContain('Test Result');
     });
   });
@@ -187,7 +187,7 @@ describe('toon formatters', () => {
         { Name: 'Shows', ItemId: 'lib-2', CollectionType: 'tvshows' },
       ];
       const result = formatLibraries(libraries);
-      expect(result).toContain('type: libraries');
+      expect(result).toContain('type: libs');
       expect(result).toContain('Movies');
       expect(result).toContain('Shows');
     });
@@ -211,7 +211,7 @@ describe('toon formatters', () => {
         { Id: 1, Name: 'User Login', Type: 'UserLoggedIn', Date: '2024-01-01T00:00:00Z' },
       ];
       const result = formatActivityLog(entries);
-      expect(result).toContain('type: activity_log');
+      expect(result).toContain('type: activity');
       expect(result).toContain('User Login');
     });
   });
@@ -219,16 +219,17 @@ describe('toon formatters', () => {
   describe('formatMessage', () => {
     it('should format success message', () => {
       const result = formatMessage('Operation successful');
-      expect(result).toContain('type: message');
+      expect(result).toContain('type: ok');
+      expect(result).toContain('msg:');
       expect(result).toContain('Operation successful');
-      expect(result).toContain('success: true');
     });
   });
 
   describe('formatError', () => {
     it('should format error message', () => {
       const result = formatError('Something went wrong', 500);
-      expect(result).toContain('type: error');
+      expect(result).toContain('type: err');
+      expect(result).toContain('err:');
       expect(result).toContain('Something went wrong');
       expect(result).toContain('code: 500');
     });
@@ -248,8 +249,8 @@ describe('toon formatters', () => {
       const result = formatConfig(config);
       expect(result).toContain('type: config');
       expect(result).toContain('http://localhost:8096');
-      expect(result).toContain('has_api_key: true');
-      expect(result).toContain('has_password: true');
+      expect(result).toContain('key: true');
+      expect(result).toContain('pw: true');
       expect(result).not.toContain('secret-key-12345');
       expect(result).not.toContain('mySecretPassword123');
     });
