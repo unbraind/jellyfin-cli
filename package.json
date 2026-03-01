@@ -16,6 +16,8 @@
     "test": "bun test",
     "test:coverage": "bun test --coverage",
     "lint": "eslint src tests --ext .ts",
+    "lint:fix": "eslint src tests --ext .ts --fix",
+    "lint:cache": "eslint src tests --ext .ts --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build"

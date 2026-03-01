@@ -2,6 +2,16 @@
 
 This document provides detailed information about the Jellyfin CLI commands and their options.
 
+## Related Documentation
+
+| Document | Description |
+|----------|-------------|
+| [README.md](README.md) | Documentation index and quick start |
+| [toon-format.md](toon-format.md) | Output format specification |
+| [agent-integration.md](agent-integration.md) | LLM/agent integration guide |
+| [security.md](security.md) | Security best practices |
+| [troubleshooting.md](troubleshooting.md) | Common issues and solutions |
+
 ## Global Options
 
 | Option | Description |
@@ -9,7 +19,22 @@ This document provides detailed information about the Jellyfin CLI commands and 
 | `-f, --format <format>` | Output format (toon, json, table, raw) |
 | `-s, --server <name>` | Server name from config |
 | `-v, --version` | Show version number |
-| `-h, --help` | Show help |
+| | `-h, --help` | Show help |
+
+## Output Types
+
+Every command outputs structured data with a `type` field. Use `jf schema <type>` to get the JSON schema for any output type.
+
+Common output types:
+- `message` - Success/error messages
+- `error` - Error responses
+- `items` - List of media items
+- `item` - Single item details
+- `users` - List of users
+- `user` - Single user details
+- `sessions` - Active sessions
+- `libraries` - Media libraries
+- `tasks` - Scheduled tasks
 
 ## setup
 
@@ -334,6 +359,8 @@ Get intro videos for an item.
 jf items intros <itemId>
 ```
 
+Output type: `items`
+
 ### items chapters
 
 Get chapters for an item.
@@ -341,6 +368,8 @@ Get chapters for an item.
 ```bash
 jf items chapters <itemId>
 ```
+
+Output type: `chapters`
 
 ### items special-features
 
@@ -350,6 +379,8 @@ Get special features for an item.
 jf items special-features <itemId>
 ```
 
+Output type: `items`
+
 ### items trailers
 
 Get local trailers for an item.
@@ -357,6 +388,8 @@ Get local trailers for an item.
 ```bash
 jf items trailers <itemId>
 ```
+
+Output type: `items`
 
 ### items ancestors
 
@@ -366,6 +399,8 @@ Get parent items (ancestors) for an item.
 jf items ancestors <itemId>
 ```
 
+Output type: `items`
+
 ### items parts
 
 Get additional parts for a video.
@@ -374,6 +409,8 @@ Get additional parts for a video.
 jf items parts <itemId>
 ```
 
+Output type: `items`
+
 ### items playback-info
 
 Get playback information for an item.
@@ -381,6 +418,8 @@ Get playback information for an item.
 ```bash
 jf items playback-info <itemId>
 ```
+
+Output type: `playback_info`
 
 ### items stream-url
 
@@ -397,6 +436,8 @@ jf items stream-url <itemId> [options]
 | `--subtitle-stream <index>` | Subtitle stream index |
 | `--max-bitrate <bps>` | Max streaming bitrate |
 
+Output type: `stream_url`
+
 ### items audio-url
 
 Get audio stream URL.
@@ -411,6 +452,8 @@ jf items audio-url <itemId> [options]
 | `--audio-stream <index>` | Audio stream index |
 | `--max-bitrate <bps>` | Max streaming bitrate |
 
+Output type: `audio_url`
+
 ### items image-url
 
 Get image URL for an item.
@@ -424,6 +467,8 @@ jf items image-url <itemId> [options]
 | `--max-width <pixels>` | Max width |
 | `--max-height <pixels>` | Max height |
 
+Output type: `image_url`
+
 ### items subtitle-url
 
 Get subtitle URL.
@@ -435,6 +480,8 @@ jf items subtitle-url <itemId> <mediaSourceId> <streamIndex> [--format-type <for
 | Option | Description |
 |--------|-------------|
 | `--format-type <format>` | Subtitle format (srt, vtt, ass) |
+
+Output type: `subtitle_url`
 
 ### items refresh
 
@@ -450,6 +497,8 @@ jf items refresh <itemId> [options]
 | `--replace-metadata` | Replace all metadata |
 | `--replace-images` | Replace all images |
 
+Output type: `message`
+
 ### items delete
 
 Delete an item.
@@ -457,6 +506,47 @@ Delete an item.
 ```bash
 jf items delete <itemId> --force
 ```
+
+Output type: `message`
+
+### items update
+
+Update item metadata.
+
+```bash
+jf items update <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Item name |
+| `--overview <text>` | Item overview/description |
+| `--genres <genres>` | Genres (comma-separated) |
+| `--tags <tags>` | Tags (comma-separated) |
+| `--studios <studios>` | Studios (comma-separated) |
+| `--year <year>` | Production year |
+| `--rating <rating>` | Official rating (e.g., PG, R) |
+| `--community-rating <rating>` | Community rating (0-10) |
+| `--premiere-date <date>` | Premiere date (YYYY-MM-DD) |
+| `--sort-name <name>` | Sort name |
+| `--trailer-url <url>` | Trailer URL |
+
+Output type: `message`
+
+### items filters
+
+Get available query filters for a library.
+
+```bash
+jf items filters [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Parent ID (library) |
+| `--types <types>` | Item types (comma-separated) |
+
+Output type: `filters`
 
 ## sessions
 

@@ -59,12 +59,12 @@ function formatTable(data: unknown): string {
     }
   }
 
-  const colWidths = keys.map((_, i) => Math.max(...rows.map((row) => String(row[i] ?? '').length)));
+  const colWidths: number[] = keys.map((_, i) => Math.max(1, ...rows.map((row) => String(row[i] ?? '').length)));
   
   const lines = rows.map((row, idx) => {
-    const cells = row.map((cell, i) => String(cell ?? '').padEnd(colWidths[i]!));
+    const cells = row.map((cell, i) => String(cell ?? '').padEnd(colWidths[i] ?? 0));
     const line = cells.join(' | ');
-    return idx === 0 ? `${line}\n${colWidths.map((w) => '-'.repeat(w)).join('-+-')}` : line;
+    return idx === 0 ? `${line}\n${colWidths.map((w) => '-'.repeat(w ?? 1)).join('-+-')}` : line;
   });
 
   return lines.join('\n');

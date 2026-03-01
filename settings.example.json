@@ -1,0 +1,22 @@
+{
+  "defaultServer": {
+    "serverUrl": "http://your-jellyfin-server:8096",
+    "apiKey": "your-api-key-here",
+    "username": "your-username",
+    "password": "your-password",
+    "userId": "auto-detected-on-auth",
+    "timeout": 30000,
+    "outputFormat": "toon"
+  },
+  "servers": {
+    "home": {
+      "serverUrl": "http://home-server:8096",
+      "apiKey": "home-api-key"
+    },
+    "work": {
+      "serverUrl": "http://work-server:8096",
+      "apiKey": "work-api-key"
+    }
+  },
+  "currentServer": "home"
+}

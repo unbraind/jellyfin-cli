@@ -23,5 +23,13 @@
     "prefer-const": "warn",
     "no-var": "error"
   },
-  "ignorePatterns": ["dist/", "node_modules/", "coverage/"]
+  "ignorePatterns": ["dist/", "node_modules/", "coverage/", "*.js"],
+  "overrides": [
+    {
+      "files": ["tests/**/*.ts"],
+      "rules": {
+        "@typescript-eslint/no-explicit-any": "off"
+      }
+    }
+  ]
 }
