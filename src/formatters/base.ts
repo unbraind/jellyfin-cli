@@ -5,27 +5,25 @@ export interface ToonOutput {
   data: unknown;
 }
 
-const VERSION = '1.0.0';
-
 export function createToonOutput(type: string, data: unknown): ToonOutput {
-  return { type, data: stripNulls(data) };
+  return { type, data: compact(data) };
 }
 
-function stripNulls(obj: unknown): unknown {
+function compact(obj: unknown): unknown {
   if (obj === null || obj === undefined) return undefined;
   if (Array.isArray(obj)) {
-    const filtered = obj.map(stripNulls).filter(v => v !== undefined);
-    return filtered.length > 0 ? filtered : undefined;
+    const arr = obj.map(compact).filter(v => v !== undefined);
+    return arr.length > 0 ? arr : undefined;
   }
   if (typeof obj === 'object') {
-    const result: Record<string, unknown> = {};
+    const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
-      const cleaned = stripNulls(v);
+      const cleaned = compact(v);
       if (cleaned !== undefined && cleaned !== '' && !(Array.isArray(cleaned) && cleaned.length === 0)) {
-        result[k] = cleaned;
+        out[k] = cleaned;
       }
     }
-    return Object.keys(result).length > 0 ? result : undefined;
+    return Object.keys(out).length > 0 ? out : undefined;
   }
   return obj;
 }
@@ -34,12 +32,14 @@ export function formatToon(output: unknown, typeHint?: string): string {
   const type = typeHint ?? detectType(output);
   const toonOutput = createToonOutput(type, output);
   return YAML.stringify(toonOutput, { 
-    lineWidth: 0,
+    indent: 1,
+    indentSeq: false,
+    lineWidth: -1,
+    minContentWidth: 0,
     defaultStringType: 'PLAIN',
     defaultKeyType: 'PLAIN',
     singleQuote: false,
-    doubleQuote: { json: false },
-  });
+  }).trim();
 }
 
 function detectType(output: unknown): string {
@@ -81,8 +81,6 @@ export function formatMessage(message: string, success = true): string {
 export function formatError(error: string, code?: number, details?: unknown): string {
   const data: Record<string, unknown> = { err: error };
   if (code) data.code = code;
-  if (details !== undefined) data.details = details;
+  if (details !== undefined) data.ctx = details;
   return formatToon(data, 'err');
 }
-
-export { VERSION };
