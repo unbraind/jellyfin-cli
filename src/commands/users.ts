@@ -66,5 +66,63 @@ export function createUsersCommand(): Command {
       }
     });
 
+  cmd
+    .command('create <username>')
+    .description('Create a new user')
+    .option('-f, --format <format>', 'Output format')
+    .option('--password <password>', 'User password')
+    .action(async (username, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.createUser({ Name: username, Password: options.password });
+        console.log(toon.formatToon({
+          id: result.Id,
+          name: result.Name,
+          server_id: result.ServerId,
+          created: true,
+        }, 'user_created'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('update-password <userId>')
+    .description('Update user password')
+    .option('-f, --format <format>', 'Output format')
+    .option('--current <password>', 'Current password')
+    .option('--new <password>', 'New password')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.updateUserPassword(userId, {
+          CurrentPw: options.current,
+          NewPw: options.new,
+        });
+        console.log(toon.formatMessage(`Password updated for user ${userId}`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('delete <userId>')
+    .description('Delete a user')
+    .option('-f, --format <format>', 'Output format')
+    .option('--force', 'Skip confirmation')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      if (!options.force) {
+        console.error('Use --force to confirm deletion');
+        process.exit(1);
+      }
+      try {
+        await client.deleteUser(userId);
+        console.log(toon.formatMessage(`User ${userId} deleted`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }
