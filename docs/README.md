@@ -117,6 +117,10 @@ The CLI supports multiple output formats:
 - `jf users create <username>` - Create a new user
 - `jf users update-password <userId>` - Update user password
 - `jf users delete <userId> --force` - Delete a user
+- `jf users policy <userId>` - Get user policy
+- `jf users update-policy <userId>` - Update user policy (admin rights, permissions)
+- `jf users config <userId>` - Get user configuration
+- `jf users update-config <userId>` - Update user configuration (preferences)
 
 ### Items
 
@@ -138,6 +142,7 @@ The CLI supports multiple output formats:
 - `jf items image-url <itemId>` - Get image URL
 - `jf items subtitle-url <itemId> <mediaSourceId> <streamIndex>` - Get subtitle URL
 - `jf items refresh <itemId>` - Refresh item metadata
+- `jf items update <itemId>` - Update item metadata (name, overview, genres, etc.)
 - `jf items delete <itemId>` - Delete an item
 - `jf items filters` - Get available query filters
 

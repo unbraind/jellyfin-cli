@@ -69,6 +69,9 @@ export interface BaseItemDto {
   EpisodeCount?: number | null;
   SeasonCount?: number | null;
   MovieCount?: number | null;
+  Tags?: string[] | null;
+  SortName?: string | null;
+  RemoteTrailers?: { Url?: string }[] | null;
 }
 
 export interface UserItemData {

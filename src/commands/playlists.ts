@@ -19,7 +19,7 @@ export function createPlaylistsCommand(): Command {
           ids: options.items?.split(','),
           mediaType: options.mediaType,
         });
-        console.log(toon.formatMessage('Playlist created', { id: result.Id, name: result.Name }));
+        console.log(toon.formatToon({ id: result.Id, name: name, created: true }, 'playlist_created'));
       } catch (err) {
         handleError(err, format);
       }

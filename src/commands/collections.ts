@@ -71,7 +71,7 @@ export function createCollectionsCommand(): Command {
           ids: options.items?.split(',').map((id: string) => id.trim()),
           parentId: options.parent,
         });
-        console.log(toon.formatMessage('Collection created', { id: result.Id }));
+        console.log(toon.formatToon({ id: result.Id, name: name, created: true }, 'collection_created'));
       } catch (err) {
         handleError(err, format);
       }

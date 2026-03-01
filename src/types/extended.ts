@@ -145,6 +145,7 @@ export interface QueryFilters {
   Tags?: string[] | null;
   Years?: number[] | null;
   OfficialRatings?: string[] | null;
+  Persons?: NameIdPair[] | null;
   HasSubtitles?: boolean;
   HasTrailer?: boolean;
   HasSpecialFeature?: boolean;

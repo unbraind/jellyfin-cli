@@ -124,5 +124,97 @@ export function createUsersCommand(): Command {
       }
     });
 
+  cmd
+    .command('policy <userId>')
+    .description('Get user policy')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const user = await client.getUserById(userId);
+        console.log(toon.formatToon(user.Policy ?? {}, 'user_policy'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('update-policy <userId>')
+    .description('Update user policy')
+    .option('-f, --format <format>', 'Output format')
+    .option('--admin <boolean>', 'Is administrator (true/false)')
+    .option('--hidden <boolean>', 'Is hidden (true/false)')
+    .option('--disabled <boolean>', 'Is disabled (true/false)')
+    .option('--remote-access <boolean>', 'Enable remote access (true/false)')
+    .option('--live-tv <boolean>', 'Enable Live TV access (true/false)')
+    .option('--live-tv-manage <boolean>', 'Enable Live TV management (true/false)')
+    .option('--playback <boolean>', 'Enable media playback (true/false)')
+    .option('--transcoding <boolean>', 'Enable transcoding (true/false)')
+    .option('--delete-content <boolean>', 'Enable content deletion (true/false)')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const user = await client.getUserById(userId);
+        const policy = user.Policy ?? {};
+        
+        if (options.admin !== undefined) policy.IsAdministrator = options.admin === 'true';
+        if (options.hidden !== undefined) policy.IsHidden = options.hidden === 'true';
+        if (options.disabled !== undefined) policy.IsDisabled = options.disabled === 'true';
+        if (options.remoteAccess !== undefined) policy.EnableRemoteAccess = options.remoteAccess === 'true';
+        if (options.liveTv !== undefined) policy.EnableLiveTvAccess = options.liveTv === 'true';
+        if (options.liveTvManage !== undefined) policy.EnableLiveTvManagement = options.liveTvManage === 'true';
+        if (options.playback !== undefined) policy.EnableMediaPlayback = options.playback === 'true';
+        if (options.transcoding !== undefined) policy.EnableVideoPlaybackTranscoding = options.transcoding === 'true';
+        if (options.deleteContent !== undefined) policy.EnableContentDeletion = options.deleteContent === 'true';
+
+        await client.updateUserPolicy(userId, policy as Record<string, unknown>);
+        console.log(toon.formatMessage(`Policy updated for user ${userId}`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('config <userId>')
+    .description('Get user configuration')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const user = await client.getUserById(userId);
+        console.log(toon.formatToon(user.Configuration ?? {}, 'user_config'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('update-config <userId>')
+    .description('Update user configuration')
+    .option('-f, --format <format>', 'Output format')
+    .option('--subtitle-lang <lang>', 'Subtitle language preference')
+    .option('--subtitle-mode <mode>', 'Subtitle playback mode (Default, Always, OnlyForced, None, Smart)')
+    .option('--play-default-audio <boolean>', 'Play default audio track (true/false)')
+    .option('--hide-played <boolean>', 'Hide played items in latest (true/false)')
+    .option('--auto-play-next <boolean>', 'Auto-play next episode (true/false)')
+    .action(async (userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const user = await client.getUserById(userId);
+        const config = user.Configuration ?? {};
+        
+        if (options.subtitleLang !== undefined) config.SubtitleLanguagePreference = options.subtitleLang;
+        if (options.subtitleMode !== undefined) config.SubtitleMode = options.subtitleMode;
+        if (options.playDefaultAudio !== undefined) config.PlayDefaultAudioTrack = options.playDefaultAudio === 'true';
+        if (options.hidePlayed !== undefined) config.HidePlayedInLatest = options.hidePlayed === 'true';
+        if (options.autoPlayNext !== undefined) config.EnableNextEpisodeAutoPlay = options.autoPlayNext === 'true';
+
+        await client.updateUserConfiguration(userId, config as Record<string, unknown>);
+        console.log(toon.formatMessage(`Configuration updated for user ${userId}`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

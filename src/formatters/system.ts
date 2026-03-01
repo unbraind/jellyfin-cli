@@ -1,8 +1,8 @@
 import type { SystemInfo, UserDto, JellyfinConfig } from '../types/index.js';
 import { formatToon } from './base.js';
 
-function sanitizeUrl(url: string | undefined): string | undefined {
-  if (!url) return url;
+function sanitizeUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
   return url.replace(/^https?:\/\/https?:\/\//, 'http://').replace(/^http:\/\/https?:\/\//, 'https://');
 }
 
