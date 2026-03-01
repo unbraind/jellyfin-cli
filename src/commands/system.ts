@@ -117,5 +117,15 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('endpoint').description('Get network endpoint info (is local, is in network)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const ep = await client.getSystemEndpoint();
+        console.log(toon.formatToon({ is_local: ep.IsLocal, is_in_network: ep.IsInNetwork }, 'endpoint'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

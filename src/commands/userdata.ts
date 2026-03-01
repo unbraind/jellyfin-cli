@@ -111,5 +111,23 @@ export function createUserDataCommand(): Command {
       }
     });
 
+  cmd.command('get <itemId>').description('Get user data for an item (play count, favorite status, position)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const data = await client.getUserItemData(itemId, options.user);
+        console.log(toon.formatToon({
+          is_favorite: data.IsFavorite,
+          played: data.Played,
+          play_count: data.PlayCount,
+          last_played: data.LastPlayedDate,
+          position_ticks: data.PlaybackPositionTicks,
+          rating: data.Rating,
+        }, 'user_item_data'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

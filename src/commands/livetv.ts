@@ -200,5 +200,94 @@ export function createLivetvCommand(): Command {
       }
     });
 
+  cmd.command('guide-info').description('Get TV guide date range')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const info = await client.getLiveTvGuideInfo();
+        console.log(toon.formatToon({ start_date: info.StartDate, end_date: info.EndDate }, 'guide_info'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('recommended').description('Get recommended Live TV programs')
+    .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '20')
+    .option('--is-airing', 'Only currently airing')
+    .option('--has-aired', 'Only programs that have aired')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getLiveTvRecommendedPrograms({
+          limit: parseInt(options.limit, 10),
+          isAiring: options.isAiring,
+          hasAired: options.hasAired,
+        });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('recording-folders').description('List Live TV recording folder collections')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getLiveTvRecordingFolders();
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('recording-groups').description('List Live TV recording groups')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getLiveTvRecordingGroups();
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('recording <id>').description('Get Live TV recording by ID')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (id, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const recording = await client.getLiveTvRecordingById(id);
+        console.log(toon.formatItem(recording));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('delete-recording <id>').description('Delete a Live TV recording')
+    .option('-f, --format <format>', 'Output format')
+    .option('--force', 'Skip confirmation')
+    .action(async (id, options) => {
+      const { client, format } = await createApiClient(options);
+      if (!options.force) { console.error('Use --force to confirm deletion'); process.exit(1); }
+      try {
+        await client.deleteLiveTvRecording(id);
+        console.log(toon.formatMessage(`Recording ${id} deleted`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('discover-tuners').description('Discover available tuner devices on the network')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const tuners = await client.discoverTuners();
+        console.log(toon.formatToon(tuners.map((t) => ({ type: t.Type, url: t.Url })), 'tuners'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('tuner-types').description('List supported tuner host types')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const types = await client.getTunerHostTypes();
+        console.log(toon.formatToon(types.map((t) => ({ id: t.Id, name: t.Name })), 'tuner_types'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

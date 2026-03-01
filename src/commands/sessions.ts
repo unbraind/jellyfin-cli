@@ -213,5 +213,25 @@ export function createSessionsCommand(): Command {
       }
     });
 
+  cmd.command('user-add <sessionId> <userId>').description('Add user to a session')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.addSessionUser(sessionId, userId);
+        console.log(toon.formatMessage(`User ${userId} added to session`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('user-remove <sessionId> <userId>').description('Remove user from a session')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.removeSessionUser(sessionId, userId);
+        console.log(toon.formatMessage(`User ${userId} removed from session`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

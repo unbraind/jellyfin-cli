@@ -256,5 +256,15 @@ export function createUsersCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('public').description('List public (non-hidden) users (no auth required)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const users = await client.getPublicUsers();
+        console.log(toon.formatUsers(users));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

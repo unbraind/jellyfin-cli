@@ -86,5 +86,71 @@ export function createPlaylistsCommand(): Command {
       }
     });
 
+  cmd.command('get <playlistId>').description('Get playlist details')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const playlist = await client.getPlaylist(playlistId);
+        console.log(toon.formatItem(playlist));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('update <playlistId>').description('Update playlist name or items')
+    .option('-f, --format <format>', 'Output format')
+    .option('--name <name>', 'New playlist name')
+    .option('--items <ids>', 'Item IDs (comma-separated)')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.updatePlaylist(playlistId, {
+          Name: options.name,
+          Ids: options.items?.split(','),
+        });
+        console.log(toon.formatMessage('Playlist updated', true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('users <playlistId>').description('List users with access to a playlist')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const users = await client.getPlaylistUsers(playlistId);
+        console.log(toon.formatToon(users.map((u) => ({ user_id: u.UserId, can_edit: u.CanEdit })), 'playlist_users'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('share <playlistId> <userId>').description('Grant a user access to a playlist')
+    .option('-f, --format <format>', 'Output format')
+    .option('--can-edit', 'Grant edit permissions (default: read-only)')
+    .action(async (playlistId, userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.setPlaylistUserAccess(playlistId, userId, !!options.canEdit);
+        console.log(toon.formatMessage(`User ${userId} granted ${options.canEdit ? 'edit' : 'read'} access`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('unshare <playlistId> <userId>').description('Remove a user\'s access to a playlist')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistId, userId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.removePlaylistUserAccess(playlistId, userId);
+        console.log(toon.formatMessage(`User ${userId} access removed`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('move <playlistId> <itemId> <newIndex>').description('Move item to new position in playlist')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistId, itemId, newIndex, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.movePlaylistItem(playlistId, itemId, parseInt(newIndex, 10));
+        console.log(toon.formatMessage('Item moved', true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

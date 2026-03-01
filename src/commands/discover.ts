@@ -52,5 +52,40 @@ export function createDiscoverCommand(): Command {
       }
     });
 
+  cmd.command('album-mix <albumId>').description('Get instant mix based on an album')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
+    .action(async (albumId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getAlbumInstantMix(albumId, { limit: parseInt(options.limit, 10) });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('song-mix <songId>').description('Get instant mix based on a song')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
+    .action(async (songId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getSongInstantMix(songId, { limit: parseInt(options.limit, 10) });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('trailers').description('Browse trailer items in the library')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '20')
+    .option('--offset <number>', 'Start index', '0').option('--sort <field>', 'Sort field')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getTrailers({
+          limit: parseInt(options.limit, 10),
+          startIndex: parseInt(options.offset, 10),
+          sortBy: options.sort,
+        });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

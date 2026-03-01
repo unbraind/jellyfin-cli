@@ -166,6 +166,7 @@ jf system info --format raw
 | Command | Description |
 |---------|-------------|
 | `jf users list` | List all users |
+| `jf users public` | List public users (no auth needed) |
 | `jf users get <userId>` | Get user by ID |
 | `jf users me` | Get current user info |
 | `jf users views` | Get user's library views |
@@ -176,6 +177,8 @@ jf system info --format raw
 | `jf users update-policy <userId>` | Update user permissions |
 | `jf users config <userId>` | Get user configuration |
 | `jf users update-config <userId>` | Update user preferences |
+| `jf auth providers` | List auth providers |
+| `jf auth password-reset-providers` | List password reset providers |
 
 ### Content Management
 
@@ -195,11 +198,16 @@ jf system info --format raw
 | `jf items list` | List items with filters |
 | `jf items search <term>` | Search for items |
 | `jf items get <itemId>` | Get item details |
+| `jf items root` | Get root virtual folder |
+| `jf items critic-reviews <itemId>` | Get critic reviews |
+| `jf items download-url <itemId>` | Get download URL |
+| `jf items set-content-type <itemId>` | Set content type |
 | `jf items identify <itemId>` | Search for metadata matches |
 | `jf items apply-match <itemId>` | Apply metadata search result |
 | `jf items update <itemId>` | Update item metadata |
 | `jf items delete <itemId>` | Delete an item |
 | `jf items refresh <itemId>` | Refresh item metadata |
+| `jf userdata get <itemId>` | Get user data for item |
 | `jf collections list` | List box sets / collections |
 | `jf collections get <id>` | Get collection details |
 | `jf collections items <id>` | List items in collection |
@@ -249,6 +257,7 @@ jf system info --format raw
 | `jf videos parts <itemId>` | List video parts/versions |
 | `jf videos merge-versions <ids...>` | Merge video versions |
 | `jf videos delete-alternates <id>` | Delete alternate sources |
+| `jf videos cancel-transcoding` | Cancel active video encodings |
 
 ### Playback Control
 
@@ -260,7 +269,16 @@ jf system info --format raw
 | `jf sessions stop <sessionId>` | Stop playback |
 | `jf sessions seek <sessionId> <ticks>` | Seek to position |
 | `jf sessions volume <sessionId> <level>` | Set volume |
+| `jf sessions user-add` | Add user to session |
+| `jf sessions user-remove` | Remove user from session |
 | `jf syncplay list` | List SyncPlay groups |
+| `jf syncplay create` | Create a SyncPlay group |
+| `jf syncplay seek` | Seek in SyncPlay group |
+| `jf syncplay next/previous` | Skip tracks in SyncPlay |
+| `jf syncplay set-repeat <mode>` | Set SyncPlay repeat mode |
+| `jf syncplay set-shuffle <mode>` | Set SyncPlay shuffle mode |
+| `jf syncplay queue` | Add to SyncPlay queue |
+| `jf syncplay set-queue` | Replace SyncPlay queue |
 
 ### Plugins & Packages
 
@@ -279,6 +297,14 @@ jf system info --format raw
 | `jf livetv info` | Get Live TV info |
 | `jf livetv channels` | List Live TV channels |
 | `jf livetv programs` | List TV programs |
+| `jf livetv guide-info` | Get guide date range |
+| `jf livetv recommended` | Get recommended programs |
+| `jf livetv recording-folders` | Get recording folders |
+| `jf livetv recording-groups` | Get recording groups |
+| `jf livetv recording <id>` | Get single recording |
+| `jf livetv delete-recording <id>` | Delete a recording |
+| `jf livetv discover-tuners` | Discover tuner devices |
+| `jf livetv tuner-types` | List tuner host types |
 | `jf channels list` | List channel plugin channels |
 
 ### Discovery & Stats
@@ -287,9 +313,23 @@ jf system info --format raw
 |---------|-------------|
 | `jf discover recommendations` | Get personalized recommendations |
 | `jf discover mix <itemId>` | Get instant mix for item |
+| `jf discover album-mix <albumId>` | Get instant mix based on album |
+| `jf discover song-mix <songId>` | Get instant mix based on song |
+| `jf discover trailers` | List trailers |
 | `jf stats counts` | Get library item counts |
 | `jf years list` | List content years |
 | `jf years get <year>` | Get items from a year |
+| `jf reports activities` | Activity report (plugin) |
+| `jf reports items` | Items report (plugin) |
+| `jf reports headers` | Report headers (plugin) |
+
+### System & Environment
+
+| Command | Description |
+|---------|-------------|
+| `jf system endpoint` | Get network endpoint info |
+| `jf environment dir-contents <path>` | List directory contents |
+| `jf environment network-shares` | List network shares |
 
 ### Schema & LLM Integration
 

@@ -46,5 +46,16 @@ export function createVideosCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('cancel-transcoding').description('Cancel active video transcoding sessions')
+    .option('-f, --format <format>', 'Output format')
+    .option('--device <id>', 'Specific device ID')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.cancelActiveEncodings(options.device);
+        console.log(toon.formatMessage('Active transcoding cancelled', true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

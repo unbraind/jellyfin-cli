@@ -270,5 +270,54 @@ export function createItemsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('critic-reviews <itemId>').description('Get critic reviews for an item')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getCriticReviews(itemId);
+        console.log(toon.formatToon({
+          total: result.TotalRecordCount,
+          reviews: (result.Items ?? []).map((r) => ({
+            reviewer: r.ReviewerName,
+            date: r.Date,
+            is_negative: r.IsNegative,
+            body: r.Body ? r.Body.substring(0, 200) : undefined,
+            url: r.Url,
+          })),
+        }, 'critic_reviews'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('download-url <itemId>').description('Get direct download URL for an item')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const url = client.getItemDownloadUrl(itemId);
+        console.log(toon.formatToon({ url, item_id: itemId }, 'download_url'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('root').description('Get the root virtual folder for the current user')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const root = await client.getItemRootFolder();
+        console.log(toon.formatItem(root));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('set-content-type <itemId> <contentType>').description('Set content type for an item (e.g. TvShows, Movies, Music)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, contentType, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.setItemContentType(itemId, contentType);
+        console.log(toon.formatMessage(`Content type set to '${contentType}' for item ${itemId}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

@@ -40,6 +40,8 @@ import {
   createSchemaCommand,
   createArtistsCommand,
   createVideosCommand,
+  createAuthCommand,
+  createReportsCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -92,5 +94,7 @@ program.addCommand(createChannelsCommand());
 program.addCommand(createSchemaCommand());
 program.addCommand(createArtistsCommand());
 program.addCommand(createVideosCommand());
+program.addCommand(createAuthCommand());
+program.addCommand(createReportsCommand());
 
 program.parse();

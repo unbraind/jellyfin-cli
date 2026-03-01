@@ -71,5 +71,29 @@ export function createEnvironmentCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('dir-contents <path>').description('List directory contents on the server')
+    .option('-f, --format <format>', 'Output format')
+    .option('--files', 'Include files (not just directories)')
+    .action(async (path, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const contents = await client.getDirectoryContents(path, {
+          includeFiles: options.files,
+          includeDirectories: true,
+        });
+        console.log(toon.formatToon(contents.map((c) => ({ name: c.Name, path: c.Path, type: c.Type })), 'dir_contents'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('network-shares').description('List available network shares on the server')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const shares = await client.getNetworkShares();
+        console.log(toon.formatToon(shares.map((s) => ({ name: s.Name, path: s.Path })), 'network_shares'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

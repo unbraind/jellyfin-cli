@@ -2639,4 +2639,507 @@ jf schema <type>
 
 Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `item`, `sessions`, `session`, `libraries`, `tasks`, `search_result`, `plugins`, `config`
 
+---
+
+## auth
+
+Authentication provider management.
+
+### auth providers
+
+List all authentication providers configured on the server.
+
+```bash
+jf auth providers [-f format]
+```
+
+Output type: `auth_providers`
+
+### auth password-reset-providers
+
+List all password reset providers configured on the server.
+
+```bash
+jf auth password-reset-providers [-f format]
+```
+
+Output type: `password_reset_providers`
+
+---
+
+## reports
+
+Reporting commands (requires the Reports plugin installed on server).
+
+### reports activities
+
+Get the activity log report.
+
+```bash
+jf reports activities [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--limit <n>` | Max number of entries (default: 50) |
+| `--offset <n>` | Start index (default: 0) |
+| `--min-date <date>` | Minimum date (ISO format) |
+
+Output type: `report`
+
+### reports items
+
+Get an items report.
+
+```bash
+jf reports items [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--view <view>` | Report view (e.g. movies, tvshows, music) |
+| `--display-type <type>` | Display type (Screen, Export, Screen\|Export) |
+| `--limit <n>` | Max number of entries (default: 100) |
+| `--offset <n>` | Start index (default: 0) |
+
+Output type: `report`
+
+### reports headers
+
+Get report column headers.
+
+```bash
+jf reports headers [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--view <view>` | Report view |
+| `--display-type <type>` | Display type |
+
+Output type: `report_headers`
+
+---
+
+## system endpoint
+
+Get network endpoint information (is local, is in network).
+
+```bash
+jf system endpoint [-f format]
+```
+
+Output type: `endpoint`
+
+---
+
+## environment dir-contents
+
+List directory contents on the server file system.
+
+```bash
+jf environment dir-contents <path> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--include-files` | Include files (default: directories only) |
+
+Output type: `dir_contents`
+
+## environment network-shares
+
+List available network shares.
+
+```bash
+jf environment network-shares [-f format]
+```
+
+Output type: `network_shares`
+
+---
+
+## users public
+
+List public users (no authentication required).
+
+```bash
+jf users public [-f format]
+```
+
+Output type: `users`
+
+---
+
+## userdata get
+
+Get user-specific play data for an item.
+
+```bash
+jf userdata get <itemId> [--user-id <id>] [-f format]
+```
+
+Output type: `user_data`
+
+---
+
+## items root
+
+Get the root virtual folder for the current user.
+
+```bash
+jf items root [--user-id <id>] [-f format]
+```
+
+Output type: `item`
+
+## items critic-reviews
+
+Get critic reviews for an item.
+
+```bash
+jf items critic-reviews <itemId> [-f format]
+```
+
+Output type: `items`
+
+## items download-url
+
+Get the authenticated download URL for an item.
+
+```bash
+jf items download-url <itemId> [-f format]
+```
+
+Output type: `message`
+
+## items set-content-type
+
+Set the content type of an item.
+
+```bash
+jf items set-content-type <itemId> <contentType> [-f format]
+```
+
+Output type: `message`
+
+---
+
+## sessions user-add
+
+Add a user to an active session.
+
+```bash
+jf sessions user-add --session-id <id> --user-id <id> [-f format]
+```
+
+Output type: `message`
+
+## sessions user-remove
+
+Remove a user from an active session.
+
+```bash
+jf sessions user-remove --session-id <id> --user-id <id> [-f format]
+```
+
+Output type: `message`
+
+---
+
+## videos cancel-transcoding
+
+Cancel all active video transcoding sessions (optionally filter by device).
+
+```bash
+jf videos cancel-transcoding [--device-id <id>] [-f format]
+```
+
+Output type: `message`
+
+---
+
+## playlists get
+
+Get playlist details.
+
+```bash
+jf playlists get <playlistId> [-f format]
+```
+
+Output type: `item`
+
+## playlists update
+
+Update playlist metadata.
+
+```bash
+jf playlists update <playlistId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | New playlist name |
+| `--ids <ids>` | Comma-separated item IDs |
+| `--user-id <id>` | User ID |
+
+Output type: `message`
+
+## playlists users
+
+List users with access to a playlist.
+
+```bash
+jf playlists users <playlistId> [-f format]
+```
+
+Output type: `playlist_users`
+
+## playlists share
+
+Grant a user access to a playlist.
+
+```bash
+jf playlists share <playlistId> --user-id <id> [--can-edit] [-f format]
+```
+
+Output type: `message`
+
+## playlists unshare
+
+Revoke a user's access to a playlist.
+
+```bash
+jf playlists unshare <playlistId> --user-id <id> [-f format]
+```
+
+Output type: `message`
+
+## playlists move
+
+Move a playlist item to a new position.
+
+```bash
+jf playlists move <playlistId> --item-id <id> --new-index <n> [-f format]
+```
+
+Output type: `message`
+
+---
+
+## livetv guide-info
+
+Get the Live TV guide date range.
+
+```bash
+jf livetv guide-info [-f format]
+```
+
+Output type: `guide_info`
+
+## livetv recommended
+
+Get recommended Live TV programs.
+
+```bash
+jf livetv recommended [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--user-id <id>` | User ID |
+| `--limit <n>` | Max results |
+| `--is-airing` | Only currently airing |
+| `--has-aired` | Only already aired |
+
+Output type: `items`
+
+## livetv recording-folders
+
+Get recording folder list.
+
+```bash
+jf livetv recording-folders [--user-id <id>] [-f format]
+```
+
+Output type: `items`
+
+## livetv recording-groups
+
+Get recording groups.
+
+```bash
+jf livetv recording-groups [--user-id <id>] [-f format]
+```
+
+Output type: `items`
+
+## livetv recording
+
+Get a single recording by ID.
+
+```bash
+jf livetv recording <id> [--user-id <id>] [-f format]
+```
+
+Output type: `item`
+
+## livetv delete-recording
+
+Delete a recording.
+
+```bash
+jf livetv delete-recording <id> [-f format]
+```
+
+Output type: `message`
+
+## livetv discover-tuners
+
+Discover available tuner devices on the network.
+
+```bash
+jf livetv discover-tuners [--new-devices-only] [-f format]
+```
+
+Output type: `tuners`
+
+## livetv tuner-types
+
+List available tuner host types.
+
+```bash
+jf livetv tuner-types [-f format]
+```
+
+Output type: `tuner_types`
+
+---
+
+## discover album-mix
+
+Get an instant mix based on an album.
+
+```bash
+jf discover album-mix <albumId> [--limit <n>] [--user-id <id>] [-f format]
+```
+
+Output type: `items`
+
+## discover song-mix
+
+Get an instant mix based on a song.
+
+```bash
+jf discover song-mix <songId> [--limit <n>] [--user-id <id>] [-f format]
+```
+
+Output type: `items`
+
+## discover trailers
+
+List trailer items in the library.
+
+```bash
+jf discover trailers [--limit <n>] [--user-id <id>] [-f format]
+```
+
+Output type: `items`
+
+---
+
+## syncplay create
+
+Create a new SyncPlay group.
+
+```bash
+jf syncplay create [--name <groupName>] [-f format]
+```
+
+Output type: `message`
+
+## syncplay get
+
+Get details of a SyncPlay group.
+
+```bash
+jf syncplay get <groupId> [-f format]
+```
+
+Output type: `syncplay_group`
+
+## syncplay seek
+
+Seek to a position in the current SyncPlay group.
+
+```bash
+jf syncplay seek --ticks <positionTicks> [-f format]
+```
+
+Output type: `message`
+
+## syncplay next
+
+Skip to the next item in the SyncPlay queue.
+
+```bash
+jf syncplay next [--playlist-item-id <id>] [-f format]
+```
+
+Output type: `message`
+
+## syncplay previous
+
+Go to the previous item in the SyncPlay queue.
+
+```bash
+jf syncplay previous [--playlist-item-id <id>] [-f format]
+```
+
+Output type: `message`
+
+## syncplay set-repeat
+
+Set the repeat mode for the SyncPlay group.
+
+```bash
+jf syncplay set-repeat <mode> [-f format]
+```
+
+`mode` values: `RepeatNone`, `RepeatOne`, `RepeatAll`
+
+Output type: `message`
+
+## syncplay set-shuffle
+
+Set the shuffle mode for the SyncPlay group.
+
+```bash
+jf syncplay set-shuffle <mode> [-f format]
+```
+
+`mode` values: `Sorted`, `Shuffle`
+
+Output type: `message`
+
+## syncplay queue
+
+Add items to the SyncPlay queue.
+
+```bash
+jf syncplay queue --ids <id1,id2,...> [-f format]
+```
+
+Output type: `message`
+
+## syncplay set-queue
+
+Replace the SyncPlay queue with new items.
+
+```bash
+jf syncplay set-queue --ids <id1,id2,...> [--start-ticks <n>] [-f format]
+```
+
+Output type: `message`
+
 Output type: `schema`

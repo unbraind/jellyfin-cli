@@ -36,3 +36,5 @@ export { createChannelsCommand } from './channels.js';
 export { createSchemaCommand } from './schema.js';
 export { createArtistsCommand } from './artists.js';
 export { createVideosCommand } from './videos.js';
+export { createAuthCommand } from './auth.js';
+export { createReportsCommand } from './reports.js';
