@@ -38,6 +38,8 @@ import {
   createTrickplayCommand,
   createChannelsCommand,
   createSchemaCommand,
+  createArtistsCommand,
+  createVideosCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -88,5 +90,7 @@ program.addCommand(createMusicGenresCommand());
 program.addCommand(createTrickplayCommand());
 program.addCommand(createChannelsCommand());
 program.addCommand(createSchemaCommand());
+program.addCommand(createArtistsCommand());
+program.addCommand(createVideosCommand());
 
 program.parse();

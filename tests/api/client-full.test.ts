@@ -424,21 +424,32 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
 
   describe('API Key Operations', () => {
     it('should get API keys', async () => {
-      const mockKeys = [{ Id: 'key-1', AppName: 'Test App' }];
+      const mockKeys = { Items: [{ Id: 1, AppName: 'Test App' }], TotalRecordCount: 1 };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockKeys));
       const result = await client.getApiKeys();
-      expect(result).toHaveLength(1);
+      expect(result.Items).toHaveLength(1);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/Auth/Keys'),
+        expect.anything()
+      );
     });
 
     it('should create API key', async () => {
-      mockFetch.mockResolvedValueOnce(createMockResponse({ Id: 'key-1', AppName: 'Test App' }));
-      const result = await client.createApiKey('Test App');
-      expect(result.AppName).toBe('Test App');
+      mockFetch.mockResolvedValueOnce(createMockResponse(null, { status: 204 }));
+      await expect(client.createApiKey('Test App')).resolves.toBeUndefined();
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/Auth/Keys'),
+        expect.objectContaining({ method: 'POST' })
+      );
     });
 
     it('should delete API key', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null, { status: 204 }));
       await expect(client.deleteApiKey('key-1')).resolves.toBeUndefined();
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/Auth/Keys/key-1'),
+        expect.objectContaining({ method: 'DELETE' })
+      );
     });
   });
 

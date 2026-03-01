@@ -1,7 +1,6 @@
 import { Command } from 'commander';
-import { JellyfinApiError } from '../api/client.js';
-import { formatSuccess, formatError, toon } from '../formatters/index.js';
-import { createApiClient } from './utils.js';
+import { createApiClient, handleError } from './utils.js';
+import { formatSuccess, toon } from '../formatters/index.js';
 
 export function createSystemCommand(): Command {
   const cmd = new Command('system');
@@ -15,23 +14,19 @@ export function createSystemCommand(): Command {
       try {
         const info = await client.getSystemInfo();
         console.log(toon.formatSystemInfo(info));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
     });
 
   cmd
     .command('health')
-    .description('Check server health')
+    .description('Check server health status')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
         const health = await client.getHealth();
         console.log(formatSuccess(`Server health: ${health}`, format));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
     });
 
   cmd
@@ -41,16 +36,11 @@ export function createSystemCommand(): Command {
     .option('--force', 'Skip confirmation')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
-      if (!options.force) {
-        console.error('Use --force to confirm restart');
-        process.exit(1);
-      }
+      if (!options.force) { console.error('Use --force to confirm restart'); process.exit(1); }
       try {
         await client.restartServer();
         console.log(formatSuccess('Server restart initiated', format));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
     });
 
   cmd
@@ -60,16 +50,11 @@ export function createSystemCommand(): Command {
     .option('--force', 'Skip confirmation')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
-      if (!options.force) {
-        console.error('Use --force to confirm shutdown');
-        process.exit(1);
-      }
+      if (!options.force) { console.error('Use --force to confirm shutdown'); process.exit(1); }
       try {
         await client.shutdownServer();
         console.log(formatSuccess('Server shutdown initiated', format));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
     });
 
   cmd
@@ -90,20 +75,47 @@ export function createSystemCommand(): Command {
           hasUserId: options.hasUser,
         });
         console.log(toon.formatActivityLog(result.Items ?? []));
-      } catch (err) {
-        handleError(err, format);
-      }
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('time')
+    .description('Get server UTC time (useful for clock sync checking)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const timeInfo = await client.getUtcTime();
+        console.log(toon.formatToon({
+          request_received: timeInfo.RequestReceptionTime,
+          response_sent: timeInfo.ResponseTransmissionTime,
+        }, 'server_time'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('config')
+    .description('Get server application configuration')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const config = await client.getServerConfiguration();
+        console.log(toon.formatToon(config, 'server_config'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('config-section <key>')
+    .description('Get a named server configuration section (e.g. network, encoding)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (key, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const section = await client.getNamedConfiguration(key);
+        console.log(toon.formatToon(section, `config_${key}`));
+      } catch (err) { handleError(err, format); }
     });
 
   return cmd;
-}
-
-function handleError(err: unknown, format: string): never {
-  if (err instanceof JellyfinApiError) {
-    console.error(formatError(err.message, format as 'toon' | 'json' | 'table' | 'raw', err.statusCode, err.details));
-  } else {
-    const message = err instanceof Error ? err.message : 'Unknown error';
-    console.error(formatError(message, format as 'toon' | 'json' | 'table' | 'raw'));
-  }
-  process.exit(1);
 }

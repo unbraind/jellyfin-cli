@@ -197,7 +197,7 @@ export function createItemsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const item = await client.getItem(itemId);
-        
+
         if (options.name !== undefined) item.Name = options.name;
         if (options.overview !== undefined) item.Overview = options.overview;
         if (options.genres !== undefined) item.Genres = options.genres.split(',');
@@ -214,6 +214,59 @@ export function createItemsCommand(): Command {
 
         await client.updateItem(itemId, item);
         console.log(toon.formatMessage(`Item ${itemId} updated successfully`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('identify <itemId>')
+    .description('Search remote metadata providers to identify/re-identify an item')
+    .option('-f, --format <format>', 'Output format')
+    .option('--type <type>', 'Item type (Movie, Series, MusicAlbum, MusicArtist, Person, Trailer)', 'Movie')
+    .option('--name <name>', 'Override search name')
+    .option('--year <year>', 'Override search year')
+    .option('--provider <name>', 'Specific provider name (e.g. TheMovieDb)')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const item = await client.getItem(itemId);
+        const typeMap: Record<string, string> = {
+          Movie: 'Movie', Series: 'Series', MusicAlbum: 'MusicAlbum',
+          MusicArtist: 'MusicArtist', Person: 'Person', Trailer: 'Trailer',
+        };
+        const searchType = typeMap[options.type] ?? 'Movie';
+        const results = await client.remoteSearch(searchType, {
+          SearchInfo: {
+            Name: options.name ?? item.Name,
+            Year: options.year ? parseInt(options.year, 10) : item.ProductionYear,
+            ItemId: itemId,
+          },
+          SearchProviderName: options.provider,
+          IncludeDisabledProviders: false,
+        });
+        console.log(toon.formatToon(results.map((r) => ({
+          name: r.Name,
+          year: r.ProductionYear,
+          premiere: r.PremiereDate,
+          provider: r.SearchProviderName,
+          overview: r.Overview ? r.Overview.substring(0, 100) + (r.Overview.length > 100 ? '...' : '') : undefined,
+          ids: r.ProviderIds,
+          image: r.ImageUrl,
+        })), 'identify_results'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('apply-match <itemId>')
+    .description('Apply a remote metadata match to an item (use after identify)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--provider <name>', 'Provider name')
+    .option('--replace-images', 'Replace all images')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.applySearchResult(itemId, {
+          searchProviderName: options.provider,
+          replaceAllImages: options.replaceImages,
+        });
+        console.log(toon.formatMessage(`Metadata match applied to item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 

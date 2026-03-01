@@ -8,6 +8,8 @@ export interface ScheduledTaskInfo {
   Category?: string | null;
   IsHidden?: boolean;
   Key?: string | null;
+  Progress?: number | null;
+  CurrentProgressPercentage?: number | null;
 }
 
 export type TaskState = 'Idle' | 'Cancelling' | 'Running';

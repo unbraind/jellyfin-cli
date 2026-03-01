@@ -169,7 +169,9 @@ jf config test [--name <name>]
 
 
 
-System commands.
+## system
+
+System administration commands.
 
 ### system info
 
@@ -222,6 +224,36 @@ jf system activity [options]
 
 Output type: `activity_log`
 
+### system time
+
+Get the server's current UTC time (useful for time synchronization).
+
+```bash
+jf system time [-f format]
+```
+
+Output type: `server_time`
+
+### system config
+
+Get the complete server configuration.
+
+```bash
+jf system config [-f format]
+```
+
+Output type: `server_config`
+
+### system config-section
+
+Get a named server configuration section.
+
+```bash
+jf system config-section <key> [-f format]
+```
+
+Output type: `config_section`
+
 ## users
 
 User management commands.
@@ -265,6 +297,28 @@ jf users by-name <username> [-f format]
 ```
 
 Output type: `user`
+
+### users views
+
+Get the library views for the current (or specified) user.
+
+```bash
+jf users views [--user <userId>] [-f format]
+```
+
+Output type: `user_views`
+
+### users display-prefs
+
+Get display preferences by preference ID.
+
+```bash
+jf users display-prefs <prefsId> [--user <userId>] [-f format]
+```
+
+Common preference IDs: `usersettings`, `movies`, `tvshows`
+
+Output type: `display_prefs`
 
 ## items
 
@@ -548,6 +602,39 @@ jf items filters [options]
 
 Output type: `filters`
 
+### items identify
+
+Search remote metadata providers for matches for an item. Read-only — does not modify any data.
+
+```bash
+jf items identify <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--type <type>` | Item type override (Movie, Series, Episode, etc.) |
+| `--name <name>` | Name override for search |
+| `--year <year>` | Production year override |
+| `--provider <name>` | Specific metadata provider |
+
+Output type: `identify_results`
+
+### items apply-match
+
+Apply a remote metadata search result to an item.
+
+```bash
+jf items apply-match <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--provider <name>` | Metadata provider name |
+| `--replace-images` | Replace all images with provider images |
+| `--provider-ids <json>` | Provider IDs as JSON (e.g. '{"Tmdb":"12345"}') |
+
+Output type: `message`
+
 ## sessions
 
 Session and playback commands.
@@ -744,6 +831,73 @@ jf library album-artists [--parent <id>] [--limit <number>]
 ```
 
 Output type: `items`
+
+### library virtual-folders
+
+List all virtual folders (library sources) with their configured media paths.
+
+```bash
+jf library virtual-folders [-f format]
+```
+
+Output type: `virtual_folders`
+
+### library add-folder
+
+Add a new virtual folder (library source).
+
+```bash
+jf library add-folder [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Folder name (required) |
+| `--type <type>` | Collection type (movies, tvshows, music, books, mixed) |
+| `--paths <paths>` | Comma-separated media paths |
+| `--refresh` | Refresh library after adding |
+
+Output type: `message`
+
+### library remove-folder
+
+Remove a virtual folder.
+
+```bash
+jf library remove-folder <name> --force [--refresh] [-f format]
+```
+
+Output type: `message`
+
+### library rename-folder
+
+Rename a virtual folder.
+
+```bash
+jf library rename-folder <name> <newName> [--refresh] [-f format]
+```
+
+Output type: `message`
+
+### library add-path
+
+Add a media path to a virtual folder.
+
+```bash
+jf library add-path <folderName> <path> [--network-path <path>] [--refresh] [-f format]
+```
+
+Output type: `message`
+
+### library remove-path
+
+Remove a media path from a virtual folder.
+
+```bash
+jf library remove-path <folderName> <path> [--refresh] [-f format]
+```
+
+Output type: `message`
 
 ## userdata
 
@@ -2212,6 +2366,241 @@ Delete a task trigger.
 
 ```bash
 jf tasks delete-trigger <taskId> <triggerId>
+```
+
+Output type: `message`
+
+## artists
+
+Commands for browsing music artists.
+
+### artists list
+
+List music artists.
+
+```bash
+jf artists list [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Parent library ID |
+| `--limit <number>` | Limit (default: 50) |
+| `--sort <field>` | Sort field (e.g. SortName) |
+| `--order <direction>` | Sort order (Ascending/Descending) |
+
+Output type: `items`
+
+### artists album-artists
+
+List album artists.
+
+```bash
+jf artists album-artists [options]
+```
+
+Same options as `artists list`.
+
+Output type: `items`
+
+### artists get
+
+Get an artist by name.
+
+```bash
+jf artists get <name> [-f format]
+```
+
+Output type: `item`
+
+## videos
+
+Commands for managing video versions.
+
+### videos parts
+
+List all parts/versions of a video item.
+
+```bash
+jf videos parts <itemId> [-f format]
+```
+
+Output type: `items`
+
+### videos merge-versions
+
+Merge multiple versions of a video into one item (admin, non-destructive metadata merge).
+
+```bash
+jf videos merge-versions <itemId1> <itemId2> [...] --force [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Required to confirm the merge |
+
+Output type: `message`
+
+### videos delete-alternates
+
+Delete all alternate sources (non-primary versions) for a video item.
+
+```bash
+jf videos delete-alternates <itemId> --force [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--force` | Required to confirm deletion |
+
+Output type: `message`
+
+## system time
+
+Get the server's current UTC time.
+
+```bash
+jf system time [-f format]
+```
+
+Output type: `server_time`
+
+## system config
+
+Get the server configuration.
+
+```bash
+jf system config [-f format]
+```
+
+Output type: `server_config`
+
+## system config-section
+
+Get a named configuration section.
+
+```bash
+jf system config-section <key> [-f format]
+```
+
+Output type: `config_section`
+
+## users views
+
+Get the library views for the current user.
+
+```bash
+jf users views [--user <userId>] [-f format]
+```
+
+Output type: `user_views`
+
+## users display-prefs
+
+Get display preferences by preference ID (e.g. usersettings).
+
+```bash
+jf users display-prefs <prefsId> [--user <userId>] [-f format]
+```
+
+Output type: `display_prefs`
+
+## items identify
+
+Search remote metadata providers for matches for an item.
+
+```bash
+jf items identify <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--type <type>` | Item type (Movie, Series, Episode, etc.) |
+| `--name <name>` | Override item name for search |
+| `--year <year>` | Override production year for search |
+| `--provider <name>` | Specific metadata provider |
+
+Output type: `identify_results`
+
+## items apply-match
+
+Apply a remote metadata search result to an item.
+
+```bash
+jf items apply-match <itemId> [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--provider <name>` | Metadata provider name |
+| `--replace-images` | Replace all images |
+| `--provider-ids <json>` | Provider IDs as JSON object |
+
+Output type: `message`
+
+## library virtual-folders
+
+List all virtual folders (library sources) with their paths.
+
+```bash
+jf library virtual-folders [-f format]
+```
+
+Output type: `virtual_folders`
+
+## library add-folder
+
+Add a new virtual folder (library source).
+
+```bash
+jf library add-folder [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--name <name>` | Folder name (required) |
+| `--type <type>` | Collection type (movies, tvshows, music, books, mixed) |
+| `--paths <paths>` | Media paths (comma-separated) |
+| `--refresh` | Refresh library after adding |
+
+Output type: `message`
+
+## library remove-folder
+
+Remove a virtual folder by name.
+
+```bash
+jf library remove-folder <name> --force [--refresh] [-f format]
+```
+
+Output type: `message`
+
+## library rename-folder
+
+Rename a virtual folder.
+
+```bash
+jf library rename-folder <name> <newName> [--refresh] [-f format]
+```
+
+Output type: `message`
+
+## library add-path
+
+Add a media path to an existing virtual folder.
+
+```bash
+jf library add-path <folderName> <path> [--network-path <path>] [--refresh] [-f format]
+```
+
+Output type: `message`
+
+## library remove-path
+
+Remove a media path from a virtual folder.
+
+```bash
+jf library remove-path <folderName> <path> [--refresh] [-f format]
 ```
 
 Output type: `message`

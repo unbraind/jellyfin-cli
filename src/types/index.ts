@@ -47,4 +47,12 @@ export type {
   LibraryOptions as ExtendedLibraryOptions,
   TypeOption,
   ImageOption as ExtendedImageOption,
+  RemoteSearchResult,
+  RemoteSearchQuery,
+  UserView,
+  UserViewGroupingOption,
+  UtcTimeResponse,
+  AddVirtualFolderParams,
+  AddMediaPathParams,
+  UpdateMediaPathParams,
 } from './extended.js';

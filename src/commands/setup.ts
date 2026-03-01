@@ -2,6 +2,7 @@ import { Command } from 'commander';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
 import { toon, formatSuccess } from '../formatters/index.js';
+import { promptGithubStar } from '../utils/github-star.js';
 
 export function createSetupCommand(): Command {
   const cmd = new Command('setup');
@@ -103,6 +104,7 @@ export function createSetupCommand(): Command {
         };
 
         console.log(toon.formatToon(result, 'setup_complete'));
+        await promptGithubStar();
 
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Setup failed';
@@ -143,6 +145,7 @@ export function createSetupCommand(): Command {
           server_version: info.Version,
           can_connect: true,
         }, 'setup_status'));
+        await promptGithubStar();
       } catch (err) {
         console.log(toon.formatToon({
           configured: true,

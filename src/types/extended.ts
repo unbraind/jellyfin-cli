@@ -255,3 +255,67 @@ export interface CreateUserResult {
   Name?: string | null;
   ServerId?: string | null;
 }
+
+export interface RemoteSearchResult {
+  Name?: string | null;
+  ProductionYear?: number | null;
+  PremiereDate?: string | null;
+  ImageUrl?: string | null;
+  SearchProviderName?: string | null;
+  Overview?: string | null;
+  ProviderIds?: Record<string, string | null>;
+}
+
+export interface RemoteSearchQuery {
+  SearchInfo?: {
+    Name?: string | null;
+    Year?: number | null;
+    ProviderIds?: Record<string, string | null>;
+    ItemId?: string | null;
+  };
+  ItemId?: string | null;
+  SearchProviderName?: string | null;
+  IncludeDisabledProviders?: boolean;
+}
+
+export interface UserView {
+  Id?: string | null;
+  Name?: string | null;
+  CollectionType?: string | null;
+  ImageTags?: Record<string, string | null>;
+  ServerId?: string | null;
+  Type?: string | null;
+  ParentId?: string | null;
+}
+
+export interface UserViewGroupingOption {
+  Id?: string | null;
+  Name?: string | null;
+}
+
+export interface UtcTimeResponse {
+  RequestReceptionTime?: string | null;
+  ResponseTransmissionTime?: string | null;
+}
+
+export interface AddVirtualFolderParams {
+  name: string;
+  collectionType?: string;
+  paths?: string[];
+  refreshLibrary?: boolean;
+}
+
+export interface AddMediaPathParams {
+  name: string;
+  path: string;
+  networkPath?: string;
+  refreshLibrary?: boolean;
+}
+
+export interface UpdateMediaPathParams {
+  name: string;
+  pathInfo: {
+    Path?: string | null;
+    NetworkPath?: string | null;
+  };
+}

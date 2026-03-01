@@ -143,6 +143,9 @@ jf system info --format raw
 |---------|-------------|
 | `jf system info` | Get system information |
 | `jf system health` | Check server health |
+| `jf system time` | Get server UTC time |
+| `jf system config` | Get server configuration |
+| `jf system config-section <key>` | Get named config section |
 | `jf system restart` | Restart the server |
 | `jf system shutdown` | Shutdown the server |
 | `jf system activity` | Get activity log |
@@ -151,6 +154,12 @@ jf system info --format raw
 | `jf backup restore <path>` | Restore from backup |
 | `jf tasks list` | List scheduled tasks |
 | `jf tasks run <taskId>` | Run a task |
+| `jf environment drives` | List available drives |
+| `jf environment logs` | List log files |
+| `jf environment log <name>` | Get log file content |
+| `jf apikeys list` | List API keys |
+| `jf apikeys create <app>` | Create a new API key |
+| `jf apikeys delete <key>` | Delete an API key |
 
 ### User Management
 
@@ -159,6 +168,8 @@ jf system info --format raw
 | `jf users list` | List all users |
 | `jf users get <userId>` | Get user by ID |
 | `jf users me` | Get current user info |
+| `jf users views` | Get user's library views |
+| `jf users display-prefs <id>` | Get display preferences |
 | `jf users create <username>` | Create a new user |
 | `jf users update-password <userId>` | Update user password |
 | `jf users policy <userId>` | Get user policy |
@@ -172,12 +183,72 @@ jf system info --format raw
 |---------|-------------|
 | `jf library list` | List all libraries |
 | `jf library refresh` | Refresh all libraries |
+| `jf library genres` | List all genres |
+| `jf library studios` | List all studios |
+| `jf library persons` | List all persons |
+| `jf library virtual-folders` | List virtual folders with paths |
+| `jf library add-folder` | Add a new virtual folder |
+| `jf library remove-folder <name>` | Remove a virtual folder |
+| `jf library rename-folder <name> <new>` | Rename a virtual folder |
+| `jf library add-path <folder> <path>` | Add media path to folder |
+| `jf library remove-path <folder> <path>` | Remove media path |
 | `jf items list` | List items with filters |
 | `jf items search <term>` | Search for items |
 | `jf items get <itemId>` | Get item details |
+| `jf items identify <itemId>` | Search for metadata matches |
+| `jf items apply-match <itemId>` | Apply metadata search result |
 | `jf items update <itemId>` | Update item metadata |
 | `jf items delete <itemId>` | Delete an item |
 | `jf items refresh <itemId>` | Refresh item metadata |
+| `jf collections list` | List box sets / collections |
+| `jf collections get <id>` | Get collection details |
+| `jf collections items <id>` | List items in collection |
+| `jf favorites list` | List favorite items |
+| `jf suggestions get` | Get content suggestions |
+
+### TV Shows
+
+| Command | Description |
+|---------|-------------|
+| `jf tvshows episodes <seriesId>` | List episodes for a series |
+| `jf tvshows seasons <seriesId>` | List seasons for a series |
+| `jf tvshows next-up` | Get next up episodes |
+| `jf tvshows upcoming` | Get upcoming episodes |
+
+### Music & Artists
+
+| Command | Description |
+|---------|-------------|
+| `jf artists list` | List music artists |
+| `jf artists album-artists` | List album artists |
+| `jf artists get <name>` | Get artist by name |
+| `jf music-genres list` | List music genres |
+| `jf music-genres get <name>` | Get a specific music genre |
+
+### Media & Images
+
+| Command | Description |
+|---------|-------------|
+| `jf images list <itemId>` | List images for an item |
+| `jf images url <itemId> <type>` | Get image URL |
+| `jf images user <userId>` | Get user profile image URL |
+| `jf media segments <itemId>` | Get media segments |
+| `jf media remote-images <itemId>` | List available remote images |
+| `jf media hls-url <itemId>` | Get HLS master playlist URL |
+| `jf media theme-songs <itemId>` | Get theme songs |
+| `jf media theme-videos <itemId>` | Get theme videos |
+| `jf media external-ids <itemId>` | Get external IDs |
+| `jf media lyrics <itemId>` | Get audio lyrics |
+| `jf trickplay hls-url <itemId> <w>` | Get trickplay HLS URL |
+| `jf trickplay tile-url <itemId> <w> <i>` | Get trickplay tile URL |
+
+### Videos
+
+| Command | Description |
+|---------|-------------|
+| `jf videos parts <itemId>` | List video parts/versions |
+| `jf videos merge-versions <ids...>` | Merge video versions |
+| `jf videos delete-alternates <id>` | Delete alternate sources |
 
 ### Playback Control
 
@@ -189,6 +260,36 @@ jf system info --format raw
 | `jf sessions stop <sessionId>` | Stop playback |
 | `jf sessions seek <sessionId> <ticks>` | Seek to position |
 | `jf sessions volume <sessionId> <level>` | Set volume |
+| `jf syncplay list` | List SyncPlay groups |
+
+### Plugins & Packages
+
+| Command | Description |
+|---------|-------------|
+| `jf plugins list` | List installed plugins |
+| `jf packages list` | List available packages |
+| `jf packages get <id>` | Get package details |
+| `jf packages repositories` | List plugin repositories |
+| `jf packages installing` | List installing packages |
+
+### Live TV & Channels
+
+| Command | Description |
+|---------|-------------|
+| `jf livetv info` | Get Live TV info |
+| `jf livetv channels` | List Live TV channels |
+| `jf livetv programs` | List TV programs |
+| `jf channels list` | List channel plugin channels |
+
+### Discovery & Stats
+
+| Command | Description |
+|---------|-------------|
+| `jf discover recommendations` | Get personalized recommendations |
+| `jf discover mix <itemId>` | Get instant mix for item |
+| `jf stats counts` | Get library item counts |
+| `jf years list` | List content years |
+| `jf years get <year>` | Get items from a year |
 
 ### Schema & LLM Integration
 

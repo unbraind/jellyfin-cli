@@ -20,6 +20,7 @@ interface SettingsFile {
   defaultServer?: JellyfinConfig;
   servers?: Record<string, JellyfinConfig>;
   currentServer?: string;
+  githubStarred?: boolean;
 }
 
 function ensureConfigDir(): void {
@@ -187,4 +188,14 @@ export function setCurrentServer(name: string): boolean {
 
 export function getSettingsPath(): string {
   return SETTINGS_FILE;
+}
+
+export function isGithubStarred(): boolean {
+  return readSettingsFile().githubStarred === true;
+}
+
+export function markGithubStarred(): void {
+  const settings = readSettingsFile();
+  settings.githubStarred = true;
+  writeSettingsFile(settings);
 }

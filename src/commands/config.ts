@@ -3,6 +3,7 @@ import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, deleteServer, writeSettingsFile } from '../utils/config.js';
 import { formatSuccess, formatError, toon } from '../formatters/index.js';
 import type { OutputFormat } from '../types/index.js';
+import { promptGithubStar } from '../utils/github-star.js';
 
 export function createConfigCommand(): Command {
   const cmd = new Command('config');
@@ -58,6 +59,7 @@ export function createConfigCommand(): Command {
 
       saveConfig(newConfig, options.name, options.default);
       console.log(formatSuccess(`Configuration saved to ${getSettingsPath()}`, format));
+      await promptGithubStar();
     });
 
   cmd
@@ -145,6 +147,7 @@ export function createConfigCommand(): Command {
         const client = new JellyfinApiClient(config);
         const info = await client.getPublicSystemInfo();
         console.log(toon.formatSystemInfo(info));
+        await promptGithubStar();
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Connection failed';
         console.error(formatError(message, format));

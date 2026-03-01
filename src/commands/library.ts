@@ -132,5 +132,100 @@ export function createLibraryCommand(): Command {
       }
     });
 
+  cmd
+    .command('virtual-folders')
+    .description('List all virtual folders (library sources with paths)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const folders = await client.getVirtualFolders();
+        console.log(toon.formatToon(folders.map((f) => ({
+          id: f.ItemId,
+          name: f.Name,
+          type: f.CollectionType,
+          paths: f.Locations,
+          refresh_progress: f.RefreshProgress,
+          refresh_status: f.RefreshStatus,
+        })), 'virtual_folders'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('add-folder')
+    .description('Add a new virtual folder (library source)')
+    .option('-f, --format <format>', 'Output format')
+    .requiredOption('--name <name>', 'Library name')
+    .option('--type <type>', 'Collection type (movies, tvshows, music, books, photos, mixed)', 'mixed')
+    .option('--paths <paths>', 'Comma-separated media paths')
+    .option('--refresh', 'Refresh library after adding')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.addVirtualFolder({
+          name: options.name,
+          collectionType: options.type,
+          paths: options.paths?.split(',').map((p: string) => p.trim()),
+          refreshLibrary: options.refresh,
+        });
+        console.log(toon.formatMessage(`Virtual folder '${options.name}' added`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('remove-folder <name>')
+    .description('Remove a virtual folder by name')
+    .option('-f, --format <format>', 'Output format')
+    .option('--refresh', 'Refresh library after removing')
+    .option('--force', 'Skip confirmation')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      if (!options.force) { console.error('Use --force to confirm removal'); process.exit(1); }
+      try {
+        await client.removeVirtualFolder(name, options.refresh);
+        console.log(toon.formatMessage(`Virtual folder '${name}' removed`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('rename-folder <name> <newName>')
+    .description('Rename a virtual folder')
+    .option('-f, --format <format>', 'Output format')
+    .option('--refresh', 'Refresh library after renaming')
+    .action(async (name, newName, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.renameVirtualFolder(name, newName, options.refresh);
+        console.log(toon.formatMessage(`Virtual folder renamed from '${name}' to '${newName}'`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('add-path <folderName> <path>')
+    .description('Add a media path to an existing virtual folder')
+    .option('-f, --format <format>', 'Output format')
+    .option('--network-path <path>', 'Network path override')
+    .option('--refresh', 'Refresh library after adding')
+    .action(async (folderName, path, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.addMediaPath({ name: folderName, path, networkPath: options.networkPath, refreshLibrary: options.refresh });
+        console.log(toon.formatMessage(`Path '${path}' added to '${folderName}'`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('remove-path <folderName> <path>')
+    .description('Remove a media path from a virtual folder')
+    .option('-f, --format <format>', 'Output format')
+    .option('--refresh', 'Refresh library after removing')
+    .action(async (folderName, path, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.removeMediaPath(folderName, path, options.refresh);
+        console.log(toon.formatMessage(`Path '${path}' removed from '${folderName}'`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

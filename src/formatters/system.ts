@@ -1,12 +1,18 @@
 import type { SystemInfo, UserDto, JellyfinConfig } from '../types/index.js';
 import { formatToon } from './base.js';
 
+// Fix double-protocol issue (e.g. "http://http://..." from misconfigured servers)
+function sanitizeUrl(url: string | null | undefined): string | undefined {
+  if (!url) return undefined;
+  return url.replace(/^(https?:\/\/)+/, (_, p: string) => p);
+}
+
 export function formatSystemInfo(info: SystemInfo): string {
   return formatToon({
     name: info.ServerName,
     ver: info.Version,
     id: info.Id,
-    url: info.LocalAddress,
+    url: sanitizeUrl(info.LocalAddress),
     os: info.OperatingSystem,
     restart: info.HasPendingRestart,
     canRestart: info.CanSelfRestart,

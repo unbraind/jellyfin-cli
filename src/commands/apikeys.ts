@@ -12,9 +12,8 @@ export function createApikeysCommand(): Command {
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const keys = await client.getApiKeys();
-        const simplified = keys.map((k) => ({
-          name: k.Name,
+        const result = await client.getApiKeys();
+        const simplified = (result.Items ?? []).map((k) => ({
           app_name: k.AppName,
           app_version: k.AppVersion,
           date_created: k.DateCreated,
@@ -34,13 +33,8 @@ export function createApikeysCommand(): Command {
     .action(async (app, options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const key = await client.createApiKey(app);
-        console.log(toon.formatToon({
-          name: key.Name,
-          access_token: key.AccessToken,
-          app_name: key.AppName,
-          date_created: key.DateCreated,
-        }, 'api_key'));
+        await client.createApiKey(app);
+        console.log(toon.formatMessage(`API key created for app: ${app}`, true));
       } catch (err) {
         handleError(err, format);
       }

@@ -202,7 +202,7 @@ export function createUsersCommand(): Command {
       try {
         const user = await client.getUserById(userId);
         const config = user.Configuration ?? {};
-        
+
         if (options.subtitleLang !== undefined) config.SubtitleLanguagePreference = options.subtitleLang;
         if (options.subtitleMode !== undefined) config.SubtitleMode = options.subtitleMode;
         if (options.playDefaultAudio !== undefined) config.PlayDefaultAudioTrack = options.playDefaultAudio === 'true';
@@ -214,6 +214,46 @@ export function createUsersCommand(): Command {
       } catch (err) {
         handleError(err, format);
       }
+    });
+
+  cmd
+    .command('views')
+    .description('Get library views for the current user')
+    .option('-f, --format <format>', 'Output format')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getUserViews(options.user);
+        console.log(toon.formatToon((result.Items ?? []).map((v) => ({
+          id: v.Id,
+          name: v.Name,
+          type: v.CollectionType ?? v.Type,
+        })), 'user_views'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('display-prefs <prefsId>')
+    .description('Get display preferences for a view (use "usersettings" for general prefs)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--client <client>', 'Client name', 'emby')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .action(async (prefsId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const prefs = await client.getDisplayPreferences(prefsId, options.user, options.client);
+        console.log(toon.formatToon({
+          id: prefs.Id,
+          client: prefs.Client,
+          sort_by: prefs.SortBy,
+          sort_order: prefs.SortOrder,
+          view_type: prefs.ViewType,
+          index_by: prefs.IndexBy,
+          remember_indexing: prefs.RememberIndexing,
+          remember_sorting: prefs.RememberSorting,
+        }, 'display_prefs'));
+      } catch (err) { handleError(err, format); }
     });
 
   return cmd;

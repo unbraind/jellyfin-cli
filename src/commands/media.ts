@@ -10,8 +10,8 @@ export function createMediaCommand(): Command {
     .action(async (itemId, options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const segments = await client.getMediaSegments(itemId);
-        console.log(toon.formatToon(segments.map((s) => ({
+        const result = await client.getMediaSegments(itemId);
+        console.log(toon.formatToon((result.Items ?? []).map((s) => ({
           id: s.Id,
           type: s.Type,
           start_ticks: s.StartTicks,

@@ -16,7 +16,8 @@ export function createFavoritesCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const result = await client.getItems({
-          isFavorite: true,
+          filters: ['IsFavorite'],
+          recursive: true,
           includeItemTypes: options.types?.split(','),
           limit: parseInt(options.limit, 10),
           startIndex: parseInt(options.offset, 10),
