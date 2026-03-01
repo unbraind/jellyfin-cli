@@ -116,7 +116,7 @@ describe('JellyfinApiClient New Features', () => {
 
   describe('Suggestions', () => {
     it('should get suggestions', async () => {
-      const mockData = [{ Id: 's1', Name: 'Suggested Movie' }];
+      const mockData = { Items: [{ Id: 's1', Name: 'Suggested Movie' }], TotalRecordCount: 1 };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockData));
       const result = await client.getSuggestions({ limit: 10 });
       expect(result).toHaveLength(1);
