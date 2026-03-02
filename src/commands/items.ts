@@ -179,6 +179,23 @@ export function createItemsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('filters2').description('Get advanced query filters (Filters2 endpoint)').option('-f, --format <format>', 'Output format')
+    .option('--parent <id>', 'Parent ID').option('--types <types>', 'Item types (comma-separated)')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const filters = await client.getQueryFilters2({ parentId: options.parent, includeItemTypes: options.types?.split(',') });
+        console.log(toon.formatToon({
+          genres: filters.Genres ?? [],
+          studios: filters.Studios ?? [],
+          tags: filters.Tags ?? [],
+          years: filters.Years ?? [],
+          official_ratings: filters.OfficialRatings ?? [],
+          persons: filters.Persons ?? [],
+        }, 'filters'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('update <itemId>')
     .description('Update item metadata')
     .option('-f, --format <format>', 'Output format')

@@ -260,6 +260,27 @@ export function createSessionsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('report-full-capabilities').description('Report full session capabilities (Capabilities/Full endpoint)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--media-types <types>', 'Playable media types (comma-separated, e.g. Video,Audio)', 'Video,Audio')
+    .option('--commands <cmds>', 'Supported commands (comma-separated)')
+    .option('--media-control', 'Supports media control')
+    .option('--content-uploading', 'Supports content uploading')
+    .option('--sync', 'Supports sync')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.reportFullSessionCapabilities({
+          playableMediaTypes: options.mediaTypes?.split(','),
+          supportedCommands: options.commands?.split(','),
+          supportsMediaControl: !!options.mediaControl,
+          supportsContentUploading: !!options.contentUploading,
+          supportsSync: !!options.sync,
+        });
+        console.log(toon.formatMessage('Full session capabilities reported', true));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('report-start <itemId>').description('Report that playback has started for an item')
     .option('-f, --format <format>', 'Output format')
     .option('--media-source <id>', 'Media source ID')

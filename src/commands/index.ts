@@ -42,3 +42,7 @@ export { createReportsCommand } from './reports.js';
 export { createUsageStatsCommand } from './usage-stats.js';
 export { createFontsCommand } from './fonts.js';
 export { createLiveStreamsCommand } from './live-streams.js';
+export { createGenresCommand } from './genres.js';
+export { createStudiosCommand } from './studios.js';
+export { createPersonsCommand } from './persons.js';
+export { createClientlogCommand } from './clientlog.js';

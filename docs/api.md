@@ -618,6 +618,21 @@ jf items filters [options]
 
 Output type: `filters`
 
+### items filters2
+
+Get advanced query filters (Filters2 endpoint — includes richer metadata).
+
+```bash
+jf items filters2 [options]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Parent ID (library) |
+| `--types <types>` | Item types (comma-separated) |
+
+Output type: `filters`
+
 ### items identify
 
 Search remote metadata providers for matches for an item. Read-only — does not modify any data.
@@ -791,6 +806,22 @@ jf sessions report-capabilities [--media-types <types>] [--commands <cmds>] [--m
 | `--media-types <types>` | Playable media types (comma-separated) | `Video,Audio` |
 | `--commands <cmds>` | Supported commands (comma-separated) | None |
 | `--media-control` | Flag as supporting media control | `false` |
+
+### sessions report-full-capabilities
+
+Report full session capabilities using the Capabilities/Full endpoint (includes sync and content uploading flags).
+
+```bash
+jf sessions report-full-capabilities [--media-types <types>] [--commands <cmds>] [--media-control] [--content-uploading] [--sync]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--media-types <types>` | Playable media types (comma-separated) | `Video,Audio` |
+| `--commands <cmds>` | Supported commands (comma-separated) | None |
+| `--media-control` | Supports media control | `false` |
+| `--content-uploading` | Supports content uploading | `false` |
+| `--sync` | Supports sync | `false` |
 
 ## library
 
@@ -4001,3 +4032,119 @@ jf users view-grouping [--user <userId>]
 Output type: `view_grouping_options`
 
 Fields: `name`, `id`
+
+## genres
+
+Manage content genres.
+
+### genres list
+
+List all content genres.
+
+```bash
+jf genres list [--parent <id>] [--limit <number>] [--sort <field>] [--order <dir>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Filter to a parent library |
+| `--limit <number>` | Maximum results (default: 100) |
+| `--sort <field>` | Sort field (default: SortName) |
+| `--order <dir>` | Sort order: Ascending or Descending (default: Ascending) |
+
+Output type: `items`
+
+### genres get
+
+Get a genre by name.
+
+```bash
+jf genres get <name>
+```
+
+Output type: `item`
+
+---
+
+## studios
+
+Manage production studios.
+
+### studios list
+
+List all studios.
+
+```bash
+jf studios list [--parent <id>] [--limit <number>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Filter to a parent library |
+| `--limit <number>` | Maximum results (default: 100) |
+
+Output type: `items`
+
+### studios get
+
+Get a studio by name.
+
+```bash
+jf studios get <name>
+```
+
+Output type: `item`
+
+---
+
+## persons
+
+Manage persons (actors, directors, writers, etc.).
+
+### persons list
+
+List all persons.
+
+```bash
+jf persons list [--parent <id>] [--limit <number>] [--search <term>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--parent <id>` | Filter to a parent library |
+| `--limit <number>` | Maximum results (default: 100) |
+| `--search <term>` | Search by name (client-side filter) |
+
+Output type: `items`
+
+### persons get
+
+Get a person by name.
+
+```bash
+jf persons get <name>
+```
+
+Output type: `item`
+
+---
+
+## clientlog
+
+Send client-side log entries to the Jellyfin server.
+
+### clientlog send
+
+Send a log entry to the server.
+
+```bash
+jf clientlog send [--message <text>] [--level <level>] [--name <name>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--message <text>` | Log message (default: "jellyfin-cli log entry") |
+| `--level <level>` | Log level: Debug, Information, Warning, Error (default: Information) |
+| `--name <name>` | Logger name (default: "jellyfin-cli") |
+
+Output type: `message`

@@ -742,4 +742,64 @@ describe.skipIf(skip)('E2E items root and filters', () => {
     const out = await jf('items', 'filters', '--types', 'Movie');
     expect(out).toMatch(/^type: filters/m);
   }, T);
+
+  it('items filters2 returns filters type', async () => {
+    const out = await jf('items', 'filters2', '--types', 'Movie');
+    expect(out).toMatch(/^type: filters/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Genres
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E genres', () => {
+  it('genres list returns items type', async () => {
+    const out = await jf('genres', 'list', '--limit', '10');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Studios
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E studios', () => {
+  it('studios list returns items type', async () => {
+    const out = await jf('studios', 'list', '--limit', '10');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Persons
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E persons', () => {
+  it('persons list returns items type', async () => {
+    const out = await jf('persons', 'list', '--limit', '10');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Sessions report-full-capabilities
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E sessions report-full-capabilities', () => {
+  it('sessions report-full-capabilities help is available', async () => {
+    const out = await jf('sessions', 'report-full-capabilities', '--help');
+    expect(out).toMatch(/full session capabilities/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Client log
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E clientlog', () => {
+  it('clientlog send help is available', async () => {
+    const out = await jf('clientlog', 'send', '--help');
+    expect(out).toMatch(/log entry/i);
+  }, T);
 });
