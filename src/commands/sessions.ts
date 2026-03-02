@@ -233,5 +233,32 @@ export function createSessionsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('logout').description('Log out the current API session')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.logoutSession();
+        console.log(toon.formatMessage('Session logged out', true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('report-capabilities').description('Report session capabilities to the server')
+    .option('-f, --format <format>', 'Output format')
+    .option('--media-types <types>', 'Playable media types (comma-separated, e.g. Video,Audio)', 'Video,Audio')
+    .option('--commands <cmds>', 'Supported commands (comma-separated, e.g. Play,Stop)')
+    .option('--media-control', 'Indicate this client supports media control')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.reportSessionCapabilities({
+          playableMediaTypes: options.mediaTypes?.split(','),
+          supportedCommands: options.commands?.split(','),
+          supportsMediaControl: !!options.mediaControl,
+        });
+        console.log(toon.formatMessage('Session capabilities reported', true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

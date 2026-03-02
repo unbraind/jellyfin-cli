@@ -254,6 +254,22 @@ jf system config-section <key> [-f format]
 
 Output type: `config_section`
 
+### system bitrate-test
+
+Test server-to-client bitrate by downloading a payload and measuring throughput.
+
+```bash
+jf system bitrate-test [--size <bytes>]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--size <bytes>` | Test payload size in bytes | `1000000` |
+
+Output type: `bitrate_test`
+
+Fields: `size_bytes`, `elapsed_ms`, `bitrate_bps`, `bitrate_mbps`
+
 ## users
 
 User management commands.
@@ -754,6 +770,28 @@ Send message to session.
 jf sessions message <sessionId> --header <text> --text <text> [--timeout <ms>]
 ```
 
+### sessions logout
+
+Log out the current API session.
+
+```bash
+jf sessions logout
+```
+
+### sessions report-capabilities
+
+Report this client's playback capabilities to the server.
+
+```bash
+jf sessions report-capabilities [--media-types <types>] [--commands <cmds>] [--media-control]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--media-types <types>` | Playable media types (comma-separated) | `Video,Audio` |
+| `--commands <cmds>` | Supported commands (comma-separated) | None |
+| `--media-control` | Flag as supporting media control | `false` |
+
 ## library
 
 Library commands.
@@ -988,6 +1026,22 @@ Remove rating from item.
 ```bash
 jf userdata unrate <itemId> [--user <userId>]
 ```
+
+### userdata played-items
+
+List items marked as played by the current user.
+
+```bash
+jf userdata played-items [--limit <number>] [--types <types>] [--recursive]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--limit <number>` | Maximum items to return | `20` |
+| `--types <types>` | Item types filter (comma-separated) | All types |
+| `--recursive` | Recursive search | `true` |
+
+Output type: `items` (sorted by `DatePlayed` descending)
 
 ## favorites
 
@@ -1602,6 +1656,52 @@ Get lyrics for an audio item.
 
 ```bash
 jf media lyrics <itemId>
+```
+
+Output type: `lyrics`
+
+### media lyrics-upload
+
+Upload lyrics to an audio item (LRC or plain text format).
+
+```bash
+jf media lyrics-upload <itemId> --data <text> [--language <lang>] [--synced]
+```
+
+| Option | Description | Default |
+|--------|-------------|---------|
+| `--data <text>` | Lyrics data (LRC or plain text) | Required |
+| `--language <lang>` | Language code | `en` |
+| `--synced` | Mark as synced (timestamped) lyrics | `false` |
+
+Output type: `lyrics`
+
+### media lyrics-delete
+
+Delete lyrics from an audio item.
+
+```bash
+jf media lyrics-delete <itemId>
+```
+
+### media lyrics-remote-search
+
+Search for remote lyrics providers for an audio item.
+
+```bash
+jf media lyrics-remote-search <itemId> [-f format]
+```
+
+Output type: `remote_lyrics`
+
+Fields per result: `id`, `name`, `provider`, `language`, `format`, `is_synced`
+
+### media lyrics-remote-download
+
+Download and apply remote lyrics to an audio item (use ID from `lyrics-remote-search`).
+
+```bash
+jf media lyrics-remote-download <itemId> <lyricId> [-f format]
 ```
 
 Output type: `lyrics`

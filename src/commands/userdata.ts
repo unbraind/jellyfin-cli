@@ -129,5 +129,25 @@ export function createUserDataCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('played-items').description('List items marked as played by the current user')
+    .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '20')
+    .option('--types <types>', 'Item types (comma-separated)')
+    .option('--recursive', 'Recursive search')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getItems({
+          isPlayed: true,
+          recursive: options.recursive ?? true,
+          limit: parseInt(options.limit, 10),
+          includeItemTypes: options.types?.split(','),
+          sortBy: 'DatePlayed',
+          sortOrder: 'Descending',
+        });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

@@ -204,5 +204,27 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd
+    .command('bitrate-test')
+    .description('Test server-to-client bitrate (downloads a test payload)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--size <bytes>', 'Test payload size in bytes', '1000000')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const sizeByes = parseInt(options.size, 10);
+        const start = Date.now();
+        await client.testBitrate(sizeByes);
+        const elapsed = Date.now() - start;
+        const bitsPerSecond = (sizeByes * 8) / (elapsed / 1000);
+        console.log(toon.formatToon({
+          size_bytes: sizeByes,
+          elapsed_ms: elapsed,
+          bitrate_bps: Math.round(bitsPerSecond),
+          bitrate_mbps: Math.round(bitsPerSecond / 1_000_000 * 100) / 100,
+        }, 'bitrate_test'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

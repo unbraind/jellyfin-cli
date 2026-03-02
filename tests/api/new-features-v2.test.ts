@@ -198,13 +198,16 @@ describe('JellyfinApiClient - New Features', () => {
   });
 
   describe('Session Capabilities API', () => {
-    it('should get session capabilities', async () => {
-      mockFetch.mockResolvedValueOnce(createMockResponse({
-        PlayableMediaTypes: ['Video', 'Audio'],
-        SupportsMediaControl: true,
-      }));
-      const result = await client.getSessionCapabilities();
-      expect(result.PlayableMediaTypes).toContain('Video');
+    it('should report session capabilities (write-only endpoint)', async () => {
+      mockFetch.mockResolvedValueOnce(createMockResponse(null, { status: 204 }));
+      await client.reportSessionCapabilities({
+        playableMediaTypes: ['Video', 'Audio'],
+        supportsMediaControl: true,
+      });
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/Sessions/Capabilities'),
+        expect.objectContaining({ method: 'POST' }),
+      );
     });
 
     it('should report session capabilities', async () => {

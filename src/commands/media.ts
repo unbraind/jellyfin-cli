@@ -128,6 +128,66 @@ export function createMediaCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('lyrics-upload <itemId>').description('Upload lyrics to an audio item')
+    .option('-f, --format <format>', 'Output format')
+    .option('--language <lang>', 'Language code', 'en')
+    .option('--synced', 'Mark as synced lyrics')
+    .option('--data <text>', 'Lyrics data (LRC or plain text)')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.uploadLyrics(itemId, {
+          language: options.language,
+          isSynced: !!options.synced,
+          data: options.data ?? '',
+        });
+        console.log(toon.formatToon({
+          metadata: result.Metadata,
+          lyrics: result.Lyrics?.map((l) => ({ text: l.Text, start: l.Start })),
+        }, 'lyrics'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('lyrics-delete <itemId>').description('Delete lyrics from an audio item')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.deleteLyrics(itemId);
+        console.log(toon.formatMessage(`Lyrics deleted from item ${itemId}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('lyrics-remote-search <itemId>').description('Search for remote lyrics for an audio item')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const results = await client.searchRemoteLyrics(itemId);
+        console.log(toon.formatToon(results.map((r) => ({
+          id: r.Id,
+          name: r.Name,
+          provider: r.ProviderName,
+          language: r.ThreeLetterISOLanguageName,
+          format: r.Format,
+          is_synced: r.IsHashMatch,
+        })), 'remote_lyrics'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('lyrics-remote-download <itemId> <lyricId>').description('Download and apply remote lyrics to an audio item')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, lyricId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.downloadRemoteLyrics(itemId, lyricId);
+        console.log(toon.formatToon({
+          metadata: result.Metadata,
+          lyrics: result.Lyrics?.map((l) => ({ text: l.Text, start: l.Start })),
+        }, 'lyrics'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('hls-url <itemId>').description('Get HLS master playlist URL')
     .option('-f, --format <format>', 'Output format')
     .option('--media-source <id>', 'Media source ID')

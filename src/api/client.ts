@@ -231,6 +231,10 @@ export class JellyfinApiClient extends CoreApi {
   async updateItem(itemId: string, item: Partial<BaseItemDto>): Promise<void> { await this.request<void>('POST', `/Items/${itemId}`, undefined, item); }
   async getMediaSegments(itemId: string): Promise<QueryResult<MediaSegment>> { return this.request<QueryResult<MediaSegment>>('GET', `/MediaSegments/${itemId}`); }
   async getLyrics(itemId: string): Promise<LyricsInfo> { return this.request<LyricsInfo>('GET', `/Audio/${itemId}/Lyrics`); }
+  async uploadLyrics(itemId: string, params: { language: string; isSynced: boolean; data: string }): Promise<LyricsInfo> { return this.request<LyricsInfo>('POST', `/Audio/${itemId}/Lyrics`, undefined, params); }
+  async deleteLyrics(itemId: string): Promise<void> { await this.request<void>('DELETE', `/Audio/${itemId}/Lyrics`); }
+  async searchRemoteLyrics(itemId: string): Promise<RemoteSubtitleInfo[]> { return this.request<RemoteSubtitleInfo[]>('GET', `/Audio/${itemId}/RemoteSearch/Lyrics`); }
+  async downloadRemoteLyrics(itemId: string, lyricId: string): Promise<LyricsInfo> { return this.request<LyricsInfo>('POST', `/Audio/${itemId}/RemoteSearch/Lyrics/${encodeURIComponent(lyricId)}`); }
   async remoteSearch(type: string, query: RemoteSearchQuery): Promise<RemoteSearchResult[]> { return this.request<RemoteSearchResult[]>('POST', `/Items/RemoteSearch/${type}`, undefined, query); }
   async applySearchResult(itemId: string, params: { searchProviderName?: string; replaceAllImages?: boolean; providerIds?: Record<string, string> }): Promise<void> { await this.request<void>('POST', `/Items/RemoteSearch/Apply/${itemId}`, params); }
 
@@ -268,6 +272,7 @@ export class JellyfinApiClient extends CoreApi {
   async getSystemLogFile(name: string): Promise<string> { return this.request<string>('GET', `/System/Logs/Log`, { name }); }
   async getSystemEndpoint(): Promise<{ IsLocal?: boolean; IsInNetwork?: boolean }> { return this.request<{ IsLocal?: boolean; IsInNetwork?: boolean }>('GET', '/System/Endpoint'); }
   async getUtcTime(): Promise<UtcTimeResponse> { return this.request<UtcTimeResponse>('GET', '/GetUtcTime'); }
+  async testBitrate(size?: number): Promise<number> { return this.request<number>('GET', '/Playback/BitrateTest', size !== undefined ? { size } : undefined); }
   async getSubtitleProviders(): Promise<{ Name?: string | null }[]> { return this.request<{ Name?: string | null }[]>('GET', '/Providers/Subtitles/Subtitles'); }
   async getDisplayPreferences(displayPreferencesId: string, userId?: string, client?: string): Promise<DisplayPreferences> { return this.request<DisplayPreferences>('GET', `/DisplayPreferences/${displayPreferencesId}`, { userId, client }); }
 
@@ -296,8 +301,8 @@ export class JellyfinApiClient extends CoreApi {
   async addSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/User/${userId}`); }
   async removeSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('DELETE', `/Sessions/${sessionId}/User/${userId}`); }
   async setNowViewing(sessionId: string, itemId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/Viewing`, { itemId }); }
-  async getSessionCapabilities(): Promise<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[] }> { return this.request<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[] }>('GET', '/Sessions/Capabilities'); }
   async reportSessionCapabilities(params: { playableMediaTypes?: string[]; supportedCommands?: string[]; supportsMediaControl?: boolean }): Promise<void> { await this.request<void>('POST', '/Sessions/Capabilities', params); }
+  async logoutSession(): Promise<void> { await this.request<void>('POST', '/Sessions/Logout'); }
 
   // Library Structure
   async getVirtualFolders(): Promise<VirtualFolderInfo[]> { return this.request<VirtualFolderInfo[]>('GET', '/Library/VirtualFolders'); }
@@ -352,7 +357,7 @@ export class JellyfinApiClient extends CoreApi {
   async getLocalizationOptions(): Promise<LocalizationOption[]> { return this.request<LocalizationOption[]>('GET', '/Localization/Options'); }
   async getCountries(): Promise<CountryInfo[]> { return this.request<CountryInfo[]>('GET', '/Localization/Countries'); }
   async getCultures(): Promise<CultureDto[]> { return this.request<CultureDto[]>('GET', '/Localization/Cultures'); }
-  async getRatingSystems(): Promise<{ Name?: string; CountryCode?: string }[]> { return this.request<{ Name?: string; CountryCode?: string }[]>('GET', '/Localization/RatingSystems'); }
+  async getRatingSystems(): Promise<{ Name?: string; CountryCode?: string }[]> { return this.request<{ Name?: string; CountryCode?: string }[]>('GET', '/Localization/ParentalRatings'); }
 
   // QuickConnect & Auth
   async quickConnectEnabled(): Promise<boolean> { return this.request<boolean>('GET', '/QuickConnect/Enabled'); }

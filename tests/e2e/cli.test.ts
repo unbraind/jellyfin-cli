@@ -350,3 +350,185 @@ describe.skipIf(skip)('E2E misc', () => {
     expect(out).toMatch(/^type: items/m);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// Devices
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E devices', () => {
+  it('devices list returns devices type', async () => {
+    const out = await jf('devices', 'list');
+    expect(out).toMatch(/^type: devices/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Environment
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E environment', () => {
+  it('environment drives returns drives list', async () => {
+    const out = await jf('environment', 'drives');
+    expect(out).toMatch(/^type: drives/m);
+  }, T);
+
+  it('environment network-shares returns shares list', async () => {
+    const out = await jf('environment', 'network-shares');
+    expect(out).toMatch(/^type: network_shares/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Playlists (read-only)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E playlists', () => {
+  it('playlists list returns items type', async () => {
+    const out = await jf('playlists', 'list');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Collections
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E collections', () => {
+  it('collections list returns box-set items', async () => {
+    const out = await jf('collections', 'list');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// System bitrate test
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E system bitrate', () => {
+  it('system bitrate-test returns bitrate_test type', async () => {
+    const out = await jf('system', 'bitrate-test', '--size', '100000');
+    expect(out).toMatch(/^type: bitrate_test/m);
+    expect(out).toMatch(/bitrate_mbps:/);
+    expect(out).toMatch(/elapsed_ms:/);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Schema
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E schema', () => {
+  it('schema list returns available types', async () => {
+    const out = await jf('schema', 'list');
+    expect(out).toMatch(/item/);
+  }, T);
+
+  it('schema item returns JSON schema with properties', async () => {
+    const out = await jf('schema', 'item');
+    expect(out).toMatch(/properties/);
+    expect(out).toMatch(/\$schema/);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Localization extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E localization extended', () => {
+  it('localization cultures returns cultures list', async () => {
+    const out = await jf('localization', 'cultures');
+    expect(out).toMatch(/^type: cultures/m);
+  }, T);
+
+  it('localization ratings returns list', async () => {
+    const out = await jf('localization', 'ratings');
+    expect(out).toMatch(/^type: rating_systems/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Packages & Repositories
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E packages', () => {
+  it('packages repositories returns list', async () => {
+    const out = await jf('packages', 'repositories');
+    expect(out).toMatch(/^type: repositories/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Sessions extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E sessions extended', () => {
+  it('sessions list returns sessions type output', async () => {
+    const out = await jf('sessions', 'list');
+    expect(out).toMatch(/^type: sessions/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Library structure
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E library structure', () => {
+  it('library virtual-folders returns virtual folders', async () => {
+    const out = await jf('library', 'virtual-folders');
+    expect(out).toMatch(/^type: virtual_folders/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Items extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E items extended', () => {
+  it('items list --types Series returns series items', async () => {
+    const out = await jf('items', 'list', '--types', 'Series', '--recursive', '--limit', '3');
+    expect(out).toMatch(/type: Series/);
+  }, T);
+
+  it('items search inception returns results', async () => {
+    const out = await jf('items', 'search', 'inception');
+    expect(out).toMatch(/^type: search/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Music extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E music extended', () => {
+  it('music-genres list with limit returns items', async () => {
+    const out = await jf('music-genres', 'list', '--limit', '5');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('years list returns year entries', async () => {
+    const out = await jf('years', 'list', '--limit', '5');
+    expect(out).toMatch(/^type: years/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Notifications
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E notifications', () => {
+  it('notifications types returns notification types', async () => {
+    const out = await jf('notifications', 'types');
+    expect(out).toMatch(/^type: notification_types/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Userdata
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E userdata', () => {
+  it('userdata played-items returns items', async () => {
+    const out = await jf('userdata', 'played-items', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
