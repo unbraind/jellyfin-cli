@@ -40,3 +40,5 @@ export { createVideosCommand } from './videos.js';
 export { createAuthCommand } from './auth.js';
 export { createReportsCommand } from './reports.js';
 export { createUsageStatsCommand } from './usage-stats.js';
+export { createFontsCommand } from './fonts.js';
+export { createLiveStreamsCommand } from './live-streams.js';

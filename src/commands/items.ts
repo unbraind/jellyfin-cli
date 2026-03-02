@@ -319,5 +319,15 @@ export function createItemsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('metadata-editor <itemId>').description('Get metadata editor data for an item (external IDs, lock status, content type options)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const info = await client.getMetadataEditorInfo(itemId);
+        console.log(toon.formatToon(info, 'metadata_editor'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

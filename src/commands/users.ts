@@ -293,6 +293,20 @@ export function createUsersCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('view-grouping').description('Get user view grouping options (library grouping/merging options)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const opts = await client.getUserViewGroupingOptions(options.user);
+        console.log(toon.formatToon(opts.map((o) => ({
+          name: o.Name,
+          id: o.Id,
+        })), 'view_grouping_options'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('forgot-password <username>').description('Initiate forgot password flow for a user')
     .option('-f, --format <format>', 'Output format')
     .action(async (username, options) => {

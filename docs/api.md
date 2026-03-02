@@ -3845,3 +3845,157 @@ Options:
 Output type: `message`
 
 > Use `jf users views` to find view IDs, then `jf users display-prefs <id>` to inspect current settings.
+
+---
+
+## New v8 commands (metadata, fonts, live streams, alternate sources)
+
+### items metadata-editor
+
+Get metadata editor information for an item (external IDs, content type options, lock status).
+
+```bash
+jf items metadata-editor <itemId>
+```
+
+Output type: `metadata_editor`
+
+Useful for inspecting which external ID providers are configured for an item, or checking whether metadata is locked.
+
+---
+
+### library available-options
+
+Get all available options for creating and configuring libraries (supported metadata scrapers, image fetchers, subtitle downloaders, etc.).
+
+```bash
+jf library available-options
+```
+
+Output type: `library_options`
+
+---
+
+### system metadata-options
+
+Get the default metadata options configured on the server (disabled metadata fetchers, disabled image fetchers, etc.).
+
+```bash
+jf system metadata-options
+```
+
+Output type: `metadata_options`
+
+---
+
+### fonts list
+
+List all fallback subtitle fonts installed on the server.
+
+```bash
+jf fonts list
+```
+
+Output type: `fallback_fonts`
+
+Fields: `name`, `filename`, `size` (bytes), `created` (date)
+
+### fonts get
+
+Download a fallback font file from the server.
+
+```bash
+jf fonts get <name> [--output <path>]
+```
+
+- `--output` — Save path (defaults to the font name)
+
+Output type: `font_downloaded`
+
+---
+
+### live-streams open
+
+Open a live media stream (direct media source). Returns the media source ID for use in playback.
+
+```bash
+jf live-streams open [--token <openToken>] [--item <itemId>] [--session <playSessionId>] [--bitrate <bps>] [--direct-play] [--direct-stream]
+```
+
+Output type: `live_stream_opened`
+
+Fields: `media_source_id`, `media_source`
+
+### live-streams close
+
+Close an open live stream by its ID.
+
+```bash
+jf live-streams close <liveStreamId>
+```
+
+Output type: `message`
+
+---
+
+### videos alternate-sources
+
+List alternate video sources/versions for an item (items merged via `videos merge-versions`).
+
+```bash
+jf videos alternate-sources <itemId>
+```
+
+Output type: `items`
+
+Complements `videos delete-alternates` — use this first to inspect before deleting.
+
+---
+
+### sessions set-viewing
+
+Tell a remote session what content it is currently viewing (for Now Playing overlays).
+
+```bash
+jf sessions set-viewing <sessionId> <itemId>
+```
+
+Output type: `message`
+
+### sessions general-command
+
+Send a general client command to a remote session. Common commands: `GoHome`, `GoToSettings`, `MoveUp`, `MoveDown`, `MoveLeft`, `MoveRight`, `Select`, `Back`, `DisplayContent`, `PlayState`, `TakeScreenshot`.
+
+```bash
+jf sessions general-command <sessionId> <command> [--args '{"key":"value"}']
+```
+
+- `--args` — JSON object of command arguments (e.g. `{"ItemId":"abc","ItemType":"Movie"}`)
+
+Output type: `message`
+
+---
+
+### userdata update
+
+Update user data for an item directly (position, play count, favorite state, rating).
+
+```bash
+jf userdata update <itemId> [--favorite true/false] [--played true/false] [--play-count <n>] [--position <ticks>] [--rating <0-10>] [--user <userId>]
+```
+
+Output type: `user_item_data`
+
+---
+
+### users view-grouping
+
+Get the available library grouping/merging options for a user's views.
+
+```bash
+jf users view-grouping [--user <userId>]
+```
+
+Output type: `view_grouping_options`
+
+Fields: `name`, `id`

@@ -585,3 +585,67 @@ describe.skipIf(skip)('E2E usage-stats', () => {
     expect(out).toMatch(/^type: play_activity/m);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// New v8: Metadata editor, library options, system metadata options
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E metadata editor', () => {
+  it('items metadata-editor returns metadata_editor type for a real item', async () => {
+    const listOut = await jf('items', 'list', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'metadata-editor', idMatch[1]);
+    expect(out).toMatch(/^type: metadata_editor/m);
+  }, T);
+});
+
+describe.skipIf(skip)('E2E library available-options', () => {
+  it('library available-options returns library_options type', async () => {
+    const out = await jf('library', 'available-options');
+    expect(out).toMatch(/^type: library_options/m);
+  }, T);
+});
+
+describe.skipIf(skip)('E2E system metadata-options', () => {
+  it('system metadata-options returns metadata_options type', async () => {
+    const out = await jf('system', 'metadata-options');
+    expect(out).toMatch(/^type: metadata_options/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// New v8: Fallback fonts
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E fonts list', () => {
+  it('fonts list returns fallback_fonts type', async () => {
+    const out = await jf('fonts', 'list');
+    expect(out).toMatch(/^type: fallback_fonts/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// New v8: Videos alternate sources
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E videos alternate-sources', () => {
+  it('videos alternate-sources returns items type for a video', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('videos', 'alternate-sources', idMatch[1]);
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// New v8: Users view-grouping
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E users view-grouping', () => {
+  it('users view-grouping returns view_grouping_options type', async () => {
+    const out = await jf('users', 'view-grouping');
+    expect(out).toMatch(/^type: view_grouping_options/m);
+  }, T);
+});

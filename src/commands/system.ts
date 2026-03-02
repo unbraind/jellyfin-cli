@@ -226,5 +226,15 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('metadata-options').description('Get default metadata options (scrapers, image fetchers, etc.)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const opts = await client.getDefaultMetadataOptions();
+        console.log(toon.formatToon(opts, 'metadata_options'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

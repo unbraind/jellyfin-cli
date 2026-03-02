@@ -286,5 +286,15 @@ export function createLibraryCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('available-options').description('Get available library creation options (supported media types, subtitle downloaders, etc.)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const opts = await client.getAvailableLibraryOptions();
+        console.log(toon.formatToon(opts, 'library_options'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

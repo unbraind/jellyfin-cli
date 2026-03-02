@@ -323,5 +323,30 @@ export function createSessionsCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('set-viewing <sessionId> <itemId>').description('Set the currently-viewing item for a remote session')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (sessionId, itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.setNowViewing(sessionId, itemId);
+        console.log(toon.formatMessage(`Session ${sessionId} now viewing item ${itemId}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('general-command <sessionId> <command>').description('Send a general client command to a session (e.g. GoHome, GoToSettings, MoveUp)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--args <json>', 'Command arguments as JSON object (e.g. \'{"key":"value"}\')')
+    .action(async (sessionId, command, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        let args: Record<string, string> | undefined;
+        if (options.args) {
+          args = JSON.parse(options.args) as Record<string, string>;
+        }
+        await client.sendGeneralCommand(sessionId, command, args);
+        console.log(toon.formatMessage(`Command '${command}' sent to session ${sessionId}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

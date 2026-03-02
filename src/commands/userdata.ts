@@ -149,5 +149,33 @@ export function createUserDataCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('update <itemId>').description('Update user data for an item directly (position, play count, favorite, rating)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .option('--favorite <boolean>', 'Set favorite (true/false)')
+    .option('--played <boolean>', 'Set played state (true/false)')
+    .option('--play-count <n>', 'Set play count')
+    .option('--position <ticks>', 'Set playback position in ticks')
+    .option('--rating <number>', 'Set community rating (0-10)')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const data: { IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number } = {};
+        if (options.favorite !== undefined) data.IsFavorite = options.favorite === 'true';
+        if (options.played !== undefined) data.Played = options.played === 'true';
+        if (options.playCount !== undefined) data.PlayCount = parseInt(options.playCount, 10);
+        if (options.position !== undefined) data.PlaybackPositionTicks = parseInt(options.position, 10);
+        if (options.rating !== undefined) data.Rating = parseFloat(options.rating);
+        const result = await client.updateUserItemData(itemId, data, options.user);
+        console.log(toon.formatToon({
+          is_favorite: result.IsFavorite,
+          played: result.Played,
+          play_count: result.PlayCount,
+          position_ticks: result.PlaybackPositionTicks,
+          rating: result.Rating,
+        }, 'user_item_data'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

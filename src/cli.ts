@@ -44,6 +44,8 @@ import {
   createAuthCommand,
   createReportsCommand,
   createUsageStatsCommand,
+  createFontsCommand,
+  createLiveStreamsCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -100,5 +102,7 @@ program.addCommand(createVideosCommand());
 program.addCommand(createAuthCommand());
 program.addCommand(createReportsCommand());
 program.addCommand(createUsageStatsCommand());
+program.addCommand(createFontsCommand());
+program.addCommand(createLiveStreamsCommand());
 
 program.parse();

@@ -390,4 +390,26 @@ export class JellyfinApiClient extends CoreApi {
   async getUsageUserList(): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/user_list'); }
   async getUsageTypeFilterList(): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/type_filter_list'); }
   async getUserReportData(userId: string, date: string): Promise<unknown> { return this.request<unknown>('GET', `/user_usage_stats/${userId}/${date}/GetItems`); }
+
+  // Metadata editor & library options
+  async getMetadataEditorInfo(itemId: string): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>('GET', `/Items/${itemId}/MetadataEditor`); }
+  async getAvailableLibraryOptions(): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>('GET', '/Libraries/AvailableOptions'); }
+  async getDefaultMetadataOptions(): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>('GET', '/System/Configuration/MetadataOptions/Default'); }
+
+  // Fallback fonts
+  async getFallbackFonts(): Promise<{ Name?: string; Filename?: string; FileSize?: number; DateCreated?: string }[]> { return this.request<{ Name?: string; Filename?: string; FileSize?: number; DateCreated?: string }[]>('GET', '/FallbackFont/Fonts'); }
+  async getFallbackFont(name: string): Promise<ArrayBuffer> { return this.request<ArrayBuffer>('GET', `/FallbackFont/Fonts/${encodeURIComponent(name)}`); }
+
+  // Live streams
+  async openLiveStream(params: { openToken?: string; userId?: string; playSessionId?: string; maxStreamingBitrate?: number; itemId?: string; enableDirectPlay?: boolean; enableDirectStream?: boolean }): Promise<{ MediaSource?: Record<string, unknown>; MediaSourceId?: string }> { return this.request<{ MediaSource?: Record<string, unknown>; MediaSourceId?: string }>('POST', '/LiveStreams/Open', undefined, params); }
+  async closeLiveStream(liveStreamId: string): Promise<void> { await this.request<void>('POST', '/LiveStreams/Close', undefined, { LiveStreamId: liveStreamId }); }
+
+  // Session general commands
+  async sendGeneralCommand(sessionId: string, command: string, args?: Record<string, string>): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/Command/${encodeURIComponent(command)}`, undefined, args ? { Arguments: args } : undefined); }
+
+  // Video alternate sources (GET — DELETE already exists)
+  async getAlternateSources(itemId: string): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', `/Videos/${itemId}/AlternateSources`); }
+
+  // Update user item data (POST)
+  async updateUserItemData(itemId: string, data: { IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }, userId?: string): Promise<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }>('POST', `/UserItems/${itemId}/UserData`, { userId: uid }, data); }
 }
