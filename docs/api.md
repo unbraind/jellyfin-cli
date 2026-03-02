@@ -1971,6 +1971,22 @@ jf packages repositories
 
 Output type: `repositories`
 
+### packages set-repositories
+
+Replace the list of plugin repositories. Accepts a JSON array via `--data` or stdin.
+
+```bash
+# From --data flag
+jf packages set-repositories --data '[{"Name":"Official","Url":"https://repo.jellyfin.org/releases/plugin/manifest-stable.json","Enabled":true}]'
+
+# From stdin (pipe)
+echo '[{"Name":"Official","Url":"https://repo.example.com","Enabled":true}]' | jf packages set-repositories
+```
+
+Output type: `message`
+
+> **Note**: This replaces the entire list. First run `jf packages repositories` to get the current list, modify it, then set it back.
+
 ## images
 
 Image management commands.
@@ -3935,20 +3951,6 @@ jf live-streams close <liveStreamId>
 ```
 
 Output type: `message`
-
----
-
-### videos alternate-sources
-
-List alternate video sources/versions for an item (items merged via `videos merge-versions`).
-
-```bash
-jf videos alternate-sources <itemId>
-```
-
-Output type: `items`
-
-Complements `videos delete-alternates` — use this first to inspect before deleting.
 
 ---
 

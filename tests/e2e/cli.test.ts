@@ -626,16 +626,16 @@ describe.skipIf(skip)('E2E fonts list', () => {
 });
 
 // -------------------------------------------------------------------------
-// New v8: Videos alternate sources
+// New v8: Videos delete-alternates (write, skipped) / merge-versions
+// Note: GET /Videos/{id}/AlternateSources was removed in Jellyfin 10.11.6.
+// Only DELETE is supported. We test the merge/split commands are available.
 // -------------------------------------------------------------------------
 
-describe.skipIf(skip)('E2E videos alternate-sources', () => {
-  it('videos alternate-sources returns items type for a video', async () => {
-    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
-    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
-    if (!idMatch) return;
-    const out = await jf('videos', 'alternate-sources', idMatch[1]);
-    expect(out).toMatch(/^type: items/m);
+describe.skipIf(skip)('E2E videos commands', () => {
+  it('videos help lists known subcommands', async () => {
+    // Non-API test: just verify the subcommands are registered
+    const out = await jf('videos', '--help');
+    expect(out).toMatch(/merge-versions|parts|cancel-transcoding/);
   }, T);
 });
 
@@ -647,5 +647,99 @@ describe.skipIf(skip)('E2E users view-grouping', () => {
   it('users view-grouping returns view_grouping_options type', async () => {
     const out = await jf('users', 'view-grouping');
     expect(out).toMatch(/^type: view_grouping_options/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Channels
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E channels', () => {
+  it('channels list returns items type', async () => {
+    const out = await jf('channels', 'list', '--limit', '5');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Items extended: similar, playback-info, ancestors, critic-reviews
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E items extra', () => {
+  it('items similar returns items type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'similar', idMatch[1], '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('items ancestors returns items type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'ancestors', idMatch[1]);
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('items playback-info returns playback_info type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'playback-info', idMatch[1]);
+    expect(out).toMatch(/^type: playback_info/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Reports plugin
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E reports', () => {
+  it('reports activities returns activity_report type', async () => {
+    const out = await jf('reports', 'activities', '--limit', '3');
+    expect(out).toMatch(/^type: activity_report/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Trickplay URL generation
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E trickplay', () => {
+  it('trickplay hls-url returns trickplay_hls_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('trickplay', 'hls-url', idMatch[1], '320');
+    expect(out).toMatch(/^type: trickplay_hls_url/m);
+    expect(out).toMatch(/url:/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Packages set-repositories (read path only: list then help)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E packages set-repositories', () => {
+  it('packages set-repositories help is available', async () => {
+    const out = await jf('packages', 'set-repositories', '--help');
+    expect(out).toMatch(/Set.*replace.*list.*plugin/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Items root & filters
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E items root and filters', () => {
+  it('items root returns item type', async () => {
+    const out = await jf('items', 'root');
+    expect(out).toMatch(/^type: item/m);
+  }, T);
+
+  it('items filters returns filters type', async () => {
+    const out = await jf('items', 'filters', '--types', 'Movie');
+    expect(out).toMatch(/^type: filters/m);
   }, T);
 });

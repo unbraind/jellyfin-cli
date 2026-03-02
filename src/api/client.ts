@@ -407,9 +407,6 @@ export class JellyfinApiClient extends CoreApi {
   // Session general commands
   async sendGeneralCommand(sessionId: string, command: string, args?: Record<string, string>): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/Command/${encodeURIComponent(command)}`, undefined, args ? { Arguments: args } : undefined); }
 
-  // Video alternate sources (GET — DELETE already exists)
-  async getAlternateSources(itemId: string): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', `/Videos/${itemId}/AlternateSources`); }
-
   // Update user item data (POST)
   async updateUserItemData(itemId: string, data: { IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }, userId?: string): Promise<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number }>('POST', `/UserItems/${itemId}/UserData`, { userId: uid }, data); }
 }

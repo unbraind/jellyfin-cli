@@ -203,27 +203,8 @@ describe('JellyfinApiClient - New Features v8', () => {
     });
   });
 
-  // -----------------------------------------------------------------------
-  // Video alternate sources (GET)
-  // -----------------------------------------------------------------------
-  describe('getAlternateSources', () => {
-    it('calls GET /Videos/:id/AlternateSources', async () => {
-      const data = { Items: [{ Id: 'alt-1', Name: 'Version 2' }], TotalRecordCount: 1 };
-      mockFetch.mockResolvedValueOnce(mockOk(data));
-      const result = await client.getAlternateSources('video-1');
-      expect(result.Items).toHaveLength(1);
-      const url = mockFetch.mock.calls[0][0] as string;
-      expect(url).toContain('/Videos/video-1/AlternateSources');
-      expect(mockFetch.mock.calls[0][1]).toMatchObject({ method: 'GET' });
-    });
-
-    it('returns empty result set when no alternates', async () => {
-      mockFetch.mockResolvedValueOnce(mockOk({ Items: [], TotalRecordCount: 0 }));
-      const result = await client.getAlternateSources('video-2');
-      expect(result.Items).toHaveLength(0);
-      expect(result.TotalRecordCount).toBe(0);
-    });
-  });
+  // Note: getAlternateSources (GET /Videos/:id/AlternateSources) was removed
+  // in Jellyfin 10.11.6 — only DELETE is supported. Tests removed accordingly.
 
   // -----------------------------------------------------------------------
   // Update user item data (POST)
@@ -294,6 +275,43 @@ describe('JellyfinApiClient - New Features v8', () => {
       await client.setNowViewing('session-1', 'item-abc');
       const url = mockFetch.mock.calls[0][0] as string;
       expect(url).toMatch(/itemId=item-abc/);
+    });
+  });
+
+  // -----------------------------------------------------------------------
+  // setRepositories (POST /Repositories)
+  // -----------------------------------------------------------------------
+  describe('setRepositories', () => {
+    it('calls POST /Repositories', async () => {
+      mockFetch.mockResolvedValueOnce(mockNoContent());
+      await client.setRepositories([{ Name: 'Official', Url: 'https://repo.example.com', Enabled: true }]);
+      const [url, init] = mockFetch.mock.calls[0] as [string, RequestInit];
+      expect(url).toContain('/Repositories');
+      expect(init.method).toBe('POST');
+    });
+
+    it('sends repository array in request body', async () => {
+      mockFetch.mockResolvedValueOnce(mockNoContent());
+      const repos = [
+        { Name: 'Repo1', Url: 'https://r1.example.com', Enabled: true },
+        { Name: 'Repo2', Url: 'https://r2.example.com', Enabled: false },
+      ];
+      await client.setRepositories(repos);
+      const init = mockFetch.mock.calls[0][1] as RequestInit;
+      const body = JSON.parse(init.body as string);
+      expect(Array.isArray(body)).toBe(true);
+      expect(body).toHaveLength(2);
+      expect(body[0].Name).toBe('Repo1');
+      expect(body[1].Enabled).toBe(false);
+    });
+
+    it('accepts empty array to clear repositories', async () => {
+      mockFetch.mockResolvedValueOnce(mockNoContent());
+      await client.setRepositories([]);
+      const init = mockFetch.mock.calls[0][1] as RequestInit;
+      const body = JSON.parse(init.body as string);
+      expect(Array.isArray(body)).toBe(true);
+      expect(body).toHaveLength(0);
     });
   });
 });

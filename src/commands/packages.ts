@@ -124,5 +124,29 @@ export function createPackagesCommand(): Command {
       }
     });
 
+  cmd
+    .command('set-repositories')
+    .description('Set/replace the list of plugin repositories (JSON array on stdin or --data)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--data <json>', 'JSON array of repositories: [{"Name":"x","Url":"y","Enabled":true}]')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        let repos: { Name?: string; Url?: string; Enabled?: boolean }[];
+        if (options.data) {
+          repos = JSON.parse(options.data);
+        } else {
+          // Read from stdin (works on bun and node)
+          const chunks: Buffer[] = [];
+          for await (const chunk of process.stdin) chunks.push(chunk as Buffer);
+          repos = JSON.parse(Buffer.concat(chunks).toString('utf8').trim());
+        }
+        await client.setRepositories(repos);
+        console.log(toon.formatMessage(`Set ${repos.length} repository/repositories`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

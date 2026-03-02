@@ -97,15 +97,5 @@ export function createVideosCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
-  cmd.command('alternate-sources <itemId>').description('List alternate video sources/versions for an item')
-    .option('-f, --format <format>', 'Output format')
-    .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
-      try {
-        const result = await client.getAlternateSources(itemId);
-        console.log(toon.formatItems(result.Items ?? []));
-      } catch (err) { handleError(err, format); }
-    });
-
   return cmd;
 }
