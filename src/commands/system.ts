@@ -236,5 +236,45 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd
+    .command('update-config')
+    .description('Update server application configuration (send full or partial JSON config)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--data <json>', 'Configuration JSON string')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const raw = options.data ?? await new Promise<string>((resolve) => {
+          let buf = '';
+          process.stdin.setEncoding('utf8');
+          process.stdin.on('data', (chunk: string) => { buf += chunk; });
+          process.stdin.on('end', () => resolve(buf.trim()));
+        });
+        const config = JSON.parse(raw) as Record<string, unknown>;
+        await client.updateServerConfiguration(config);
+        console.log(formatSuccess('Server configuration updated', format));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('update-config-section <key>')
+    .description('Update a named server configuration section (e.g. network, encoding)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--data <json>', 'Configuration JSON string')
+    .action(async (key, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const raw = options.data ?? await new Promise<string>((resolve) => {
+          let buf = '';
+          process.stdin.setEncoding('utf8');
+          process.stdin.on('data', (chunk: string) => { buf += chunk; });
+          process.stdin.on('end', () => resolve(buf.trim()));
+        });
+        const data = JSON.parse(raw) as unknown;
+        await client.updateNamedConfiguration(key, data);
+        console.log(formatSuccess(`Configuration section '${key}' updated`, format));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

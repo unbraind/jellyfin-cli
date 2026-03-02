@@ -273,10 +273,14 @@ export class JellyfinApiClient extends CoreApi {
   async deleteDevice(deviceId: string): Promise<void> { await this.request<void>('DELETE', '/Devices', { id: deviceId }); }
   async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> { await this.request<void>('POST', '/Devices/Options', undefined, { Id: deviceId, ...options }); }
 
-  // System Config
+  // System Config & Branding
   async getBranding(): Promise<BrandingOptions> { return this.request<BrandingOptions>('GET', '/Branding/Configuration'); }
+  async getBrandingCss(): Promise<string> { return this.request<string>('GET', '/Branding/Css'); }
+  async getSplashscreenUrl(): Promise<string> { return `${this.baseUrl}/Branding/Splashscreen`; }
+  async deleteSplashscreen(): Promise<void> { await this.request<void>('DELETE', '/Branding/Splashscreen'); }
   async getServerConfiguration(): Promise<ServerConfiguration> { return this.request<ServerConfiguration>('GET', '/System/Configuration'); }
   async updateServerConfiguration(config: Partial<ServerConfiguration>): Promise<void> { await this.request<void>('POST', '/System/Configuration', undefined, config); }
+  async updateBrandingConfiguration(config: Partial<BrandingOptions>): Promise<void> { await this.request<void>('POST', '/System/Configuration/Branding', undefined, config); }
   async getNamedConfiguration(key: string): Promise<unknown> { return this.request<unknown>('GET', `/System/Configuration/${key}`); }
   async updateNamedConfiguration(key: string, data: unknown): Promise<void> { await this.request<void>('POST', `/System/Configuration/${key}`, undefined, data); }
   async getSystemStorageInfo(): Promise<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }> { return this.request<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }>('GET', '/System/Info/Storage'); }

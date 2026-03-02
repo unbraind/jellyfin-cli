@@ -1415,6 +1415,46 @@ jf branding get
 
 Output type: `branding`
 
+### branding css
+
+Get the server's custom CSS string.
+
+```bash
+jf branding css
+jf branding css --format raw   # raw CSS output
+```
+
+Output type: `branding_css`
+
+### branding splashscreen-url
+
+Get the URL of the server splashscreen image (no API call made).
+
+```bash
+jf branding splashscreen-url
+```
+
+Output type: `splashscreen`
+
+### branding delete-splashscreen
+
+Delete the server splashscreen image. Requires `--force` to prevent accidental deletion.
+
+```bash
+jf branding delete-splashscreen --force
+```
+
+### branding update-config
+
+Update branding configuration (login disclaimer, custom CSS, splashscreen setting).
+
+```bash
+jf branding update-config --disclaimer "Please agree to terms"
+jf branding update-config --custom-css "body { color: red; }"
+jf branding update-config --splashscreen-enabled true
+jf branding update-config --data '{"LoginDisclaimer":"Welcome","SplashscreenEnabled":false}'
+```
+
 ## stats
 
 Statistics commands.
@@ -3932,6 +3972,28 @@ jf system metadata-options
 ```
 
 Output type: `metadata_options`
+
+### system update-config
+
+Update the full server application configuration (POST /System/Configuration). Accepts JSON via `--data` flag or stdin.
+
+```bash
+jf system update-config --data '{"EnableCaseSensitiveItemIds": true}'
+echo '{"MetadataCountryCode": "US"}' | jf system update-config
+```
+
+> ⚠️ Admin only. Merges with existing config. Use `system config` first to see current values.
+
+### system update-config-section
+
+Update a named server configuration section (POST /System/Configuration/{key}). Accepts JSON via `--data` or stdin.
+
+```bash
+jf system update-config-section network --data '{"EnableUpnP": false}'
+jf system update-config-section encoding --data '{"HardwareAccelerationType": "nvenc"}'
+```
+
+> ⚠️ Admin only. Available section keys: `network`, `encoding`, `dlna`, `metadata`, `branding`, etc.
 
 ---
 

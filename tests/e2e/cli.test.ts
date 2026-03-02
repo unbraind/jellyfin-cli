@@ -6,9 +6,13 @@
  *   JELLYFIN_SERVER_URL, JELLYFIN_API_KEY, JELLYFIN_USER_ID
  *
  * Skipped automatically if the server is not reachable or env vars are missing.
+ *
+ * The test runner uses the pre-built binary (dist/cli.js) when available
+ * for faster startup, falling back to `bun run src/cli.ts`.
  */
 
 import { describe, it, expect } from 'vitest';
+import { existsSync } from 'node:fs';
 
 const SERVER_URL = process.env.JELLYFIN_SERVER_URL ?? '';
 const API_KEY = process.env.JELLYFIN_API_KEY ?? '';
@@ -16,17 +20,27 @@ const USER_ID = process.env.JELLYFIN_USER_ID ?? '';
 
 const HAS_ENV = Boolean(SERVER_URL && API_KEY && USER_ID);
 
+// Determine which CLI runner to use (compiled binary is faster).
+const DIST_BIN = new URL('../../dist/cli.js', import.meta.url).pathname;
+const USE_COMPILED = existsSync(DIST_BIN);
+const CLI_CMD: string[] = USE_COMPILED ? ['node', DIST_BIN] : ['bun', 'run', 'src/cli.ts'];
+
 async function checkReachable(): Promise<boolean> {
   if (!HAS_ENV) return false;
-  try {
-    const res = await fetch(`${SERVER_URL}/Health`, {
-      headers: { 'X-Emby-Token': API_KEY },
-      signal: AbortSignal.timeout(5000),
-    });
-    return res.ok;
-  } catch {
-    return false;
+  // Retry up to 3 times — worker initialisation can be slow on first run.
+  for (let attempt = 0; attempt < 3; attempt++) {
+    try {
+      const res = await fetch(`${SERVER_URL}/Health`, {
+        headers: { 'X-Emby-Token': API_KEY },
+        signal: AbortSignal.timeout(15000),
+      });
+      if (res.ok) return true;
+    } catch {
+      // ignore, retry
+    }
+    if (attempt < 2) await new Promise((r) => setTimeout(r, 2000));
   }
+  return false;
 }
 
 // Top-level await: resolve before tests run so describe.skipIf conditions work.
@@ -35,11 +49,13 @@ const skip = !serverReachable;
 
 if (skip) {
   console.warn(`⚠  Skipping E2E tests: server not reachable at ${SERVER_URL || '(no URL set)'}`);
+} else {
+  console.info(`ℹ  E2E using ${USE_COMPILED ? 'compiled binary' : 'bun run src/cli.ts'}`);
 }
 
 /** Run a jf-cli command and return stdout. Drains stdout & stderr in parallel to prevent pipe deadlock. */
 async function jf(...args: string[]): Promise<string> {
-  const proc = Bun.spawn(['bun', 'run', 'src/cli.ts', ...args], {
+  const proc = Bun.spawn([...CLI_CMD, ...args], {
     env: {
       ...process.env,
       JELLYFIN_SERVER_URL: SERVER_URL,
@@ -61,8 +77,8 @@ async function jf(...args: string[]): Promise<string> {
   return text;
 }
 
-// Per-test timeout: each test spawns a bun subprocess (2-4s startup + API call).
-const T = 30_000;
+// Per-test timeout: compiled binary ~1-2s startup + API call; fallback ~4-5s.
+const T = 60_000;
 
 // -------------------------------------------------------------------------
 // System commands
@@ -880,5 +896,49 @@ describe.skipIf(skip)('E2E plugins-ext', () => {
   it('plugins-ext infusesync help is available', async () => {
     const out = await jf('plugins-ext', 'infusesync', '--help');
     expect(out).toMatch(/infuse/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Branding extended (CSS, splashscreen URL, config update help)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E branding extended', () => {
+  it('branding css returns branding_css type', async () => {
+    const out = await jf('branding', 'css');
+    expect(out).toMatch(/^type: branding_css/m);
+  }, T);
+
+  it('branding splashscreen-url returns url', async () => {
+    const out = await jf('branding', 'splashscreen-url');
+    expect(out).toMatch(/^type: splashscreen/m);
+    expect(out).toMatch(/url:/);
+    expect(out).toMatch(/Branding\/Splashscreen/);
+  }, T);
+
+  it('branding update-config help is available', async () => {
+    const out = await jf('branding', 'update-config', '--help');
+    expect(out).toMatch(/disclaimer|css|splashscreen/i);
+  }, T);
+
+  it('branding delete-splashscreen help is available', async () => {
+    const out = await jf('branding', 'delete-splashscreen', '--help');
+    expect(out).toMatch(/splashscreen|delete/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// System config update (read-only: help only, no actual writes)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E system config update', () => {
+  it('system update-config help is available', async () => {
+    const out = await jf('system', 'update-config', '--help');
+    expect(out).toMatch(/configuration|json/i);
+  }, T);
+
+  it('system update-config-section help is available', async () => {
+    const out = await jf('system', 'update-config-section', '--help');
+    expect(out).toMatch(/section|configuration/i);
   }, T);
 });
