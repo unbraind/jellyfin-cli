@@ -3631,3 +3631,217 @@ jf livetv-admin set-channel-mappings --provider <id> --mappings '<json>' [-f for
 `--mappings` accepts a JSON array: `'[{"tunerChannelId":"ch1","providerChannelId":"pch1"}]'`
 
 Output type: `message`
+
+---
+
+## usage-stats
+
+Playback usage statistics from the **PlaybackReportingActivity plugin** (must be installed separately).
+
+### usage-stats play-activity
+
+Get playback activity stats over time (plays per user per day).
+
+```bash
+jf usage-stats play-activity [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>] [--data-type <type>]
+```
+
+Output type: `play_activity`
+
+### usage-stats user-activity
+
+Get per-user activity summary report.
+
+```bash
+jf usage-stats user-activity [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>]
+```
+
+Output type: `user_activity`
+
+### usage-stats hourly
+
+Get playback counts by hour of day.
+
+```bash
+jf usage-stats hourly [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>] [--data-type <type>]
+```
+
+Output type: `hourly_report`
+
+### usage-stats breakdown
+
+Get breakdown report by media attribute. Common types: `MediaType`, `AudioCodec`, `VideoCodec`, `VideoResolution`, `SubtitleCodec`, `StreamType`.
+
+```bash
+jf usage-stats breakdown <type> [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>]
+```
+
+Output type: `breakdown_<type>`
+
+### usage-stats movies
+
+Get most-played movies report.
+
+```bash
+jf usage-stats movies [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>]
+```
+
+Output type: `movies_report`
+
+Fields: `label`, `count`, `time`
+
+### usage-stats tv-shows
+
+Get most-played TV shows report.
+
+```bash
+jf usage-stats tv-shows [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>]
+```
+
+Output type: `tv_shows_report`
+
+### usage-stats duration-histogram
+
+Get histogram of session durations.
+
+```bash
+jf usage-stats duration-histogram [--days <number>] [--end-date <YYYY-MM-DD>] [--filter <userId>] [--data-type <type>]
+```
+
+Output type: `duration_histogram`
+
+### usage-stats users
+
+List users tracked by the playback reporting plugin.
+
+```bash
+jf usage-stats users
+```
+
+Output type: `usage_users`
+
+Fields: `name`, `id`, `in_list`
+
+### usage-stats type-filters
+
+List available media type filters for reports.
+
+```bash
+jf usage-stats type-filters
+```
+
+Output type: `type_filters`
+
+### usage-stats user-items
+
+Get individual playback items for a specific user on a specific date.
+
+```bash
+jf usage-stats user-items <userId> <date>
+```
+
+`<date>` format: `YYYY-MM-DD`
+
+Output type: `user_items`
+
+---
+
+## New discover instant mix commands
+
+### discover artist-mix
+
+Get an instant mix queue based on an artist.
+
+```bash
+jf discover artist-mix <artistId> [--limit <number>]
+```
+
+Output type: `items`
+
+### discover genre-mix
+
+Get an instant mix queue based on a music genre name.
+
+```bash
+jf discover genre-mix <genreName> [--limit <number>]
+```
+
+Output type: `items`
+
+### discover playlist-mix
+
+Get an instant mix queue based on a playlist.
+
+```bash
+jf discover playlist-mix <playlistId> [--limit <number>]
+```
+
+Output type: `items`
+
+---
+
+## New sessions playback reporting commands
+
+### sessions report-start
+
+Report that a client has started playing an item (used for playback tracking).
+
+```bash
+jf sessions report-start <itemId> [--media-source <id>] [--audio-stream <index>] [--subtitle-stream <index>] [--position <ticks>]
+```
+
+Output type: `message`
+
+### sessions report-progress
+
+Report current playback position for an actively playing item.
+
+```bash
+jf sessions report-progress <itemId> [--media-source <id>] [--position <ticks>] [--paused] [--muted]
+```
+
+Output type: `message`
+
+### sessions report-stopped
+
+Report that a client has stopped playing an item.
+
+```bash
+jf sessions report-stopped <itemId> [--media-source <id>] [--position <ticks>]
+```
+
+Output type: `message`
+
+### sessions ping-playback
+
+Ping an active transcoding/playback session to prevent it from timing out.
+
+```bash
+jf sessions ping-playback <playSessionId>
+```
+
+Output type: `message`
+
+---
+
+## New users commands
+
+### users update-display-prefs
+
+Update display preferences for a library view (sort order, view type, etc.).
+
+```bash
+jf users update-display-prefs <prefsId> [--sort-by <field>] [--sort-order <order>] [--view-type <type>] [--index-by <field>] [--client <name>] [--user <userId>]
+```
+
+Options:
+- `--sort-by` — Sort field: `SortName`, `DateCreated`, `PremiereDate`, `CommunityRating`, etc.
+- `--sort-order` — `Ascending` or `Descending`
+- `--view-type` — Display mode: `Poster`, `Thumb`, `List`, `Banner`
+- `--index-by` — Index grouping: `None`, `ProductionYear`, `Genre`
+- `--remember-sorting` / `--no-remember-sorting` — Persist sort preference
+- `--remember-indexing` / `--no-remember-indexing` — Persist index preference
+
+Output type: `message`
+
+> Use `jf users views` to find view IDs, then `jf users display-prefs <id>` to inspect current settings.

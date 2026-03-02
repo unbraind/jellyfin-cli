@@ -39,3 +39,4 @@ export { createArtistsCommand } from './artists.js';
 export { createVideosCommand } from './videos.js';
 export { createAuthCommand } from './auth.js';
 export { createReportsCommand } from './reports.js';
+export { createUsageStatsCommand } from './usage-stats.js';

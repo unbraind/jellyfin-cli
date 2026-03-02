@@ -256,6 +256,33 @@ export function createUsersCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('update-display-prefs <prefsId>').description('Update display preferences for a view')
+    .option('-f, --format <format>', 'Output format')
+    .option('--client <client>', 'Client name', 'emby')
+    .option('--user <userId>', 'User ID (defaults to current user)')
+    .option('--sort-by <field>', 'Sort field (e.g. SortName, DateCreated)')
+    .option('--sort-order <order>', 'Sort order (Ascending or Descending)')
+    .option('--view-type <type>', 'View type (e.g. Poster, Thumb, List, Banner)')
+    .option('--index-by <field>', 'Index by field (e.g. None, ProductionYear)')
+    .option('--remember-sorting', 'Remember sorting preferences')
+    .option('--no-remember-sorting', 'Do not remember sorting preferences')
+    .option('--remember-indexing', 'Remember indexing preferences')
+    .option('--no-remember-indexing', 'Do not remember indexing preferences')
+    .action(async (prefsId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const current = await client.getDisplayPreferences(prefsId, options.user, options.client);
+        if (options.sortBy !== undefined) current.SortBy = options.sortBy;
+        if (options.sortOrder !== undefined) current.SortOrder = options.sortOrder;
+        if (options.viewType !== undefined) current.ViewType = options.viewType;
+        if (options.indexBy !== undefined) current.IndexBy = options.indexBy;
+        if (options.rememberSorting !== undefined) current.RememberSorting = options.rememberSorting;
+        if (options.rememberIndexing !== undefined) current.RememberIndexing = options.rememberIndexing;
+        await client.updateDisplayPreferences(prefsId, current, options.user, options.client);
+        console.log(toon.formatMessage(`Display preferences '${prefsId}' updated`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('public').description('List public (non-hidden) users (no auth required)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {

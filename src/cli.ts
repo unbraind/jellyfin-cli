@@ -43,6 +43,7 @@ import {
   createVideosCommand,
   createAuthCommand,
   createReportsCommand,
+  createUsageStatsCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -98,5 +99,6 @@ program.addCommand(createArtistsCommand());
 program.addCommand(createVideosCommand());
 program.addCommand(createAuthCommand());
 program.addCommand(createReportsCommand());
+program.addCommand(createUsageStatsCommand());
 
 program.parse();

@@ -532,3 +532,56 @@ describe.skipIf(skip)('E2E userdata', () => {
     expect(out).toMatch(/^type: items/m);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// Display Preferences
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E display preferences', () => {
+  it('users display-prefs with valid view ID returns display_prefs type', async () => {
+    // Get a real view ID first, then fetch prefs for it
+    const viewsOut = await jf('users', 'views');
+    const idMatch = viewsOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return; // no views to test with
+    const viewId = idMatch[1];
+    const out = await jf('users', 'display-prefs', viewId);
+    expect(out).toMatch(/^type: display_prefs/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Discover instant mix variants
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E discover instant mix', () => {
+  it('discover genre-mix with genre name returns items or empty', async () => {
+    // Uses library genres endpoint to get a real genre, then tests instant mix
+    const genresOut = await jf('library', 'genres', '--limit', '1');
+    const nameMatch = genresOut.match(/name: (.+)/);
+    if (!nameMatch) return;
+    const genreName = nameMatch[1].trim().replace(/^"|"$/g, '');
+    const out = await jf('discover', 'genre-mix', genreName, '--limit', '5');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Usage Stats plugin
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E usage-stats', () => {
+  it('usage-stats movies returns movies_report type', async () => {
+    const out = await jf('usage-stats', 'movies', '--days', '30');
+    expect(out).toMatch(/^type: movies_report/m);
+  }, T);
+
+  it('usage-stats users returns usage_users type', async () => {
+    const out = await jf('usage-stats', 'users');
+    expect(out).toMatch(/^type: usage_users/m);
+  }, T);
+
+  it('usage-stats play-activity returns play_activity type', async () => {
+    const out = await jf('usage-stats', 'play-activity', '--days', '7');
+    expect(out).toMatch(/^type: play_activity/m);
+  }, T);
+});

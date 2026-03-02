@@ -41,6 +41,10 @@ class CoreApi extends ApiClientBase {
   async reportPlaybackStart(info: PlaybackProgressInfo): Promise<void> { await this.request<void>('POST', '/Sessions/Playing', undefined, info); }
   async reportPlaybackProgress(info: PlaybackProgressInfo): Promise<void> { await this.request<void>('POST', '/Sessions/Playing/Progress', undefined, info); }
   async reportPlaybackStopped(info: PlaybackStopInfo): Promise<void> { await this.request<void>('POST', '/Sessions/Playing/Stopped', undefined, info); }
+  async pingPlaybackSession(playSessionId: string): Promise<void> { await this.request<void>('POST', '/Sessions/Playing/Ping', undefined, { PlaySessionId: playSessionId }); }
+  async reportPlayingItemStart(itemId: string, params?: { sessionId?: string; mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; positionTicks?: number }): Promise<void> { await this.request<void>('POST', `/PlayingItems/${itemId}`, params); }
+  async reportPlayingItemProgress(itemId: string, params?: { sessionId?: string; mediaSourceId?: string; positionTicks?: number; isPaused?: boolean; isMuted?: boolean; playbackRate?: number }): Promise<void> { await this.request<void>('POST', `/PlayingItems/${itemId}/Progress`, params); }
+  async reportPlayingItemStopped(itemId: string, params?: { sessionId?: string; mediaSourceId?: string; positionTicks?: number }): Promise<void> { await this.request<void>('DELETE', `/PlayingItems/${itemId}`, params); }
   async getItems(params?: ItemsQueryParams & { userId?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; const path = userId ? `/Users/${userId}/Items` : '/Items'; return this.request<QueryResult<BaseItemDto>>('GET', path, params as Record<string, unknown>); }
   async getItem(itemId: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; if (uid) return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/${itemId}`); return this.request<BaseItemDto>('GET', `/Items/${itemId}`); }
   async getLatestItems(params?: { parentId?: string; limit?: number; fields?: string[]; userId?: string }): Promise<BaseItemDto[]> { const userId = params?.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<BaseItemDto[]>('GET', `/Users/${userId}/Items/Latest`, params as Record<string, unknown>); }
@@ -209,6 +213,8 @@ export class JellyfinApiClient extends CoreApi {
   async setItemContentType(itemId: string, contentType: string): Promise<void> { await this.request<void>('POST', `/Items/${itemId}/ContentType`, { contentType }); }
   async getAlbumInstantMix(albumId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Albums/${albumId}/InstantMix`, { ...params, userId }); }
   async getSongInstantMix(songId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Songs/${songId}/InstantMix`, { ...params, userId }); }
+  async getArtistInstantMix(artistId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Artists/${artistId}/InstantMix`, { ...params, userId }); }
+  async getMusicGenreInstantMix(genreName: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/MusicGenres/${encodeURIComponent(genreName)}/InstantMix`, { ...params, userId }); }
   async getIntros(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/Intros`); }
   async getAdditionalParts(itemId: string): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', `/Videos/${itemId}/AdditionalParts`); }
   async getChapters(itemId: string): Promise<ChapterInfo[]> { return this.request<ChapterInfo[]>('GET', `/Items/${itemId}/Chapters`); }
@@ -274,7 +280,8 @@ export class JellyfinApiClient extends CoreApi {
   async getUtcTime(): Promise<UtcTimeResponse> { return this.request<UtcTimeResponse>('GET', '/GetUtcTime'); }
   async testBitrate(size?: number): Promise<number> { return this.request<number>('GET', '/Playback/BitrateTest', size !== undefined ? { size } : undefined); }
   async getSubtitleProviders(): Promise<{ Name?: string | null }[]> { return this.request<{ Name?: string | null }[]>('GET', '/Providers/Subtitles/Subtitles'); }
-  async getDisplayPreferences(displayPreferencesId: string, userId?: string, client?: string): Promise<DisplayPreferences> { return this.request<DisplayPreferences>('GET', `/DisplayPreferences/${displayPreferencesId}`, { userId, client }); }
+  async getDisplayPreferences(displayPreferencesId: string, userId?: string, client?: string): Promise<DisplayPreferences> { const uid = userId ?? this.userId; return this.request<DisplayPreferences>('GET', `/DisplayPreferences/${displayPreferencesId}`, { userId: uid, client: client ?? 'emby' }); }
+  async updateDisplayPreferences(displayPreferencesId: string, prefs: Partial<DisplayPreferences>, userId?: string, client?: string): Promise<void> { const uid = userId ?? this.userId; await this.request<void>('POST', `/DisplayPreferences/${displayPreferencesId}`, { userId: uid, client: client ?? 'emby' }, prefs); }
 
   // API Keys & Notifications
   async getApiKeys(): Promise<QueryResult<ApiKeyInfo>> { return this.request<QueryResult<ApiKeyInfo>>('GET', '/Auth/Keys'); }
@@ -371,4 +378,16 @@ export class JellyfinApiClient extends CoreApi {
   async getActivityReport(params?: { limit?: number; startIndex?: number; minDate?: string }): Promise<{ Rows?: { Columns?: { Name?: string }[]; Id?: string; RowType?: string }[]; TotalRecordCount?: number }> { return this.request<{ Rows?: { Columns?: { Name?: string }[]; Id?: string; RowType?: string }[]; TotalRecordCount?: number }>('GET', '/Reports/Activities', params); }
   async getItemsReport(params?: { reportView?: string; displayType?: string; limit?: number; startIndex?: number }): Promise<{ Rows?: { Columns?: { Name?: string }[] }[]; TotalRecordCount?: number }> { return this.request<{ Rows?: { Columns?: { Name?: string }[] }[]; TotalRecordCount?: number }>('GET', '/Reports/Items', params); }
   async getReportHeaders(params?: { reportView?: string; displayType?: string }): Promise<{ Name?: string; FieldName?: string; DisplayType?: string }[]> { return this.request<{ Name?: string; FieldName?: string; DisplayType?: string }[]>('GET', '/Reports/Headers', params); }
+
+  // Usage Stats (PlaybackReportingActivity plugin)
+  async getUsagePlayActivity(params?: { days?: number; endDate?: string; filter?: string; dataType?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/PlayActivity', params); }
+  async getUserActivity(params?: { days?: number; endDate?: string; filter?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/user_activity', params); }
+  async getHourlyReport(params?: { days?: number; endDate?: string; filter?: string; dataType?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/HourlyReport', params); }
+  async getBreakdownReport(breakdownType: string, params?: { days?: number; endDate?: string; filter?: string }): Promise<unknown> { return this.request<unknown>('GET', `/user_usage_stats/${encodeURIComponent(breakdownType)}/BreakdownReport`, params); }
+  async getMoviesReport(params?: { days?: number; endDate?: string; filter?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/MoviesReport', params); }
+  async getTvShowsReport(params?: { days?: number; endDate?: string; filter?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/GetTvShowsReport', params); }
+  async getDurationHistogramReport(params?: { days?: number; endDate?: string; filter?: string; dataType?: string }): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/DurationHistogramReport', params); }
+  async getUsageUserList(): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/user_list'); }
+  async getUsageTypeFilterList(): Promise<unknown> { return this.request<unknown>('GET', '/user_usage_stats/type_filter_list'); }
+  async getUserReportData(userId: string, date: string): Promise<unknown> { return this.request<unknown>('GET', `/user_usage_stats/${userId}/${date}/GetItems`); }
 }

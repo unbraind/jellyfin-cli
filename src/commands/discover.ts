@@ -72,6 +72,36 @@ export function createDiscoverCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('artist-mix <artistId>').description('Get instant mix based on an artist ID')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
+    .action(async (artistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getArtistInstantMix(artistId, { limit: parseInt(options.limit, 10) });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('genre-mix <genreName>').description('Get instant mix based on a music genre name')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
+    .action(async (genreName, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getMusicGenreInstantMix(genreName, { limit: parseInt(options.limit, 10) });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('playlist-mix <playlistId>').description('Get instant mix based on a playlist')
+    .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getPlaylistInstantMix(playlistId, { limit: parseInt(options.limit, 10) });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('trailers').description('Browse trailer items in the library')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '20')
     .option('--offset <number>', 'Start index', '0').option('--sort <field>', 'Sort field')
