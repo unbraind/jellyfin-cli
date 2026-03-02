@@ -224,6 +224,9 @@ jf system info --format raw
 - `jf library persons` - List all persons
 - `jf library artists` - List all artists
 - `jf library album-artists` - List all album artists
+- `jf library get-genre <name>` - Get a genre by name
+- `jf library get-person <name>` - Get a person by name
+- `jf library get-studio <name>` - Get a studio by name
 
 ### User Data
 

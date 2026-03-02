@@ -832,6 +832,36 @@ jf library album-artists [--parent <id>] [--limit <number>]
 
 Output type: `items`
 
+### library get-genre
+
+Get a genre by exact name.
+
+```bash
+jf library get-genre <name>
+```
+
+Output type: `item`
+
+### library get-person
+
+Get a person (actor, director, etc.) by exact name.
+
+```bash
+jf library get-person <name>
+```
+
+Output type: `item`
+
+### library get-studio
+
+Get a studio by exact name.
+
+```bash
+jf library get-studio <name>
+```
+
+Output type: `item`
+
 ### library virtual-folders
 
 List all virtual folders (library sources) with their configured media paths.

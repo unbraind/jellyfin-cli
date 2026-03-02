@@ -135,6 +135,42 @@ export function createLibraryCommand(): Command {
     });
 
   cmd
+    .command('get-genre <name>')
+    .description('Get a genre by name')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const item = await client.getGenreByName(name);
+        console.log(toon.formatItem(item));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('get-person <name>')
+    .description('Get a person (actor, director, etc.) by name')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const item = await client.getPersonByName(name);
+        console.log(toon.formatItem(item));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('get-studio <name>')
+    .description('Get a studio by name')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const item = await client.getStudioByName(name);
+        console.log(toon.formatItem(item));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
     .command('virtual-folders')
     .description('List all virtual folders (library sources with paths)')
     .option('-f, --format <format>', 'Output format')

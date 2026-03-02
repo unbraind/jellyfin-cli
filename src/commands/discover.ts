@@ -78,12 +78,27 @@ export function createDiscoverCommand(): Command {
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const result = await client.getTrailers({
-          limit: parseInt(options.limit, 10),
-          startIndex: parseInt(options.offset, 10),
-          sortBy: options.sort,
-        });
-        console.log(toon.formatItems(result.Items ?? []));
+        // Try the dedicated /Trailers endpoint first (requires Trailers plugin).
+        // Fall back to Items API with IncludeItemTypes=Trailer for servers without the plugin.
+        let items;
+        try {
+          const result = await client.getTrailers({
+            limit: parseInt(options.limit, 10),
+            startIndex: parseInt(options.offset, 10),
+            sortBy: options.sort,
+          });
+          items = result.Items ?? [];
+        } catch {
+          const result = await client.getItems({
+            includeItemTypes: ['Trailer'],
+            recursive: true,
+            limit: parseInt(options.limit, 10),
+            startIndex: parseInt(options.offset, 10),
+            sortBy: options.sort,
+          });
+          items = result.Items ?? [];
+        }
+        console.log(toon.formatItems(items));
       } catch (err) { handleError(err, format); }
     });
 
