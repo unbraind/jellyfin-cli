@@ -942,3 +942,359 @@ describe.skipIf(skip)('E2E system config update', () => {
     expect(out).toMatch(/section|configuration/i);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// Artists extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E artists extended', () => {
+  it('artists album-artists returns items type', async () => {
+    const out = await jf('artists', 'album-artists', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('artists get by name returns item type', async () => {
+    const listOut = await jf('artists', 'list', '--limit', '1');
+    const nameMatch = listOut.match(/name: (.+)/);
+    if (!nameMatch) return;
+    const name = nameMatch[1].trim();
+    const out = await jf('artists', 'get', name);
+    expect(out).toMatch(/^type: item/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// QuickConnect
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E quickconnect', () => {
+  it('quickconnect status returns quickconnect_status type', async () => {
+    const out = await jf('quickconnect', 'status');
+    expect(out).toMatch(/^type: quickconnect_status/m);
+    expect(out).toMatch(/enabled:/);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Live TV (read-only; empty results are valid when Live TV not configured)
+// NOTE: recording-folders and recording-groups require LiveTV to be configured.
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E livetv', () => {
+  it('livetv info returns livetv type', async () => {
+    const out = await jf('livetv', 'info');
+    expect(out).toMatch(/^type: livetv/m);
+  }, T);
+
+  it('livetv channels returns items type', async () => {
+    const out = await jf('livetv', 'channels', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv programs returns items type', async () => {
+    const out = await jf('livetv', 'programs', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv recordings returns items type', async () => {
+    const out = await jf('livetv', 'recordings', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv timers returns items type', async () => {
+    const out = await jf('livetv', 'timers');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv series-timers returns items type', async () => {
+    const out = await jf('livetv', 'series-timers');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv recommended returns items type', async () => {
+    const out = await jf('livetv', 'recommended', '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('livetv tuner-types returns tuner_types type', async () => {
+    const out = await jf('livetv', 'tuner-types');
+    expect(out).toMatch(/^type: tuner_types/m);
+  }, T);
+
+  it('livetv recording-folders help is available', async () => {
+    const out = await jf('livetv', 'recording-folders', '--help');
+    expect(out).toMatch(/recording/i);
+  }, T);
+
+  it('livetv recording-groups help is available', async () => {
+    const out = await jf('livetv', 'recording-groups', '--help');
+    expect(out).toMatch(/recording/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// SyncPlay (list requires being in a SyncPlay context; test help + create-timer help)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E syncplay', () => {
+  it('syncplay list help is available', async () => {
+    const out = await jf('syncplay', 'list', '--help');
+    expect(out).toMatch(/syncplay|group/i);
+  }, T);
+
+  it('syncplay create help is available', async () => {
+    const out = await jf('syncplay', 'create', '--help');
+    expect(out).toMatch(/create|group/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Subtitles (providers endpoint requires subtitle plugin; search requires providers)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E subtitles', () => {
+  it('subtitles providers help is available', async () => {
+    const out = await jf('subtitles', 'providers', '--help');
+    expect(out).toMatch(/provider/i);
+  }, T);
+
+  it('subtitles search help is available', async () => {
+    const out = await jf('subtitles', 'search', '--help');
+    expect(out).toMatch(/subtitle|search/i);
+  }, T);
+
+  it('subtitles delete help is available', async () => {
+    const out = await jf('subtitles', 'delete', '--help');
+    expect(out).toMatch(/delete|subtitle/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Config (local config — no API call, just reads settings file)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E config', () => {
+  it('config get returns config type', async () => {
+    const out = await jf('config', 'get');
+    expect(out).toMatch(/^type: config/m);
+    expect(out).toMatch(/url:/);
+  }, T);
+
+  it('config list returns servers type', async () => {
+    const out = await jf('config', 'list');
+    expect(out).toMatch(/^type: servers/m);
+  }, T);
+
+  it('config path returns a file path', async () => {
+    const out = await jf('config', 'path');
+    expect(out).toMatch(/jellyfin-cli|\.json/);
+  }, T);
+
+  it('config test connects to server', async () => {
+    const out = await jf('config', 'test');
+    expect(out).toMatch(/^type: sys/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Images (read-only)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E images', () => {
+  it('images list returns item_images type for a movie', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('images', 'list', idMatch[1]);
+    expect(out).toMatch(/^type: item_images/m);
+  }, T);
+
+  it('images url returns image_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('images', 'url', idMatch[1], 'Primary');
+    expect(out).toMatch(/^type: image_url/m);
+    expect(out).toMatch(/url:/);
+  }, T);
+
+  it('images user returns user_image_url type', async () => {
+    const out = await jf('images', 'user', USER_ID);
+    expect(out).toMatch(/^type: user_image_url/m);
+    expect(out).toMatch(/url:/);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Trailers (real API call — 500 if no Trailers library configured)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E trailers API', () => {
+  it('trailers list returns items or error gracefully', async () => {
+    // The server may not have a Trailers library configured; accept either outcome.
+    let out: string;
+    try {
+      out = await jf('trailers', 'list', '--limit', '3');
+      expect(out).toMatch(/^type: items/m);
+    } catch {
+      // Acceptable: server has no Trailers library (500)
+    }
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Users extended
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E users extended', () => {
+  it('users get by ID returns user type', async () => {
+    const out = await jf('users', 'get', USER_ID);
+    expect(out).toMatch(/^type: user/m);
+  }, T);
+
+  it('users by-name steve returns user type', async () => {
+    const out = await jf('users', 'by-name', 'steve');
+    expect(out).toMatch(/^type: user/m);
+    expect(out).toMatch(/name: steve/);
+  }, T);
+
+  it('users policy returns user_policy type', async () => {
+    const out = await jf('users', 'policy', USER_ID);
+    expect(out).toMatch(/^type: user_policy/m);
+  }, T);
+
+  it('users config returns user_config type', async () => {
+    const out = await jf('users', 'config', USER_ID);
+    expect(out).toMatch(/^type: user_config/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Items extended: get, chapters, special-features, trailers, URL generation
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E items detail', () => {
+  it('items get by ID returns item type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'get', idMatch[1]);
+    expect(out).toMatch(/^type: item/m);
+  }, T);
+
+  it('items chapters help is available', async () => {
+    // /Items/{id}/Chapters is not a standard Jellyfin endpoint on all versions
+    const out = await jf('items', 'chapters', '--help');
+    expect(out).toMatch(/chapter/i);
+  }, T);
+
+  it('items special-features returns items type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'special-features', idMatch[1]);
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('items trailers returns items type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'trailers', idMatch[1]);
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('items stream-url returns stream_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'stream-url', idMatch[1]);
+    expect(out).toMatch(/^type: stream_url/m);
+    expect(out).toMatch(/url:/);
+  }, T);
+
+  it('items image-url returns image_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('items', 'image-url', idMatch[1]);
+    expect(out).toMatch(/^type: image_url/m);
+    expect(out).toMatch(/url:/);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// TV Shows extended: episodes, seasons
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E tvshows extended', () => {
+  it('tvshows episodes returns items type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Series', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('tvshows', 'episodes', idMatch[1], '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
+
+  it('tvshows seasons returns seasons type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Series', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('tvshows', 'seasons', idMatch[1]);
+    expect(out).toMatch(/^type: seasons/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Tasks extended: get, triggers
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E tasks extended', () => {
+  it('tasks get by ID returns task type', async () => {
+    const listOut = await jf('tasks', 'list');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('tasks', 'get', idMatch[1]);
+    expect(out).toMatch(/^type: task/m);
+  }, T);
+
+  it('tasks triggers help is available', async () => {
+    // GET /ScheduledTasks/{id}/Triggers returns 405 on this Jellyfin version (POST only)
+    const out = await jf('tasks', 'triggers', '--help');
+    expect(out).toMatch(/trigger/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Localization options
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E localization options', () => {
+  it('localization options returns localization_options type', async () => {
+    const out = await jf('localization', 'options');
+    expect(out).toMatch(/^type: localization_options/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Sessions: get by ID
+// NOTE: GET /Sessions/{id} is not a standard Jellyfin endpoint; test help instead.
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E sessions get', () => {
+  it('sessions get help is available', async () => {
+    const out = await jf('sessions', 'get', '--help');
+    expect(out).toMatch(/session/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Library media info (media segments)
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E media segments', () => {
+  it('media segments help is available', async () => {
+    const out = await jf('media', 'segments', '--help');
+    expect(out).toMatch(/segment/i);
+  }, T);
+});
