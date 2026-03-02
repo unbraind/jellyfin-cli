@@ -1,6 +1,6 @@
-import type { JellyfinConfig, UserDto, SystemInfo, SessionInfo, QueryResult, SearchResult, BaseItemDto, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo, PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult, LiveTvInfo, PlaylistCreationResult, RecommendationDto, SimilarItemResult, PluginInfo, DeviceInfo, BrandingOptions, ServerConfiguration, ItemCounts, ApiKeyInfo, NotificationTypeInfo, NotificationResult, QuickConnectResult, DisplayPreferences, VirtualFolderInfo, QueryFilters, RemoteImageInfo, ExternalIdInfo, ThemeMediaResult, SyncPlayGroup, RemoteSubtitleInfo, MediaSegment, LyricsInfo, LocalizationOption, CountryInfo, CultureDto, BackupInfo, CreateUserDto, UpdateUserPasswordDto, RemoteSearchResult, RemoteSearchQuery, UserView, UserViewGroupingOption, UtcTimeResponse, AddVirtualFolderParams, AddMediaPathParams, UpdateMediaPathParams } from '../types/index.js';
+import type { JellyfinConfig, UserDto, SystemInfo, SessionInfo, QueryResult, SearchResult, BaseItemDto, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo, PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult, PlaylistCreationResult, RecommendationDto, SimilarItemResult, PluginInfo, DeviceInfo, BrandingOptions, ServerConfiguration, ItemCounts, ApiKeyInfo, NotificationTypeInfo, NotificationResult, QuickConnectResult, DisplayPreferences, VirtualFolderInfo, QueryFilters, RemoteImageInfo, ExternalIdInfo, ThemeMediaResult, RemoteSubtitleInfo, MediaSegment, LyricsInfo, LocalizationOption, CountryInfo, CultureDto, BackupInfo, CreateUserDto, UpdateUserPasswordDto, RemoteSearchResult, RemoteSearchQuery, UserView, UserViewGroupingOption, UtcTimeResponse, AddVirtualFolderParams, AddMediaPathParams, UpdateMediaPathParams } from '../types/index.js';
 import { ApiClientBase } from './base.js';
-import { JellyfinApiError, ChapterInfo, PlaybackInfoResponse } from './types.js';
+import { JellyfinApiError, ChapterInfo, PlaybackInfoResponse, buildQueryString } from './types.js';
 import { TvShowsApi } from './tvshows.js';
 import { PackagesApi, type PackageInfo } from './packages.js';
 import { ImagesApi, type ItemImageInfo } from './images.js';
@@ -9,9 +9,11 @@ import { YearsApi } from './years.js';
 import { MusicGenresApi } from './musicgenres.js';
 import { TrickplayApi } from './trickplay.js';
 import { ChannelsApi, type ChannelFeatures } from './channels.js';
+import { LiveTvApi, type LiveTvTimerParams, type LiveTvSeriesTimerParams, type TunerHostInfo, type ListingProviderInfo } from './livetv.js';
+import { SyncPlayApi } from './syncplay.js';
 
 export { JellyfinApiError } from './types.js';
-export type { ChapterInfo, PlaybackInfoResponse, PackageInfo, ItemImageInfo, ChannelFeatures };
+export type { ChapterInfo, PlaybackInfoResponse, PackageInfo, ItemImageInfo, ChannelFeatures, LiveTvTimerParams, LiveTvSeriesTimerParams, TunerHostInfo, ListingProviderInfo };
 
 class CoreApi extends ApiClientBase {
   async authenticate(username: string, password: string): Promise<UserDto> {
@@ -62,6 +64,8 @@ export class JellyfinApiClient extends CoreApi {
   private musicGenres: MusicGenresApi;
   private trickplay: TrickplayApi;
   private channels: ChannelsApi;
+  public livetv: LiveTvApi;
+  public syncplay: SyncPlayApi;
 
   constructor(config: JellyfinConfig) {
     super(config);
@@ -73,26 +77,36 @@ export class JellyfinApiClient extends CoreApi {
     this.musicGenres = new MusicGenresApi(config);
     this.trickplay = new TrickplayApi(config);
     this.channels = new ChannelsApi(config);
+    this.livetv = new LiveTvApi(config);
+    this.syncplay = new SyncPlayApi(config);
   }
 
   setUserId(userId: string): void { super.setUserId(userId); this.syncModules(); }
-  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); }
+  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); this.livetv = new LiveTvApi(cfg); this.syncplay = new SyncPlayApi(cfg); }
 
+  // TV Shows
   async getEpisodes(seriesId: string, params?: { seasonId?: string; userId?: string; season?: number; limit?: number; startIndex?: number; isMissing?: boolean; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getEpisodes(seriesId, params); }
   async getSeasons(seriesId: string, params?: { userId?: string; isSpecialSeason?: boolean }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getSeasons(seriesId, params); }
   async getNextUpEpisodes(params?: { userId?: string; seriesId?: string; parentId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getNextUpEpisodes(params); }
   async getUpcomingEpisodes(params?: { userId?: string; parentId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getUpcomingEpisodes(params); }
+
+  // Packages / Plugins
   async getPackages(): Promise<PackageInfo[]> { return this.packages.getPackages(); }
   async getPackageInfo(packageId: string): Promise<PackageInfo> { return this.packages.getPackageInfo(packageId); }
   async installPackage(packageId: string, version?: string, repositoryUrl?: string): Promise<void> { return this.packages.installPackage(packageId, version, repositoryUrl); }
   async cancelPackageInstallation(installationId: string): Promise<void> { return this.packages.cancelPackageInstallation(installationId); }
   async getRepositories() { return this.packages.getRepositories(); }
+  async setRepositories(repositories: { Name?: string; Url?: string; Enabled?: boolean }[]): Promise<void> { return this.packages.setRepositories(repositories); }
   async getInstallingPackages() { return this.packages.getInstallingPackages(); }
+
+  // Images
   async getItemImages(itemId: string): Promise<ItemImageInfo[]> { return this.images.getItemImages(itemId); }
   getItemImage(itemId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; quality?: number; imageIndex?: number }): string { return this.images.getItemImage(itemId, imageType, params); }
   async deleteItemImage(itemId: string, imageType: string, imageIndex?: number): Promise<void> { return this.images.deleteItemImage(itemId, imageType, imageIndex); }
   async deleteUserImage(userId: string, imageType: string): Promise<void> { return this.images.deleteUserImage(userId, imageType); }
   getUserImage(userId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; imageIndex?: number }): string { return this.images.getUserImage(userId, imageType, params); }
+
+  // Suggestions / Years / Music / Trickplay / Channels
   async getSuggestions(params?: { userId?: string; parentId?: string; limit?: number }): Promise<BaseItemDto[]> { return this.suggestions.getSuggestions(params); }
   async getYears(params?: { userId?: string; parentId?: string; limit?: number; sortBy?: string; sortOrder?: string }): Promise<QueryResult<BaseItemDto>> { return this.years.getYears(params); }
   async getYear(year: number, params?: { userId?: string }): Promise<BaseItemDto> { return this.years.getYear(year, params); }
@@ -106,49 +120,95 @@ export class JellyfinApiClient extends CoreApi {
   async getChannelItems(channelId: string, params?: { folderId?: string; userId?: string; limit?: number; startIndex?: number; sortBy?: string; sortOrder?: string }): Promise<QueryResult<BaseItemDto>> { return this.channels.getChannelItems(channelId, params); }
   async getLatestChannelItems(channelId: string, userId?: string, limit?: number): Promise<BaseItemDto[]> { return this.channels.getLatestChannelItems(channelId, { userId, limit }); }
 
-  async getLiveTvInfo(): Promise<LiveTvInfo> { return this.request<LiveTvInfo>('GET', '/LiveTv/Info'); }
-  async getLiveTvChannels(params?: { startIndex?: number; limit?: number; userId?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Channels', { ...params, userId }); }
-  async getLiveTvPrograms(params?: { channelId?: string; userId?: string; startIndex?: number; limit?: number; minStartDate?: string; maxStartDate?: string; hasAired?: boolean }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Programs', { ...params, userId }); }
-  async getLiveTvRecordings(params?: { userId?: string; startIndex?: number; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Recordings', { ...params, userId }); }
-  async getLiveTvTimer(id: string): Promise<BaseItemDto> { return this.request<BaseItemDto>('GET', `/LiveTv/Timers/${id}`); }
-  async getLiveTvTimers(params?: { channelId?: string }): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Timers', params); }
+  // Live TV (delegate to livetv submodule)
+  async getLiveTvInfo() { return this.livetv.getLiveTvInfo(); }
+  async getLiveTvChannels(params?: Parameters<LiveTvApi['getLiveTvChannels']>[0]) { return this.livetv.getLiveTvChannels(params); }
+  async getLiveTvPrograms(params?: Parameters<LiveTvApi['getLiveTvPrograms']>[0]) { return this.livetv.getLiveTvPrograms(params); }
+  async getLiveTvRecordings(params?: Parameters<LiveTvApi['getLiveTvRecordings']>[0]) { return this.livetv.getLiveTvRecordings(params); }
+  async getLiveTvTimer(id: string) { return this.livetv.getLiveTvTimer(id); }
+  async getLiveTvTimers(params?: Parameters<LiveTvApi['getLiveTvTimers']>[0]) { return this.livetv.getLiveTvTimers(params); }
+  async createLiveTvTimer(params: LiveTvTimerParams) { return this.livetv.createLiveTvTimer(params); }
+  async updateLiveTvTimer(id: string, params: LiveTvTimerParams) { return this.livetv.updateLiveTvTimer(id, params); }
+  async deleteLiveTvTimer(id: string) { return this.livetv.deleteLiveTvTimer(id); }
+  async getLiveTvSeriesTimers() { return this.livetv.getLiveTvSeriesTimers(); }
+  async getLiveTvSeriesTimer(id: string) { return this.livetv.getLiveTvSeriesTimer(id); }
+  async createLiveTvSeriesTimer(params: LiveTvSeriesTimerParams) { return this.livetv.createLiveTvSeriesTimer(params); }
+  async deleteLiveTvSeriesTimer(id: string) { return this.livetv.deleteLiveTvSeriesTimer(id); }
+  async getLiveTvGuideInfo() { return this.livetv.getLiveTvGuideInfo(); }
+  async getLiveTvRecommendedPrograms(params?: Parameters<LiveTvApi['getLiveTvRecommendedPrograms']>[0]) { return this.livetv.getLiveTvRecommendedPrograms(params); }
+  async getLiveTvRecordingFolders() { return this.livetv.getLiveTvRecordingFolders(); }
+  async getLiveTvRecordingGroups() { return this.livetv.getLiveTvRecordingGroups(); }
+  async getLiveTvRecordingById(id: string) { return this.livetv.getLiveTvRecordingById(id); }
+  async deleteLiveTvRecording(id: string) { return this.livetv.deleteLiveTvRecording(id); }
+  async discoverTuners() { return this.livetv.discoverTuners(); }
+  async getTunerHostTypes() { return this.livetv.getTunerHostTypes(); }
+
+  // SyncPlay (delegate to syncplay submodule)
+  async getSyncPlayGroups() { return this.syncplay.getGroups(); }
+  async syncPlayCreate(groupName?: string) { return this.syncplay.createGroup(groupName ? { GroupName: groupName } : undefined); }
+  async syncPlayGetGroup(groupId: string) { return this.syncplay.getGroup(groupId); }
+  async syncPlayJoin(groupId: string) { return this.syncplay.joinGroup(groupId); }
+  async syncPlayLeave() { return this.syncplay.leaveGroup(); }
+  async syncPlayPause() { return this.syncplay.pauseGroup(); }
+  async syncPlayUnpause() { return this.syncplay.unpauseGroup(); }
+  async syncPlayStop() { return this.syncplay.stopGroup(); }
+  async syncPlaySeek(positionTicks: number) { return this.syncplay.seekGroup(positionTicks); }
+  async syncPlayNextItem(playlistItemId?: string) { return this.syncplay.nextItem(playlistItemId ? { PlaylistItemId: playlistItemId } : undefined); }
+  async syncPlayPreviousItem(playlistItemId?: string) { return this.syncplay.previousItem(playlistItemId ? { PlaylistItemId: playlistItemId } : undefined); }
+  async syncPlaySetRepeatMode(mode: string) { return this.syncplay.setRepeatMode(mode); }
+  async syncPlaySetShuffleMode(mode: string) { return this.syncplay.setShuffleMode(mode); }
+  async syncPlayQueue(itemIds: string[]) { return this.syncplay.queueItems(itemIds); }
+  async syncPlaySetNewQueue(itemIds: string[], startPositionTicks?: number) { return this.syncplay.setNewQueue({ ItemIds: itemIds, StartPositionTicks: startPositionTicks }); }
+  async syncPlayRemoveFromPlaylist(playlistItemIds: string[]) { return this.syncplay.removeFromPlaylist(playlistItemIds); }
+  async syncPlayMovePlaylistItem(playlistItemId: string, newIndex: number) { return this.syncplay.movePlaylistItem(playlistItemId, newIndex); }
+  async syncPlaySetPlaylistItem(playlistItemId: string) { return this.syncplay.setPlaylistItem(playlistItemId); }
+  async syncPlayPing(ping: number) { return this.syncplay.updatePing(ping); }
+  async syncPlayBuffering(params?: Parameters<SyncPlayApi['reportBuffering']>[0]) { return this.syncplay.reportBuffering(params); }
+  async syncPlayReady(params?: Parameters<SyncPlayApi['reportReady']>[0]) { return this.syncplay.reportReady(params); }
+  async syncPlaySetIgnoreWait(ignoreWait: boolean) { return this.syncplay.setIgnoreWait(ignoreWait); }
+
+  // Playlists
   async createPlaylist(params: { name: string; ids?: string[]; userId?: string; mediaType?: string }): Promise<PlaylistCreationResult> { const userId = params.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<PlaylistCreationResult>('POST', '/Playlists', { ...params, userId, ids: params.ids?.join(',') }); }
   async addToPlaylist(playlistId: string, ids: string[], userId?: string): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Items`, { ids: ids.join(','), userId: userId ?? this.userId }); }
   async removeFromPlaylist(playlistId: string, entryIds: string[]): Promise<void> { await this.request<void>('DELETE', `/Playlists/${playlistId}/Items`, { entryIds: entryIds.join(',') }); }
   async getPlaylistItems(playlistId: string, params?: { userId?: string; startIndex?: number; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Playlists/${playlistId}/Items`, { ...params, userId }); }
-  async markFavorite(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }>('POST', `/Users/${uid}/FavoriteItems/${itemId}`); }
-  async unmarkFavorite(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number; IsFavorite?: boolean }>('DELETE', `/Users/${uid}/FavoriteItems/${itemId}`); }
-  async markPlayed(itemId: string, userId?: string, datePlayed?: string): Promise<{ Played?: boolean; PlayCount?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number }>('POST', `/Users/${uid}/PlayedItems/${itemId}`, { datePlayed }); }
-  async unmarkPlayed(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number }>('DELETE', `/Users/${uid}/PlayedItems/${itemId}`); }
-  async updateUserItemRating(itemId: string, userId?: string, likes?: boolean): Promise<{ Played?: boolean; PlayCount?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number }>('POST', `/Users/${uid}/Items/${itemId}/Rating`, { likes }); }
-  async deleteUserItemRating(itemId: string, userId?: string): Promise<{ Played?: boolean; PlayCount?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean; PlayCount?: number }>('DELETE', `/Users/${uid}/Items/${itemId}/Rating`); }
-  async getGenres(params?: { parentId?: string; userId?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Genres', { ...params, userId }); }
-  async getStudios(params?: { parentId?: string; userId?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Studios', { ...params, userId }); }
+  async deletePlaylist(playlistId: string): Promise<void> { await this.request<void>('DELETE', `/Playlists/${playlistId}`); }
+  async getPlaylist(playlistId: string): Promise<BaseItemDto> { return this.request<BaseItemDto>('GET', `/Playlists/${playlistId}`); }
+  async updatePlaylist(playlistId: string, data: { Name?: string; Ids?: string[]; UserId?: string }): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}`, undefined, data); }
+  async getPlaylistUsers(playlistId: string): Promise<{ UserId?: string; CanEdit?: boolean }[]> { return this.request<{ UserId?: string; CanEdit?: boolean }[]>('GET', `/Playlists/${playlistId}/Users`); }
+  async setPlaylistUserAccess(playlistId: string, userId: string, canEdit: boolean): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Users/${userId}`, undefined, { UserId: userId, CanEdit: canEdit }); }
+  async removePlaylistUserAccess(playlistId: string, userId: string): Promise<void> { await this.request<void>('DELETE', `/Playlists/${playlistId}/Users/${userId}`); }
+  async movePlaylistItem(playlistId: string, itemId: string, newIndex: number): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Items/${itemId}/Move/${newIndex}`); }
+  async getPlaylistInstantMix(playlistId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Playlists/${playlistId}/InstantMix`, { ...params, userId }); }
+
+  // Favorites & User Data
+  async markFavorite(itemId: string, userId?: string): Promise<{ IsFavorite?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean }>('POST', `/UserFavoriteItems/${itemId}`, { userId: uid }); }
+  async unmarkFavorite(itemId: string, userId?: string): Promise<{ IsFavorite?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean }>('DELETE', `/UserFavoriteItems/${itemId}`, { userId: uid }); }
+  async markPlayed(itemId: string, userId?: string, datePlayed?: string): Promise<{ Played?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean }>('POST', `/UserPlayedItems/${itemId}`, { userId: uid, datePlayed }); }
+  async unmarkPlayed(itemId: string, userId?: string): Promise<{ Played?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean }>('DELETE', `/UserPlayedItems/${itemId}`, { userId: uid }); }
+  async updateUserItemRating(itemId: string, userId?: string, likes?: boolean): Promise<{ Played?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean }>('POST', `/UserItems/${itemId}/Rating`, { userId: uid, likes }); }
+  async deleteUserItemRating(itemId: string, userId?: string): Promise<{ Played?: boolean }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ Played?: boolean }>('DELETE', `/UserItems/${itemId}/Rating`, { userId: uid }); }
+  async getUserItemData(itemId: string, userId?: string): Promise<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; LastPlayedDate?: string; PlaybackPositionTicks?: number; Rating?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; LastPlayedDate?: string; PlaybackPositionTicks?: number; Rating?: number }>('GET', `/UserItems/${itemId}/UserData`, { userId: uid }); }
+
+  // Library Browsing
+  async getGenres(params?: { parentId?: string; userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Genres', { ...params, userId }); }
+  async getStudios(params?: { parentId?: string; userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Studios', { ...params, userId }); }
   async getPersons(params?: { parentId?: string; userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Persons', { ...params, userId }); }
   async getArtists(params?: { parentId?: string; userId?: string; limit?: number; sortBy?: string; sortOrder?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<QueryResult<BaseItemDto>>('GET', '/Artists', { ...params, userId }); }
   async getAlbumArtists(params?: { parentId?: string; userId?: string; limit?: number; sortBy?: string; sortOrder?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<QueryResult<BaseItemDto>>('GET', '/Artists/AlbumArtists', { ...params, userId }); }
+  async getMediaFolders(isHidden?: boolean): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/Library/MediaFolders', { isHidden }); }
+  async getPhysicalPaths(): Promise<string[]> { return this.request<string[]>('GET', '/Library/PhysicalPaths'); }
+
+  // Items
   async getSimilarItems(itemId: string, params?: { userId?: string; limit?: number }): Promise<SimilarItemResult> { const userId = params?.userId ?? this.userId; return this.request<SimilarItemResult>('GET', `/Items/${itemId}/Similar`, { ...params, userId }); }
   async getRecommendations(params?: { userId?: string; categoryLimit?: number; itemLimit?: number }): Promise<RecommendationDto[]> { const userId = params?.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<RecommendationDto[]>('GET', '/Movies/Recommendations', { userId, categoryLimit: params?.categoryLimit, itemLimit: params?.itemLimit }); }
   async getInstantMix(itemId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; if (!userId) throw new JellyfinApiError('User ID required'); return this.request<QueryResult<BaseItemDto>>('GET', `/Items/${itemId}/InstantMix`, { ...params, userId }); }
-  async getPlugins(): Promise<PluginInfo[]> { return this.request<PluginInfo[]>('GET', '/Plugins'); }
-  async getPlugin(pluginId: string): Promise<PluginInfo> { return this.request<PluginInfo>('GET', `/Plugins/${pluginId}`); }
-  async uninstallPlugin(pluginId: string): Promise<void> { await this.request<void>('DELETE', `/Plugins/${pluginId}`); }
-  async getPluginConfiguration(pluginId: string): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>('GET', `/Plugins/${pluginId}/Configuration`); }
-  async updatePluginConfiguration(pluginId: string, config: Record<string, unknown>): Promise<void> { await this.request<void>('POST', `/Plugins/${pluginId}/Configuration`, undefined, config); }
-  async getDevices(): Promise<QueryResult<DeviceInfo>> { return this.request<QueryResult<DeviceInfo>>('GET', '/Devices'); }
-  async getDevice(deviceId: string): Promise<DeviceInfo> { return this.request<DeviceInfo>('GET', `/Devices/${deviceId}`); }
-  async deleteDevice(deviceId: string): Promise<void> { await this.request<void>('DELETE', '/Devices', { id: deviceId }); }
-  async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> { await this.request<void>('POST', '/Devices/Options', undefined, { Id: deviceId, ...options }); }
-  async getBranding(): Promise<BrandingOptions> { return this.request<BrandingOptions>('GET', '/Branding/Configuration'); }
-  async getServerConfiguration(): Promise<ServerConfiguration> { return this.request<ServerConfiguration>('GET', '/System/Configuration'); }
-  async updateServerConfiguration(config: Partial<ServerConfiguration>): Promise<void> { await this.request<void>('POST', '/System/Configuration', undefined, config); }
-  async getItemCounts(): Promise<ItemCounts> { return this.request<ItemCounts>('GET', '/Items/Counts'); }
-  async getApiKeys(): Promise<QueryResult<ApiKeyInfo>> { return this.request<QueryResult<ApiKeyInfo>>('GET', '/Auth/Keys'); }
-  async createApiKey(app: string): Promise<void> { await this.request<void>('POST', '/Auth/Keys', { app }); }
-  async deleteApiKey(key: string): Promise<void> { await this.request<void>('DELETE', `/Auth/Keys/${key}`); }
-  async getNotificationTypes(): Promise<NotificationTypeInfo[]> { return this.request<NotificationTypeInfo[]>('GET', '/Notifications/Types'); }
-  async getNotifications(userId?: string): Promise<NotificationResult> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<NotificationResult>('GET', `/Notifications/${uid}`); }
-  async sendAdminNotification(params: { name: string; description?: string; url?: string; level?: string; userIds?: string[] }): Promise<void> { await this.request<void>('POST', '/Notifications/Admin', params); }
+  async getTrailers(params?: { userId?: string; limit?: number; startIndex?: number; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Trailers', { ...params, userId }); }
+  async getCriticReviews(itemId: string): Promise<QueryResult<{ Body?: string; Date?: string; IsNegative?: boolean; ReviewerName?: string; Url?: string }>> { return this.request<QueryResult<{ Body?: string; Date?: string; IsNegative?: boolean; ReviewerName?: string; Url?: string }>>('GET', `/Items/${itemId}/CriticReviews`); }
+  async getItemRootFolder(userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/Root`); }
+  async setItemContentType(itemId: string, contentType: string): Promise<void> { await this.request<void>('POST', `/Items/${itemId}/ContentType`, { contentType }); }
+  async getAlbumInstantMix(albumId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Albums/${albumId}/InstantMix`, { ...params, userId }); }
+  async getSongInstantMix(songId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Songs/${songId}/InstantMix`, { ...params, userId }); }
   async getIntros(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/Intros`); }
   async getAdditionalParts(itemId: string): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', `/Videos/${itemId}/AdditionalParts`); }
   async getChapters(itemId: string): Promise<ChapterInfo[]> { return this.request<ChapterInfo[]>('GET', `/Items/${itemId}/Chapters`); }
@@ -157,11 +217,7 @@ export class JellyfinApiClient extends CoreApi {
   async getAncestors(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/Ancestors`); }
   async getItemsByPath(path: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', '/Items/ByPath', { path }); }
   async getPlaybackInfo(itemId: string, userId?: string): Promise<PlaybackInfoResponse> { const uid = userId ?? this.userId; return this.request<PlaybackInfoResponse>('GET', `/Items/${itemId}/PlaybackInfo`, { userId: uid }); }
-  getStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Videos/${itemId}/stream${this.buildQS({ ...params, userId: this.userId })}`; }
-  getAudioStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Audio/${itemId}/stream${this.buildQS({ ...params, userId: this.userId })}`; }
-  getSubtitleUrl(itemId: string, mediaSourceId: string, streamIndex: number, format?: string): string { return `${this.getBackendUrl()}/Videos/${itemId}/${mediaSourceId}/Subtitles/${streamIndex}/Stream.${format ?? 'srt'}${this.buildQS({ mediaSourceId, streamIndex, format, userId: this.userId })}`; }
-  getThumbUrl(itemId: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string { return `${this.getBackendUrl()}/Items/${itemId}/Images/Primary${this.buildQS(params as Record<string, unknown>)}`; }
-  getHlsMasterPlaylistUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Videos/${itemId}/master.m3u8${this.buildQS({ ...params, userId: this.userId })}`; }
+  async getItemCounts(): Promise<ItemCounts> { return this.request<ItemCounts>('GET', '/Items/Counts'); }
   async getQueryFilters(params?: { userId?: string; parentId?: string; includeItemTypes?: string[] }): Promise<QueryFilters> { return this.request<QueryFilters>('GET', '/Items/Filters', params as Record<string, unknown>); }
   async getThemeSongs(itemId: string, userId?: string, inheritFromParent?: boolean): Promise<ThemeMediaResult> { return this.request<ThemeMediaResult>('GET', `/Items/${itemId}/ThemeSongs`, { userId, inheritFromParent }); }
   async getThemeVideos(itemId: string, userId?: string, inheritFromParent?: boolean): Promise<ThemeMediaResult> { return this.request<ThemeMediaResult>('GET', `/Items/${itemId}/ThemeVideos`, { userId, inheritFromParent }); }
@@ -170,64 +226,81 @@ export class JellyfinApiClient extends CoreApi {
   async getExternalIdInfos(itemId: string): Promise<ExternalIdInfo[]> { return this.request<ExternalIdInfo[]>('GET', `/Items/${itemId}/ExternalIdInfos`); }
   async searchRemoteSubtitles(itemId: string, language: string, isPerfectMatch?: boolean): Promise<RemoteSubtitleInfo[]> { return this.request<RemoteSubtitleInfo[]>('GET', `/Items/${itemId}/RemoteSearch/Subtitles/${language}`, { isPerfectMatch }); }
   async downloadRemoteSubtitle(itemId: string, subtitleId: string): Promise<void> { await this.request<void>('POST', `/Items/${itemId}/RemoteSearch/Subtitles/${subtitleId}`); }
-  async getMediaSegments(itemId: string): Promise<QueryResult<MediaSegment>> { return this.request<QueryResult<MediaSegment>>('GET', `/MediaSegments/${itemId}`); }
-  async getLyrics(itemId: string): Promise<LyricsInfo> { return this.request<LyricsInfo>('GET', `/Audio/${itemId}/Lyrics`); }
-  async getSyncPlayGroups(): Promise<SyncPlayGroup[]> { return this.request<SyncPlayGroup[]>('GET', '/SyncPlay/List'); }
-  async syncPlayJoin(groupId: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/Join', undefined, { GroupId: groupId }); }
-  async syncPlayLeave(): Promise<void> { await this.request<void>('POST', '/SyncPlay/Leave'); }
-  async syncPlayPause(): Promise<void> { await this.request<void>('POST', '/SyncPlay/Pause'); }
-  async syncPlayUnpause(): Promise<void> { await this.request<void>('POST', '/SyncPlay/Unpause'); }
-  async syncPlayStop(): Promise<void> { await this.request<void>('POST', '/SyncPlay/Stop'); }
-  async getLocalizationOptions(): Promise<LocalizationOption[]> { return this.request<LocalizationOption[]>('GET', '/Localization/Options'); }
-  async getCountries(): Promise<CountryInfo[]> { return this.request<CountryInfo[]>('GET', '/Localization/Countries'); }
-  async getCultures(): Promise<CultureDto[]> { return this.request<CultureDto[]>('GET', '/Localization/Cultures'); }
-  async getDrives(): Promise<{ Name?: string; Path?: string }[]> { return this.request<{ Name?: string; Path?: string }[]>('GET', '/Environment/Drives'); }
-  async getBackups(): Promise<BackupInfo[]> { return this.request<BackupInfo[]>('GET', '/Backup'); }
-  async createBackup(): Promise<void> { await this.request<void>('POST', '/Backup'); }
-  async restoreBackup(backupPath: string): Promise<void> { await this.request<void>('POST', `/Backup/${encodeURIComponent(backupPath)}`); }
-  async deleteBackup(backupPath: string): Promise<void> { await this.request<void>('DELETE', `/Backup/${encodeURIComponent(backupPath)}`); }
   async refreshItem(itemId: string, params?: { recursive?: boolean; replaceAllMetadata?: boolean; replaceAllImages?: boolean }): Promise<void> { await this.request<void>('POST', `/Items/${itemId}/Refresh`, params); }
   async deleteItem(itemId: string): Promise<void> { await this.request<void>('DELETE', `/Items/${itemId}`); }
-  async getVirtualFolders(): Promise<VirtualFolderInfo[]> { return this.request<VirtualFolderInfo[]>('GET', '/Library/VirtualFolders'); }
+  async updateItem(itemId: string, item: Partial<BaseItemDto>): Promise<void> { await this.request<void>('POST', `/Items/${itemId}`, undefined, item); }
+  async getMediaSegments(itemId: string): Promise<QueryResult<MediaSegment>> { return this.request<QueryResult<MediaSegment>>('GET', `/MediaSegments/${itemId}`); }
+  async getLyrics(itemId: string): Promise<LyricsInfo> { return this.request<LyricsInfo>('GET', `/Audio/${itemId}/Lyrics`); }
+  async remoteSearch(type: string, query: RemoteSearchQuery): Promise<RemoteSearchResult[]> { return this.request<RemoteSearchResult[]>('POST', `/Items/RemoteSearch/${type}`, undefined, query); }
+  async applySearchResult(itemId: string, params: { searchProviderName?: string; replaceAllImages?: boolean; providerIds?: Record<string, string> }): Promise<void> { await this.request<void>('POST', `/Items/RemoteSearch/Apply/${itemId}`, params); }
+
+  // Streaming URLs
+  getStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Videos/${itemId}/stream${buildQueryString({ ...params, userId: this.userId })}`; }
+  getAudioStreamUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Audio/${itemId}/stream${buildQueryString({ ...params, userId: this.userId })}`; }
+  getSubtitleUrl(itemId: string, mediaSourceId: string, streamIndex: number, format?: string): string { return `${this.getBackendUrl()}/Videos/${itemId}/${mediaSourceId}/Subtitles/${streamIndex}/Stream.${format ?? 'srt'}${buildQueryString({ mediaSourceId, streamIndex, format, userId: this.userId })}`; }
+  getThumbUrl(itemId: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string { return `${this.getBackendUrl()}/Items/${itemId}/Images/Primary${buildQueryString(params as Record<string, unknown>)}`; }
+  getHlsMasterPlaylistUrl(itemId: string, params?: { mediaSourceId?: string; audioStreamIndex?: number; subtitleStreamIndex?: number; maxStreamingBitrate?: number }): string { return `${this.getBackendUrl()}/Videos/${itemId}/master.m3u8${buildQueryString({ ...params, userId: this.userId })}`; }
+  getItemDownloadUrl(itemId: string): string { return `${this.getBackendUrl()}/Items/${itemId}/Download${buildQueryString({ api_key: this.apiKey } as Record<string, unknown>)}`; }
+
+  // Plugins
+  async getPlugins(): Promise<PluginInfo[]> { return this.request<PluginInfo[]>('GET', '/Plugins'); }
+  async getPlugin(pluginId: string): Promise<PluginInfo> { return this.request<PluginInfo>('GET', `/Plugins/${pluginId}`); }
+  async uninstallPlugin(pluginId: string): Promise<void> { await this.request<void>('DELETE', `/Plugins/${pluginId}`); }
+  async disablePlugin(pluginId: string, version: string): Promise<void> { await this.request<void>('POST', `/Plugins/${pluginId}/${version}/Disable`); }
+  async enablePlugin(pluginId: string, version: string): Promise<void> { await this.request<void>('POST', `/Plugins/${pluginId}/${version}/Enable`); }
+  async getPluginConfiguration(pluginId: string): Promise<Record<string, unknown>> { return this.request<Record<string, unknown>>('GET', `/Plugins/${pluginId}/Configuration`); }
+  async updatePluginConfiguration(pluginId: string, config: Record<string, unknown>): Promise<void> { await this.request<void>('POST', `/Plugins/${pluginId}/Configuration`, undefined, config); }
+
+  // Devices
+  async getDevices(): Promise<QueryResult<DeviceInfo>> { return this.request<QueryResult<DeviceInfo>>('GET', '/Devices'); }
+  async getDevice(deviceId: string): Promise<DeviceInfo> { return this.request<DeviceInfo>('GET', `/Devices/${deviceId}`); }
+  async deleteDevice(deviceId: string): Promise<void> { await this.request<void>('DELETE', '/Devices', { id: deviceId }); }
+  async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> { await this.request<void>('POST', '/Devices/Options', undefined, { Id: deviceId, ...options }); }
+
+  // System Config
+  async getBranding(): Promise<BrandingOptions> { return this.request<BrandingOptions>('GET', '/Branding/Configuration'); }
+  async getServerConfiguration(): Promise<ServerConfiguration> { return this.request<ServerConfiguration>('GET', '/System/Configuration'); }
+  async updateServerConfiguration(config: Partial<ServerConfiguration>): Promise<void> { await this.request<void>('POST', '/System/Configuration', undefined, config); }
+  async getNamedConfiguration(key: string): Promise<unknown> { return this.request<unknown>('GET', `/System/Configuration/${key}`); }
+  async updateNamedConfiguration(key: string, data: unknown): Promise<void> { await this.request<void>('POST', `/System/Configuration/${key}`, undefined, data); }
   async getSystemStorageInfo(): Promise<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }> { return this.request<{ DataPaths?: string[]; CachePath?: string; InternalMetadataPath?: string; LogPath?: string; TranscodingTempPath?: string }>('GET', '/System/Info/Storage'); }
   async getSystemLogs(): Promise<{ Name?: string; DateCreated?: string; Size?: number }[]> { return this.request<{ Name?: string; DateCreated?: string; Size?: number }[]>('GET', '/System/Logs'); }
-  async getRatingSystems(): Promise<{ Name?: string; CountryCode?: string }[]> { return this.request<{ Name?: string; CountryCode?: string }[]>('GET', '/Localization/RatingSystems'); }
+  async getSystemLogFile(name: string): Promise<string> { return this.request<string>('GET', `/System/Logs/Log`, { name }); }
+  async getSystemEndpoint(): Promise<{ IsLocal?: boolean; IsInNetwork?: boolean }> { return this.request<{ IsLocal?: boolean; IsInNetwork?: boolean }>('GET', '/System/Endpoint'); }
+  async getUtcTime(): Promise<UtcTimeResponse> { return this.request<UtcTimeResponse>('GET', '/GetUtcTime'); }
   async getSubtitleProviders(): Promise<{ Name?: string | null }[]> { return this.request<{ Name?: string | null }[]>('GET', '/Providers/Subtitles/Subtitles'); }
   async getDisplayPreferences(displayPreferencesId: string, userId?: string, client?: string): Promise<DisplayPreferences> { return this.request<DisplayPreferences>('GET', `/DisplayPreferences/${displayPreferencesId}`, { userId, client }); }
-  async updateUserPassword(userId: string, password: UpdateUserPasswordDto): Promise<void> { await this.request<void>('POST', '/Users/Password', { userId }, password); }
+
+  // API Keys & Notifications
+  async getApiKeys(): Promise<QueryResult<ApiKeyInfo>> { return this.request<QueryResult<ApiKeyInfo>>('GET', '/Auth/Keys'); }
+  async createApiKey(app: string): Promise<void> { await this.request<void>('POST', '/Auth/Keys', { app }); }
+  async deleteApiKey(key: string): Promise<void> { await this.request<void>('DELETE', `/Auth/Keys/${key}`); }
+  async getNotificationTypes(): Promise<NotificationTypeInfo[]> { return this.request<NotificationTypeInfo[]>('GET', '/Notifications/Types'); }
+  async getNotifications(userId?: string): Promise<NotificationResult> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<NotificationResult>('GET', `/Notifications/${uid}`); }
+  async sendAdminNotification(params: { name: string; description?: string; url?: string; level?: string; userIds?: string[] }): Promise<void> { await this.request<void>('POST', '/Notifications/Admin', params); }
+
+  // Users
   async createUser(user: CreateUserDto): Promise<{ Id?: string; Name?: string; ServerId?: string }> { return this.request<{ Id?: string; Name?: string; ServerId?: string }>('POST', '/Users/New', undefined, user); }
   async deleteUser(userId: string): Promise<void> { await this.request<void>('DELETE', `/Users/${userId}`); }
   async updateUserPolicy(userId: string, policy: Record<string, unknown>): Promise<void> { await this.request<void>('POST', `/Users/${userId}/Policy`, undefined, policy); }
   async updateUserConfiguration(userId: string, config: Record<string, unknown>): Promise<void> { await this.request<void>('POST', '/Users/Configuration', { userId }, config); }
-  async updateItem(itemId: string, item: Partial<BaseItemDto>): Promise<void> { await this.request<void>('POST', `/Items/${itemId}`, undefined, item); }
-  async quickConnectEnabled(): Promise<boolean> { return this.request<boolean>('GET', '/QuickConnect/Enabled'); }
-  async quickConnectInitiate(): Promise<QuickConnectResult> { return this.request<QuickConnectResult>('POST', '/QuickConnect/Initiate'); }
-  async quickConnectConnect(secret: string): Promise<QuickConnectResult> { return this.request<QuickConnectResult>('GET', '/QuickConnect/Connect', { secret }); }
-  async quickConnectAuthorize(code: string, userId?: string): Promise<boolean> { return this.request<boolean>('POST', '/QuickConnect/Authorize', { code, userId }); }
-  async deleteSubtitle(itemId: string, index: number): Promise<void> { await this.request<void>('DELETE', `/Videos/${itemId}/Subtitles/${index}`); }
-  async getSystemLogFile(name: string): Promise<string> { return this.request<string>('GET', `/System/Logs/Log`, { name }); }
-  async createCollection(params: { name: string; ids?: string[]; parentId?: string }): Promise<{ Id?: string }> { return this.request<{ Id?: string }>('POST', '/Collections', { ...params, ids: params.ids?.join(',') }); }
-  async addToCollection(collectionId: string, ids: string[]): Promise<void> { await this.request<void>('POST', `/Collections/${collectionId}/Items`, { ids: ids.join(',') }); }
-  async removeFromCollection(collectionId: string, ids: string[]): Promise<void> { await this.request<void>('DELETE', `/Collections/${collectionId}/Items`, { ids: ids.join(',') }); }
-  async createLiveTvTimer(params: { programId?: string; channelId?: string; startDate?: string; endDate?: string; name?: string; prePaddingSeconds?: number; postPaddingSeconds?: number; isPrePaddingRequired?: boolean; isPostPaddingRequired?: boolean; priority?: number }): Promise<void> { await this.request<void>('POST', '/LiveTv/Timers', undefined, params); }
-  async updateLiveTvTimer(timerId: string, params: { programId?: string; channelId?: string; startDate?: string; endDate?: string; name?: string; prePaddingSeconds?: number; postPaddingSeconds?: number; isPrePaddingRequired?: boolean; isPostPaddingRequired?: boolean; priority?: number }): Promise<void> { await this.request<void>('POST', `/LiveTv/Timers/${timerId}`, undefined, params); }
-  async deleteLiveTvTimer(timerId: string): Promise<void> { await this.request<void>('DELETE', `/LiveTv/Timers/${timerId}`); }
-  async getLiveTvSeriesTimers(): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/SeriesTimers'); }
-  async getLiveTvSeriesTimer(id: string): Promise<BaseItemDto> { return this.request<BaseItemDto>('GET', `/LiveTv/SeriesTimers/${id}`); }
-  async createLiveTvSeriesTimer(params: { programId?: string; channelId?: string; startDate?: string; endDate?: string; name?: string; prePaddingSeconds?: number; postPaddingSeconds?: number; isPrePaddingRequired?: boolean; isPostPaddingRequired?: boolean; priority?: number; recordAnyTime?: boolean; recordAnyChannel?: boolean; recordNewOnly?: boolean; days?: string[] }): Promise<void> { await this.request<void>('POST', '/LiveTv/SeriesTimers', undefined, params); }
-  async deleteLiveTvSeriesTimer(id: string): Promise<void> { await this.request<void>('DELETE', `/LiveTv/SeriesTimers/${id}`); }
-  async deletePlaylist(playlistId: string): Promise<void> { await this.request<void>('DELETE', `/Playlists/${playlistId}`); }
-  async getTaskTriggers(taskId: string): Promise<{ Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]> { return this.request<{ Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]>('GET', `/ScheduledTasks/${taskId}/Triggers`); }
-  async createTaskTrigger(taskId: string, params: { type: string; intervalTicks?: number; timeOfDayTicks?: number; dayOfWeek?: string[] }): Promise<void> { await this.request<void>('POST', `/ScheduledTasks/${taskId}/Triggers`, undefined, params); }
-  async deleteTaskTrigger(taskId: string, triggerId: string): Promise<void> { await this.request<void>('DELETE', `/ScheduledTasks/${taskId}/Triggers/${triggerId}`); }
-  async getArtistByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Artists/${encodeURIComponent(name)}`, { userId: uid }); }
-  async getGenreByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Genres/${encodeURIComponent(name)}`, { userId: uid }); }
-  async getStudioByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Studios/${encodeURIComponent(name)}`, { userId: uid }); }
-  async getPersonByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Persons/${encodeURIComponent(name)}`, { userId: uid }); }
-  async getSessionCapabilities(): Promise<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[]; SupportsMediaControl?: boolean; SupportsSync?: boolean; SupportsPersistentIdentifier?: boolean }> { return this.request<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[]; SupportsMediaControl?: boolean; SupportsSync?: boolean; SupportsPersistentIdentifier?: boolean }>('GET', '/Sessions/Capabilities'); }
-  async reportSessionCapabilities(params: { playableMediaTypes?: string[]; supportedCommands?: string[]; supportsMediaControl?: boolean; supportsSync?: boolean; supportsPersistentIdentifier?: boolean }): Promise<void> { await this.request<void>('POST', '/Sessions/Capabilities', params); }
+  async updateUserPassword(userId: string, password: UpdateUserPasswordDto): Promise<void> { await this.request<void>('POST', '/Users/Password', { userId }, password); }
+  async getPublicUsers(): Promise<UserDto[]> { return this.request<UserDto[]>('GET', '/Users/Public'); }
+  async getUserViews(userId?: string): Promise<QueryResult<UserView>> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<QueryResult<UserView>>('GET', '/UserViews', { userId: uid }); }
+  async getUserViewGroupingOptions(userId?: string): Promise<UserViewGroupingOption[]> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<UserViewGroupingOption[]>('GET', '/UserViews/GroupingOptions', { userId: uid }); }
+  async forgotPassword(enteredUsername: string): Promise<{ Action?: string; PinFile?: string; PinExpirationDate?: string }> { return this.request<{ Action?: string; PinFile?: string; PinExpirationDate?: string }>('POST', '/Users/ForgotPassword', undefined, { EnteredUsername: enteredUsername }); }
+  async redeemForgotPasswordPin(pin: string): Promise<{ Success?: boolean; UsersReset?: string[] }> { return this.request<{ Success?: boolean; UsersReset?: string[] }>('POST', '/Users/ForgotPassword/Pin', undefined, { Pin: pin }); }
+  async authenticateWithQuickConnect(secret: string): Promise<UserDto> { return this.request<UserDto>('POST', '/Users/AuthenticateWithQuickConnect', undefined, { Secret: secret }); }
 
-  // LibraryStructure
+  // Sessions extended
+  async addSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/User/${userId}`); }
+  async removeSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('DELETE', `/Sessions/${sessionId}/User/${userId}`); }
+  async setNowViewing(sessionId: string, itemId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/Viewing`, { itemId }); }
+  async getSessionCapabilities(): Promise<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[] }> { return this.request<{ PlayableMediaTypes?: string[]; SupportedCommands?: string[] }>('GET', '/Sessions/Capabilities'); }
+  async reportSessionCapabilities(params: { playableMediaTypes?: string[]; supportedCommands?: string[]; supportsMediaControl?: boolean }): Promise<void> { await this.request<void>('POST', '/Sessions/Capabilities', params); }
+
+  // Library Structure
+  async getVirtualFolders(): Promise<VirtualFolderInfo[]> { return this.request<VirtualFolderInfo[]>('GET', '/Library/VirtualFolders'); }
   async addVirtualFolder(params: AddVirtualFolderParams): Promise<void> { const { name, collectionType, paths, refreshLibrary } = params; await this.request<void>('POST', '/Library/VirtualFolders', { name, collectionType, refreshLibrary }, { LibraryOptions: {}, Paths: paths }); }
   async removeVirtualFolder(name: string, refreshLibrary?: boolean): Promise<void> { await this.request<void>('DELETE', '/Library/VirtualFolders', { name, refreshLibrary }); }
   async renameVirtualFolder(name: string, newName: string, refreshLibrary?: boolean): Promise<void> { await this.request<void>('POST', '/Library/VirtualFolders/Name', { name, newName, refreshLibrary }); }
@@ -235,95 +308,62 @@ export class JellyfinApiClient extends CoreApi {
   async removeMediaPath(name: string, path: string, refreshLibrary?: boolean): Promise<void> { await this.request<void>('DELETE', '/Library/VirtualFolders/Paths', { name, path, refreshLibrary }); }
   async updateMediaPath(params: UpdateMediaPathParams): Promise<void> { const { name, pathInfo } = params; await this.request<void>('POST', '/Library/VirtualFolders/Paths/Update', undefined, { Name: name, PathInfo: pathInfo }); }
 
-  // ItemLookup - remote metadata search
-  async remoteSearch(type: string, query: RemoteSearchQuery): Promise<RemoteSearchResult[]> { return this.request<RemoteSearchResult[]>('POST', `/Items/RemoteSearch/${type}`, undefined, query); }
-  async applySearchResult(itemId: string, params: { searchProviderName?: string; replaceAllImages?: boolean; providerIds?: Record<string, string> }): Promise<void> { await this.request<void>('POST', `/Items/RemoteSearch/Apply/${itemId}`, params); }
+  // Scheduled Tasks
+  async getTaskTriggers(taskId: string): Promise<{ Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]> { return this.request<{ Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]>('GET', `/ScheduledTasks/${taskId}/Triggers`); }
+  async createTaskTrigger(taskId: string, params: { type: string; intervalTicks?: number; timeOfDayTicks?: number; dayOfWeek?: string[] }): Promise<void> { await this.request<void>('POST', `/ScheduledTasks/${taskId}/Triggers`, undefined, params); }
+  async deleteTaskTrigger(taskId: string, triggerId: string): Promise<void> { await this.request<void>('DELETE', `/ScheduledTasks/${taskId}/Triggers/${triggerId}`); }
 
-  // UserViews
-  async getUserViews(userId?: string): Promise<QueryResult<UserView>> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<QueryResult<UserView>>('GET', '/UserViews', { userId: uid }); }
-  async getUserViewGroupingOptions(userId?: string): Promise<UserViewGroupingOption[]> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<UserViewGroupingOption[]>('GET', '/UserViews/GroupingOptions', { userId: uid }); }
+  // Named lookups
+  async getArtistByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Artists/${encodeURIComponent(name)}`, { userId: uid }); }
+  async getGenreByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Genres/${encodeURIComponent(name)}`, { userId: uid }); }
+  async getStudioByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Studios/${encodeURIComponent(name)}`, { userId: uid }); }
+  async getPersonByName(name: string, userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; return this.request<BaseItemDto>('GET', `/Persons/${encodeURIComponent(name)}`, { userId: uid }); }
 
-  // Videos / MergeVersions
-  async mergeVideoVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/Videos/MergeVersions', { ids: ids.join(',') }); }
-  async deleteAlternateSources(itemId: string): Promise<void> { await this.request<void>('DELETE', `/Videos/${itemId}/AlternateSources`); }
+  // Collections
+  async createCollection(params: { name: string; ids?: string[]; parentId?: string }): Promise<{ Id?: string }> { return this.request<{ Id?: string }>('POST', '/Collections', { ...params, ids: params.ids?.join(',') }); }
+  async addToCollection(collectionId: string, ids: string[]): Promise<void> { await this.request<void>('POST', `/Collections/${collectionId}/Items`, { ids: ids.join(',') }); }
+  async removeFromCollection(collectionId: string, ids: string[]): Promise<void> { await this.request<void>('DELETE', `/Collections/${collectionId}/Items`, { ids: ids.join(',') }); }
 
-  // TimeSync
-  async getUtcTime(): Promise<UtcTimeResponse> { return this.request<UtcTimeResponse>('GET', '/GetUtcTime'); }
-
-  // Named server configuration
-  async getNamedConfiguration(key: string): Promise<unknown> { return this.request<unknown>('GET', `/System/Configuration/${key}`); }
-  async updateNamedConfiguration(key: string, data: unknown): Promise<void> { await this.request<void>('POST', `/System/Configuration/${key}`, undefined, data); }
-
-  // SyncPlay extended
-  async syncPlayCreate(groupName?: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/New', undefined, groupName ? { GroupName: groupName } : undefined); }
-  async syncPlayGetGroup(groupId: string): Promise<SyncPlayGroup> { return this.request<SyncPlayGroup>('GET', `/SyncPlay/${groupId}`); }
-  async syncPlaySeek(positionTicks: number): Promise<void> { await this.request<void>('POST', '/SyncPlay/Seek', undefined, { PositionTicks: positionTicks }); }
-  async syncPlayNextItem(playlistItemId?: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/NextItem', undefined, playlistItemId ? { PlaylistItemId: playlistItemId } : undefined); }
-  async syncPlayPreviousItem(playlistItemId?: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/PreviousItem', undefined, playlistItemId ? { PlaylistItemId: playlistItemId } : undefined); }
-  async syncPlaySetRepeatMode(mode: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/SetRepeatMode', undefined, { Mode: mode }); }
-  async syncPlaySetShuffleMode(mode: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/SetShuffleMode', undefined, { Mode: mode }); }
-  async syncPlayQueue(itemIds: string[]): Promise<void> { await this.request<void>('POST', '/SyncPlay/Queue', undefined, { ItemIds: itemIds }); }
-  async syncPlaySetNewQueue(itemIds: string[], startPositionTicks?: number): Promise<void> { await this.request<void>('POST', '/SyncPlay/SetNewQueue', undefined, { ItemIds: itemIds, StartPositionTicks: startPositionTicks }); }
-  async syncPlayRemoveFromPlaylist(playlistItemIds: string[]): Promise<void> { await this.request<void>('POST', '/SyncPlay/RemoveFromPlaylist', undefined, { PlaylistItemIds: playlistItemIds }); }
-  async syncPlayMovePlaylistItem(playlistItemId: string, newIndex: number): Promise<void> { await this.request<void>('POST', '/SyncPlay/MovePlaylistItem', undefined, { PlaylistItemId: playlistItemId, NewIndex: newIndex }); }
-  async syncPlaySetPlaylistItem(playlistItemId: string): Promise<void> { await this.request<void>('POST', '/SyncPlay/SetPlaylistItem', undefined, { PlaylistItemId: playlistItemId }); }
-  async syncPlayPing(ping: number): Promise<void> { await this.request<void>('POST', '/SyncPlay/Ping', undefined, { Ping: ping }); }
-
-  // LiveTV extended
-  async getLiveTvGuideInfo(): Promise<{ StartDate?: string; EndDate?: string }> { return this.request<{ StartDate?: string; EndDate?: string }>('GET', '/LiveTv/GuideInfo'); }
-  async getLiveTvRecommendedPrograms(params?: { userId?: string; limit?: number; isAiring?: boolean; hasAired?: boolean }): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Programs/Recommended', { ...params, userId: params?.userId ?? this.userId }); }
-  async getLiveTvRecordingFolders(): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Recordings/Folders'); }
-  async getLiveTvRecordingGroups(): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Recordings/Groups'); }
-  async getLiveTvRecordingById(id: string): Promise<BaseItemDto> { return this.request<BaseItemDto>('GET', `/LiveTv/Recordings/${id}`); }
-  async deleteLiveTvRecording(id: string): Promise<void> { await this.request<void>('DELETE', `/LiveTv/Recordings/${id}`); }
-  async discoverTuners(): Promise<{ Type?: string; Url?: string }[]> { return this.request<{ Type?: string; Url?: string }[]>('GET', '/LiveTv/Tuners/Discover'); }
-  async getTunerHostTypes(): Promise<{ Name?: string; Id?: string }[]> { return this.request<{ Name?: string; Id?: string }[]>('GET', '/LiveTv/TunerHosts/Types'); }
-  // Auth providers
-  async getAuthProviders(): Promise<{ Name?: string; Id?: string }[]> { return this.request<{ Name?: string; Id?: string }[]>('GET', '/Auth/Providers'); }
-  async getPasswordResetProviders(): Promise<{ Name?: string; Id?: string }[]> { return this.request<{ Name?: string; Id?: string }[]>('GET', '/Auth/PasswordResetProviders'); }
-
-  // Items extended
-  async getTrailers(params?: { userId?: string; limit?: number; startIndex?: number; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Trailers', { ...params, userId }); }
-  async getCriticReviews(itemId: string): Promise<QueryResult<{ Body?: string; Date?: string; IsNegative?: boolean; ReviewerName?: string; Url?: string }>> { return this.request<QueryResult<{ Body?: string; Date?: string; IsNegative?: boolean; ReviewerName?: string; Url?: string }>>('GET', `/Items/${itemId}/CriticReviews`); }
-  async getItemRootFolder(userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/Root`); }
-  async setItemContentType(itemId: string, contentType: string): Promise<void> { await this.request<void>('POST', `/Items/${itemId}/ContentType`, { contentType }); }
-  async getAlbumInstantMix(albumId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Albums/${albumId}/InstantMix`, { ...params, userId }); }
-  async getSongInstantMix(songId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', `/Songs/${songId}/InstantMix`, { ...params, userId }); }
-  getItemDownloadUrl(itemId: string): string { return `${this.getBackendUrl()}/Items/${itemId}/Download${this.buildQS({ api_key: this.apiKey } as Record<string, unknown>)}`; }
-
-  // User data
-  async getUserItemData(itemId: string, userId?: string): Promise<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; LastPlayedDate?: string; PlaybackPositionTicks?: number; Rating?: number }> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<{ IsFavorite?: boolean; Played?: boolean; PlayCount?: number; LastPlayedDate?: string; PlaybackPositionTicks?: number; Rating?: number }>('GET', `/UserItems/${itemId}/UserData`, { userId: uid }); }
-
-  // Sessions extended
-  async addSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/User/${userId}`); }
-  async removeSessionUser(sessionId: string, userId: string): Promise<void> { await this.request<void>('DELETE', `/Sessions/${sessionId}/User/${userId}`); }
-  async setNowViewing(sessionId: string, itemId: string): Promise<void> { await this.request<void>('POST', `/Sessions/${sessionId}/Viewing`, { itemId }); }
-
-  // Playlists extended
-  async getPlaylist(playlistId: string): Promise<BaseItemDto> { return this.request<BaseItemDto>('GET', `/Playlists/${playlistId}`); }
-  async updatePlaylist(playlistId: string, data: { Name?: string; Ids?: string[]; UserId?: string }): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}`, undefined, data); }
-  async getPlaylistUsers(playlistId: string): Promise<{ UserId?: string; CanEdit?: boolean }[]> { return this.request<{ UserId?: string; CanEdit?: boolean }[]>('GET', `/Playlists/${playlistId}/Users`); }
-  async setPlaylistUserAccess(playlistId: string, userId: string, canEdit: boolean): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Users/${userId}`, undefined, { UserId: userId, CanEdit: canEdit }); }
-  async removePlaylistUserAccess(playlistId: string, userId: string): Promise<void> { await this.request<void>('DELETE', `/Playlists/${playlistId}/Users/${userId}`); }
-  async movePlaylistItem(playlistId: string, itemId: string, newIndex: number): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Items/${itemId}/Move/${newIndex}`); }
-
-  // Users extended
-  async getPublicUsers(): Promise<UserDto[]> { return this.request<UserDto[]>('GET', '/Users/Public'); }
-
-  // Environment extended
+  // Environment
+  async getDrives(): Promise<{ Name?: string; Path?: string }[]> { return this.request<{ Name?: string; Path?: string }[]>('GET', '/Environment/Drives'); }
   async getDirectoryContents(path: string, params?: { includeFiles?: boolean; includeDirectories?: boolean }): Promise<{ Name?: string; Path?: string; Type?: string }[]> { return this.request<{ Name?: string; Path?: string; Type?: string }[]>('GET', '/Environment/DirectoryContents', { path, ...params }); }
   async getNetworkShares(): Promise<{ Name?: string; Path?: string }[]> { return this.request<{ Name?: string; Path?: string }[]>('GET', '/Environment/NetworkShares'); }
+  async getParentPath(path: string): Promise<string> { return this.request<string>('GET', '/Environment/ParentPath', { path }); }
+  async validatePath(params: { path: string; isFile?: boolean }): Promise<void> { await this.request<void>('POST', '/Environment/ValidatePath', undefined, params); }
 
-  // System extended
-  async getSystemEndpoint(): Promise<{ IsLocal?: boolean; IsInNetwork?: boolean }> { return this.request<{ IsLocal?: boolean; IsInNetwork?: boolean }>('GET', '/System/Endpoint'); }
+  // Backup
+  async getBackups(): Promise<BackupInfo[]> { return this.request<BackupInfo[]>('GET', '/Backup'); }
+  async createBackup(): Promise<void> { await this.request<void>('POST', '/Backup/Create'); }
+  async restoreBackup(backupPath: string): Promise<void> { await this.request<void>('POST', '/Backup/Restore', undefined, { backupPath }); }
+  async deleteBackup(backupPath: string): Promise<void> { await this.request<void>('DELETE', `/Backup/${encodeURIComponent(backupPath)}`); }
 
-  // Videos extended
+  // Videos
+  async mergeVideoVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/Videos/MergeVersions', { ids: ids.join(',') }); }
+  async mergeEpisodeVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/MergeVersions/MergeEpisodes', undefined, { Ids: ids }); }
+  async mergeMovieVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/MergeVersions/MergeMovies', undefined, { Ids: ids }); }
+  async splitEpisodeVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/MergeVersions/SplitEpisodes', undefined, { Ids: ids }); }
+  async splitMovieVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/MergeVersions/SplitMovies', undefined, { Ids: ids }); }
+  async deleteAlternateSources(itemId: string): Promise<void> { await this.request<void>('DELETE', `/Videos/${itemId}/AlternateSources`); }
   async cancelActiveEncodings(deviceId?: string): Promise<void> { await this.request<void>('DELETE', '/Videos/ActiveEncodings', deviceId ? { deviceId } : undefined); }
+  async deleteSubtitle(itemId: string, index: number): Promise<void> { await this.request<void>('DELETE', `/Videos/${itemId}/Subtitles/${index}`); }
+  async uploadSubtitle(itemId: string, params: { language: string; format: string; data: string; isForced?: boolean }): Promise<void> { await this.request<void>('POST', `/Videos/${itemId}/Subtitles`, undefined, params); }
+
+  // Localization
+  async getLocalizationOptions(): Promise<LocalizationOption[]> { return this.request<LocalizationOption[]>('GET', '/Localization/Options'); }
+  async getCountries(): Promise<CountryInfo[]> { return this.request<CountryInfo[]>('GET', '/Localization/Countries'); }
+  async getCultures(): Promise<CultureDto[]> { return this.request<CultureDto[]>('GET', '/Localization/Cultures'); }
+  async getRatingSystems(): Promise<{ Name?: string; CountryCode?: string }[]> { return this.request<{ Name?: string; CountryCode?: string }[]>('GET', '/Localization/RatingSystems'); }
+
+  // QuickConnect & Auth
+  async quickConnectEnabled(): Promise<boolean> { return this.request<boolean>('GET', '/QuickConnect/Enabled'); }
+  async quickConnectInitiate(): Promise<QuickConnectResult> { return this.request<QuickConnectResult>('POST', '/QuickConnect/Initiate'); }
+  async quickConnectConnect(secret: string): Promise<QuickConnectResult> { return this.request<QuickConnectResult>('GET', '/QuickConnect/Connect', { secret }); }
+  async quickConnectAuthorize(code: string, userId?: string): Promise<boolean> { return this.request<boolean>('POST', '/QuickConnect/Authorize', { code, userId }); }
+  async getAuthProviders(): Promise<{ Name?: string; Id?: string }[]> { return this.request<{ Name?: string; Id?: string }[]>('GET', '/Auth/Providers'); }
+  async getPasswordResetProviders(): Promise<{ Name?: string; Id?: string }[]> { return this.request<{ Name?: string; Id?: string }[]>('GET', '/Auth/PasswordResetProviders'); }
 
   // Reports (plugin)
   async getActivityReport(params?: { limit?: number; startIndex?: number; minDate?: string }): Promise<{ Rows?: { Columns?: { Name?: string }[]; Id?: string; RowType?: string }[]; TotalRecordCount?: number }> { return this.request<{ Rows?: { Columns?: { Name?: string }[]; Id?: string; RowType?: string }[]; TotalRecordCount?: number }>('GET', '/Reports/Activities', params); }
   async getItemsReport(params?: { reportView?: string; displayType?: string; limit?: number; startIndex?: number }): Promise<{ Rows?: { Columns?: { Name?: string }[] }[]; TotalRecordCount?: number }> { return this.request<{ Rows?: { Columns?: { Name?: string }[] }[]; TotalRecordCount?: number }>('GET', '/Reports/Items', params); }
   async getReportHeaders(params?: { reportView?: string; displayType?: string }): Promise<{ Name?: string; FieldName?: string; DisplayType?: string }[]> { return this.request<{ Name?: string; FieldName?: string; DisplayType?: string }[]>('GET', '/Reports/Headers', params); }
-
-  private buildQS(params: Record<string, unknown>): string { const sp = new URLSearchParams(); for (const [k, v] of Object.entries(params ?? {})) { if (v !== undefined && v !== null) sp.append(k, String(v)); } const qs = sp.toString(); return qs ? `?${qs}` : ''; }
 }

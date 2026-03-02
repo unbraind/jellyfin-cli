@@ -63,11 +63,13 @@ export function createLibraryCommand(): Command {
     .description('List all studios')
     .option('-f, --format <format>', 'Output format')
     .option('--parent <id>', 'Parent ID')
+    .option('--limit <number>', 'Limit results', '100')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
         const result = await client.getStudios({
           parentId: options.parent,
+          limit: parseInt(options.limit, 10),
         });
         console.log(toon.formatItems(result.Items ?? []));
       } catch (err) {
@@ -224,6 +226,27 @@ export function createLibraryCommand(): Command {
       try {
         await client.removeMediaPath(folderName, path, options.refresh);
         console.log(toon.formatMessage(`Path '${path}' removed from '${folderName}'`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('media-folders').description('List media folders (top-level library items)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--include-hidden', 'Include hidden folders')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getMediaFolders(options.includeHidden ? undefined : false);
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('physical-paths').description('List physical paths registered on the server')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const paths = await client.getPhysicalPaths();
+        console.log(toon.formatToon(paths.map((p) => ({ path: p })), 'physical_paths'));
       } catch (err) { handleError(err, format); }
     });
 

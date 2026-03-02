@@ -3142,4 +3142,362 @@ jf syncplay set-queue --ids <id1,id2,...> [--start-ticks <n>] [-f format]
 
 Output type: `message`
 
-Output type: `schema`
+## syncplay remove
+
+Remove items from the SyncPlay playlist by playlist item ID.
+
+```bash
+jf syncplay remove <playlistItemIds...> [-f format]
+```
+
+Output type: `message`
+
+## syncplay move-item
+
+Move a playlist item to a new position in the SyncPlay queue.
+
+```bash
+jf syncplay move-item <playlistItemId> <newIndex> [-f format]
+```
+
+Output type: `message`
+
+## syncplay set-item
+
+Jump to a specific item in the SyncPlay playlist.
+
+```bash
+jf syncplay set-item <playlistItemId> [-f format]
+```
+
+Output type: `message`
+
+## syncplay ping
+
+Report client network latency to the SyncPlay group.
+
+```bash
+jf syncplay ping <ms> [-f format]
+```
+
+Output type: `message`
+
+## syncplay buffering
+
+Report that the client is buffering to the SyncPlay group.
+
+```bash
+jf syncplay buffering [--position <ticks>] [--playing] [--playlist-item <id>] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--position <ticks>` | Current playback position in ticks |
+| `--playing` | Indicate playback was active before buffering |
+| `--playlist-item <id>` | Playlist item ID |
+
+Output type: `message`
+
+## syncplay ready
+
+Report that the client has finished buffering and is ready to play.
+
+```bash
+jf syncplay ready [--position <ticks>] [--playing] [--playlist-item <id>] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--position <ticks>` | Current playback position in ticks |
+| `--playing` | Indicate playback is active |
+| `--playlist-item <id>` | Playlist item ID |
+
+Output type: `message`
+
+## syncplay set-ignore-wait
+
+Control whether this client should be ignored when the group waits for all clients.
+
+```bash
+jf syncplay set-ignore-wait <value> [-f format]
+```
+
+`value`: `true` or `false`
+
+Output type: `message`
+
+---
+
+## videos merge-episodes
+
+Merge multiple episode items into a single record.
+
+```bash
+jf videos merge-episodes <ids...> [-f format]
+```
+
+Output type: `message`
+
+## videos merge-movies
+
+Merge multiple movie items into a single record.
+
+```bash
+jf videos merge-movies <ids...> [-f format]
+```
+
+Output type: `message`
+
+## videos split-episodes
+
+Split merged episode versions back into separate records.
+
+```bash
+jf videos split-episodes <ids...> [-f format]
+```
+
+Output type: `message`
+
+## videos split-movies
+
+Split merged movie versions back into separate records.
+
+```bash
+jf videos split-movies <ids...> [-f format]
+```
+
+Output type: `message`
+
+---
+
+## plugins enable
+
+Enable a previously disabled plugin.
+
+```bash
+jf plugins enable <pluginId> <version> [-f format]
+```
+
+Output type: `message`
+
+## plugins disable
+
+Disable a plugin without uninstalling it.
+
+```bash
+jf plugins disable <pluginId> <version> [-f format]
+```
+
+Output type: `message`
+
+---
+
+## users forgot-password
+
+Initiate the forgot password flow for a user. This generates a PIN file on the server that an admin can use.
+
+```bash
+jf users forgot-password <username> [-f format]
+```
+
+Output type: `forgot_password`
+
+Fields: `action`, `pin_file`, `pin_expires`
+
+## users redeem-pin
+
+Redeem a forgot-password PIN to reset a user account.
+
+```bash
+jf users redeem-pin <pin> [-f format]
+```
+
+Output type: `pin_redeemed`
+
+Fields: `success`, `users_reset`
+
+---
+
+## library media-folders
+
+List media folders (top-level library items as seen by users).
+
+```bash
+jf library media-folders [--include-hidden] [-f format]
+```
+
+Output type: `items`
+
+## library physical-paths
+
+List the physical filesystem paths registered on the Jellyfin server.
+
+```bash
+jf library physical-paths [-f format]
+```
+
+Output type: `physical_paths`
+
+---
+
+## playlists instant-mix
+
+Generate an instant mix based on the songs in a playlist.
+
+```bash
+jf playlists instant-mix <playlistId> [--limit <n>] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--limit <n>` | Max number of items to return (default: 50) |
+
+Output type: `items`
+
+---
+
+## livetv-admin
+
+Administrative commands for Live TV tuner management, recording schedules, and EPG provider configuration.
+
+### livetv-admin series-recordings
+
+List all series (auto) recordings.
+
+```bash
+jf livetv-admin series-recordings [--limit <n>] [--offset <n>] [-f format]
+```
+
+Output type: `items`
+
+### livetv-admin timer-defaults
+
+Get default values for creating a new timer (optionally for a specific program).
+
+```bash
+jf livetv-admin timer-defaults [--program <programId>] [-f format]
+```
+
+Output type: `item`
+
+### livetv-admin update-timer
+
+Update an existing timer.
+
+```bash
+jf livetv-admin update-timer <timerId> [--channel <id>] [--name <name>] [--start <date>] [--end <date>] [--pre-padding <secs>] [--post-padding <secs>] [-f format]
+```
+
+Output type: `message`
+
+### livetv-admin create-series-timer
+
+Create a series timer (recurring recording schedule).
+
+```bash
+jf livetv-admin create-series-timer --channel <id> --name <name> [--record-any-time] [--record-any-channel] [--record-new-only] [--pre-padding <secs>] [--post-padding <secs>] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--channel <id>` | Channel ID (required) |
+| `--name <name>` | Timer name (required) |
+| `--record-any-time` | Record at any time of day |
+| `--record-any-channel` | Record on any channel |
+| `--record-new-only` | Only record new episodes |
+| `--pre-padding <secs>` | Pre-padding seconds (default: 60) |
+| `--post-padding <secs>` | Post-padding seconds (default: 300) |
+
+Output type: `message`
+
+### livetv-admin add-tuner-host
+
+Add a tuner host device (HDHomeRun, M3U, etc.).
+
+```bash
+jf livetv-admin add-tuner-host --url <url> --type <type> [--name <name>] [--tuner-count <n>] [--allow-hw-transcode] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--url <url>` | Tuner device URL (required) |
+| `--type <type>` | Tuner type: `HdHomerun`, `M3U`, etc. (required) |
+| `--name <name>` | Friendly display name |
+| `--tuner-count <n>` | Number of tuners (default: 2) |
+| `--allow-hw-transcode` | Allow hardware transcoding |
+
+Output type: `tuner_host`
+
+### livetv-admin delete-tuner-host
+
+Delete a tuner host by ID.
+
+```bash
+jf livetv-admin delete-tuner-host <id> --force [-f format]
+```
+
+Output type: `message`
+
+### livetv-admin reset-tuner
+
+Reset a tuner device.
+
+```bash
+jf livetv-admin reset-tuner <tunerId> [-f format]
+```
+
+Output type: `message`
+
+### livetv-admin add-listing-provider
+
+Add an EPG/program guide listings provider (SchedulesDirect, XmlTV, etc.).
+
+```bash
+jf livetv-admin add-listing-provider --type <type> [--listings-id <id>] [--username <u>] [--password <p>] [--zip <zip>] [--country <code>] [--path <path>] [-f format]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--type <type>` | Provider type: `SchedulesDirect`, `XmlTv` (required) |
+| `--listings-id <id>` | Listings/headend ID |
+| `--username <u>` | Provider username |
+| `--password <p>` | Provider password |
+| `--zip <zip>` | ZIP/postal code for SchedulesDirect |
+| `--country <code>` | Country code |
+| `--path <path>` | Local file path (for XmlTv) |
+
+Output type: `listing_provider`
+
+### livetv-admin delete-listing-provider
+
+Delete a listings provider by ID.
+
+```bash
+jf livetv-admin delete-listing-provider <id> --force [-f format]
+```
+
+Output type: `message`
+
+### livetv-admin channel-mapping-options
+
+Get available channel mapping options for a listings provider.
+
+```bash
+jf livetv-admin channel-mapping-options [--provider <providerId>] [-f format]
+```
+
+Output type: `channel_mapping_options`
+
+Fields: `provider_name`, `tuner_channels`, `provider_channels`, `mappings`
+
+### livetv-admin set-channel-mappings
+
+Configure channel mappings between tuner channels and provider channels.
+
+```bash
+jf livetv-admin set-channel-mappings --provider <id> --mappings '<json>' [-f format]
+```
+
+`--mappings` accepts a JSON array: `'[{"tunerChannelId":"ch1","providerChannelId":"pch1"}]'`
+
+Output type: `message`

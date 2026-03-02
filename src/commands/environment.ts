@@ -85,7 +85,9 @@ export function createEnvironmentCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
-  cmd.command('network-shares').description('List available network shares on the server')
+  cmd.command('network-shares')
+    .alias('shares')
+    .description('List available network shares on the server')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
@@ -93,6 +95,35 @@ export function createEnvironmentCommand(): Command {
         const shares = await client.getNetworkShares();
         console.log(toon.formatToon(shares.map((s) => ({ name: s.Name, path: s.Path })), 'network_shares'));
       } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('parent-path').description('Get parent path of a given path on the server')
+    .option('-f, --format <format>', 'Output format')
+    .requiredOption('--path <path>', 'Path to get parent of')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getParentPath(options.path);
+        console.log(toon.formatToon({ path: options.path, parent: result }, 'parent_path'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('validate-path').description('Validate that a path exists and is accessible on the server')
+    .option('-f, --format <format>', 'Output format')
+    .requiredOption('--path <path>', 'Path to validate')
+    .option('--is-file', 'Validate as file (default: directory)')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.validatePath({ path: options.path, isFile: options.isFile });
+        console.log(toon.formatToon({ path: options.path, valid: true }, 'path_validation'));
+      } catch (err) {
+        if (err instanceof Error && err.message.includes('40')) {
+          console.log(toon.formatToon({ path: options.path, valid: false, error: err.message }, 'path_validation'));
+        } else {
+          handleError(err, format);
+        }
+      }
     });
 
   return cmd;

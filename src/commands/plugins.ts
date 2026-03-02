@@ -85,5 +85,33 @@ export function createPluginsCommand(): Command {
       }
     });
 
+  cmd
+    .command('enable <pluginId> <version>')
+    .description('Enable a disabled plugin by ID and version')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (pluginId, version, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.enablePlugin(pluginId, version);
+        console.log(toon.formatMessage(`Plugin ${pluginId} v${version} enabled`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
+    .command('disable <pluginId> <version>')
+    .description('Disable a plugin by ID and version (without uninstalling)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (pluginId, version, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.disablePlugin(pluginId, version);
+        console.log(toon.formatMessage(`Plugin ${pluginId} v${version} disabled`, true));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

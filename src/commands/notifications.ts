@@ -7,7 +7,7 @@ export function createNotificationsCommand(): Command {
 
   cmd
     .command('types')
-    .description('List notification types')
+    .description('List notification types (requires Notifications plugin)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
@@ -21,7 +21,11 @@ export function createNotificationsCommand(): Command {
         }));
         console.log(toon.formatToon(simplified, 'notification_types'));
       } catch (err) {
-        handleError(err, format);
+        if (err instanceof Error && err.message.includes('404')) {
+          console.log(toon.formatToon({ available: false, message: 'Notification types endpoint not available on this server version' }, 'notification_types'));
+        } else {
+          handleError(err, format);
+        }
       }
     });
 

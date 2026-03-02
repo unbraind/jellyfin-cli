@@ -6,7 +6,8 @@ export function createSuggestionsCommand(): Command {
   const cmd = new Command('suggestions');
 
   cmd
-    .command('get')
+    .command('list')
+    .alias('get')
     .description('Get content suggestions')
     .option('-f, --format <format>', 'Output format')
     .option('--parent <id>', 'Parent ID')

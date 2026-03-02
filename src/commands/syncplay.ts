@@ -175,5 +175,91 @@ export function createSyncPlayCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('remove <playlistItemIds...>').description('Remove items from SyncPlay playlist by playlist item ID')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistItemIds, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlayRemoveFromPlaylist(playlistItemIds);
+        console.log(toon.formatMessage(`Removed ${playlistItemIds.length} item(s) from SyncPlay playlist`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('move-item <playlistItemId> <newIndex>').description('Move a playlist item to a new position')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistItemId, newIndex, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlayMovePlaylistItem(playlistItemId, parseInt(newIndex, 10));
+        console.log(toon.formatMessage(`Moved playlist item ${playlistItemId} to index ${newIndex}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('set-item <playlistItemId>').description('Jump to a specific item in the SyncPlay playlist')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (playlistItemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlaySetPlaylistItem(playlistItemId);
+        console.log(toon.formatMessage(`SyncPlay now playing playlist item ${playlistItemId}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('ping <ms>').description('Report client ping to SyncPlay group (latency in ms)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (ms, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlayPing(parseInt(ms, 10));
+        console.log(toon.formatMessage(`SyncPlay ping reported: ${ms}ms`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('buffering').description('Report buffering state to SyncPlay group')
+    .option('-f, --format <format>', 'Output format')
+    .option('--position <ticks>', 'Current position in ticks')
+    .option('--playing', 'Indicate playback was active before buffering')
+    .option('--playlist-item <id>', 'Playlist item ID')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlayBuffering({
+          PositionTicks: options.position ? parseInt(options.position, 10) : undefined,
+          IsPlaying: options.playing,
+          PlaylistItemId: options.playlistItem,
+          When: new Date().toISOString(),
+        });
+        console.log(toon.formatMessage('SyncPlay buffering state reported', true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('ready').description('Report ready state to SyncPlay group (buffering complete)')
+    .option('-f, --format <format>', 'Output format')
+    .option('--position <ticks>', 'Current position in ticks')
+    .option('--playing', 'Indicate playback is active')
+    .option('--playlist-item <id>', 'Playlist item ID')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlayReady({
+          PositionTicks: options.position ? parseInt(options.position, 10) : undefined,
+          IsPlaying: options.playing,
+          PlaylistItemId: options.playlistItem,
+          When: new Date().toISOString(),
+        });
+        console.log(toon.formatMessage('SyncPlay ready state reported', true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('set-ignore-wait <value>').description('Set whether this client should be ignored in group wait (true/false)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (value, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.syncPlaySetIgnoreWait(value === 'true');
+        console.log(toon.formatMessage(`SyncPlay ignore-wait set to ${value}`, true));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

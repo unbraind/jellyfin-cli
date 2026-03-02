@@ -266,5 +266,32 @@ export function createUsersCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('forgot-password <username>').description('Initiate forgot password flow for a user')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (username, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.forgotPassword(username);
+        console.log(toon.formatToon({
+          action: result.Action,
+          pin_file: result.PinFile,
+          pin_expires: result.PinExpirationDate,
+        }, 'forgot_password'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('redeem-pin <pin>').description('Redeem a forgot-password PIN to reset a user account')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (pin, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.redeemForgotPasswordPin(pin);
+        console.log(toon.formatToon({
+          success: result.Success,
+          users_reset: result.UsersReset,
+        }, 'pin_redeemed'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

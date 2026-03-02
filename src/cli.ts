@@ -12,6 +12,7 @@ import {
   createTasksCommand,
   createPlaylistsCommand,
   createLivetvCommand,
+  createLivetvAdminCommand,
   createDiscoverCommand,
   createSetupCommand,
   createPluginsCommand,
@@ -67,6 +68,7 @@ program.addCommand(createUserDataCommand());
 program.addCommand(createTasksCommand());
 program.addCommand(createPlaylistsCommand());
 program.addCommand(createLivetvCommand());
+program.addCommand(createLivetvAdminCommand());
 program.addCommand(createDiscoverCommand());
 program.addCommand(createPluginsCommand());
 program.addCommand(createDevicesCommand());

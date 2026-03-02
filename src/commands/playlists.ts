@@ -6,6 +6,23 @@ export function createPlaylistsCommand(): Command {
   const cmd = new Command('playlists');
 
   cmd
+    .command('list')
+    .description('List all playlists')
+    .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '100')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getItems({
+          includeItemTypes: ['Playlist'],
+          recursive: true,
+          limit: parseInt(options.limit, 10),
+        });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
     .command('create <name>')
     .description('Create a new playlist')
     .option('-f, --format <format>', 'Output format')
@@ -149,6 +166,19 @@ export function createPlaylistsCommand(): Command {
       try {
         await client.movePlaylistItem(playlistId, itemId, parseInt(newIndex, 10));
         console.log(toon.formatMessage('Item moved', true));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('instant-mix <playlistId>').description('Get an instant mix based on a playlist')
+    .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '50')
+    .action(async (playlistId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getPlaylistInstantMix(playlistId, {
+          limit: parseInt(options.limit, 10),
+        });
+        console.log(toon.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 

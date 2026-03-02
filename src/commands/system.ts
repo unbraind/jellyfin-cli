@@ -9,11 +9,34 @@ export function createSystemCommand(): Command {
     .command('info')
     .description('Get system information')
     .option('-f, --format <format>', 'Output format')
+    .option('--public', 'Public info only (no auth required)')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const info = await client.getSystemInfo();
-        console.log(toon.formatSystemInfo(info));
+        if (options.public) {
+          const info = await client.getPublicSystemInfo();
+          console.log(toon.formatToon({
+            name: info.ServerName,
+            ver: info.Version,
+            id: info.Id,
+            url: info.LocalAddress,
+          }, 'sys_public'));
+        } else {
+          const info = await client.getSystemInfo();
+          console.log(toon.formatSystemInfo(info));
+        }
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('ping')
+    .description('Ping server to check connectivity')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        await client.getHealth();
+        console.log(toon.formatToon({ status: 'ok', reachable: true }, 'ping'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -26,6 +49,58 @@ export function createSystemCommand(): Command {
       try {
         const health = await client.getHealth();
         console.log(formatSuccess(`Server health: ${health}`, format));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('logs')
+    .description('List server log files')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const logs = await client.getSystemLogs();
+        console.log(toon.formatToon(logs.map((l) => ({
+          name: l.Name, date: l.DateCreated, size: l.Size,
+        })), 'log_files'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('log <name>')
+    .description('Get content of a log file')
+    .option('-f, --format <format>', 'Output format')
+    .option('--lines <n>', 'Number of lines', '100')
+    .action(async (name, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const content = await client.getSystemLogFile(name);
+        const lines = content.split('\n');
+        const limit = parseInt(options.lines, 10);
+        const result = lines.slice(-limit);
+        if (format === 'raw') {
+          console.log(result.join('\n'));
+        } else {
+          console.log(toon.formatToon({ name, total_lines: lines.length, showing: result.length, content: result }, 'log_content'));
+        }
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd
+    .command('storage')
+    .description('Get system storage paths')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const storage = await client.getSystemStorageInfo();
+        console.log(toon.formatToon({
+          data_paths: storage.DataPaths,
+          cache_path: storage.CachePath,
+          internal_metadata_path: storage.InternalMetadataPath,
+          log_path: storage.LogPath,
+          transcoding_temp_path: storage.TranscodingTempPath,
+        }, 'storage_info'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -117,7 +192,9 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
-  cmd.command('endpoint').description('Get network endpoint info (is local, is in network)')
+  cmd
+    .command('endpoint')
+    .description('Get network endpoint info (is local, is in network)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);

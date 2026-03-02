@@ -17,10 +17,12 @@ export function createLocalizationCommand(): Command {
 
   cmd.command('countries').description('Get available countries')
     .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit results')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const countries = await client.getCountries();
+        let countries = await client.getCountries();
+        if (options.limit) countries = countries.slice(0, parseInt(options.limit, 10));
         console.log(toon.formatToon(countries.map((c) => ({
           name: c.Name,
           display_name: c.DisplayName,
@@ -32,10 +34,12 @@ export function createLocalizationCommand(): Command {
 
   cmd.command('cultures').description('Get available cultures/languages')
     .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit results')
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
-        const cultures = await client.getCultures();
+        let cultures = await client.getCultures();
+        if (options.limit) cultures = cultures.slice(0, parseInt(options.limit, 10));
         console.log(toon.formatToon(cultures.map((c) => ({
           name: c.Name,
           display_name: c.DisplayName,

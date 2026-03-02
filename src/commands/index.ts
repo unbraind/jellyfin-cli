@@ -8,6 +8,7 @@ export { createUserDataCommand } from './userdata.js';
 export { createTasksCommand } from './tasks.js';
 export { createPlaylistsCommand } from './playlists.js';
 export { createLivetvCommand } from './livetv.js';
+export { createLivetvAdminCommand } from './livetv-admin.js';
 export { createDiscoverCommand } from './discover.js';
 export { createSetupCommand } from './setup.js';
 export { createPluginsCommand } from './plugins.js';

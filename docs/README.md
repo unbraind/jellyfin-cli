@@ -177,6 +177,8 @@ jf system info --format raw
 | `jf users update-policy <userId>` | Update user permissions |
 | `jf users config <userId>` | Get user configuration |
 | `jf users update-config <userId>` | Update user preferences |
+| `jf users forgot-password <username>` | Initiate forgot password flow |
+| `jf users redeem-pin <pin>` | Redeem a forgot-password PIN |
 | `jf auth providers` | List auth providers |
 | `jf auth password-reset-providers` | List password reset providers |
 
@@ -195,6 +197,8 @@ jf system info --format raw
 | `jf library rename-folder <name> <new>` | Rename a virtual folder |
 | `jf library add-path <folder> <path>` | Add media path to folder |
 | `jf library remove-path <folder> <path>` | Remove media path |
+| `jf library media-folders` | List top-level media folders |
+| `jf library physical-paths` | List physical server paths |
 | `jf items list` | List items with filters |
 | `jf items search <term>` | Search for items |
 | `jf items get <itemId>` | Get item details |
@@ -256,6 +260,10 @@ jf system info --format raw
 |---------|-------------|
 | `jf videos parts <itemId>` | List video parts/versions |
 | `jf videos merge-versions <ids...>` | Merge video versions |
+| `jf videos merge-episodes <ids...>` | Merge episode versions |
+| `jf videos merge-movies <ids...>` | Merge movie versions |
+| `jf videos split-episodes <ids...>` | Split episode versions |
+| `jf videos split-movies <ids...>` | Split movie versions |
 | `jf videos delete-alternates <id>` | Delete alternate sources |
 | `jf videos cancel-transcoding` | Cancel active video encodings |
 
@@ -279,12 +287,21 @@ jf system info --format raw
 | `jf syncplay set-shuffle <mode>` | Set SyncPlay shuffle mode |
 | `jf syncplay queue` | Add to SyncPlay queue |
 | `jf syncplay set-queue` | Replace SyncPlay queue |
+| `jf syncplay remove <ids...>` | Remove items from SyncPlay playlist |
+| `jf syncplay move-item <id> <index>` | Move playlist item to new position |
+| `jf syncplay set-item <id>` | Jump to specific playlist item |
+| `jf syncplay ping <ms>` | Report client latency |
+| `jf syncplay buffering` | Report buffering state |
+| `jf syncplay ready` | Report ready state |
+| `jf syncplay set-ignore-wait <bool>` | Set ignore-wait flag |
 
 ### Plugins & Packages
 
 | Command | Description |
 |---------|-------------|
 | `jf plugins list` | List installed plugins |
+| `jf plugins enable <id> <version>` | Enable a disabled plugin |
+| `jf plugins disable <id> <version>` | Disable a plugin |
 | `jf packages list` | List available packages |
 | `jf packages get <id>` | Get package details |
 | `jf packages repositories` | List plugin repositories |
@@ -297,6 +314,9 @@ jf system info --format raw
 | `jf livetv info` | Get Live TV info |
 | `jf livetv channels` | List Live TV channels |
 | `jf livetv programs` | List TV programs |
+| `jf livetv recordings` | List recordings |
+| `jf livetv timers` | List recording timers |
+| `jf livetv series-timers` | List series timers |
 | `jf livetv guide-info` | Get guide date range |
 | `jf livetv recommended` | Get recommended programs |
 | `jf livetv recording-folders` | Get recording folders |
@@ -306,6 +326,22 @@ jf system info --format raw
 | `jf livetv discover-tuners` | Discover tuner devices |
 | `jf livetv tuner-types` | List tuner host types |
 | `jf channels list` | List channel plugin channels |
+
+### Live TV Administration
+
+| Command | Description |
+|---------|-------------|
+| `jf livetv-admin series-recordings` | List series recordings |
+| `jf livetv-admin timer-defaults` | Get timer default values |
+| `jf livetv-admin update-timer <id>` | Update an existing timer |
+| `jf livetv-admin create-series-timer` | Create a series timer |
+| `jf livetv-admin add-tuner-host` | Add a tuner host device |
+| `jf livetv-admin delete-tuner-host <id>` | Delete a tuner host |
+| `jf livetv-admin reset-tuner <id>` | Reset a tuner device |
+| `jf livetv-admin add-listing-provider` | Add an EPG provider |
+| `jf livetv-admin delete-listing-provider <id>` | Delete an EPG provider |
+| `jf livetv-admin channel-mapping-options` | Get channel mapping options |
+| `jf livetv-admin set-channel-mappings` | Configure channel mappings |
 
 ### Discovery & Stats
 
