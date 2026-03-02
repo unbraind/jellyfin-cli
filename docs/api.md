@@ -4148,3 +4148,144 @@ jf clientlog send [--message <text>] [--level <level>] [--name <name>]
 | `--name <name>` | Logger name (default: "jellyfin-cli") |
 
 Output type: `message`
+
+---
+
+## trailers
+
+Browse trailers from a dedicated Trailers library (if configured on the server).
+
+### trailers list
+
+List trailers from the Trailers library.
+
+```bash
+jf trailers list [--limit <number>] [--offset <number>] [--sort <field>] [--order <dir>]
+```
+
+| Option | Description |
+|--------|-------------|
+| `--limit <number>` | Maximum results (default: 50) |
+| `--offset <number>` | Start index (default: 0) |
+| `--sort <field>` | Sort field (SortName, DateCreated, CommunityRating) |
+| `--order <dir>` | Sort order (Ascending, Descending) |
+
+Output type: `items`
+
+### trailers similar
+
+Get items similar to a trailer.
+
+```bash
+jf trailers similar <itemId> [--limit <number>]
+```
+
+Output type: `items`
+
+---
+
+## backup manifest
+
+### backup manifest
+
+Get the manifest of an existing backup archive (shows its contents/version).
+
+```bash
+jf backup manifest <backupPath>
+```
+
+| Argument | Description |
+|----------|-------------|
+| `backupPath` | Full path to the backup archive file on the server |
+
+Output type: `backup_manifest`
+
+---
+
+## library-notify
+
+Webhook-style notification commands that tell Jellyfin a file has changed on disk,
+triggering a targeted rescan without a full library scan. Useful in CI/CD pipelines.
+
+### library-notify media-updated
+
+Notify that a media file has been modified.
+
+```bash
+jf library-notify media-updated [--path <path>]
+```
+
+### library-notify movies-added
+
+Notify that new movie files have been added.
+
+```bash
+jf library-notify movies-added [--path <path>]
+```
+
+### library-notify movies-updated
+
+Notify that existing movie files have changed.
+
+```bash
+jf library-notify movies-updated [--path <path>]
+```
+
+### library-notify series-added
+
+Notify that a new TV series directory has been added.
+
+```bash
+jf library-notify series-added [--path <path>]
+```
+
+### library-notify series-updated
+
+Notify that an existing TV series directory has changed.
+
+```bash
+jf library-notify series-updated [--path <path>]
+```
+
+All `library-notify` commands output type: `message`
+
+---
+
+## plugins-ext
+
+Commands for optional Jellyfin plugins. Commands will return an error if the
+corresponding plugin is not installed on the server.
+
+### Meilisearch plugin
+
+```bash
+jf plugins-ext meilisearch status        # Get plugin status
+jf plugins-ext meilisearch reconnect     # Reconnect to Meilisearch
+jf plugins-ext meilisearch reindex       # Trigger full reindex
+```
+
+### TMDb plugin
+
+```bash
+jf plugins-ext tmdb config               # Get TMDb client configuration
+jf plugins-ext tmdb refresh-boxsets      # Refresh TMDb box set collections
+```
+
+### Telegram notifier plugin
+
+```bash
+jf plugins-ext telegram test             # Send a test Telegram notification
+```
+
+### InfuseSync plugin (Infuse iOS/tvOS client)
+
+```bash
+jf plugins-ext infusesync checkpoint-create              # Create checkpoint
+jf plugins-ext infusesync checkpoint-sync <id>           # Start sync
+jf plugins-ext infusesync checkpoint-removed <id>        # Get removed items
+jf plugins-ext infusesync checkpoint-updated <id>        # Get updated items
+jf plugins-ext infusesync checkpoint-userdata <id>       # Get user data
+jf plugins-ext infusesync user-folders [userId]          # Get user folders
+```
+
+All `plugins-ext` commands output type: `message` or plugin-specific toon output.

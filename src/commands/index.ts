@@ -46,3 +46,6 @@ export { createGenresCommand } from './genres.js';
 export { createStudiosCommand } from './studios.js';
 export { createPersonsCommand } from './persons.js';
 export { createClientlogCommand } from './clientlog.js';
+export { createTrailersCommand } from './trailers.js';
+export { createPluginsExtCommand } from './plugins-ext.js';
+export { createLibraryNotifyCommand } from './library-notify.js';

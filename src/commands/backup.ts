@@ -40,6 +40,16 @@ export function createBackupCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('manifest <backupPath>').description('Get the manifest of an existing backup archive')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (backupPath, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const manifest = await client.getBackupManifest(backupPath);
+        console.log(toon.formatToon(manifest, 'backup_manifest'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('delete <backupPath>').description('Delete a backup')
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')

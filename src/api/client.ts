@@ -11,6 +11,7 @@ import { TrickplayApi } from './trickplay.js';
 import { ChannelsApi, type ChannelFeatures } from './channels.js';
 import { LiveTvApi, type LiveTvTimerParams, type LiveTvSeriesTimerParams, type TunerHostInfo, type ListingProviderInfo } from './livetv.js';
 import { SyncPlayApi } from './syncplay.js';
+import { PluginsExtApi } from './plugins-ext.js';
 
 export { JellyfinApiError } from './types.js';
 export type { ChapterInfo, PlaybackInfoResponse, PackageInfo, ItemImageInfo, ChannelFeatures, LiveTvTimerParams, LiveTvSeriesTimerParams, TunerHostInfo, ListingProviderInfo };
@@ -70,6 +71,7 @@ export class JellyfinApiClient extends CoreApi {
   private channels: ChannelsApi;
   public livetv: LiveTvApi;
   public syncplay: SyncPlayApi;
+  public pluginsExt: PluginsExtApi;
 
   constructor(config: JellyfinConfig) {
     super(config);
@@ -83,10 +85,11 @@ export class JellyfinApiClient extends CoreApi {
     this.channels = new ChannelsApi(config);
     this.livetv = new LiveTvApi(config);
     this.syncplay = new SyncPlayApi(config);
+    this.pluginsExt = new PluginsExtApi(config);
   }
 
   setUserId(userId: string): void { super.setUserId(userId); this.syncModules(); }
-  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); this.livetv = new LiveTvApi(cfg); this.syncplay = new SyncPlayApi(cfg); }
+  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); this.livetv = new LiveTvApi(cfg); this.syncplay = new SyncPlayApi(cfg); this.pluginsExt = new PluginsExtApi(cfg); }
 
   // TV Shows
   async getEpisodes(seriesId: string, params?: { seasonId?: string; userId?: string; season?: number; limit?: number; startIndex?: number; isMissing?: boolean; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getEpisodes(seriesId, params); }
@@ -348,9 +351,31 @@ export class JellyfinApiClient extends CoreApi {
 
   // Backup
   async getBackups(): Promise<BackupInfo[]> { return this.request<BackupInfo[]>('GET', '/Backup'); }
+  async getBackupManifest(path: string): Promise<Record<string, unknown>> { return this.pluginsExt.getBackupManifest(path); }
   async createBackup(): Promise<void> { await this.request<void>('POST', '/Backup/Create'); }
   async restoreBackup(backupPath: string): Promise<void> { await this.request<void>('POST', '/Backup/Restore', undefined, { backupPath }); }
   async deleteBackup(backupPath: string): Promise<void> { await this.request<void>('DELETE', `/Backup/${encodeURIComponent(backupPath)}`); }
+
+  // Library media notifications (webhook-style POST endpoints)
+  async notifyLibraryMediaUpdated(updates: { Path?: string; UpdateType?: string }[]): Promise<void> { return this.pluginsExt.notifyLibraryMediaUpdated(updates); }
+  async notifyMoviesAdded(updates: { Path?: string; UpdateType?: string }[]): Promise<void> { return this.pluginsExt.notifyMoviesAdded(updates); }
+  async notifyMoviesUpdated(updates: { Path?: string; UpdateType?: string }[]): Promise<void> { return this.pluginsExt.notifyMoviesUpdated(updates); }
+  async notifySeriesAdded(updates: { Path?: string; UpdateType?: string }[]): Promise<void> { return this.pluginsExt.notifySeriesAdded(updates); }
+  async notifySeriesUpdated(updates: { Path?: string; UpdateType?: string }[]): Promise<void> { return this.pluginsExt.notifySeriesUpdated(updates); }
+
+  // Plugin extended (delegate to pluginsExt submodule)
+  async getMeilisearchStatus() { return this.pluginsExt.getMeilisearchStatus(); }
+  async reconnectMeilisearch() { return this.pluginsExt.reconnectMeilisearch(); }
+  async reindexMeilisearch() { return this.pluginsExt.reindexMeilisearch(); }
+  async getTmdbClientConfiguration() { return this.pluginsExt.getTmdbClientConfiguration(); }
+  async refreshTmdbBoxSets() { return this.pluginsExt.refreshTmdbBoxSets(); }
+  async testTelegramNotifier() { return this.pluginsExt.testTelegramNotifier(); }
+  async createInfuseSyncCheckpoint() { return this.pluginsExt.createInfuseSyncCheckpoint(); }
+  async startInfuseSyncCheckpoint(id: string) { return this.pluginsExt.startInfuseSyncCheckpoint(id); }
+  async getInfuseSyncRemovedItems(id: string) { return this.pluginsExt.getInfuseSyncRemovedItems(id); }
+  async getInfuseSyncUpdatedItems(id: string) { return this.pluginsExt.getInfuseSyncUpdatedItems(id); }
+  async getInfuseSyncUserData(id: string) { return this.pluginsExt.getInfuseSyncUserData(id); }
+  async getInfuseSyncUserFolders(userId?: string) { return this.pluginsExt.getInfuseSyncUserFolders(userId); }
 
   // Videos
   async mergeVideoVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/Videos/MergeVersions', { ids: ids.join(',') }); }

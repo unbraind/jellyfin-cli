@@ -50,6 +50,9 @@ import {
   createStudiosCommand,
   createPersonsCommand,
   createClientlogCommand,
+  createTrailersCommand,
+  createPluginsExtCommand,
+  createLibraryNotifyCommand,
 } from './commands/index.js';
 
 const VERSION = '1.0.0';
@@ -112,5 +115,8 @@ program.addCommand(createGenresCommand());
 program.addCommand(createStudiosCommand());
 program.addCommand(createPersonsCommand());
 program.addCommand(createClientlogCommand());
+program.addCommand(createTrailersCommand());
+program.addCommand(createPluginsExtCommand());
+program.addCommand(createLibraryNotifyCommand());
 
 program.parse();

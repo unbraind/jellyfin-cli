@@ -803,3 +803,82 @@ describe.skipIf(skip)('E2E clientlog', () => {
     expect(out).toMatch(/log entry/i);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// Trailers
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E trailers', () => {
+  it('trailers list help is available', async () => {
+    const out = await jf('trailers', 'list', '--help');
+    expect(out).toMatch(/trailer/i);
+  }, T);
+
+  it('trailers similar help is available', async () => {
+    const out = await jf('trailers', 'similar', '--help');
+    expect(out).toMatch(/similar/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Backup manifest
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E backup manifest', () => {
+  it('backup manifest help is available', async () => {
+    const out = await jf('backup', 'manifest', '--help');
+    expect(out).toMatch(/manifest/i);
+  }, T);
+
+  it('backup list returns toon output', async () => {
+    const out = await jf('backup', 'list');
+    expect(out).toMatch(/^type: backups/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Library notify commands
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E library-notify', () => {
+  it('library-notify media-updated help is available', async () => {
+    const out = await jf('library-notify', 'media-updated', '--help');
+    expect(out).toMatch(/media|updated/i);
+  }, T);
+
+  it('library-notify movies-added help is available', async () => {
+    const out = await jf('library-notify', 'movies-added', '--help');
+    expect(out).toMatch(/movie|added/i);
+  }, T);
+
+  it('library-notify series-added help is available', async () => {
+    const out = await jf('library-notify', 'series-added', '--help');
+    expect(out).toMatch(/series|added/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Plugin-ext commands
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E plugins-ext', () => {
+  it('plugins-ext meilisearch help is available', async () => {
+    const out = await jf('plugins-ext', 'meilisearch', '--help');
+    expect(out).toMatch(/meilisearch/i);
+  }, T);
+
+  it('plugins-ext tmdb help is available', async () => {
+    const out = await jf('plugins-ext', 'tmdb', '--help');
+    expect(out).toMatch(/tmdb/i);
+  }, T);
+
+  it('plugins-ext telegram help is available', async () => {
+    const out = await jf('plugins-ext', 'telegram', '--help');
+    expect(out).toMatch(/telegram/i);
+  }, T);
+
+  it('plugins-ext infusesync help is available', async () => {
+    const out = await jf('plugins-ext', 'infusesync', '--help');
+    expect(out).toMatch(/infuse/i);
+  }, T);
+});
