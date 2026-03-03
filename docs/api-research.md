@@ -44,8 +44,14 @@ To avoid modifying media library state during validation:
 - Supports `--include-paths` and `--limit` for deterministic operation-list sampling.
 - Reuses centralized OpenAPI probing logic shared with `config doctor`.
 
+4. `jf schema tools`
+
+- New command-tree introspection command that exports tool schemas for every CLI leaf command.
+- Emits typed `input_schema` payloads for both positional args and options, including inherited global options.
+- Includes `read_only_safe` metadata per command to help agents select non-mutating tool calls.
+
 ## Recommended Next Enhancements
 
-1. Add `jf schema tools` to emit machine-readable command tool schemas for LLM function-calling.
-2. Add optional `--explain` mode to print resolved Jellyfin endpoint + query before execution.
-3. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
+1. Add optional `--explain` mode to print resolved Jellyfin endpoint + query before execution.
+2. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
+3. Add command-to-endpoint mapping metadata in `schema tools` so agents can reason about underlying API operations directly.

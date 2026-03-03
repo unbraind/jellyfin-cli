@@ -2877,6 +2877,16 @@ jf schema openapi [--name <name>] [--include-paths] [--limit <number>] [--format
 
 Output type: `openapi_summary`
 
+### schema tools
+
+Export command tool schemas for function-calling and LLM agent workflows.
+
+```bash
+jf schema tools [--command <prefix>] [--limit <number>] [--format <format>]
+```
+
+Output type: `tool_schemas`
+
 ---
 
 ## auth

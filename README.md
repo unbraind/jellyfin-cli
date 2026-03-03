@@ -167,6 +167,7 @@ jf system info --format raw
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
+- `jf schema tools` - Export command tool schemas for LLM function-calling
 
 ## Release Validation
 
@@ -471,6 +472,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema <type>` - Output JSON schema for a specific type
 - `jf schema list` - List all available output types
 - `jf schema openapi [--include-paths --limit 50]` - Fetch and summarize server OpenAPI
+- `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
 
 ## Agent/LLM Optimization
 

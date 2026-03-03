@@ -51,6 +51,9 @@ jf config doctor
 # Inspect live OpenAPI surface for agent planning
 jf schema openapi --include-paths --limit 25
 
+# Export tool schemas for function-calling agents
+jf schema tools --command items --limit 20
+
 # Optional: enforce non-destructive command execution
 export JELLYFIN_READ_ONLY=1
 
@@ -174,6 +177,7 @@ Notes:
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
 | `jf schema openapi` | Fetch and summarize live OpenAPI paths/operations/tags |
+| `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |
 
 ### System Administration
 

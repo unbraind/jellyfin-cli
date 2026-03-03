@@ -86,3 +86,20 @@ describe('schema openapi command', () => {
     expect(result.stderr).toContain('Limit must be a positive integer');
   });
 });
+
+describe('schema tools command', () => {
+  it('exports tool schemas with read-only safety metadata', async () => {
+    const result = await runCli(['schema', 'tools', '--command', 'system', '--limit', '5']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('type: tool_schemas');
+    expect(result.stdout).toContain('command: jf system activity');
+    expect(result.stdout).toContain('read_only_safe: true');
+    expect(result.stdout).toContain('tools:');
+  });
+
+  it('returns error for invalid --limit', async () => {
+    const result = await runCli(['schema', 'tools', '--limit', '0']);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('Limit must be a positive integer');
+  });
+});

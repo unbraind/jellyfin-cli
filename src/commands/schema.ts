@@ -4,6 +4,7 @@ import { getSchema, getAvailableTypes } from './schema-defs.js';
 import { getConfig } from '../utils/config.js';
 import { fetchOpenApiDocument, summarizeOpenApi } from '../utils/openapi.js';
 import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
+import { generateCliToolSchemas } from '../utils/tool-schema.js';
 
 const formatToon = toon.formatToon;
 
@@ -97,6 +98,44 @@ export function createSchemaCommand(): Command {
         console.error(formatOutput({ error: message }, outputFormat, 'error'));
         process.exit(1);
       }
+    });
+
+  cmd
+    .command('tools')
+    .description('Export command tool schemas for LLM/function-calling workflows')
+    .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
+    .option('--command <prefix>', 'Optional command prefix filter, e.g. "items" or "users get"')
+    .option('--limit <number>', 'Schema list limit', '500')
+    .action(function (this: Command, options) {
+      if (!isOutputFormat(options.format)) {
+        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
+        process.exit(1);
+      }
+
+      const outputFormat = parseOutputFormat(options.format, 'toon');
+      const limit = parseInt(options.limit, 10);
+      if (!Number.isFinite(limit) || limit <= 0) {
+        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      const root = this.parent?.parent;
+      if (!root) {
+        console.error(formatOutput({ error: 'Could not access root command tree' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      const allTools = generateCliToolSchemas(root, options.command as string | undefined);
+      const tools = allTools.slice(0, limit);
+      const data = {
+        tool_count: tools.length,
+        total_tool_count: allTools.length,
+        command_prefix: options.command ?? null,
+        truncated: allTools.length > limit,
+        tools,
+      };
+
+      console.log(formatOutput(data, outputFormat, 'tool_schemas'));
     });
 
   return cmd;
