@@ -32,6 +32,9 @@ jf setup --server http://your-server:8096 --username your-user --password your-p
 # Test connection
 jf config test
 
+# Run diagnostics (connectivity/auth/OpenAPI checks)
+jf config doctor
+
 # List libraries
 jf library list
 
@@ -48,11 +51,12 @@ jf sessions play SESSION_ID ITEM_ID
 - **Full Jellyfin API Coverage**: All major API endpoints supported
 - **Agent-Optimized**: Designed for LLM/AI agent integration with structured output
 - **Toon Format**: Default YAML output format for easy parsing
-- **Multiple Output Formats**: JSON, table, and raw formats available
+- **Multiple Output Formats**: Toon, JSON, table, raw, YAML, and Markdown
 - **Secure**: Credentials stored in user config directory, never committed
 - **Type-Safe**: Full TypeScript implementation
 - **Bun-Powered**: Fast package management and builds with Bun
 - **Setup Wizard**: Interactive configuration wizard
+- **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Plugin Management**: List, configure, and manage plugins
 - **Device Management**: View and manage connected devices
 - **Statistics**: View library statistics and item counts
@@ -72,7 +76,7 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_PASSWORD` | Password for authentication |
 | `JELLYFIN_USER_ID` | User ID |
 | `JELLYFIN_TIMEOUT` | Request timeout (ms) |
-| `JELLYFIN_OUTPUT_FORMAT` | Output format (toon, json, table, raw) |
+| `JELLYFIN_OUTPUT_FORMAT` | Output format (toon, json, table, raw, yaml, markdown) |
 
 ### Configuration File
 
@@ -153,6 +157,7 @@ jf system info --format raw
 - `jf config delete <name> --force` - Delete a server configuration
 - `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
+- `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
 
 ### System
 

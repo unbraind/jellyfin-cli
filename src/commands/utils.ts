@@ -13,7 +13,7 @@ import type {
   UserDto,
 } from '../types/index.js';
 import { getConfig } from '../utils/config.js';
-import { parseOutputFormat } from '../utils/output-format.js';
+import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
 
 interface ClientResult {
   client: JellyfinApiClient;
@@ -23,6 +23,12 @@ interface ClientResult {
 
 export async function createApiClient(options: { format?: string; server?: string }): Promise<ClientResult> {
   const config = getConfig(options.server);
+  if (options.format && !isOutputFormat(options.format)) {
+    console.error(
+      `Invalid format '${options.format}'. Use one of: toon, json, table, raw, yaml, markdown`,
+    );
+    process.exit(1);
+  }
   const format = parseOutputFormat(options.format, config.outputFormat ?? 'toon');
 
   if (!config.serverUrl) {

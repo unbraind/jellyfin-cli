@@ -12,13 +12,46 @@
  */
 
 import { describe, it, expect } from 'vitest';
-import { existsSync } from 'node:fs';
+import { existsSync, readFileSync } from 'node:fs';
+import { homedir } from 'node:os';
+import { join } from 'node:path';
 
-const SERVER_URL = process.env.JELLYFIN_SERVER_URL ?? '';
-const API_KEY = process.env.JELLYFIN_API_KEY ?? '';
-const USER_ID = process.env.JELLYFIN_USER_ID ?? '';
+interface StoredConfig {
+  serverUrl?: string;
+  apiKey?: string;
+  userId?: string;
+}
 
-const HAS_ENV = Boolean(SERVER_URL && API_KEY && USER_ID);
+interface StoredSettings {
+  defaultServer?: StoredConfig;
+  servers?: Record<string, StoredConfig>;
+  currentServer?: string;
+}
+
+function readSettingsAuth(): StoredConfig {
+  const configDir = process.env.JELLYFIN_CONFIG_DIR ?? join(homedir(), '.jellyfin-cli');
+  const settingsPath = join(configDir, 'settings.json');
+  if (!existsSync(settingsPath)) {
+    return {};
+  }
+  try {
+    const raw = readFileSync(settingsPath, 'utf-8');
+    const settings = JSON.parse(raw) as StoredSettings;
+    if (settings.currentServer && settings.servers?.[settings.currentServer]) {
+      return settings.servers[settings.currentServer];
+    }
+    return settings.defaultServer ?? {};
+  } catch {
+    return {};
+  }
+}
+
+const fileAuth = readSettingsAuth();
+const SERVER_URL = process.env.JELLYFIN_SERVER_URL ?? fileAuth.serverUrl ?? '';
+const API_KEY = process.env.JELLYFIN_API_KEY ?? fileAuth.apiKey ?? '';
+const USER_ID = process.env.JELLYFIN_USER_ID ?? fileAuth.userId ?? '';
+
+const HAS_AUTH = Boolean(SERVER_URL && API_KEY && USER_ID);
 
 // Determine which CLI runner to use (compiled binary is faster).
 const DIST_BIN = new URL('../../dist/cli.js', import.meta.url).pathname;
@@ -26,7 +59,7 @@ const USE_COMPILED = existsSync(DIST_BIN);
 const CLI_CMD: string[] = USE_COMPILED ? ['node', DIST_BIN] : ['bun', 'run', 'src/cli.ts'];
 
 async function checkReachable(): Promise<boolean> {
-  if (!HAS_ENV) return false;
+  if (!HAS_AUTH) return false;
   // Retry up to 3 times — worker initialisation can be slow on first run.
   for (let attempt = 0; attempt < 3; attempt++) {
     try {
@@ -48,7 +81,8 @@ const serverReachable = await checkReachable();
 const skip = !serverReachable;
 
 if (skip) {
-  console.warn(`⚠  Skipping E2E tests: server not reachable at ${SERVER_URL || '(no URL set)'}`);
+  const reason = HAS_AUTH ? 'server not reachable' : 'missing auth (env and settings.json)';
+  console.warn(`⚠  Skipping E2E tests: ${reason} at ${SERVER_URL || '(no URL set)'}`);
 } else {
   console.info(`ℹ  E2E using ${USE_COMPILED ? 'compiled binary' : 'bun run src/cli.ts'}`);
 }

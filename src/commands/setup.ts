@@ -6,7 +6,7 @@ import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
 import { toon } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
-import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
+import { isOutputFormat, outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { isValidServerUrl, maskSecret, quoteShellValue } from './setup-utils.js';
 import chalk from 'chalk';
 
@@ -65,11 +65,9 @@ export function createSetupCommand(): Command {
     .option('--non-interactive', 'Do not prompt for missing values')
     .action(async (options) => {
       const existingConfig = getConfig(options.name);
-      const outputFormat = parseOutputFormat(
-        options.outputFormat,
-        existingConfig.outputFormat ?? 'toon',
-      );
-      const timeout = options.timeout ? parseInt(options.timeout, 10) : existingConfig.timeout ?? 30000;
+      let outputFormatInput = options.outputFormat as string | undefined;
+      let outputFormat = parseOutputFormat(outputFormatInput, existingConfig.outputFormat ?? 'toon');
+      let timeout = options.timeout ? parseInt(options.timeout, 10) : existingConfig.timeout ?? 30000;
       let serverUrl = options.server ?? existingConfig.serverUrl;
       let apiKey = options.apiKey ?? existingConfig.apiKey;
       let username = options.username ?? existingConfig.username;
@@ -82,6 +80,19 @@ export function createSetupCommand(): Command {
         console.log(chalk.cyan('\n🧙 Jellyfin CLI Setup Wizard\n'));
         serverUrl = await prompt('Enter Jellyfin server URL (e.g., http://192.168.1.100:8096): ');
       }
+      if (isInteractive && !options.outputFormat) {
+        const candidate = (await prompt(`Default output format [${outputFormatChoices()}] (${outputFormat}): `)).trim();
+        if (candidate.length > 0) {
+          outputFormatInput = candidate;
+          outputFormat = parseOutputFormat(outputFormatInput, outputFormat);
+        }
+      }
+      if (isInteractive && !options.timeout) {
+        const candidate = (await prompt(`Request timeout in ms (${timeout}): `)).trim();
+        if (candidate.length > 0) {
+          timeout = parseInt(candidate, 10);
+        }
+      }
 
       if (!serverUrl) {
         console.error(toon.formatError('Server URL is required. Use --server <url> or set JELLYFIN_SERVER_URL'));
@@ -91,8 +102,8 @@ export function createSetupCommand(): Command {
         console.error(toon.formatError('Server URL must be a valid http(s) URL.'));
         process.exit(1);
       }
-      if (options.outputFormat && outputFormat !== options.outputFormat) {
-        console.error(toon.formatError(`Invalid output format: ${options.outputFormat}. Use one of: ${outputFormatChoices()}`));
+      if (outputFormatInput && !isOutputFormat(outputFormatInput)) {
+        console.error(toon.formatError(`Invalid output format: ${outputFormatInput}. Use one of: ${outputFormatChoices()}`));
         process.exit(1);
       }
       if (options.timeout && (!Number.isFinite(timeout) || timeout <= 0)) {

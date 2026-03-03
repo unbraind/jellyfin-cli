@@ -4,6 +4,7 @@ import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, 
 import { formatSuccess, formatError, toon } from '../formatters/index.js';
 import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { promptGithubStar } from '../utils/github-star.js';
+import { addConfigDoctorCommand } from './config-doctor.js';
 
 export function createConfigCommand(): Command {
   const cmd = new Command('config');
@@ -168,6 +169,8 @@ export function createConfigCommand(): Command {
         process.exit(1);
       }
     });
+
+  addConfigDoctorCommand(cmd);
 
   return cmd;
 }

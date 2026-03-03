@@ -14,6 +14,7 @@ jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin me
 | [Security](security.md) | Security best practices |
 | [Troubleshooting](troubleshooting.md) | Common issues and solutions |
 | [Improvements](IMPROVEMENTS.md) | Enhancement history and features |
+| [API Research](api-research.md) | Live API discovery notes and agent-focused roadmap |
 
 ## Installation
 
@@ -42,6 +43,9 @@ jf setup --server http://your-server:8096 --username your-user --password your-p
 
 # Test connection
 jf config test
+
+# Run diagnostics (safe checks only)
+jf config doctor
 
 # Export config as environment variables (masked by default)
 jf setup env --shell
@@ -137,6 +141,8 @@ JELLYFIN_USER_ID=<user-id> \
 bun test tests/e2e/cli.test.ts
 ```
 
+Or run directly from `~/.jellyfin-cli/settings.json` (no env vars needed) after `jf setup`.
+
 Notes:
 - Tests are designed to be read-only for safety.
 - Write endpoints are validated via `--help` checks or skipped patterns.
@@ -159,6 +165,7 @@ Notes:
 | `jf config delete <name>` | Delete a server configuration |
 | `jf config reset` | Reset all configuration |
 | `jf config test` | Test connection to server |
+| `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
 
 ### System Administration
 
