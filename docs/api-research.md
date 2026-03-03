@@ -2,8 +2,9 @@
 
 ## Scope
 
-This document summarizes live API discovery work used to improve `jellyfin-cli` agent workflows without mutating server data.
-Latest verification run: **March 3, 2026** against Jellyfin **10.11.6**.
+This document summarizes live API discovery work used to improve `jellyfin-cli` agent workflows
+without mutating server data. Latest verification run: **March 3, 2026** against Jellyfin
+**10.11.6**.
 
 ## Verified Discovery Endpoint
 
@@ -107,6 +108,26 @@ To avoid modifying media library state during validation:
 - `jf setup` and `jf setup status` now honor runtime/global `--format` for both success and error payloads.
 - `--output-format` continues to persist the default output format in config, but no longer affects immediate response encoding unless selected as active runtime format.
 - Added regression tests for JSON output in `setup status` and JSON error rendering for validation failures.
+
+14. OpenAPI coverage mapping accuracy (`jf schema coverage`)
+
+- Coverage analysis now uses a uniqueness-aware assignment strategy when matching command intents
+  to operations.
+- This prevents repeated mapping of many tools to the same endpoint and improves backlog quality
+  for unmatched API operations.
+- On the March 3, 2026 verification run against Jellyfin 10.11.6:
+  - read-only scope: `257` operations
+  - mapped: `216`
+  - coverage: `84.05%`
+  - unmatched: `41`
+
+15. Global option propagation for agent workflows
+
+- Global `--format` and global `--server` are now propagated to subcommands before action
+  execution.
+- This makes command behavior deterministic for wrappers that always place global options first
+  (for example: `jf --format json --server prod system health`).
+- Added regression tests in `tests/commands/global-options.test.ts`.
 
 ## Recommended Next Enhancements
 

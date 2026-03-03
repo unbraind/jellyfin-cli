@@ -77,6 +77,16 @@ program
   .option('--read-only', 'Block mutating commands (or set JELLYFIN_READ_ONLY=1)');
 
 program.hook('preAction', (thisCommand, actionCommand) => {
+  const effectiveFormat = thisCommand.optsWithGlobals().format as unknown;
+  if (typeof effectiveFormat === 'string' && effectiveFormat.trim().length > 0) {
+    actionCommand.setOptionValue('format', effectiveFormat);
+  }
+
+  const effectiveServer = thisCommand.optsWithGlobals().server as unknown;
+  if (typeof effectiveServer === 'string' && effectiveServer.trim().length > 0) {
+    actionCommand.setOptionValue('server', effectiveServer);
+  }
+
   const explainOption = thisCommand.optsWithGlobals().explain as unknown;
   if (isExplainModeEnabled(explainOption, process.env[EXPLAIN_ENV_KEY])) {
     process.env[EXPLAIN_ENV_KEY] = '1';

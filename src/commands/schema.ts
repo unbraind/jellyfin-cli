@@ -215,12 +215,18 @@ export function createSchemaCommand(): Command {
 
         for (const tool of tools) {
           const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
-          const match = matchOperationsForCommandIntent(filteredOperations, commandIntent).find(
+          const matches = matchOperationsForCommandIntent(filteredOperations, commandIntent).filter(
             (candidate) => candidate.score >= minScore,
           );
-          if (!match) {
+          if (matches.length === 0) {
             continue;
           }
+
+          const uniqueMatch = matches.find(
+            (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
+          );
+          const match = uniqueMatch ?? matches[0];
+
           mappedToolCount += 1;
           mappedOperationKeys.add(`${match.method} ${match.path}`);
         }
