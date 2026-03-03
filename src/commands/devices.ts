@@ -30,6 +30,41 @@ export function createDevicesCommand(): Command {
     });
 
   cmd
+    .command('info [deviceId]')
+    .description('Get device info (auto-resolves first device when omitted)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (deviceId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const resolvedDeviceId = typeof deviceId === 'string' && deviceId.trim().length > 0
+          ? deviceId
+          : (await client.getDevices()).Items?.[0]?.Id;
+        if (!resolvedDeviceId) {
+          throw new Error('No device ID found. Provide one with: jf devices info <deviceId>');
+        }
+        const device = await client.getDeviceInfo(resolvedDeviceId);
+        const simplified = {
+          id: device.Id,
+          name: device.Name,
+          custom_name: device.CustomName,
+          app_name: device.AppName,
+          app_version: device.AppVersion,
+          last_user: device.LastUserName,
+          last_user_id: device.LastUserId,
+          last_activity: device.DateLastActivity,
+          capabilities: device.Capabilities ? {
+            playable_media_types: device.Capabilities.PlayableMediaTypes,
+            supports_media_control: device.Capabilities.SupportsMediaControl,
+            supports_sync: device.Capabilities.SupportsSync,
+          } : null,
+        };
+        console.log(toon.formatToon(simplified, 'device'));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
     .command('get <deviceId>')
     .description('Get device details')
     .option('-f, --format <format>', 'Output format')

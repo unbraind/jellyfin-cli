@@ -436,6 +436,11 @@ describe.skipIf(skip)('E2E devices', () => {
     const out = await jf('devices', 'list');
     expect(out).toMatch(/^type: devices/m);
   }, T);
+
+  it('devices info returns device type', async () => {
+    const out = await jf('devices', 'info');
+    expect(out).toMatch(/^type: device/m);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

@@ -216,6 +216,9 @@ export class JellyfinApiClient extends JellyfinExtensions {
   async updatePluginConfiguration(pluginId: string, config: Record<string, unknown>): Promise<void> { await this.request<void>('POST', `/Plugins/${pluginId}/Configuration`, undefined, config); }
   // Devices
   async getDevices(): Promise<QueryResult<DeviceInfo>> { return this.request<QueryResult<DeviceInfo>>('GET', '/Devices'); }
+  async getDeviceInfo(deviceId: string): Promise<DeviceInfo> {
+    return this.request<DeviceInfo>('GET', '/Devices/Info', { id: deviceId });
+  }
   async getDevice(deviceId: string): Promise<DeviceInfo> { return this.request<DeviceInfo>('GET', `/Devices/${deviceId}`); }
   async deleteDevice(deviceId: string): Promise<void> { await this.request<void>('DELETE', '/Devices', { id: deviceId }); }
   async updateDeviceOptions(deviceId: string, options: { customName?: string }): Promise<void> { await this.request<void>('POST', '/Devices/Options', undefined, { Id: deviceId, ...options }); }

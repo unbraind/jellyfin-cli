@@ -353,6 +353,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 ### Devices
 
 - `jf devices list` - List all devices
+- `jf devices info` - Get current device info
 - `jf devices get <deviceId>` - Get device details
 - `jf devices rename <deviceId> <name>` - Rename device
 - `jf devices delete <deviceId>` - Delete device

@@ -34,6 +34,33 @@ describe('JellyfinApiClient - New Features v11 (Branding & System Config)', () =
   afterEach(() => { vi.clearAllMocks(); });
 
   // -----------------------------------------------------------------------
+  // getDeviceInfo
+  // -----------------------------------------------------------------------
+  describe('getDeviceInfo', () => {
+    it('calls GET /Devices/Info', async () => {
+      mockFetch.mockResolvedValueOnce(mockOk({ Id: 'device-1' }));
+      await client.getDeviceInfo('device-1');
+      const url = mockFetch.mock.calls[0][0] as string;
+      expect(url).toContain('/Devices/Info');
+      expect(url).toContain('id=device-1');
+      expect(mockFetch.mock.calls[0][1]).toMatchObject({ method: 'GET' });
+    });
+
+    it('returns current device info payload', async () => {
+      const device = {
+        Id: 'device-1',
+        Name: 'Jellyfin CLI',
+        AppName: 'jellyfin-cli',
+        AppVersion: '1.0.0',
+      };
+      mockFetch.mockResolvedValueOnce(mockOk(device));
+      const result = await client.getDeviceInfo('device-1');
+      expect(result.Id).toBe('device-1');
+      expect(result.AppName).toBe('jellyfin-cli');
+    });
+  });
+
+  // -----------------------------------------------------------------------
   // getBrandingCss
   // -----------------------------------------------------------------------
   describe('getBrandingCss', () => {

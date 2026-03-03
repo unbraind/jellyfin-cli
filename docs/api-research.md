@@ -97,6 +97,11 @@ To avoid modifying media library state during validation:
 - Supports stdin pipelines (`jf items list | jf schema validate items --from toon`) and inline payload checks.
 - Emits machine-readable validation status and deterministic field-level errors for CI/agent guardrails.
 
+12. `jf devices info`
+
+- Added support for read-only `GET /Devices/Info` via `jf devices info`.
+- This closes one live OpenAPI gap discovered in coverage output and improves current-client diagnostics for agent workflows.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

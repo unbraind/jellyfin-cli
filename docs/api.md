@@ -1386,6 +1386,16 @@ jf devices list
 
 Output type: `devices`
 
+### devices info
+
+Get device info by ID (or auto-resolve from first device entry).
+
+```bash
+jf devices info [deviceId]
+```
+
+Output type: `device`
+
 ### devices get
 
 Get device details.
