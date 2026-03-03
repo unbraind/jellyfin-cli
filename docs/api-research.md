@@ -102,6 +102,12 @@ To avoid modifying media library state during validation:
 - Added support for read-only `GET /Devices/Info` via `jf devices info`.
 - This closes one live OpenAPI gap discovered in coverage output and improves current-client diagnostics for agent workflows.
 
+13. Setup formatter consistency (`jf setup`, `jf setup status`)
+
+- `jf setup` and `jf setup status` now honor runtime/global `--format` for both success and error payloads.
+- `--output-format` continues to persist the default output format in config, but no longer affects immediate response encoding unless selected as active runtime format.
+- Added regression tests for JSON output in `setup status` and JSON error rendering for validation failures.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

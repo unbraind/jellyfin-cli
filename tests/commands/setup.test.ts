@@ -31,6 +31,14 @@ afterEach(() => {
 });
 
 describe('setup command', () => {
+  it('setup status honors --format json when unconfigured', async () => {
+    const result = await runCli(['setup', 'status', '--format', 'json']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.configured).toBe(false);
+    expect(parsed.message).toContain('No server configured');
+  });
+
   it('prints masked environment values by default', async () => {
     mkdirSync(testConfigDir, { recursive: true });
     writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
@@ -67,5 +75,23 @@ describe('setup command', () => {
 
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Server URL must be a valid http(s) URL');
+  });
+
+  it('renders setup validation errors in requested runtime format', async () => {
+    const result = await runCli(
+      [
+        'setup',
+        '--api-key',
+        'abc',
+        '--non-interactive',
+        '--format',
+        'json',
+      ],
+      { JELLYFIN_SERVER_URL: 'not-a-url' },
+    );
+
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stderr);
+    expect(parsed.error).toContain('Server URL must be a valid http(s) URL');
   });
 });

@@ -4,7 +4,7 @@ import { stdin as input, stdout as output } from 'node:process';
 import { Writable } from 'node:stream';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { saveConfig, getConfig, getSettingsPath, listServers } from '../utils/config.js';
-import { toon } from '../formatters/index.js';
+import { formatOutput } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
 import { isOutputFormat, outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import {
@@ -15,6 +15,20 @@ import {
   resolveSetupSaveServerName,
 } from './setup-utils.js';
 import chalk from 'chalk';
+import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import { attachSetupStatusSubcommand } from './setup-status.js';
+
+type SetupCommandOptions = FormatOptions & {
+  apiKey?: string | undefined;
+  default?: boolean | undefined;
+  name?: string | undefined;
+  nonInteractive?: boolean | undefined;
+  outputFormat?: string | undefined;
+  password?: string | undefined;
+  server?: string | undefined;
+  timeout?: string | undefined;
+  username?: string | undefined;
+};
 
 class MutedOutput extends Writable {
   private muted = false;
@@ -69,10 +83,11 @@ export function createSetupCommand(): Command {
     .option('-o, --output-format <format>', `Persist default output format (${outputFormatChoices()})`)
     .option('--timeout <ms>', 'Persist request timeout in milliseconds')
     .option('--non-interactive', 'Do not prompt for missing values')
-    .action(async (options) => {
+    .action(async function (this: Command, options: SetupCommandOptions) {
       const existingConfig = getConfig(options.name);
-      let outputFormatInput = options.outputFormat as string | undefined;
-      let outputFormat = parseOutputFormat(outputFormatInput, existingConfig.outputFormat ?? 'toon');
+      const runtimeFormat = resolveOutputFormat(this, options);
+      let outputFormatInput = options.outputFormat;
+      let persistedOutputFormat = parseOutputFormat(outputFormatInput, existingConfig.outputFormat ?? 'toon');
       let timeout = options.timeout ? parseInt(options.timeout, 10) : existingConfig.timeout ?? 30000;
       let serverUrl = options.server ?? existingConfig.serverUrl;
       let apiKey = options.apiKey ?? existingConfig.apiKey;
@@ -87,10 +102,12 @@ export function createSetupCommand(): Command {
         serverUrl = await prompt('Enter Jellyfin server URL (e.g., http://192.168.1.100:8096): ');
       }
       if (isInteractive && !options.outputFormat) {
-        const candidate = (await prompt(`Default output format [${outputFormatChoices()}] (${outputFormat}): `)).trim();
+        const candidate = (
+          await prompt(`Default output format [${outputFormatChoices()}] (${persistedOutputFormat}): `)
+        ).trim();
         if (candidate.length > 0) {
           outputFormatInput = candidate;
-          outputFormat = parseOutputFormat(outputFormatInput, outputFormat);
+          persistedOutputFormat = parseOutputFormat(outputFormatInput, persistedOutputFormat);
         }
       }
       if (isInteractive && !options.timeout) {
@@ -101,27 +118,47 @@ export function createSetupCommand(): Command {
       }
 
       if (!serverUrl) {
-        console.error(toon.formatError('Server URL is required. Use --server <url> or set JELLYFIN_SERVER_URL'));
+        console.error(
+          formatOutput(
+            { error: 'Server URL is required. Use --server <url> or set JELLYFIN_SERVER_URL' },
+            runtimeFormat,
+            'error',
+          ),
+        );
         process.exit(1);
       }
       if (!isValidServerUrl(serverUrl)) {
-        console.error(toon.formatError('Server URL must be a valid http(s) URL.'));
+        console.error(formatOutput({ error: 'Server URL must be a valid http(s) URL.' }, runtimeFormat, 'error'));
         process.exit(1);
       }
       if (outputFormatInput && !isOutputFormat(outputFormatInput)) {
-        console.error(toon.formatError(`Invalid output format: ${outputFormatInput}. Use one of: ${outputFormatChoices()}`));
+        console.error(
+          formatOutput(
+            { error: `Invalid output format: ${outputFormatInput}. Use one of: ${outputFormatChoices()}` },
+            runtimeFormat,
+            'error',
+          ),
+        );
         process.exit(1);
       }
       if (options.timeout && (!Number.isFinite(timeout) || timeout <= 0)) {
-        console.error(toon.formatError('Timeout must be a positive integer.'));
+        console.error(formatOutput({ error: 'Timeout must be a positive integer.' }, runtimeFormat, 'error'));
         process.exit(1);
       }
       if (apiKey && (username || password)) {
-        console.error(toon.formatError('Use either API key auth OR username/password auth, not both.'));
+        console.error(
+          formatOutput(
+            { error: 'Use either API key auth OR username/password auth, not both.' },
+            runtimeFormat,
+            'error',
+          ),
+        );
         process.exit(1);
       }
       if ((username && !password) || (!username && password)) {
-        console.error(toon.formatError('Username and password must be provided together.'));
+        console.error(
+          formatOutput({ error: 'Username and password must be provided together.' }, runtimeFormat, 'error'),
+        );
         process.exit(1);
       }
 
@@ -130,16 +167,22 @@ export function createSetupCommand(): Command {
 
       try {
         publicInfo = await client.getPublicSystemInfo();
-        if (options.format === 'toon' || !options.format) {
-          console.log(toon.formatToon({
+        console.log(
+          formatOutput(
+            {
             server_name: publicInfo.ServerName,
             version: publicInfo.Version,
             server_id: publicInfo.Id,
             local_address: sanitizeServerAddress(publicInfo.LocalAddress),
-          }, 'setup_server_detected'));
-        }
+            },
+            runtimeFormat,
+            'setup_server_detected',
+          ),
+        );
       } catch (err) {
-        console.error(toon.formatError(`Could not connect to server at ${serverUrl}`));
+        console.error(
+          formatOutput({ error: `Could not connect to server at ${serverUrl}` }, runtimeFormat, 'error'),
+        );
         process.exit(1);
       }
 
@@ -160,11 +203,19 @@ export function createSetupCommand(): Command {
           userId = user.Id ?? undefined;
           apiKey = undefined;
         } catch (authErr) {
-          console.error(toon.formatError('Authentication failed. Check username and password.'));
+          console.error(
+            formatOutput({ error: 'Authentication failed. Check username and password.' }, runtimeFormat, 'error'),
+          );
           process.exit(1);
         }
       } else if (!apiKey && !username) {
-        console.error(toon.formatError('Either --api-key or --username/--password is required'));
+        console.error(
+          formatOutput(
+            { error: 'Either --api-key or --username/--password is required' },
+            runtimeFormat,
+            'error',
+          ),
+        );
         process.exit(1);
       }
 
@@ -181,8 +232,9 @@ export function createSetupCommand(): Command {
       try {
         const users = await testClient.getUsers();
         if (!userId && users.length > 0) {
+          const usernameLower = typeof username === 'string' ? username.toLowerCase() : undefined;
           const matchedUser = username
-            ? users.find((u) => u.Name?.toLowerCase() === username.toLowerCase())
+            ? users.find((u) => u.Name?.toLowerCase() === usernameLower)
             : undefined;
           const adminUser = users.find((u) => u.Policy?.IsAdministrator);
           userId = matchedUser?.Id ?? adminUser?.Id ?? users[0]?.Id ?? undefined;
@@ -197,11 +249,11 @@ export function createSetupCommand(): Command {
           username,
           password,
           userId,
-          outputFormat,
+          outputFormat: persistedOutputFormat,
           timeout,
         };
 
-        const targetServerName = resolveSetupSaveServerName(options.name, listServers());
+      const targetServerName = resolveSetupSaveServerName(options.name, listServers());
         saveConfig(newConfig, targetServerName, options.default);
 
         const result = {
@@ -211,18 +263,18 @@ export function createSetupCommand(): Command {
           user_id: userId,
           has_api_key: !!apiKey,
           has_password: !!password,
-          output_format: newConfig.outputFormat,
+          output_format: persistedOutputFormat,
           server_name: publicInfo.ServerName,
           server_version: publicInfo.Version,
           setup_complete: true,
         };
 
-        console.log(toon.formatToon(result, 'setup_complete'));
+        console.log(formatOutput(result, runtimeFormat, 'setup_complete'));
         await promptGithubStar();
 
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Setup validation failed. API Key might be invalid.';
-        console.error(toon.formatError(message));
+        console.error(formatOutput({ error: message }, runtimeFormat, 'error'));
         process.exit(1);
       }
     });
@@ -257,47 +309,7 @@ export function createSetupCommand(): Command {
 
       console.log(lines.join('\n'));
     });
-  cmd
-    .command('status')
-    .description('Check current setup status')
-    .option('--name <name>', 'Server name')
-    .option('-f, --format <format>', 'Output format')
-    .action(async (options) => {
-      const config = getConfig(options.name);
-      if (!config.serverUrl) {
-        console.log(toon.formatToon({
-          configured: false,
-          message: 'No server configured. Run: jf setup --server <url> --api-key <key>',
-        }, 'setup_status'));
-        return;
-      }
-
-      try {
-        const client = new JellyfinApiClient(config);
-        const info = await client.getPublicSystemInfo();
-
-        console.log(toon.formatToon({
-          configured: true,
-          server_url: config.serverUrl,
-          username: config.username,
-          user_id: config.userId,
-          has_api_key: !!config.apiKey,
-          output_format: config.outputFormat,
-          server_name: info.ServerName,
-          server_version: info.Version,
-          can_connect: true,
-        }, 'setup_status'));
-        await promptGithubStar();
-      } catch (err) {
-        console.log(toon.formatToon({
-          configured: true,
-          server_url: config.serverUrl,
-          username: config.username,
-          can_connect: false,
-          error: err instanceof Error ? err.message : 'Connection failed',
-        }, 'setup_status'));
-      }
-    });
+  attachSetupStatusSubcommand(cmd);
 
   return cmd;
 }
