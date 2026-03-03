@@ -25,6 +25,20 @@ describe('formatOutput', () => {
     expect(result).toContain('Item2');
   });
 
+  it('should format as yaml', () => {
+    const data = { name: 'Item1', value: 1 };
+    const result = formatOutput(data, 'yaml');
+    expect(result).toContain('name: Item1');
+    expect(result).toContain('value: 1');
+  });
+
+  it('should format as markdown', () => {
+    const data = [{ name: 'Item1', value: 1 }, { name: 'Item2', value: 2 }];
+    const result = formatOutput(data, 'markdown');
+    expect(result).toContain('| name | value |');
+    expect(result).toContain('| Item1 | 1 |');
+  });
+
   it('should format as toon by default', () => {
     const result = formatOutput({ test: 'data' }, 'toon');
     expect(result).toContain('type:');

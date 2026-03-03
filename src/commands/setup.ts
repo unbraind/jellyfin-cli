@@ -215,7 +215,7 @@ export function createSetupCommand(): Command {
         JELLYFIN_PASSWORD: 'Password for authentication',
         JELLYFIN_USER_ID: 'User ID',
         JELLYFIN_TIMEOUT: 'Request timeout in milliseconds',
-        JELLYFIN_OUTPUT_FORMAT: 'Output format (toon, json, table, raw)',
+        JELLYFIN_OUTPUT_FORMAT: 'Output format (toon, json, table, raw, yaml, markdown)',
       }, 'environment_variables'));
     });
 

@@ -8,4 +8,4 @@ export interface JellyfinConfig {
   outputFormat?: OutputFormat;
 }
 
-export type OutputFormat = 'toon' | 'json' | 'table' | 'raw';
+export type OutputFormat = 'toon' | 'json' | 'table' | 'raw' | 'yaml' | 'markdown';

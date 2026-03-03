@@ -1,5 +1,6 @@
 import type { OutputFormat } from '../types/index.js';
 import * as toon from './toon.js';
+import { stringify } from 'yaml';
 
 export { toon };
 
@@ -14,10 +15,53 @@ export function formatOutput(data: unknown, format: OutputFormat, typeHint?: str
       return JSON.stringify(data);
     case 'table':
       return formatTable(data);
+    case 'yaml':
+      return stringify(data).trim();
+    case 'markdown':
+      return formatMarkdown(data);
     case 'toon':
     default:
       return toon.formatToon(data, typeHint);
   }
+}
+
+function formatMarkdown(data: unknown): string {
+  if (Array.isArray(data)) {
+    if (data.length === 0) return 'No items.';
+    if (typeof data[0] === 'object' && data[0] !== null) {
+      return formatMarkdownTable(data);
+    }
+    return data.map((item) => `- ${String(item)}`).join('\n');
+  }
+  
+  if (typeof data === 'object' && data !== null) {
+    const obj = data as Record<string, unknown>;
+    if ('Items' in obj && Array.isArray(obj.Items)) {
+      return formatMarkdownTable(obj.Items);
+    }
+    return Object.entries(obj)
+      .map(([key, value]) => `**${key}**: ${formatValue(value)}`)
+      .join('\n\n');
+  }
+  
+  return String(data);
+}
+
+function formatMarkdownTable(items: unknown[]): string {
+  if (items.length === 0) return 'No items.';
+  const first = items[0] as Record<string, unknown>;
+  const keys = Object.keys(first).slice(0, 5);
+  
+  const rows = items.map(item => {
+    const obj = item as Record<string, unknown>;
+    return keys.map(k => String(formatValue(obj[k])).replace(/\|/g, '\\|'));
+  });
+  
+  const header = `| ${keys.join(' | ')} |`;
+  const separator = `| ${keys.map(() => '---').join(' | ')} |`;
+  const body = rows.map(row => `| ${row.join(' | ')} |`).join('\n');
+  
+  return `${header}\n${separator}\n${body}`;
 }
 
 function formatTable(data: unknown): string {
