@@ -10,54 +10,9 @@ import {
   matchOperationsForCommandIntent,
   summarizeOpenApi,
 } from '../utils/openapi.js';
-import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
+import { suggestCommandFromOperation } from '../utils/openapi-suggestions.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
-import type { OutputFormat } from '../types/index.js';
-
-type FormatOptions = {
-  format?: string | undefined;
-};
-
-function resolveFormatCandidate(command: Command, options: FormatOptions): string {
-  const localSource = command.getOptionValueSource('format');
-  if (localSource && localSource !== 'default' && typeof options.format === 'string') {
-    return options.format;
-  }
-
-  let parent: Command | null = command.parent;
-  while (parent) {
-    const parentValue = parent.opts().format;
-    const parentSource = parent.getOptionValueSource('format');
-    if (parentSource && parentSource !== 'default' && typeof parentValue === 'string') {
-      return parentValue;
-    }
-    parent = parent.parent;
-  }
-
-  if (typeof options.format === 'string') {
-    return options.format;
-  }
-
-  return 'toon';
-}
-
-function resolveOutputFormat(command: Command, options: FormatOptions): OutputFormat {
-  const candidate = resolveFormatCandidate(command, options);
-  if (!isOutputFormat(candidate)) {
-    console.error(formatOutput({ error: `Invalid format: ${candidate}` }, 'toon', 'error'));
-    process.exit(1);
-  }
-  return parseOutputFormat(candidate, 'toon');
-}
-
-function parsePositiveInteger(value: string, label: string, outputFormat: OutputFormat): number {
-  const parsed = parseInt(value, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    console.error(formatOutput({ error: `${label} must be a positive integer` }, outputFormat, 'error'));
-    process.exit(1);
-  }
-  return parsed;
-}
+import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
@@ -226,6 +181,7 @@ export function createSchemaCommand(): Command {
     .option('--limit <number>', 'Unmatched operation sample limit', '50')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
     .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
+    .option('--suggest-commands', 'Include suggested CLI command names for unmatched operations')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
       const outputFormat = resolveOutputFormat(this, options);
       const limit = parsePositiveInteger(String(options.limit ?? '50'), 'Limit', outputFormat);
@@ -304,9 +260,25 @@ export function createSchemaCommand(): Command {
             tags: operation.tags,
             read_only_safe: operation.readOnlySafe,
             deprecated: operation.deprecated,
+            suggested_command: options.suggestCommands
+              ? suggestCommandFromOperation(operation).suggestedCommand
+              : undefined,
           })),
           unmatched_operations_total: unmatched.length,
           unmatched_operations_truncated: unmatched.length > limit,
+          suggested_commands: options.suggestCommands
+            ? unmatched.slice(0, limit).map((operation) => {
+              const suggestion = suggestCommandFromOperation(operation);
+              return {
+                method: operation.method,
+                path: operation.path,
+                suggested_command: suggestion.suggestedCommand,
+                intent: suggestion.intent,
+                confidence: suggestion.confidence,
+                rationale: suggestion.rationale,
+              };
+            })
+            : undefined,
         };
 
         console.log(formatOutput(data, outputFormat, 'openapi_coverage'));

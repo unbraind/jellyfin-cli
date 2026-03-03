@@ -277,6 +277,47 @@ describe('schema coverage command', () => {
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Min score must be a positive integer');
   });
+
+  it('includes command suggestions for unmatched operations when requested', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Custom/Unmapped': {
+                get: { tags: ['Custom'], operationId: 'GetCustomThing', summary: 'Get custom thing' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['schema', 'coverage', '--suggest-commands', '--limit', '5']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('suggested_commands:');
+    expect(result.stdout).toContain('suggested_command: custom list');
+    expect(result.stdout).toContain('intent: list');
+  });
 });
 
 describe('schema tools command', () => {
