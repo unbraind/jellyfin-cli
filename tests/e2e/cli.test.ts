@@ -1086,6 +1086,17 @@ describe.skipIf(skip)('E2E livetv', () => {
     expect(out).toMatch(/^type: tuner_types/m);
   }, T);
 
+  it('livetv schedules-direct-countries returns countries type', async () => {
+    const out = await jf('livetv', 'schedules-direct-countries');
+    expect(out).toMatch(/^type: schedules_direct_countries/m);
+    expect(out).toMatch(/North America|Europe|Asia|Africa|Oceania|South America/i);
+  }, T);
+
+  it('livetv program help is available', async () => {
+    const out = await jf('livetv', 'program', '--help');
+    expect(out).toMatch(/program/i);
+  }, T);
+
   it('livetv recording-folders help is available', async () => {
     const out = await jf('livetv', 'recording-folders', '--help');
     expect(out).toMatch(/recording/i);

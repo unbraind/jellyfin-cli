@@ -143,6 +143,15 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
+  schedules_direct_countries: {
+    type: 'object',
+    properties: {
+      type: { const: 'schedules_direct_countries' },
+      data: { type: ['object', 'array', 'string'] },
+      meta: { $ref: '#/definitions/meta' },
+    },
+    required: ['type', 'data'],
+  },
 };
 
 const DEFINITIONS = {

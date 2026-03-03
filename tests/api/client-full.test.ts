@@ -772,6 +772,17 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
       expect(result.Items).toHaveLength(1);
     });
 
+    it('should get a Live TV program by ID', async () => {
+      const mockProgram = { Id: 'prog-1', Name: 'Show 1', Type: 'Program' };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockProgram));
+      const result = await client.getLiveTvProgram('prog-1');
+      expect(result.Id).toBe('prog-1');
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/LiveTv/Programs/prog-1'),
+        expect.anything(),
+      );
+    });
+
     it('should get Live TV recordings', async () => {
       const mockRecordings = { Items: [{ Id: 'rec-1', Name: 'Recording 1' }], TotalRecordCount: 1 };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockRecordings));
@@ -796,6 +807,17 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
     it('should create Live TV series timer', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null, { status: 204 }));
       await expect(client.createLiveTvSeriesTimer({ channelId: 'ch-1', name: 'Series Recording' })).resolves.toBeUndefined();
+    });
+
+    it('should get schedules direct countries', async () => {
+      const mockCountries = { 'North America': [{ fullName: 'United States', shortName: 'USA' }] };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockCountries));
+      const result = await client.getSchedulesDirectCountries();
+      expect(result).toEqual(mockCountries);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/LiveTv/ListingProviders/SchedulesDirect/Countries'),
+        expect.anything(),
+      );
     });
   });
 

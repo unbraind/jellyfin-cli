@@ -66,6 +66,20 @@ export function createLivetvCommand(): Command {
     });
 
   cmd
+    .command('program <programId>')
+    .description('Get Live TV program by ID')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (programId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const program = await client.getLiveTvProgram(programId);
+        console.log(toon.formatItem(program));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
+  cmd
     .command('recordings')
     .description('List Live TV recordings')
     .option('-f, --format <format>', 'Output format')
@@ -286,6 +300,17 @@ export function createLivetvCommand(): Command {
       try {
         const types = await client.getTunerHostTypes();
         console.log(toon.formatToon(types.map((t) => ({ id: t.Id, name: t.Name })), 'tuner_types'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('schedules-direct-countries').description('List Schedules Direct countries and postal code patterns')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const payload = await client.getSchedulesDirectCountries();
+        const normalized = typeof payload === 'string' ? { raw: payload } : payload;
+        console.log(toon.formatToon(normalized, 'schedules_direct_countries'));
       } catch (err) { handleError(err, format); }
     });
 

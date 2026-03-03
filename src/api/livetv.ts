@@ -42,6 +42,10 @@ export class LiveTvApi extends ApiClientBase {
     return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Programs', { ...params, userId });
   }
 
+  async getLiveTvProgram(programId: string, userId?: string): Promise<BaseItemDto> {
+    return this.request<BaseItemDto>('GET', `/LiveTv/Programs/${programId}`, { userId: userId ?? this.userId });
+  }
+
   async getLiveTvRecordings(params?: { userId?: string; startIndex?: number; limit?: number }): Promise<QueryResult<BaseItemDto>> {
     const userId = params?.userId ?? this.userId;
     return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Recordings', { ...params, userId });
@@ -122,6 +126,10 @@ export class LiveTvApi extends ApiClientBase {
 
   async getTunerHostTypes(): Promise<{ Name?: string; Id?: string }[]> {
     return this.request<{ Name?: string; Id?: string }[]>('GET', '/LiveTv/TunerHosts/Types');
+  }
+
+  async getSchedulesDirectCountries(): Promise<unknown> {
+    return this.request<unknown>('GET', '/LiveTv/ListingProviders/SchedulesDirect/Countries');
   }
 
   async addTunerHost(params: TunerHostInfo): Promise<TunerHostInfo> {

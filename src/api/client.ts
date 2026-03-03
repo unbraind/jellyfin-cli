@@ -87,6 +87,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
   async getLiveTvInfo() { return this.livetv.getLiveTvInfo(); }
   async getLiveTvChannels(params?: Parameters<LiveTvApi['getLiveTvChannels']>[0]) { return this.livetv.getLiveTvChannels(params); }
   async getLiveTvPrograms(params?: Parameters<LiveTvApi['getLiveTvPrograms']>[0]) { return this.livetv.getLiveTvPrograms(params); }
+  async getLiveTvProgram(programId: string, userId?: string) { return this.livetv.getLiveTvProgram(programId, userId); }
   async getLiveTvRecordings(params?: Parameters<LiveTvApi['getLiveTvRecordings']>[0]) { return this.livetv.getLiveTvRecordings(params); }
   async getLiveTvTimer(id: string) { return this.livetv.getLiveTvTimer(id); }
   async getLiveTvTimers(params?: Parameters<LiveTvApi['getLiveTvTimers']>[0]) { return this.livetv.getLiveTvTimers(params); }
@@ -105,6 +106,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
   async deleteLiveTvRecording(id: string) { return this.livetv.deleteLiveTvRecording(id); }
   async discoverTuners() { return this.livetv.discoverTuners(); }
   async getTunerHostTypes() { return this.livetv.getTunerHostTypes(); }
+  async getSchedulesDirectCountries() { return this.livetv.getSchedulesDirectCountries(); }
   // SyncPlay
   async getSyncPlayGroups() { return this.syncplay.getGroups(); }
   async syncPlayCreate(groupName?: string) { return this.syncplay.createGroup(groupName ? { GroupName: groupName } : undefined); }

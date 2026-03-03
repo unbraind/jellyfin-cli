@@ -61,8 +61,9 @@ import {
   createPluginsExtCommand,
   createLibraryNotifyCommand,
 } from './commands/index.js';
+import packageJson from '../package.json' with { type: 'json' };
 
-const VERSION = '1.0.0';
+const VERSION = packageJson.version;
 
 const program = new Command();
 

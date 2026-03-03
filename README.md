@@ -331,6 +331,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf livetv info` - Get Live TV info
 - `jf livetv channels` - List channels
 - `jf livetv programs` - List programs
+- `jf livetv program <programId>` - Get program by ID
 - `jf livetv recordings` - List recordings
 - `jf livetv timers` - List timers
 - `jf livetv timer <timerId>` - Get timer by ID
@@ -339,6 +340,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf livetv series-timers` - List series timers
 - `jf livetv series-timer <id>` - Get series timer by ID
 - `jf livetv delete-series-timer <id>` - Delete a series timer
+- `jf livetv schedules-direct-countries` - List Schedules Direct countries
 
 ### Discover
 

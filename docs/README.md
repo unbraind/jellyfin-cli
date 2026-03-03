@@ -385,6 +385,7 @@ Notes:
 | `jf livetv info` | Get Live TV info |
 | `jf livetv channels` | List Live TV channels |
 | `jf livetv programs` | List TV programs |
+| `jf livetv program <programId>` | Get a single TV program by id |
 | `jf livetv recordings` | List recordings |
 | `jf livetv timers` | List recording timers |
 | `jf livetv series-timers` | List series timers |
@@ -396,6 +397,7 @@ Notes:
 | `jf livetv delete-recording <id>` | Delete a recording |
 | `jf livetv discover-tuners` | Discover tuner devices |
 | `jf livetv tuner-types` | List tuner host types |
+| `jf livetv schedules-direct-countries` | List Schedules Direct countries |
 | `jf channels list` | List channel plugin channels |
 
 ### Live TV Administration

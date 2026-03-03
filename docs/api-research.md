@@ -144,6 +144,17 @@ To avoid modifying media library state during validation:
 - Added `jf setup startup` to emit structured startup wizard diagnostics for agent automation.
 - Added client unit tests and command/E2E coverage for the new setup startup workflow.
 
+18. Live TV read-only endpoint expansion
+
+- Added `jf livetv program <programId>` for `GET /LiveTv/Programs/{programId}`.
+- Added `jf livetv schedules-direct-countries` for `GET /LiveTv/ListingProviders/SchedulesDirect/Countries`.
+- Added API/client wrappers plus test coverage so the new endpoints are agent-usable in typed workflows.
+
+19. Release metadata accuracy in CLI
+
+- CLI `--version` now reads from `package.json` instead of a hardcoded constant.
+- This keeps distributed binaries aligned with the date+commit versioning policy.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

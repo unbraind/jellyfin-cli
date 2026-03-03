@@ -1289,6 +1289,16 @@ jf livetv programs [options]
 
 Output type: `items`
 
+### livetv program
+
+Get a Live TV program by ID.
+
+```bash
+jf livetv program <programId>
+```
+
+Output type: `item`
+
 ### livetv recordings
 
 List Live TV recordings.
@@ -1318,6 +1328,16 @@ jf livetv timer <timerId>
 ```
 
 Output type: `item`
+
+### livetv schedules-direct-countries
+
+List Schedules Direct countries and postal code patterns.
+
+```bash
+jf livetv schedules-direct-countries
+```
+
+Output type: `schedules_direct_countries`
 
 ## discover
 
