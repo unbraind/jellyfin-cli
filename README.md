@@ -471,7 +471,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema` - Output JSON schema for all Toon format types
 - `jf schema <type>` - Output JSON schema for a specific type
 - `jf schema list` - List all available output types
-- `jf schema openapi [--include-paths --limit 50]` - Fetch and summarize server OpenAPI
+- `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
 - `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
 
 ## Agent/LLM Optimization

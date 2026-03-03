@@ -5,6 +5,9 @@ const OPENAPI_CANDIDATES = ['/api-docs/openapi.json', '/openapi.json', '/swagger
 
 type OpenApiOperation = {
   tags?: string[] | undefined;
+  summary?: string | undefined;
+  operationId?: string | undefined;
+  deprecated?: boolean | undefined;
 };
 
 type OpenApiPathItem = Partial<Record<string, OpenApiOperation>>;
@@ -30,6 +33,28 @@ export type OpenApiStats = {
 export type OpenApiProbeResult = {
   sourcePath: string;
   document: OpenApiDocument;
+};
+
+export type OpenApiOperationEntry = {
+  method: string;
+  path: string;
+  operationId?: string | undefined;
+  summary?: string | undefined;
+  tags: string[];
+  deprecated: boolean;
+  readOnlySafe: boolean;
+};
+
+export type OpenApiOperationFilter = {
+  method?: string | undefined;
+  pathPrefix?: string | undefined;
+  tag?: string | undefined;
+  search?: string | undefined;
+};
+
+export type CommandOperationMatch = OpenApiOperationEntry & {
+  score: number;
+  matchedOn: string[];
 };
 
 function getTimeout(config: JellyfinConfig): number {
@@ -105,6 +130,174 @@ export function summarizeOpenApi(document: OpenApiDocument): Omit<OpenApiStats, 
     topTags: topTags.length > 0 ? topTags : undefined,
     serverVersion: document.info?.version,
   };
+}
+
+function isReadOnlyMethod(method: string): boolean {
+  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
+}
+
+export function extractOpenApiOperations(document: OpenApiDocument): OpenApiOperationEntry[] {
+  const paths = document.paths ?? {};
+  const operations: OpenApiOperationEntry[] = [];
+
+  for (const [path, pathItem] of Object.entries(paths)) {
+    for (const [methodName, operation] of Object.entries(pathItem ?? {})) {
+      if (!HTTP_METHODS.has(methodName.toLowerCase())) {
+        continue;
+      }
+
+      const method = methodName.toUpperCase();
+      operations.push({
+        method,
+        path,
+        operationId: operation?.operationId,
+        summary: operation?.summary,
+        tags: operation?.tags ?? [],
+        deprecated: operation?.deprecated ?? false,
+        readOnlySafe: isReadOnlyMethod(method),
+      });
+    }
+  }
+
+  return operations.sort((a, b) => {
+    if (a.path === b.path) {
+      return a.method.localeCompare(b.method);
+    }
+    return a.path.localeCompare(b.path);
+  });
+}
+
+export function filterOpenApiOperations(
+  operations: OpenApiOperationEntry[],
+  filters: OpenApiOperationFilter,
+): OpenApiOperationEntry[] {
+  const method = filters.method?.trim().toUpperCase();
+  const pathPrefix = filters.pathPrefix?.trim().toLowerCase();
+  const tag = filters.tag?.trim().toLowerCase();
+  const search = filters.search?.trim().toLowerCase();
+
+  return operations.filter((operation) => {
+    if (method && operation.method !== method) {
+      return false;
+    }
+    if (pathPrefix && !operation.path.toLowerCase().startsWith(pathPrefix)) {
+      return false;
+    }
+    if (tag && !operation.tags.some((entry) => entry.toLowerCase() === tag)) {
+      return false;
+    }
+    if (search) {
+      const haystack = [
+        operation.path,
+        operation.summary ?? '',
+        operation.operationId ?? '',
+        operation.tags.join(' '),
+      ].join(' ').toLowerCase();
+      if (!haystack.includes(search)) {
+        return false;
+      }
+    }
+    return true;
+  });
+}
+
+function tokenizeCommandIntent(value: string): string[] {
+  return value
+    .toLowerCase()
+    .split(/[^a-z0-9]+/g)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 1);
+}
+
+const LOW_SIGNAL_TOKENS = new Set([
+  'get',
+  'list',
+  'set',
+  'create',
+  'delete',
+  'update',
+  'info',
+  'status',
+  'show',
+]);
+
+function normalizeToken(token: string): string {
+  if (token.endsWith('s') && token.length > 3) {
+    return token.slice(0, -1);
+  }
+  return token;
+}
+
+function tokenizePathSegments(path: string): Set<string> {
+  const tokens = path
+    .toLowerCase()
+    .split(/[^a-z0-9]+/g)
+    .map((token) => token.trim())
+    .filter((token) => token.length > 1)
+    .map(normalizeToken);
+  return new Set(tokens);
+}
+
+export function matchOperationsForCommandIntent(
+  operations: OpenApiOperationEntry[],
+  commandPath: string,
+): CommandOperationMatch[] {
+  const tokens = tokenizeCommandIntent(commandPath).map(normalizeToken);
+  if (tokens.length === 0) {
+    return [];
+  }
+
+  const matches: CommandOperationMatch[] = [];
+  for (const operation of operations) {
+    const pathTokens = tokenizePathSegments(operation.path);
+    const tagTokens = new Set(operation.tags.flatMap((tag) => tokenizeCommandIntent(tag)).map(normalizeToken));
+    const summaryLower = operation.summary?.toLowerCase() ?? '';
+    const operationIdLower = operation.operationId?.toLowerCase() ?? '';
+    let score = 0;
+    const matchedOn: string[] = [];
+
+    for (const [index, token] of tokens.entries()) {
+      const lowSignal = LOW_SIGNAL_TOKENS.has(token);
+      const domainBoost = index === 0 ? 2 : 0;
+      if (pathTokens.has(token)) {
+        score += (lowSignal ? 0 : 3) + domainBoost;
+        matchedOn.push(`path:${token}`);
+        continue;
+      }
+      if (!lowSignal && tagTokens.has(token)) {
+        score += 2 + domainBoost;
+        matchedOn.push(`tag:${token}`);
+        continue;
+      }
+      if (!lowSignal && (summaryLower.includes(token) || operationIdLower.includes(token))) {
+        score += 1;
+        matchedOn.push(`meta:${token}`);
+      }
+    }
+
+    if (score > 0) {
+      matches.push({
+        ...operation,
+        score,
+        matchedOn,
+      });
+    }
+  }
+
+  return matches.sort((a, b) => {
+    if (b.score !== a.score) {
+      return b.score - a.score;
+    }
+    const depthA = a.path.split('/').filter((segment) => segment.length > 0).length;
+    const depthB = b.path.split('/').filter((segment) => segment.length > 0).length;
+    if (depthA !== depthB) {
+      return depthA - depthB;
+    }
+    if (a.path === b.path) {
+      return a.method.localeCompare(b.method);
+    }
+    return a.path.localeCompare(b.path);
+  });
 }
 
 export async function getOpenApiStats(config: JellyfinConfig): Promise<OpenApiStats> {

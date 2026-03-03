@@ -111,6 +111,29 @@ async function jf(...args: string[]): Promise<string> {
   return text;
 }
 
+async function runJfWithCode(
+  args: string[],
+  extraEnv?: Record<string, string>,
+): Promise<{ code: number; stdout: string; stderr: string }> {
+  const proc = Bun.spawn([...CLI_CMD, ...args], {
+    env: {
+      ...process.env,
+      JELLYFIN_SERVER_URL: SERVER_URL,
+      JELLYFIN_API_KEY: API_KEY,
+      JELLYFIN_USER_ID: USER_ID,
+      ...extraEnv,
+    },
+    stdout: 'pipe',
+    stderr: 'pipe',
+  });
+  const [stdout, stderr, code] = await Promise.all([
+    new Response(proc.stdout).text(),
+    new Response(proc.stderr).text(),
+    proc.exited,
+  ]);
+  return { code, stdout, stderr };
+}
+
 // Per-test timeout: compiled binary ~1-2s startup + API call; fallback ~4-5s.
 const T = 60_000;
 
@@ -1330,5 +1353,21 @@ describe.skipIf(skip)('E2E media segments', () => {
   it('media segments help is available', async () => {
     const out = await jf('media', 'segments', '--help');
     expect(out).toMatch(/segment/i);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Read-only safety guard
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E read-only safety', () => {
+  it('blocks mutating commands before request execution', async () => {
+    const result = await runJfWithCode(
+      ['users', 'delete', '00000000000000000000000000000000'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(1);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/users delete/);
   }, T);
 });

@@ -1,5 +1,12 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { fetchOpenApiDocument, getOpenApiStats, summarizeOpenApi } from '../../src/utils/openapi.js';
+import {
+  extractOpenApiOperations,
+  fetchOpenApiDocument,
+  filterOpenApiOperations,
+  getOpenApiStats,
+  matchOperationsForCommandIntent,
+  summarizeOpenApi,
+} from '../../src/utils/openapi.js';
 
 const CONFIG = {
   serverUrl: 'http://127.0.0.1:8096',
@@ -36,6 +43,81 @@ describe('openapi utils', () => {
       { tag: 'Users', operations: 2 },
       { tag: 'System', operations: 1 },
     ]);
+  });
+
+  it('extracts operations with read-only safety metadata', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], operationId: 'GetUsers', summary: 'List users' },
+          post: { tags: ['Users'], operationId: 'CreateUser', summary: 'Create user' },
+        },
+      },
+    });
+
+    expect(operations).toEqual([
+      {
+        method: 'GET',
+        path: '/Users',
+        operationId: 'GetUsers',
+        summary: 'List users',
+        tags: ['Users'],
+        deprecated: false,
+        readOnlySafe: true,
+      },
+      {
+        method: 'POST',
+        path: '/Users',
+        operationId: 'CreateUser',
+        summary: 'Create user',
+        tags: ['Users'],
+        deprecated: false,
+        readOnlySafe: false,
+      },
+    ]);
+  });
+
+  it('filters operations by method, tag, path prefix, and search', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], summary: 'List users' },
+          post: { tags: ['Users'], summary: 'Create user' },
+        },
+        '/System/Info/Public': {
+          get: { tags: ['System'], summary: 'Public info' },
+        },
+      },
+    });
+
+    const filtered = filterOpenApiOperations(operations, {
+      method: 'GET',
+      tag: 'Users',
+      pathPrefix: '/Users',
+      search: 'list',
+    });
+    expect(filtered).toHaveLength(1);
+    expect(filtered[0]?.path).toBe('/Users');
+    expect(filtered[0]?.method).toBe('GET');
+  });
+
+  it('matches operations for command intent with ranked scores', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], summary: 'List users' },
+        },
+        '/System/Info/Public': {
+          get: { tags: ['System'], summary: 'Public info' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'users list');
+    expect(matches.length).toBeGreaterThan(0);
+    expect(matches[0]?.path).toBe('/Users');
+    expect(matches[0]?.score).toBeGreaterThan(0);
+    expect(matches[0]?.matchedOn.some((reason) => reason.includes('path:user'))).toBe(true);
   });
 
   it('fetches openapi from fallback candidate path', async () => {

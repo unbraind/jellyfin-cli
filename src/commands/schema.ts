@@ -2,7 +2,13 @@ import { Command } from 'commander';
 import { formatOutput, toon } from '../formatters/index.js';
 import { getSchema, getAvailableTypes } from './schema-defs.js';
 import { getConfig } from '../utils/config.js';
-import { fetchOpenApiDocument, summarizeOpenApi } from '../utils/openapi.js';
+import {
+  extractOpenApiOperations,
+  fetchOpenApiDocument,
+  filterOpenApiOperations,
+  matchOperationsForCommandIntent,
+  summarizeOpenApi,
+} from '../utils/openapi.js';
 import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
 
@@ -45,7 +51,12 @@ export function createSchemaCommand(): Command {
     .description('Fetch and summarize Jellyfin OpenAPI document from configured server')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--name <name>', 'Server name')
-    .option('--include-paths', 'Include a sorted operation list')
+    .option('--include-paths', 'Include operation details')
+    .option('--method <method>', 'Filter operations by HTTP method')
+    .option('--path-prefix <prefix>', 'Filter operations by path prefix')
+    .option('--tag <tag>', 'Filter operations by exact tag')
+    .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
+    .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')
     .action(async (options) => {
       if (!isOutputFormat(options.format)) {
@@ -69,6 +80,16 @@ export function createSchemaCommand(): Command {
       try {
         const result = await fetchOpenApiDocument(config);
         const summary = summarizeOpenApi(result.document);
+        const allOperations = extractOpenApiOperations(result.document);
+        const filteredOperations = filterOpenApiOperations(allOperations, {
+          method: options.method as string | undefined,
+          pathPrefix: options.pathPrefix as string | undefined,
+          tag: options.tag as string | undefined,
+          search: options.search as string | undefined,
+        });
+        const commandMatches = options.forCommand
+          ? matchOperationsForCommandIntent(allOperations, String(options.forCommand))
+          : [];
         const data: Record<string, unknown> = {
           source_path: result.sourcePath,
           server_url: config.serverUrl,
@@ -78,18 +99,43 @@ export function createSchemaCommand(): Command {
           top_tags: summary.topTags ?? [],
         };
 
+        if (options.method || options.pathPrefix || options.tag || options.search) {
+          data.operation_filters = {
+            method: options.method ?? null,
+            path_prefix: options.pathPrefix ?? null,
+            tag: options.tag ?? null,
+            search: options.search ?? null,
+          };
+          data.filtered_operation_count = filteredOperations.length;
+        }
+
         if (options.includePaths) {
-          const paths = result.document.paths ?? {};
-          const operations = Object.entries(paths)
-            .flatMap(([path, pathItem]) =>
-              Object.keys(pathItem ?? {})
-                .filter((method) => ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'].includes(method.toLowerCase()))
-                .map((method) => `${method.toUpperCase()} ${path}`),
-            )
-            .sort()
-            .slice(0, limit);
-          data.operations = operations;
-          data.operations_truncated = operations.length === limit;
+          data.operations = filteredOperations.slice(0, limit).map((operation) => ({
+            method: operation.method,
+            path: operation.path,
+            operation_id: operation.operationId ?? null,
+            tags: operation.tags,
+            deprecated: operation.deprecated,
+            read_only_safe: operation.readOnlySafe,
+          }));
+          data.operations_total = filteredOperations.length;
+          data.operations_truncated = filteredOperations.length > limit;
+        }
+
+        if (options.forCommand) {
+          data.command_intent = String(options.forCommand);
+          data.command_match_note = 'Inferred from token similarity against OpenAPI path, tags, and operation metadata.';
+          data.command_matches = commandMatches.slice(0, limit).map((operation) => ({
+            method: operation.method,
+            path: operation.path,
+            operation_id: operation.operationId ?? null,
+            tags: operation.tags,
+            score: operation.score,
+            matched_on: operation.matchedOn,
+            read_only_safe: operation.readOnlySafe,
+          }));
+          data.command_matches_total = commandMatches.length;
+          data.command_matches_truncated = commandMatches.length > limit;
         }
 
         console.log(formatOutput(data, outputFormat, 'openapi_summary'));

@@ -41,7 +41,7 @@ To avoid modifying media library state during validation:
 3. `jf schema openapi`
 
 - New read-only API discovery command to fetch and summarize OpenAPI directly from the configured server.
-- Supports `--include-paths` and `--limit` for deterministic operation-list sampling.
+- Supports `--include-paths`, plus operation filters (`--method`, `--tag`, `--path-prefix`, `--search`) and intent matching (`--for-command`) for deterministic endpoint discovery.
 - Reuses centralized OpenAPI probing logic shared with `config doctor`.
 
 4. `jf schema tools`
@@ -54,4 +54,4 @@ To avoid modifying media library state during validation:
 
 1. Add optional `--explain` mode to print resolved Jellyfin endpoint + query before execution.
 2. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
-3. Add command-to-endpoint mapping metadata in `schema tools` so agents can reason about underlying API operations directly.
+3. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.

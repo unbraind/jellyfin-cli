@@ -2872,10 +2872,14 @@ Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `i
 Fetch and summarize the live Jellyfin OpenAPI document from your configured server.
 
 ```bash
-jf schema openapi [--name <name>] [--include-paths] [--limit <number>] [--format <format>]
+jf schema openapi [--name <name>] [--include-paths] [--method <method>] [--path-prefix <prefix>] [--tag <tag>] [--search <text>] [--for-command <path>] [--limit <number>] [--format <format>]
 ```
 
 Output type: `openapi_summary`
+
+Notes:
+- `--include-paths` now outputs structured operation entries (`method`, `path`, `operation_id`, `tags`, `read_only_safe`).
+- `--for-command` performs intent matching against OpenAPI metadata and returns ranked inferred endpoint candidates.
 
 ### schema tools
 

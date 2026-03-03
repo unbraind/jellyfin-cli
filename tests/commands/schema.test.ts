@@ -47,8 +47,13 @@ describe('schema openapi command', () => {
           JSON.stringify({
             info: { version: '10.11.6' },
             paths: {
-              '/Users': { get: { tags: ['Users'] }, post: { tags: ['Users'] } },
-              '/System/Info/Public': { get: { tags: ['System'] } },
+              '/Users': {
+                get: { tags: ['Users'], operationId: 'GetUsers', summary: 'List users' },
+                post: { tags: ['Users'], operationId: 'CreateUser', summary: 'Create user' },
+              },
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
             },
           }),
           { headers: { 'content-type': 'application/json' } },
@@ -78,6 +83,65 @@ describe('schema openapi command', () => {
     expect(result.stdout).toContain('path_count: 2');
     expect(result.stdout).toContain('operation_count: 3');
     expect(result.stdout).toContain('operations:');
+    expect(result.stdout).toContain('read_only_safe: true');
+  });
+
+  it('supports operation filtering and command-intent inference', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Users': {
+                get: { tags: ['Users'], operationId: 'GetUsers', summary: 'List users' },
+                post: { tags: ['Users'], operationId: 'CreateUser', summary: 'Create user' },
+              },
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'openapi',
+      '--include-paths',
+      '--method',
+      'GET',
+      '--tag',
+      'Users',
+      '--for-command',
+      'users list',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('filtered_operation_count: 1');
+    expect(result.stdout).toContain('command_intent: users list');
+    expect(result.stdout).toContain('command_matches:');
+    expect(result.stdout).toContain('matched_on:');
   });
 
   it('returns error for invalid --limit', async () => {

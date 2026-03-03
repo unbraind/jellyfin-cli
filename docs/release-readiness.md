@@ -44,7 +44,7 @@ The E2E suite is read-only and is designed to avoid mutating media library data.
 
 ```bash
 jf config doctor
-jf schema openapi --include-paths --limit 25
+jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
 jf schema tools --command system --limit 10
 ```
 

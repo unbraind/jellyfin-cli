@@ -49,7 +49,7 @@ jf config test
 jf config doctor
 
 # Inspect live OpenAPI surface for agent planning
-jf schema openapi --include-paths --limit 25
+jf schema openapi --include-paths --method GET --tag Users --for-command "users list" --limit 25
 
 # Export tool schemas for function-calling agents
 jf schema tools --command items --limit 20
@@ -176,7 +176,7 @@ Notes:
 | `jf config reset` | Reset all configuration |
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
-| `jf schema openapi` | Fetch and summarize live OpenAPI paths/operations/tags |
+| `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
 | `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |
 
 ### System Administration
