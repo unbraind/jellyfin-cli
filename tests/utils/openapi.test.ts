@@ -209,6 +209,21 @@ describe('openapi utils', () => {
     expect(methodsForLibrary).toEqual(['GET', 'POST']);
   });
 
+  it('prefers read-only operations for read-only command intents', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Items': {
+          get: { tags: ['Items'], summary: 'List items', operationId: 'GetItems' },
+          delete: { tags: ['Library'], summary: 'Delete items', operationId: 'DeleteItems' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'items list');
+    expect(matches[0]?.method).toBe('GET');
+    expect(matches[0]?.readOnlySafe).toBe(true);
+  });
+
   it('filters out operations when tag or search terms do not match', () => {
     const operations = extractOpenApiOperations({
       paths: {

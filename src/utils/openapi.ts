@@ -1,4 +1,5 @@
 import type { JellyfinConfig } from '../types/index.js';
+import { LOW_SIGNAL_TOKENS, isReadOnlyIntent } from './openapi-intent.js';
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 const OPENAPI_CANDIDATES = ['/api-docs/openapi.json', '/openapi.json', '/swagger/v1/swagger.json'] as const;
@@ -209,18 +210,6 @@ function tokenizeCommandIntent(value: string): string[] {
     .filter((token) => token.length > 1);
 }
 
-const LOW_SIGNAL_TOKENS = new Set([
-  'get',
-  'list',
-  'set',
-  'create',
-  'delete',
-  'update',
-  'info',
-  'status',
-  'show',
-]);
-
 function normalizeToken(token: string): string {
   if (token.endsWith('s') && token.length > 3) {
     return token.slice(0, -1);
@@ -248,6 +237,7 @@ export function matchOperationsForCommandIntent(
   }
 
   const matches: CommandOperationMatch[] = [];
+  const preferReadOnlyMatches = isReadOnlyIntent(tokens);
   for (const operation of operations) {
     const pathTokens = tokenizePathSegments(operation.path);
     const tagTokens = new Set(operation.tags.flatMap((tag) => tokenizeCommandIntent(tag)).map(normalizeToken));
@@ -276,6 +266,9 @@ export function matchOperationsForCommandIntent(
     }
 
     if (score > 0) {
+      if (preferReadOnlyMatches) {
+        score += operation.readOnlySafe ? 1 : -1;
+      }
       matches.push({
         ...operation,
         score,

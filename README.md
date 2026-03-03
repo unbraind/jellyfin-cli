@@ -477,6 +477,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema` - Output JSON schema for all Toon format types
 - `jf schema <type>` - Output JSON schema for a specific type
 - `jf schema list` - List all available output types
+- `jf schema validate [type] [--from auto|json|yaml|toon] [--input <payload>]` - Validate output payloads against CLI schemas (stdin or inline)
 - `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
 - `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
 - `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--command-prefix items] [--min-score 3] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set
@@ -487,7 +488,7 @@ This CLI is designed to be easily used by AI agents and LLMs:
 
 1. **Structured Output**: The default `toon` format provides consistent, parseable YAML output
 2. **Type Information**: Every output includes a `type` field indicating the data structure
-3. **Metadata**: Output includes timestamp, format version, and other metadata
+3. **Stable Envelope**: Output always includes a top-level `type` and structured `data`
 4. **Error Handling**: Errors are returned in a consistent format
 5. **No Interactive Prompts**: All inputs are via command-line arguments
 

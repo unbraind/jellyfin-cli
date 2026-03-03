@@ -6,7 +6,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { message: { type: 'string' }, success: { type: 'boolean' } }, required: ['message', 'success'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   error: {
     type: 'object',
@@ -15,7 +15,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { error: { type: 'string' }, code: { type: 'number' }, success: { const: false } }, required: ['error', 'success'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   system_info: {
     type: 'object',
@@ -24,7 +24,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { name: { type: 'string' }, version: { type: 'string' }, id: { type: 'string' }, local_address: { type: 'string' } }, required: ['name', 'version'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   users: {
     type: 'object',
@@ -33,7 +33,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, is_admin: { type: 'boolean' } }, required: ['id', 'name'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   user: {
     type: 'object',
@@ -42,7 +42,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, is_admin: { type: 'boolean' }, configuration: { type: 'object' }, policy: { type: 'object' } }, required: ['id', 'name'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   items: {
     type: 'object',
@@ -51,7 +51,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, type: { type: 'string' }, year: { type: 'number' }, rating: { type: 'number' } }, required: ['id', 'name', 'type'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   item: {
     type: 'object',
@@ -60,7 +60,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, type: { type: 'string' }, path: { type: 'string' }, overview: { type: 'string' }, media_streams: { type: 'array' }, user_data: { type: 'object' } }, required: ['id', 'name', 'type'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   sessions: {
     type: 'object',
@@ -69,7 +69,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, user_name: { type: 'string' }, client: { type: 'string' }, device_name: { type: 'string' }, now_playing: { type: 'object' }, play_state: { type: 'object' } }, required: ['id'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   libraries: {
     type: 'object',
@@ -78,7 +78,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { name: { type: 'string' }, id: { type: 'string' }, collection_type: { type: 'string' } }, required: ['name', 'id'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   tasks: {
     type: 'object',
@@ -87,7 +87,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, key: { type: 'string' }, state: { type: 'string' }, category: { type: 'string' } }, required: ['id', 'name', 'key', 'state'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   search_result: {
     type: 'object',
@@ -96,7 +96,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { total_count: { type: 'number' }, hints: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, type: { type: 'string' } }, required: ['id', 'name', 'type'] } } }, required: ['total_count', 'hints'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   plugins: {
     type: 'object',
@@ -105,7 +105,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, version: { type: 'string' }, status: { type: 'string' } }, required: ['id', 'name', 'version'] } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   config: {
     type: 'object',
@@ -114,7 +114,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { server_url: { type: 'string' }, username: { type: 'string' }, output_format: { type: 'string' }, has_api_key: { type: 'boolean' } }, required: ['server_url', 'output_format'] },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   recommendations: {
     type: 'object',
@@ -123,7 +123,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { baseline_item: { type: 'string' }, category_id: { type: 'string' }, type: { type: 'string' }, items: { type: 'array' } } } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   item_counts: {
     type: 'object',
@@ -132,7 +132,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'object', properties: { movies: { type: 'number' }, series: { type: 'number' }, episodes: { type: 'number' }, albums: { type: 'number' } } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
   activity_log: {
     type: 'object',
@@ -141,7 +141,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
       data: { type: 'array', items: { type: 'object', properties: { id: { type: 'number' }, name: { type: 'string' }, type: { type: 'string' }, date: { type: 'string' }, user_id: { type: 'string' } } } },
       meta: { $ref: '#/definitions/meta' },
     },
-    required: ['type', 'data', 'meta'],
+    required: ['type', 'data'],
   },
 };
 

@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { formatOutput } from '../formatters/index.js';
 import { getSchema, getAvailableTypes } from './schema-defs.js';
+import { createSchemaValidateCommand } from './schema-validate.js';
 import { getConfig } from '../utils/config.js';
 import {
   extractOpenApiOperations,
@@ -76,6 +77,8 @@ export function createSchemaCommand(): Command {
         process.exit(1);
       }
     });
+
+  cmd.addCommand(createSchemaValidateCommand());
 
   cmd
     .command('list')

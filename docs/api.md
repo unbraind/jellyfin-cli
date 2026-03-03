@@ -2867,6 +2867,21 @@ jf schema <type>
 
 Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `item`, `sessions`, `session`, `libraries`, `tasks`, `search_result`, `plugins`, `config`
 
+### schema validate [type]
+
+Validate a Toon/JSON/YAML payload against one schema type (or auto-detect from payload `type`).
+
+```bash
+jf schema validate [type] [--from <sourceFormat>] [--input <payload>] [--format <format>]
+```
+
+Output type: `schema_validation`
+
+Notes:
+- Reads from stdin when `--input` is omitted.
+- `--from` supports `auto` (default), `json`, `yaml`, and `toon`.
+- Returns non-zero exit code and structured validation errors when invalid.
+
 ### schema openapi
 
 Fetch and summarize the live Jellyfin OpenAPI document from your configured server.

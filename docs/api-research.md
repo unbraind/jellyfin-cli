@@ -80,6 +80,12 @@ To avoid modifying media library state during validation:
 - Mutating verbs now include `restore` and `split`.
 - Hyphenated command tokens are analyzed (`merge-versions`, `delete-alternates`, etc.), preventing false read-only-safe labels in tool schema exports.
 
+10. `jf schema validate`
+
+- Added payload validation command for Toon/JSON/YAML outputs against built-in CLI schemas.
+- Supports stdin pipelines (`jf items list | jf schema validate items --from toon`) and inline payload checks.
+- Emits machine-readable validation status and deterministic field-level errors for CI/agent guardrails.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

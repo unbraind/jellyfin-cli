@@ -54,6 +54,9 @@ jf schema openapi --include-paths --method GET --tag Users --for-command "users 
 # Export tool schemas for function-calling agents
 jf schema tools --command items --limit 20
 
+# Validate CLI output payloads against built-in schemas
+jf items list --limit 1 | jf schema validate items --from toon
+
 # Estimate uncovered OpenAPI operations for a command domain
 jf schema coverage --method GET --command-prefix items --min-score 3 --limit 25
 
@@ -186,6 +189,7 @@ Notes:
 | `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
 | `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents and sample unmatched operations |
+| `jf schema validate` | Validate Toon/JSON/YAML payloads against CLI schemas for CI and agent safety |
 
 ### System Administration
 

@@ -250,3 +250,76 @@ describe('schema tools command', () => {
     expect(result.stderr).toContain('Limit must be a positive integer');
   });
 });
+
+describe('schema validate command', () => {
+  it('validates payload by explicit type and returns success', async () => {
+    const payload = JSON.stringify({
+      type: 'user',
+      data: { id: 'u1', name: 'steve' },
+      meta: {
+        timestamp: '2026-03-03T00:00:00.000Z',
+        format: 'toon',
+        version: '1.0.0',
+      },
+    });
+
+    const result = await runCli(['schema', 'validate', 'user', '--from', 'json', '--input', payload]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('type: schema_validation');
+    expect(result.stdout).toContain('valid: true');
+    expect(result.stdout).toContain('expected_type: user');
+  });
+
+  it('accepts payloads without meta envelope', async () => {
+    const payload = JSON.stringify({
+      type: 'items',
+      data: [{ id: 'i1', name: 'Movie', type: 'Movie' }],
+    });
+
+    const result = await runCli(['schema', 'validate', 'items', '--from', 'json', '--input', payload]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('valid: true');
+  });
+
+  it('auto-detects payload type when type argument is omitted', async () => {
+    const payload = [
+      'type: sessions',
+      'data:',
+      ' - id: s1',
+      'meta:',
+      ' timestamp: 2026-03-03T00:00:00.000Z',
+      ' format: toon',
+      ' version: 1.0.0',
+    ].join('\n');
+
+    const result = await runCli(['schema', 'validate', '--from', 'toon', '--input', payload]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('valid: true');
+    expect(result.stdout).toContain('detected_type: sessions');
+  });
+
+  it('returns validation errors for invalid payload', async () => {
+    const payload = JSON.stringify({
+      type: 'user',
+      data: { id: 'u1' },
+      meta: {
+        timestamp: 'not-a-date',
+        format: 'toon',
+        version: '1.0.0',
+      },
+    });
+
+    const result = await runCli(['schema', 'validate', 'user', '--from', 'json', '--input', payload]);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('type: schema_validation');
+    expect(result.stderr).toContain('valid: false');
+    expect(result.stderr).toContain('$.data.name: is required');
+    expect(result.stderr).toContain('$.meta.timestamp: must be a valid date-time string');
+  });
+
+  it('returns error when no stdin or --input data is provided', async () => {
+    const result = await runCli(['schema', 'validate', 'user']);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('Validation input is empty');
+  });
+});
