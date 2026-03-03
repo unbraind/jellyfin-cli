@@ -149,6 +149,13 @@ describe('schema openapi command', () => {
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Limit must be a positive integer');
   });
+
+  it('honors global --format for schema subcommands', async () => {
+    const result = await runCli(['--format', 'json', 'schema', 'tools', '--limit', '1']);
+    expect(result.code).toBe(0);
+    expect(() => JSON.parse(result.stdout)).not.toThrow();
+    expect(result.stdout).toContain('"tool_count"');
+  });
 });
 
 describe('schema coverage command', () => {

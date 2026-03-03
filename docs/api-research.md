@@ -59,18 +59,23 @@ To avoid modifying media library state during validation:
 - Supports method/tag/path filtering and command-domain scoping via `--command-prefix`.
 - Emits deterministic `unmatched_operations` samples for backlog and release planning.
 
-5. `jf config doctor` output normalization
+5. Schema/global format consistency
+
+- `schema` subcommands now honor global `--format` values (for example `jf --format json schema tools`) in addition to local subcommand format flags.
+- This keeps formatter behavior deterministic across all CLI surfaces used in automated pipelines.
+
+6. `jf config doctor` output normalization
 
 - `server.local_address` is now sanitized when Jellyfin returns malformed duplicated protocol values.
 - The warning (`server_local_address_looks_malformed`) is still emitted so agents can surface upstream server issues.
 
-6. Global `--explain` request introspection
+7. Global `--explain` request introspection
 
 - Added `--explain` (or `JELLYFIN_EXPLAIN=1`) to emit request metadata for every API call to `stderr`.
 - Payload includes method, path, redacted query/body preview, timeout, and `read_only_safe` classification.
 - Keeps normal command result output on `stdout`, so pipelines using Toon/JSON/YAML remain stable.
 
-7. Read-only classification hardening
+8. Read-only classification hardening
 
 - Mutating verbs now include `restore` and `split`.
 - Hyphenated command tokens are analyzed (`merge-versions`, `delete-alternates`, etc.), preventing false read-only-safe labels in tool schema exports.

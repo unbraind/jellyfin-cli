@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { formatOutput, toon } from '../formatters/index.js';
+import { formatOutput } from '../formatters/index.js';
 import { getSchema, getAvailableTypes } from './schema-defs.js';
 import { getConfig } from '../utils/config.js';
 import {
@@ -11,8 +11,52 @@ import {
 } from '../utils/openapi.js';
 import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
+import type { OutputFormat } from '../types/index.js';
 
-const formatToon = toon.formatToon;
+type FormatOptions = {
+  format?: string | undefined;
+};
+
+function resolveFormatCandidate(command: Command, options: FormatOptions): string {
+  const localSource = command.getOptionValueSource('format');
+  if (localSource && localSource !== 'default' && typeof options.format === 'string') {
+    return options.format;
+  }
+
+  let parent: Command | null = command.parent;
+  while (parent) {
+    const parentValue = parent.opts().format;
+    const parentSource = parent.getOptionValueSource('format');
+    if (parentSource && parentSource !== 'default' && typeof parentValue === 'string') {
+      return parentValue;
+    }
+    parent = parent.parent;
+  }
+
+  if (typeof options.format === 'string') {
+    return options.format;
+  }
+
+  return 'toon';
+}
+
+function resolveOutputFormat(command: Command, options: FormatOptions): OutputFormat {
+  const candidate = resolveFormatCandidate(command, options);
+  if (!isOutputFormat(candidate)) {
+    console.error(formatOutput({ error: `Invalid format: ${candidate}` }, 'toon', 'error'));
+    process.exit(1);
+  }
+  return parseOutputFormat(candidate, 'toon');
+}
+
+function parsePositiveInteger(value: string, label: string, outputFormat: OutputFormat): number {
+  const parsed = parseInt(value, 10);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    console.error(formatOutput({ error: `${label} must be a positive integer` }, outputFormat, 'error'));
+    process.exit(1);
+  }
+  return parsed;
+}
 
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
@@ -20,18 +64,15 @@ export function createSchemaCommand(): Command {
   cmd
     .description('Output JSON schema for Toon format types (useful for LLMs)')
     .argument('[type]', 'Output type to get schema for (leave empty for all)')
-    .option('-f, --format <format>', 'Output format (toon, json)', 'toon')
-    .action((type, options) => {
+    .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
+    .action(function (this: Command, type, options: FormatOptions) {
+      const outputFormat = resolveOutputFormat(this, options);
       try {
         const schema = getSchema(type);
-        if (options.format === 'json') {
-          console.log(JSON.stringify(schema, null, 2));
-        } else {
-          console.log(formatToon(schema, 'schema'));
-        }
+        console.log(formatOutput(schema, outputFormat, 'schema'));
       } catch (err) {
         const message = err instanceof Error ? err.message : 'Unknown error';
-        console.error(formatToon({ error: message, available_types: getAvailableTypes() }, 'error'));
+        console.error(formatOutput({ error: message, available_types: getAvailableTypes() }, outputFormat, 'error'));
         process.exit(1);
       }
     });
@@ -39,11 +80,12 @@ export function createSchemaCommand(): Command {
   cmd
     .command('list')
     .description('List all available output types')
-    .action(() => {
-      console.log(formatToon({
+    .action(function (this: Command) {
+      const outputFormat = resolveOutputFormat(this, {});
+      console.log(formatOutput({
         types: getAvailableTypes(),
         count: getAvailableTypes().length,
-      }, 'output_types'));
+      }, outputFormat, 'output_types'));
     });
 
   cmd
@@ -58,20 +100,11 @@ export function createSchemaCommand(): Command {
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
     .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')
-    .action(async (options) => {
-      if (!isOutputFormat(options.format)) {
-        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
-        process.exit(1);
-      }
+    .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
+      const outputFormat = resolveOutputFormat(this, options);
+      const limit = parsePositiveInteger(String(options.limit ?? '50'), 'Limit', outputFormat);
 
-      const outputFormat = parseOutputFormat(options.format, 'toon');
-      const limit = parseInt(options.limit, 10);
-      if (!Number.isFinite(limit) || limit <= 0) {
-        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
-        process.exit(1);
-      }
-
-      const config = getConfig(options.name);
+      const config = getConfig(options.name as string | undefined);
       if (!config.serverUrl) {
         console.error(formatOutput({ error: 'No server URL configured' }, outputFormat, 'error'));
         process.exit(1);
@@ -152,18 +185,9 @@ export function createSchemaCommand(): Command {
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--command <prefix>', 'Optional command prefix filter, e.g. "items" or "users get"')
     .option('--limit <number>', 'Schema list limit', '500')
-    .action(function (this: Command, options) {
-      if (!isOutputFormat(options.format)) {
-        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
-        process.exit(1);
-      }
-
-      const outputFormat = parseOutputFormat(options.format, 'toon');
-      const limit = parseInt(options.limit, 10);
-      if (!Number.isFinite(limit) || limit <= 0) {
-        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
-        process.exit(1);
-      }
+    .action(function (this: Command, options: FormatOptions & Record<string, unknown>) {
+      const outputFormat = resolveOutputFormat(this, options);
+      const limit = parsePositiveInteger(String(options.limit ?? '500'), 'Limit', outputFormat);
 
       const root = this.parent?.parent;
       if (!root) {
@@ -195,25 +219,12 @@ export function createSchemaCommand(): Command {
     .option('--limit <number>', 'Unmatched operation sample limit', '50')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
     .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
-    .action(async function (this: Command, options) {
-      if (!isOutputFormat(options.format)) {
-        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
-        process.exit(1);
-      }
+    .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
+      const outputFormat = resolveOutputFormat(this, options);
+      const limit = parsePositiveInteger(String(options.limit ?? '50'), 'Limit', outputFormat);
+      const minScore = parsePositiveInteger(String(options.minScore ?? '3'), 'Min score', outputFormat);
 
-      const outputFormat = parseOutputFormat(options.format, 'toon');
-      const limit = parseInt(options.limit, 10);
-      const minScore = parseInt(options.minScore, 10);
-      if (!Number.isFinite(limit) || limit <= 0) {
-        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
-        process.exit(1);
-      }
-      if (!Number.isFinite(minScore) || minScore <= 0) {
-        console.error(formatOutput({ error: 'Min score must be a positive integer' }, outputFormat, 'error'));
-        process.exit(1);
-      }
-
-      const config = getConfig(options.name);
+      const config = getConfig(options.name as string | undefined);
       if (!config.serverUrl) {
         console.error(formatOutput({ error: 'No server URL configured' }, outputFormat, 'error'));
         process.exit(1);
