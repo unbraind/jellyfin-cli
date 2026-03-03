@@ -20,9 +20,11 @@
     "lint:fix": "eslint src tests --ext .ts --fix",
     "lint:cache": "eslint src tests --ext .ts --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
+    "version:sync": "bun run scripts/version-date-commit.ts",
+    "check:version": "bun run scripts/check-version.ts",
     "check:file-length": "bun run scripts/check-file-length.ts",
     "check:secrets": "bun run scripts/check-secrets.ts",
-    "validate:release": "bun run typecheck && bun run lint && bun run test && bun run build && bun run check:file-length && bun run check:secrets",
+    "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run build && bun run check:file-length && bun run check:secrets",
     "release:check": "bun run validate:release",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build"

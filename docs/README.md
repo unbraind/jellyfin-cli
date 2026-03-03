@@ -99,6 +99,18 @@ jf sessions play SESSION_ID ITEM_ID
 
 Settings are stored in `~/.jellyfin-cli/settings.json`.
 
+### Versioning Policy
+
+- Project version must follow: `YYYY.MM.DD-<commitIndex>`
+- Example: `2025.12.31-10`
+- Date is UTC
+- Sync before release/commit:
+
+```bash
+bun run version:sync
+bun run check:version
+```
+
 ```bash
 # View current configuration
 jf config get

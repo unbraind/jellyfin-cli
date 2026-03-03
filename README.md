@@ -175,10 +175,19 @@ jf system info --format raw
 ## Release Validation
 
 ```bash
+bun run version:sync
 bun run validate:release
 ```
 
-This runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
+This syncs/enforces the version policy and runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
+
+### Version Policy
+
+- Version format is mandatory: `YYYY.MM.DD-<commitIndex>`
+- Example: `2025.12.31-10`
+- `YYYY.MM.DD` uses UTC date
+- `<commitIndex>` must match git commit index (`HEAD` or next commit during pre-commit sync)
+- Use `bun run version:sync` before commit/release
 
 ## Read-Only Mode
 

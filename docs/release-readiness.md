@@ -18,7 +18,15 @@ You can inspect exported values without revealing secrets:
 jf setup env --shell
 ```
 
-## 2) Run full release validation
+## 2) Sync date+commit version
+
+```bash
+bun run version:sync
+```
+
+Version format is required: `YYYY.MM.DD-<commitIndex>` (example: `2025.12.31-10`).
+
+## 3) Run full release validation
 
 ```bash
 bun run validate:release
@@ -30,10 +38,11 @@ This runs:
 - Lint (`bun run lint`)
 - Full tests (`bun run test`)
 - Build (`bun run build`)
+- Version policy check (`bun run check:version`)
 - Source LOC guard (`bun run check:file-length`)
 - Secret scan on tracked files (`bun run check:secrets`)
 
-## 3) Run live read-only CLI E2E checks
+## 4) Run live read-only CLI E2E checks
 
 ```bash
 export JELLYFIN_READ_ONLY=1
@@ -43,7 +52,7 @@ bun test tests/e2e/cli.test.ts
 
 The E2E suite is read-only and is designed to avoid mutating media library data.
 
-## 4) Run discovery diagnostics against live server
+## 5) Run discovery diagnostics against live server
 
 ```bash
 jf config doctor
@@ -54,7 +63,7 @@ jf schema coverage --method GET --command-prefix system --min-score 3 --limit 20
 
 All commands above are read-only and provide machine-parseable discovery output for agent workflows.
 
-## 5) Verify executable names
+## 6) Verify executable names
 
 Installed binaries:
 
@@ -62,7 +71,7 @@ Installed binaries:
 - `jellyfin-cli`
 - `jf-cli`
 
-## 6) Final git hygiene
+## 7) Final git hygiene
 
 ```bash
 git status
