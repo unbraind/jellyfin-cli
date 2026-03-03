@@ -57,8 +57,14 @@ To avoid modifying media library state during validation:
 - `server.local_address` is now sanitized when Jellyfin returns malformed duplicated protocol values.
 - The warning (`server_local_address_looks_malformed`) is still emitted so agents can surface upstream server issues.
 
+6. Global `--explain` request introspection
+
+- Added `--explain` (or `JELLYFIN_EXPLAIN=1`) to emit request metadata for every API call to `stderr`.
+- Payload includes method, path, redacted query/body preview, timeout, and `read_only_safe` classification.
+- Keeps normal command result output on `stdout`, so pipelines using Toon/JSON/YAML remain stable.
+
 ## Recommended Next Enhancements
 
-1. Add optional `--explain` mode to print resolved Jellyfin endpoint + query before execution.
-2. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
-3. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.
+1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
+2. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.
+3. Add structured command replay snippets (`curl`, `httpie`) to `--explain` output for rapid debugging.

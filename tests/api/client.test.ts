@@ -109,6 +109,29 @@ describe('JellyfinApiClient', () => {
 
       await expect(client.getPublicSystemInfo()).rejects.toThrow(JellyfinApiError);
     });
+
+    it('should emit explain payload to stderr when explain mode is enabled', async () => {
+      const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
+      process.env.JELLYFIN_EXPLAIN = '1';
+      try {
+        mockFetch.mockResolvedValueOnce(createMockResponse({ test: 'data' }));
+
+        await client.authenticate('steve', 'secret-password');
+
+        expect(stderrSpy).toHaveBeenCalled();
+        const explainLine = stderrSpy.mock.calls
+          .map(([value]) => String(value))
+          .find((line) => line.includes('"type":"request_explain"'));
+        expect(explainLine).toBeDefined();
+        expect(explainLine).toContain('"path":"/Users/AuthenticateByName"');
+        expect(explainLine).toContain('"method":"POST"');
+        expect(explainLine).toContain('"Pw":"[REDACTED]"');
+        expect(explainLine).not.toContain('secret-password');
+      } finally {
+        delete process.env.JELLYFIN_EXPLAIN;
+        stderrSpy.mockRestore();
+      }
+    });
   });
 
   describe('getPublicSystemInfo', () => {

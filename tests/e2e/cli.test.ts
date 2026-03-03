@@ -1371,3 +1371,18 @@ describe.skipIf(skip)('E2E read-only safety', () => {
     expect(`${result.stdout}${result.stderr}`).toMatch(/users delete/);
   }, T);
 });
+
+// -------------------------------------------------------------------------
+// Explain mode
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E explain mode', () => {
+  it('prints request metadata to stderr without changing stdout payload', async () => {
+    const result = await runJfWithCode(['--explain', 'system', 'info']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toMatch(/^type: sys/m);
+    expect(result.stderr).toMatch(/"type":"request_explain"/);
+    expect(result.stderr).toMatch(/"path":"\/System\/Info"/);
+    expect(result.stderr).toMatch(/"method":"GET"/);
+  }, T);
+});

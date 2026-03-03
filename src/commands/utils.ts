@@ -14,6 +14,7 @@ import type {
 } from '../types/index.js';
 import { getConfig } from '../utils/config.js';
 import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
+import { EXPLAIN_ENV_KEY, isExplainModeEnabled } from '../utils/explain.js';
 
 interface ClientResult {
   client: JellyfinApiClient;
@@ -21,7 +22,15 @@ interface ClientResult {
   config: ReturnType<typeof getConfig>;
 }
 
-export async function createApiClient(options: { format?: string; server?: string }): Promise<ClientResult> {
+export async function createApiClient(options: {
+  format?: string;
+  server?: string;
+  explain?: boolean | string;
+}): Promise<ClientResult> {
+  if (isExplainModeEnabled(options.explain, process.env[EXPLAIN_ENV_KEY])) {
+    process.env[EXPLAIN_ENV_KEY] = '1';
+  }
+
   const config = getConfig(options.server);
   if (options.format && !isOutputFormat(options.format)) {
     console.error(

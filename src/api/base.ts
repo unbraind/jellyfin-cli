@@ -1,5 +1,10 @@
 import type { JellyfinConfig } from '../types/index.js';
 import { buildQueryString, JellyfinApiError } from './types.js';
+import {
+  buildExplainRequestPayload,
+  emitExplainRequest,
+  isExplainModeEnabled,
+} from '../utils/explain.js';
 
 export class ApiClientBase {
   protected baseUrl: string;
@@ -32,6 +37,18 @@ export class ApiClientBase {
     params?: Record<string, unknown>,
     body?: unknown
   ): Promise<T> {
+    if (isExplainModeEnabled(undefined, process.env.JELLYFIN_EXPLAIN)) {
+      emitExplainRequest(
+        buildExplainRequestPayload({
+          method,
+          path,
+          params,
+          body,
+          timeoutMs: this.timeout,
+        }),
+      );
+    }
+
     const url = `${this.baseUrl}${path}${params ? buildQueryString(params) : ''}`;
     
     const headers: Record<string, string> = {

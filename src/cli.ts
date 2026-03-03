@@ -7,6 +7,7 @@ import {
   isCommandBlockedInReadOnly,
   isReadOnlyModeEnabled,
 } from './utils/read-only-guard.js';
+import { EXPLAIN_ENV_KEY, isExplainModeEnabled } from './utils/explain.js';
 import {
   createConfigCommand,
   createSystemCommand,
@@ -72,9 +73,17 @@ program
   .version(VERSION)
   .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
   .option('-s, --server <name>', 'Server name from config')
+  .option('--explain', 'Print resolved Jellyfin API request metadata to stderr')
   .option('--read-only', 'Block mutating commands (or set JELLYFIN_READ_ONLY=1)');
 
 program.hook('preAction', (thisCommand, actionCommand) => {
+  const explainOption = thisCommand.optsWithGlobals().explain as unknown;
+  if (isExplainModeEnabled(explainOption, process.env[EXPLAIN_ENV_KEY])) {
+    process.env[EXPLAIN_ENV_KEY] = '1';
+  } else {
+    delete process.env[EXPLAIN_ENV_KEY];
+  }
+
   const readOnlyOption = thisCommand.optsWithGlobals().readOnly as unknown;
   const readOnlyEnabled = isReadOnlyModeEnabled(readOnlyOption, process.env.JELLYFIN_READ_ONLY);
   if (!readOnlyEnabled) {

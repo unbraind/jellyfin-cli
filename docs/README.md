@@ -54,6 +54,9 @@ jf schema openapi --include-paths --method GET --tag Users --for-command "users 
 # Export tool schemas for function-calling agents
 jf schema tools --command items --limit 20
 
+# Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
+jf --explain system info
+
 # Optional: enforce non-destructive command execution
 export JELLYFIN_READ_ONLY=1
 
@@ -84,6 +87,7 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_USER_ID` | User ID |
 | `JELLYFIN_TIMEOUT` | Request timeout (ms) |
 | `JELLYFIN_OUTPUT_FORMAT` | Output format (`toon`, `json`, `table`, `raw`, `yaml`, `markdown`) |
+| `JELLYFIN_EXPLAIN` | Emit redacted request metadata to stderr (`1`/`true`) |
 
 ### Configuration File
 

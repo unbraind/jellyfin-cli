@@ -63,6 +63,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Setup Wizard**: Interactive configuration wizard
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
+- **Explain Mode**: global `--explain` or `JELLYFIN_EXPLAIN=1` prints redacted request metadata to `stderr`
 - **Release Guardrails**: built-in file length + secret scanning checks for safe releases
 - **Plugin Management**: List, configure, and manage plugins
 - **Device Management**: View and manage connected devices
@@ -85,6 +86,7 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_TIMEOUT` | Request timeout (ms) |
 | `JELLYFIN_OUTPUT_FORMAT` | Output format (toon, json, table, raw, yaml, markdown) |
 | `JELLYFIN_READ_ONLY` | `1/true/on/yes` blocks mutating commands globally |
+| `JELLYFIN_EXPLAIN` | `1/true/on/yes` emits redacted request metadata to stderr |
 
 ### Configuration File
 
@@ -188,6 +190,9 @@ jf --read-only items list --limit 5
 # entire shell session
 export JELLYFIN_READ_ONLY=1
 jf library list
+
+# inspect API request mapping for a command
+jf --explain system info
 ```
 
 Mutating operations are blocked with a structured Toon error while read operations continue to work.
