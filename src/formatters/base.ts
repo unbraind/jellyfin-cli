@@ -42,7 +42,7 @@ export function formatToon(output: unknown, typeHint?: string): string {
   }).trim();
 }
 
-function detectType(output: unknown): string {
+export function detectType(output: unknown): string {
   if (output === null || output === undefined) return 'empty';
   if (typeof output === 'string') return 'msg';
   if (typeof output === 'number' || typeof output === 'boolean') return 'val';

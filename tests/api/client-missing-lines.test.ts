@@ -1,5 +1,6 @@
-import { describe, it, expect } from 'vitest';
-import { JellyfinApiClient } from '../../src/api/client.js';
+import { describe, it, expect, vi } from 'vitest';
+import { JellyfinApiClient, JellyfinApiError } from '../../src/api/client.js';
+import { detectType } from '../../src/formatters/base.js';
 
 describe('JellyfinApiClient Missing Lines', () => {
   it('should sync modules on setUserId', () => {
@@ -20,5 +21,67 @@ describe('JellyfinApiClient Missing Lines', () => {
     const url = client.getSubtitleUrl('item-1', 'source-1', 2, 'vtt');
     expect(url).toContain('Stream.vtt');
     expect(url).toContain('format=vtt');
+  });
+
+  it('should call getRepositories from client wrapper', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    // @ts-ignore
+    vi.spyOn(client.packages, 'getRepositories').mockResolvedValue([]);
+    await client.getRepositories();
+    // @ts-ignore
+    expect(client.packages.getRepositories).toHaveBeenCalled();
+  });
+
+  it('should call setRepositories from client wrapper', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    // @ts-ignore
+    vi.spyOn(client.packages, 'setRepositories').mockResolvedValue();
+    await client.setRepositories([]);
+    // @ts-ignore
+    expect(client.packages.setRepositories).toHaveBeenCalledWith([]);
+  });
+
+  it('should call getInstallingPackages from client wrapper', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    // @ts-ignore
+    vi.spyOn(client.packages, 'getInstallingPackages').mockResolvedValue([]);
+    await client.getInstallingPackages();
+    // @ts-ignore
+    expect(client.packages.getInstallingPackages).toHaveBeenCalled();
+  });
+
+  it('should throw error in getItemRootFolder when no user id', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    await expect(client.getItemRootFolder()).rejects.toThrow(JellyfinApiError);
+  });
+
+  it('should pass no mediaSourceId to trickplay hls', () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    const url = client.getTrickplayHlsPlaylistUrl('item-1', 320);
+    expect(url).toContain('/Videos/item-1/Trickplay/320/tiles.m3u8?width=320');
+  });
+
+  it('should pass no mediaSourceId to trickplay tile', () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    const url = client.getTrickplayTileImageUrl('item-1', 320, 0);
+    expect(url).toContain('/Videos/item-1/Trickplay/320/0.jpg');
+  });
+
+  it('should throw error in getSuggestions when no user id', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    await expect(client.getSuggestions()).rejects.toThrow(JellyfinApiError);
+  });
+
+  it('should fallback to unknown type in detectType', () => {
+    expect(detectType(() => {})).toBe('unknown');
+  });
+
+  it('should call getItemsByPath', async () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test' });
+    // @ts-ignore
+    vi.spyOn(client, 'request').mockResolvedValue([]);
+    await client.getItemsByPath('/test/path');
+    // @ts-ignore
+    expect(client.request).toHaveBeenCalledWith('GET', '/Items/ByPath', { path: '/test/path' });
   });
 });
