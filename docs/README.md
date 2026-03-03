@@ -384,6 +384,7 @@ Notes:
 |---------|-------------|
 | `jf livetv info` | Get Live TV info |
 | `jf livetv channels` | List Live TV channels |
+| `jf livetv channel <channelId>` | Get a single Live TV channel by id |
 | `jf livetv programs` | List TV programs |
 | `jf livetv program <programId>` | Get a single TV program by id |
 | `jf livetv recordings` | List recordings |

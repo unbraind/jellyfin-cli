@@ -169,6 +169,7 @@ describe('setup command', () => {
       const result = await runCli(['setup', 'startup', '--format', 'json']);
       expect(result.code).toBe(0);
       const parsed = JSON.parse(result.stdout);
+      expect(parsed.startup_complete_state).toBe('required');
       expect(parsed.startup_complete).toBe(false);
       expect(parsed.setup_wizard_required).toBe(true);
       expect(parsed.configuration.ui_culture).toBe('en-US');
@@ -221,6 +222,7 @@ describe('setup command', () => {
       const result = await runCli(['setup', 'startup', '--format', 'json']);
       expect(result.code).toBe(0);
       const parsed = JSON.parse(result.stdout);
+      expect(parsed.startup_complete_state).toBe('unknown');
       expect(parsed.startup_complete).toBeNull();
       expect(parsed.setup_wizard_required).toBeNull();
       expect(parsed.warnings).toContain('startup_complete_endpoint_not_available');

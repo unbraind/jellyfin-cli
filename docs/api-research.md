@@ -167,6 +167,13 @@ To avoid modifying media library state during validation:
   - coverage: `87.55%`
   - unmatched: `32`
 
+21. Live TV channel endpoint + setup startup state normalization (March 4, 2026)
+
+- Added `jf livetv channel <channelId>` for `GET /LiveTv/Channels/{channelId}`.
+- Added API/client method delegation and test coverage for the new read-only Live TV endpoint.
+- Fixed read-only allowlist mismatch for QuickConnect status checks by allowing `quickconnect check`.
+- `jf setup startup` now emits a deterministic `startup_complete_state` (`complete` | `required` | `unknown`) to keep agent pipelines stable when `/Startup/Complete` is unavailable (405).
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

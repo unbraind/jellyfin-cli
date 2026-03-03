@@ -765,6 +765,17 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
       expect(result.Items).toHaveLength(1);
     });
 
+    it('should get a Live TV channel by ID', async () => {
+      const mockChannel = { Id: 'ch-1', Name: 'Channel 1', Type: 'TvChannel' };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockChannel));
+      const result = await client.getLiveTvChannel('ch-1');
+      expect(result.Id).toBe('ch-1');
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/LiveTv/Channels/ch-1'),
+        expect.anything(),
+      );
+    });
+
     it('should get Live TV programs', async () => {
       const mockPrograms = { Items: [{ Id: 'prog-1', Name: 'Show 1' }], TotalRecordCount: 1 };
       mockFetch.mockResolvedValueOnce(createMockResponse(mockPrograms));

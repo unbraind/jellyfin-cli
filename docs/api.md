@@ -1270,6 +1270,16 @@ jf livetv channels [--limit <number>] [--offset <number>]
 
 Output type: `items`
 
+### livetv channel
+
+Get a Live TV channel by ID.
+
+```bash
+jf livetv channel <channelId>
+```
+
+Output type: `item`
+
 ### livetv programs
 
 List Live TV programs.
@@ -2391,6 +2401,16 @@ jf livetv channels [--limit <number>] [--offset <number>]
 ```
 
 Output type: `items`
+
+### livetv channel
+
+Get a Live TV channel by ID.
+
+```bash
+jf livetv channel <channelId>
+```
+
+Output type: `item`
 
 ### livetv programs
 

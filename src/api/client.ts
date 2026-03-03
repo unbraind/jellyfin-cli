@@ -86,6 +86,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
   // Live TV
   async getLiveTvInfo() { return this.livetv.getLiveTvInfo(); }
   async getLiveTvChannels(params?: Parameters<LiveTvApi['getLiveTvChannels']>[0]) { return this.livetv.getLiveTvChannels(params); }
+  async getLiveTvChannel(channelId: string, userId?: string) { return this.livetv.getLiveTvChannel(channelId, userId); }
   async getLiveTvPrograms(params?: Parameters<LiveTvApi['getLiveTvPrograms']>[0]) { return this.livetv.getLiveTvPrograms(params); }
   async getLiveTvProgram(programId: string, userId?: string) { return this.livetv.getLiveTvProgram(programId, userId); }
   async getLiveTvRecordings(params?: Parameters<LiveTvApi['getLiveTvRecordings']>[0]) { return this.livetv.getLiveTvRecordings(params); }

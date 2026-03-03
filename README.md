@@ -330,6 +330,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 - `jf livetv info` - Get Live TV info
 - `jf livetv channels` - List channels
+- `jf livetv channel <channelId>` - Get channel by ID
 - `jf livetv programs` - List programs
 - `jf livetv program <programId>` - Get program by ID
 - `jf livetv recordings` - List recordings

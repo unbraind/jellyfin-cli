@@ -1056,6 +1056,16 @@ describe.skipIf(skip)('E2E livetv', () => {
     expect(out).toMatch(/^type: items/m);
   }, T);
 
+  it('livetv channel returns item type when channel id is available', async () => {
+    const channelsOut = await jf('livetv', 'channels', '--limit', '1');
+    const channelIdMatch = channelsOut.match(/id: ([^\n]+)/);
+    if (!channelIdMatch) return;
+
+    const channelId = channelIdMatch[1].trim();
+    const out = await jf('livetv', 'channel', channelId);
+    expect(out).toMatch(/^type: item/m);
+  }, T);
+
   it('livetv programs returns items type', async () => {
     const out = await jf('livetv', 'programs', '--limit', '3');
     expect(out).toMatch(/^type: items/m);

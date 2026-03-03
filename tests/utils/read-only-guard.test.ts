@@ -36,6 +36,8 @@ describe('read-only guard', () => {
   it('allows known read-only commands', () => {
     expect(isCommandBlockedInReadOnly('system info')).toBe(false);
     expect(isCommandBlockedInReadOnly('items list')).toBe(false);
+    expect(isCommandBlockedInReadOnly('quickconnect check')).toBe(false);
+    expect(isCommandBlockedInReadOnly('livetv channel')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup status')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup startup')).toBe(false);
   });

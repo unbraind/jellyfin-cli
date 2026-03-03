@@ -37,6 +37,12 @@ export class LiveTvApi extends ApiClientBase {
     return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Channels', { ...params, userId });
   }
 
+  async getLiveTvChannel(channelId: string, userId?: string): Promise<BaseItemDto> {
+    return this.request<BaseItemDto>('GET', `/LiveTv/Channels/${channelId}`, {
+      userId: userId ?? this.userId,
+    });
+  }
+
   async getLiveTvPrograms(params?: { channelId?: string; userId?: string; startIndex?: number; limit?: number; minStartDate?: string; maxStartDate?: string; hasAired?: boolean }): Promise<QueryResult<BaseItemDto>> {
     const userId = params?.userId ?? this.userId;
     return this.request<QueryResult<BaseItemDto>>('GET', '/LiveTv/Programs', { ...params, userId });

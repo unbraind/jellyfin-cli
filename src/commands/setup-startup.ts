@@ -51,6 +51,8 @@ export function attachSetupStartupSubcommand(cmd: Command): void {
           formatOutput(
             {
               server_url: config.serverUrl,
+              startup_complete_state:
+                startupComplete === null ? 'unknown' : startupComplete ? 'complete' : 'required',
               startup_complete: startupComplete,
               setup_wizard_required: startupComplete === null ? null : !startupComplete,
               configuration: {
