@@ -6,7 +6,8 @@
   "main": "dist/index.js",
   "bin": {
     "jellyfin-cli": "./dist/cli.js",
-    "jf": "./dist/cli.js"
+    "jf": "./dist/cli.js",
+    "jf-cli": "./dist/cli.js"
   },
   "scripts": {
     "build": "bun build src/cli.ts --outdir dist --target node",
@@ -19,6 +20,9 @@
     "lint:fix": "eslint src tests --ext .ts --fix",
     "lint:cache": "eslint src tests --ext .ts --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
+    "check:file-length": "bun run scripts/check-file-length.ts",
+    "check:secrets": "bun run scripts/check-secrets.ts",
+    "validate:release": "bun run typecheck && bun run lint && bun run test && bun run build && bun run check:file-length && bun run check:secrets",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build"
   },

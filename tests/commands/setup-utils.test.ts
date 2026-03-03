@@ -1,0 +1,31 @@
+import { describe, expect, it } from 'vitest';
+import {
+  isValidServerUrl,
+  maskSecret,
+  quoteShellValue,
+  sanitizeServerAddress,
+} from '../../src/commands/setup-utils.js';
+
+describe('setup-utils', () => {
+  it('validates http/https server URLs', () => {
+    expect(isValidServerUrl('http://localhost:8096')).toBe(true);
+    expect(isValidServerUrl('https://jellyfin.local')).toBe(true);
+    expect(isValidServerUrl('ftp://example.com')).toBe(false);
+  });
+
+  it('masks secret values', () => {
+    expect(maskSecret('abcdef123456')).toBe('abcd...56');
+    expect(maskSecret('short')).toBe('********');
+  });
+
+  it('quotes shell values safely', () => {
+    expect(quoteShellValue("abc'def")).toBe("'abc'\\''def'");
+  });
+
+  it('sanitizes duplicated protocol prefixes', () => {
+    expect(sanitizeServerAddress('http://http://192.168.1.10:8096')).toBe('http://192.168.1.10:8096');
+    expect(sanitizeServerAddress('https://https://example.com')).toBe('https://example.com');
+    expect(sanitizeServerAddress('http://192.168.1.10:8096')).toBe('http://192.168.1.10:8096');
+    expect(sanitizeServerAddress(undefined)).toBeUndefined();
+  });
+});

@@ -7,7 +7,12 @@ import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
 import { toon } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
 import { isOutputFormat, outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
-import { isValidServerUrl, maskSecret, quoteShellValue } from './setup-utils.js';
+import {
+  isValidServerUrl,
+  maskSecret,
+  quoteShellValue,
+  sanitizeServerAddress,
+} from './setup-utils.js';
 import chalk from 'chalk';
 
 class MutedOutput extends Writable {
@@ -129,7 +134,7 @@ export function createSetupCommand(): Command {
             server_name: publicInfo.ServerName,
             version: publicInfo.Version,
             server_id: publicInfo.Id,
-            local_address: publicInfo.LocalAddress,
+            local_address: sanitizeServerAddress(publicInfo.LocalAddress),
           }, 'setup_server_detected'));
         }
       } catch (err) {

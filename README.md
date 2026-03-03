@@ -20,6 +20,8 @@ bun install
 bun run build
 ```
 
+Installed executable names: `jf`, `jellyfin-cli`, and `jf-cli`.
+
 ## Quick Start
 
 ```bash
@@ -57,6 +59,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Bun-Powered**: Fast package management and builds with Bun
 - **Setup Wizard**: Interactive configuration wizard
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
+- **Release Guardrails**: built-in file length + secret scanning checks for safe releases
 - **Plugin Management**: List, configure, and manage plugins
 - **Device Management**: View and manage connected devices
 - **Statistics**: View library statistics and item counts
@@ -158,6 +161,14 @@ jf system info --format raw
 - `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
+
+## Release Validation
+
+```bash
+bun run validate:release
+```
+
+This runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
 
 ### System
 

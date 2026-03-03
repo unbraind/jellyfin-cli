@@ -16,3 +16,10 @@ export function maskSecret(value?: string): string | undefined {
 export function quoteShellValue(value: string): string {
   return `'${value.replace(/'/g, `'\\''`)}'`;
 }
+
+export function sanitizeServerAddress(address?: string | null): string | undefined {
+  if (!address) {
+    return undefined;
+  }
+  return address.replace(/^(https?:\/\/)(https?:\/\/)/i, '$2');
+}
