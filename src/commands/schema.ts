@@ -1,6 +1,9 @@
 import { Command } from 'commander';
-import { toon } from '../formatters/index.js';
+import { formatOutput, toon } from '../formatters/index.js';
 import { getSchema, getAvailableTypes } from './schema-defs.js';
+import { getConfig } from '../utils/config.js';
+import { fetchOpenApiDocument, summarizeOpenApi } from '../utils/openapi.js';
+import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
 
 const formatToon = toon.formatToon;
 
@@ -34,6 +37,66 @@ export function createSchemaCommand(): Command {
         types: getAvailableTypes(),
         count: getAvailableTypes().length,
       }, 'output_types'));
+    });
+
+  cmd
+    .command('openapi')
+    .description('Fetch and summarize Jellyfin OpenAPI document from configured server')
+    .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
+    .option('--name <name>', 'Server name')
+    .option('--include-paths', 'Include a sorted operation list')
+    .option('--limit <number>', 'Path operation list limit', '50')
+    .action(async (options) => {
+      if (!isOutputFormat(options.format)) {
+        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
+        process.exit(1);
+      }
+
+      const outputFormat = parseOutputFormat(options.format, 'toon');
+      const limit = parseInt(options.limit, 10);
+      if (!Number.isFinite(limit) || limit <= 0) {
+        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      const config = getConfig(options.name);
+      if (!config.serverUrl) {
+        console.error(formatOutput({ error: 'No server URL configured' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      try {
+        const result = await fetchOpenApiDocument(config);
+        const summary = summarizeOpenApi(result.document);
+        const data: Record<string, unknown> = {
+          source_path: result.sourcePath,
+          server_url: config.serverUrl,
+          server_version: summary.serverVersion,
+          path_count: summary.pathCount,
+          operation_count: summary.operationCount,
+          top_tags: summary.topTags ?? [],
+        };
+
+        if (options.includePaths) {
+          const paths = result.document.paths ?? {};
+          const operations = Object.entries(paths)
+            .flatMap(([path, pathItem]) =>
+              Object.keys(pathItem ?? {})
+                .filter((method) => ['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace'].includes(method.toLowerCase()))
+                .map((method) => `${method.toUpperCase()} ${path}`),
+            )
+            .sort()
+            .slice(0, limit);
+          data.operations = operations;
+          data.operations_truncated = operations.length === limit;
+        }
+
+        console.log(formatOutput(data, outputFormat, 'openapi_summary'));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'OpenAPI fetch failed';
+        console.error(formatOutput({ error: message }, outputFormat, 'error'));
+        process.exit(1);
+      }
     });
 
   return cmd;

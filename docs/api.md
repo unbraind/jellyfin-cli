@@ -2867,6 +2867,16 @@ jf schema <type>
 
 Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `item`, `sessions`, `session`, `libraries`, `tasks`, `search_result`, `plugins`, `config`
 
+### schema openapi
+
+Fetch and summarize the live Jellyfin OpenAPI document from your configured server.
+
+```bash
+jf schema openapi [--name <name>] [--include-paths] [--limit <number>] [--format <format>]
+```
+
+Output type: `openapi_summary`
+
 ---
 
 ## auth

@@ -34,12 +34,22 @@ This runs:
 ## 3) Run live read-only CLI E2E checks
 
 ```bash
+export JELLYFIN_READ_ONLY=1
 bun test tests/e2e/cli.test.ts
 ```
 
 The E2E suite is read-only and is designed to avoid mutating media library data.
 
-## 4) Verify executable names
+## 4) Run discovery diagnostics against live server
+
+```bash
+jf config doctor
+jf schema openapi --include-paths --limit 25
+```
+
+Both commands are read-only and provide machine-parseable discovery output for agent workflows.
+
+## 5) Verify executable names
 
 Installed binaries:
 
@@ -47,7 +57,7 @@ Installed binaries:
 - `jellyfin-cli`
 - `jf-cli`
 
-## 5) Final git hygiene
+## 6) Final git hygiene
 
 ```bash
 git status

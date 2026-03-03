@@ -2,6 +2,12 @@
 
 import { Command } from 'commander';
 import {
+  buildReadOnlyError,
+  getCommandPath,
+  isCommandBlockedInReadOnly,
+  isReadOnlyModeEnabled,
+} from './utils/read-only-guard.js';
+import {
   createConfigCommand,
   createSystemCommand,
   createUsersCommand,
@@ -65,7 +71,24 @@ program
   .description('Agent-optimized CLI tool for interacting with the Jellyfin API')
   .version(VERSION)
   .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
-  .option('-s, --server <name>', 'Server name from config');
+  .option('-s, --server <name>', 'Server name from config')
+  .option('--read-only', 'Block mutating commands (or set JELLYFIN_READ_ONLY=1)');
+
+program.hook('preAction', (thisCommand, actionCommand) => {
+  const readOnlyOption = thisCommand.optsWithGlobals().readOnly as unknown;
+  const readOnlyEnabled = isReadOnlyModeEnabled(readOnlyOption, process.env.JELLYFIN_READ_ONLY);
+  if (!readOnlyEnabled) {
+    return;
+  }
+
+  const commandPath = getCommandPath(actionCommand);
+  if (!isCommandBlockedInReadOnly(commandPath)) {
+    return;
+  }
+
+  console.error(buildReadOnlyError(commandPath));
+  process.exit(1);
+});
 
 program.addCommand(createSetupCommand());
 program.addCommand(createConfigCommand());

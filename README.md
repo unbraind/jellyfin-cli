@@ -37,6 +37,9 @@ jf config test
 # Run diagnostics (connectivity/auth/OpenAPI checks)
 jf config doctor
 
+# Enforce non-destructive mode for all following commands
+JELLYFIN_READ_ONLY=1
+
 # List libraries
 jf library list
 
@@ -59,6 +62,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Bun-Powered**: Fast package management and builds with Bun
 - **Setup Wizard**: Interactive configuration wizard
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
+- **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
 - **Release Guardrails**: built-in file length + secret scanning checks for safe releases
 - **Plugin Management**: List, configure, and manage plugins
 - **Device Management**: View and manage connected devices
@@ -80,6 +84,7 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_USER_ID` | User ID |
 | `JELLYFIN_TIMEOUT` | Request timeout (ms) |
 | `JELLYFIN_OUTPUT_FORMAT` | Output format (toon, json, table, raw, yaml, markdown) |
+| `JELLYFIN_READ_ONLY` | `1/true/on/yes` blocks mutating commands globally |
 
 ### Configuration File
 
@@ -161,6 +166,7 @@ jf system info --format raw
 - `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
+- `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
 
 ## Release Validation
 
@@ -169,6 +175,21 @@ bun run validate:release
 ```
 
 This runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
+
+## Read-Only Mode
+
+Use read-only mode for safe agent workflows against production libraries:
+
+```bash
+# one command
+jf --read-only items list --limit 5
+
+# entire shell session
+export JELLYFIN_READ_ONLY=1
+jf library list
+```
+
+Mutating operations are blocked with a structured Toon error while read operations continue to work.
 
 ### System
 
@@ -449,6 +470,7 @@ This runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=3
 - `jf schema` - Output JSON schema for all Toon format types
 - `jf schema <type>` - Output JSON schema for a specific type
 - `jf schema list` - List all available output types
+- `jf schema openapi [--include-paths --limit 50]` - Fetch and summarize server OpenAPI
 
 ## Agent/LLM Optimization
 

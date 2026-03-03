@@ -48,6 +48,12 @@ jf config test
 # Run diagnostics (safe checks only)
 jf config doctor
 
+# Inspect live OpenAPI surface for agent planning
+jf schema openapi --include-paths --limit 25
+
+# Optional: enforce non-destructive command execution
+export JELLYFIN_READ_ONLY=1
+
 # Export config as environment variables (masked by default)
 jf setup env --shell
 
@@ -167,6 +173,7 @@ Notes:
 | `jf config reset` | Reset all configuration |
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
+| `jf schema openapi` | Fetch and summarize live OpenAPI paths/operations/tags |
 
 ### System Administration
 

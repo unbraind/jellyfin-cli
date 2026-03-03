@@ -38,8 +38,14 @@ To avoid modifying media library state during validation:
 - `tests/e2e/cli.test.ts` now reads `~/.jellyfin-cli/settings.json` when env vars are not set.
 - This keeps secrets out of repository files while enabling reproducible local full CLI runs.
 
+3. `jf schema openapi`
+
+- New read-only API discovery command to fetch and summarize OpenAPI directly from the configured server.
+- Supports `--include-paths` and `--limit` for deterministic operation-list sampling.
+- Reuses centralized OpenAPI probing logic shared with `config doctor`.
+
 ## Recommended Next Enhancements
 
 1. Add `jf schema tools` to emit machine-readable command tool schemas for LLM function-calling.
 2. Add optional `--explain` mode to print resolved Jellyfin endpoint + query before execution.
-3. Add a read-only guard mode (`--read-only`) that blocks mutating commands at CLI level.
+3. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
