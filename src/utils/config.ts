@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { chmodSync, existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { JellyfinConfig } from '../types/index.js';
@@ -52,7 +52,13 @@ function readSettingsFile(): SettingsFile {
 
 function writeSettingsFile(settings: SettingsFile): void {
   ensureConfigDir();
-  writeFileSync(getSettingsFile(), JSON.stringify(settings, null, 2), 'utf-8');
+  const settingsPath = getSettingsFile();
+  writeFileSync(settingsPath, JSON.stringify(settings, null, 2), { encoding: 'utf-8', mode: 0o600 });
+  try {
+    chmodSync(settingsPath, 0o600);
+  } catch {
+    // Best-effort hardening (e.g. some filesystems/platforms may reject chmod).
+  }
 }
 
 export { writeSettingsFile };

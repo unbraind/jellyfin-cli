@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
+import { existsSync, rmSync, mkdirSync, writeFileSync, readFileSync, statSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -52,6 +52,17 @@ describe('config', () => {
     it('should create settings file', () => {
       saveConfig({ serverUrl: 'http://test:8096' });
       expect(existsSync(testSettingsFile)).toBe(true);
+    });
+
+    it('should write settings file with owner-only permissions when supported', () => {
+      saveConfig({ serverUrl: 'http://test:8096', apiKey: 'test-api-key' });
+      if (process.platform === 'win32') {
+        expect(existsSync(testSettingsFile)).toBe(true);
+        return;
+      }
+
+      const mode = statSync(testSettingsFile).mode & 0o777;
+      expect(mode).toBe(0o600);
     });
 
     it('should read settings file', () => {

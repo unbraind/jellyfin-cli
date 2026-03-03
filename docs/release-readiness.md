@@ -10,6 +10,8 @@ Store credentials only in env vars or in `~/.jellyfin-cli/settings.json`:
 jf setup --server http://your-jellyfin-host:8096 --api-key "$JELLYFIN_API_KEY"
 ```
 
+The CLI writes `settings.json` with owner-only permissions (`0600`) on supported platforms.
+
 You can inspect exported values without revealing secrets:
 
 ```bash

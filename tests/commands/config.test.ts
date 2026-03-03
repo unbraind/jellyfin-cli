@@ -100,5 +100,6 @@ describe('config doctor command', () => {
     expect(result.stdout).toContain('path_count: 2');
     expect(result.stdout).toContain('operation_count: 3');
     expect(result.stdout).toContain('server_local_address_looks_malformed');
+    expect(result.stdout).toContain('local_address: http://127.0.0.1:8096');
   });
 });

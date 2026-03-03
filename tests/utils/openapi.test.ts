@@ -140,6 +140,91 @@ describe('openapi utils', () => {
     expect(Object.keys(result.document.paths ?? {})).toContain('/System/Info/Public');
   });
 
+  it('throws when server URL is missing', async () => {
+    await expect(fetchOpenApiDocument({
+      serverUrl: '',
+    })).rejects.toThrow('Missing server URL');
+  });
+
+  it('throws for invalid openapi payload when no valid candidate is found', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      )
+      .mockResolvedValueOnce(new Response('Not Found', { status: 404 }))
+      .mockResolvedValueOnce(new Response('Not Found', { status: 404 }));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow('HTTP 404 at /swagger/v1/swagger.json');
+  });
+
+  it('returns empty list when intent has no meaningful tokens', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], summary: 'List users' },
+        },
+      },
+    });
+
+    expect(matchOperationsForCommandIntent(operations, ' /  - _ ')).toEqual([]);
+  });
+
+  it('matches command intent on tag and summary metadata', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/People/Search': {
+          get: { tags: ['Metadata'], summary: 'Lookup persons remotely', operationId: 'LookupPerson' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'metadata lookup');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.matchedOn).toEqual(expect.arrayContaining(['tag:metadata', 'meta:lookup']));
+  });
+
+  it('sorts command intent matches by score, then depth, then method/path', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Library': {
+          get: { tags: ['Library'], summary: 'List library entries', operationId: 'GetLibrary' },
+          post: { tags: ['Library'], summary: 'List library entries', operationId: 'PostLibrary' },
+        },
+        '/Library/Items': {
+          get: { tags: ['Library'], summary: 'List library entries', operationId: 'GetLibraryItems' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'library');
+    const methodsForLibrary = matches.filter((entry) => entry.path === '/Library').map((entry) => entry.method);
+    expect(matches[0]?.path).toBe('/Library');
+    expect(matches[1]?.path).toBe('/Library');
+    expect(methodsForLibrary).toEqual(['GET', 'POST']);
+  });
+
+  it('filters out operations when tag or search terms do not match', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], summary: 'List users' },
+        },
+      },
+    });
+
+    const noTagMatch = filterOpenApiOperations(operations, { tag: 'System' });
+    expect(noTagMatch).toEqual([]);
+
+    const noSearchMatch = filterOpenApiOperations(operations, { search: 'nonexistent-token' });
+    expect(noSearchMatch).toEqual([]);
+  });
+
   it('returns unavailable stats when no openapi endpoint is reachable', async () => {
     const fetchMock = vi.fn().mockRejectedValue(new Error('connection refused'));
     globalThis.fetch = fetchMock as unknown as typeof fetch;

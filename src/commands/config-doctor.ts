@@ -4,6 +4,7 @@ import { toon } from '../formatters/index.js';
 import { getConfig, getSettingsPath } from '../utils/config.js';
 import { getOpenApiStats } from '../utils/openapi.js';
 import type { JellyfinConfig } from '../types/index.js';
+import { sanitizeServerAddress } from './setup-utils.js';
 
 function detectAuthMode(config: JellyfinConfig): 'api_key' | 'username_password' | 'none' {
   if (config.apiKey) {
@@ -45,14 +46,14 @@ export function addConfigDoctorCommand(cmd: Command): void {
       let authOk = false;
       let serverName: string | null | undefined;
       let serverVersion: string | null | undefined;
-      let localAddress: string | null | undefined;
+      let localAddressRaw: string | null | undefined;
 
       try {
         const info = await client.getPublicSystemInfo();
         connectionOk = true;
         serverName = info.ServerName;
         serverVersion = info.Version;
-        localAddress = info.LocalAddress;
+        localAddressRaw = info.LocalAddress;
       } catch {
         connectionOk = false;
       }
@@ -69,7 +70,7 @@ export function addConfigDoctorCommand(cmd: Command): void {
         authOk = false;
       }
 
-      if (localAddress?.startsWith('http://http://') || localAddress?.startsWith('https://https://')) {
+      if (localAddressRaw?.startsWith('http://http://') || localAddressRaw?.startsWith('https://https://')) {
         warnings.push('server_local_address_looks_malformed');
       }
       if (!config.userId) {
@@ -99,7 +100,7 @@ export function addConfigDoctorCommand(cmd: Command): void {
             server: {
               name: serverName,
               version: serverVersion,
-              local_address: localAddress,
+              local_address: sanitizeServerAddress(localAddressRaw),
             },
             openapi: {
               source_path: openapi.sourcePath,

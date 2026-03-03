@@ -3,6 +3,7 @@
 ## Scope
 
 This document summarizes live API discovery work used to improve `jellyfin-cli` agent workflows without mutating server data.
+Latest verification run: **March 3, 2026** against Jellyfin **10.11.6**.
 
 ## Verified Discovery Endpoint
 
@@ -13,6 +14,7 @@ This document summarizes live API discovery work used to improve `jellyfin-cli` 
 
 - OpenAPI paths: `356`
 - OpenAPI operations (standard HTTP methods across all paths): `429`
+- Verified with: `jf schema openapi --method GET --for-command "items list" --limit 10`.
 
 ## Read-Only Validation Strategy
 
@@ -49,6 +51,11 @@ To avoid modifying media library state during validation:
 - New command-tree introspection command that exports tool schemas for every CLI leaf command.
 - Emits typed `input_schema` payloads for both positional args and options, including inherited global options.
 - Includes `read_only_safe` metadata per command to help agents select non-mutating tool calls.
+
+5. `jf config doctor` output normalization
+
+- `server.local_address` is now sanitized when Jellyfin returns malformed duplicated protocol values.
+- The warning (`server_local_address_looks_malformed`) is still emitted so agents can surface upstream server issues.
 
 ## Recommended Next Enhancements
 

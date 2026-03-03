@@ -90,6 +90,8 @@ chmod 600 ~/.jellyfin-cli/settings.json
 -rw------- 1 user user settings.json
 ```
 
+`jf setup` and `jf config set` now enforce owner-only permissions (`0600`) on `settings.json` as a best-effort hardening step.
+
 ## Network Security
 
 ### Use HTTPS
