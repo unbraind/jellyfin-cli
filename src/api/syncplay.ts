@@ -1,5 +1,5 @@
 import { ApiClientBase } from './base.js';
-import type { SyncPlayGroup, SyncPlayParticipant } from '../types/index.js';
+import type { SyncPlayGroup } from '../types/index.js';
 
 export class SyncPlayApi extends ApiClientBase {
   async createGroup(params?: { GroupName?: string }): Promise<void> {

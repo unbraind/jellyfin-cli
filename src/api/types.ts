@@ -1,5 +1,3 @@
-import type { BaseItemDto, QueryResult } from '../types/index.js';
-
 export function buildQueryString(params: Record<string, unknown>): string {
   const searchParams = new URLSearchParams();
   for (const [key, value] of Object.entries(params)) {

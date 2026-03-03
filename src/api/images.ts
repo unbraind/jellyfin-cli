@@ -33,7 +33,7 @@ export class ImagesApi extends ApiClientBase {
     await this.request<void>('DELETE', path);
   }
 
-  async uploadItemImage(itemId: string, imageType: string, imageData: Buffer | Blob, params?: { imageIndex?: number }): Promise<void> {
+  async uploadItemImage(itemId: string, imageType: string, imageData: Buffer | Blob, _params?: { imageIndex?: number }): Promise<void> {
     const formData = new FormData();
     formData.append('data', imageData);
     const response = await fetch(`${this.getBackendUrl()}/Items/${itemId}/Images`, {

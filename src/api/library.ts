@@ -2,7 +2,6 @@ import { ApiClientBase } from './base.js';
 import type {
   BaseItemDto,
   QueryResult,
-  LibraryVirtualFolder,
   VirtualFolderInfo,
   LibraryOptions,
   QueryFilters,

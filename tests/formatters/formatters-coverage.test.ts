@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { formatItems, formatItem, formatQueryResult, formatSearchResult, formatLibraries, formatActivityLog, formatLiveTvInfo } from '../../src/formatters/items.js';
-import { formatSessions, formatSession, formatTasks, formatTask, formatTaskTriggers } from '../../src/formatters/sessions.js';
+import { formatSessions, formatSession, formatTask, formatTaskTriggers } from '../../src/formatters/sessions.js';
 import { formatSystemInfo, formatUsers, formatUser, formatConfig, formatServers } from '../../src/formatters/system.js';
 
 describe('formatItems', () => {

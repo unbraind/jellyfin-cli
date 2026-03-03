@@ -1,5 +1,5 @@
 import type {
-  JellyfinConfig, UserDto, QueryResult, BaseItemDto, ItemsQueryParams, ScheduledTaskInfo,
+  JellyfinConfig, UserDto, QueryResult, BaseItemDto,
   PlaylistCreationResult, RecommendationDto, SimilarItemResult, PluginInfo, DeviceInfo,
   BrandingOptions, ServerConfiguration, ItemCounts, ApiKeyInfo, NotificationTypeInfo,
   NotificationResult, DisplayPreferences, VirtualFolderInfo, QueryFilters,

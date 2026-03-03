@@ -3,7 +3,6 @@ import type {
   LocalizationOption,
   CountryInfo,
   CultureDto,
-  EnvironmentInfo,
   BackupInfo,
 } from '../types/index.js';
 

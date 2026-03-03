@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
-import { JellyfinApiClient, JellyfinApiError } from '../../src/api/client.js';
+import { JellyfinApiClient } from '../../src/api/client.js';
 
 const mockFetch = vi.fn();
 global.fetch = mockFetch;

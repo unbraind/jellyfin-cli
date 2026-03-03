@@ -68,7 +68,7 @@ describe('JellyfinApiClient', () => {
     it('should make a GET request with correct headers', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse({ test: 'data' }));
 
-      const result = await client.getPublicSystemInfo();
+      await client.getPublicSystemInfo();
       expect(mockFetch).toHaveBeenCalledWith(
         'http://localhost:8096/System/Info/Public',
         expect.objectContaining({

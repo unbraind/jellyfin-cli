@@ -1,5 +1,5 @@
 import type {
-  JellyfinConfig, UserDto, SystemInfo, SessionInfo, QueryResult, SearchResult,
+  UserDto, SystemInfo, SessionInfo, QueryResult, SearchResult,
   BaseItemDto, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo,
   PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult,
 } from '../types/index.js';

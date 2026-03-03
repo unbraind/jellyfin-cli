@@ -25,28 +25,28 @@ describe('JellyfinApiClient Missing Lines', () => {
 
   it('should call getRepositories from client wrapper', async () => {
     const client = new JellyfinApiClient({ serverUrl: 'http://test' });
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     vi.spyOn(client.packages, 'getRepositories').mockResolvedValue([]);
     await client.getRepositories();
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     expect(client.packages.getRepositories).toHaveBeenCalled();
   });
 
   it('should call setRepositories from client wrapper', async () => {
     const client = new JellyfinApiClient({ serverUrl: 'http://test' });
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     vi.spyOn(client.packages, 'setRepositories').mockResolvedValue();
     await client.setRepositories([]);
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     expect(client.packages.setRepositories).toHaveBeenCalledWith([]);
   });
 
   it('should call getInstallingPackages from client wrapper', async () => {
     const client = new JellyfinApiClient({ serverUrl: 'http://test' });
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     vi.spyOn(client.packages, 'getInstallingPackages').mockResolvedValue([]);
     await client.getInstallingPackages();
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     expect(client.packages.getInstallingPackages).toHaveBeenCalled();
   });
 
@@ -78,10 +78,10 @@ describe('JellyfinApiClient Missing Lines', () => {
 
   it('should call getItemsByPath', async () => {
     const client = new JellyfinApiClient({ serverUrl: 'http://test' });
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     vi.spyOn(client, 'request').mockResolvedValue([]);
     await client.getItemsByPath('/test/path');
-    // @ts-ignore
+    // @ts-expect-error - mocking private property or method
     expect(client.request).toHaveBeenCalledWith('GET', '/Items/ByPath', { path: '/test/path' });
   });
 });

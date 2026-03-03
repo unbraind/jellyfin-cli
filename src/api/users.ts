@@ -1,5 +1,4 @@
 import { ApiClientBase } from './base.js';
-import { JellyfinApiError } from './types.js';
 import type {
   UserDto,
   UserPolicy,
