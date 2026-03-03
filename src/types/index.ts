@@ -52,7 +52,9 @@ export type {
   UserView,
   UserViewGroupingOption,
   UtcTimeResponse,
+} from './extended.js';
+export type {
   AddVirtualFolderParams,
   AddMediaPathParams,
   UpdateMediaPathParams,
-} from './extended.js';
+} from './library-admin.js';

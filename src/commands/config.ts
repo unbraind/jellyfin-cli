@@ -2,7 +2,7 @@ import { Command } from 'commander';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, deleteServer, writeSettingsFile } from '../utils/config.js';
 import { formatSuccess, formatError, toon } from '../formatters/index.js';
-import type { OutputFormat } from '../types/index.js';
+import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { promptGithubStar } from '../utils/github-star.js';
 
 export function createConfigCommand(): Command {
@@ -17,13 +17,16 @@ export function createConfigCommand(): Command {
     .option('-u, --username <username>', 'Username')
     .option('-p, --password <password>', 'Password')
     .option('--user-id <id>', 'User ID')
-    .option('-o, --output-format <format>', 'Default output format (toon, json, table, raw)')
+    .option('-o, --output-format <format>', `Default output format (${outputFormatChoices()})`)
     .option('--timeout <ms>', 'Request timeout in milliseconds')
     .option('--name <name>', 'Server name for this config')
     .option('--default', 'Set as default server')
     .action(async (options) => {
       const config = getConfig(options.name);
       const format = config.outputFormat ?? 'toon';
+      const providedTimeout = options.timeout ? parseInt(options.timeout, 10) : undefined;
+      const timeout = providedTimeout ?? config.timeout;
+      const outputFormat = parseOutputFormat(options.outputFormat, config.outputFormat ?? 'toon');
 
       if (!options.server && !options.apiKey && !options.username && !options.password && !options.userId && !options.outputFormat && !options.timeout) {
         console.error(formatError('No configuration values provided', format));
@@ -36,12 +39,23 @@ export function createConfigCommand(): Command {
         username: options.username ?? config.username,
         password: options.password ?? config.password,
         userId: options.userId ?? config.userId,
-        outputFormat: (options.outputFormat as OutputFormat) ?? config.outputFormat,
-        timeout: options.timeout ? parseInt(options.timeout, 10) : config.timeout,
+        outputFormat,
+        timeout,
       };
 
       if (!newConfig.serverUrl) {
         console.error(formatError('Server URL is required', format));
+        process.exit(1);
+      }
+      if (options.outputFormat && outputFormat !== options.outputFormat) {
+        console.error(formatError(`Invalid output format: ${options.outputFormat}. Use one of: ${outputFormatChoices()}`, format));
+        process.exit(1);
+      }
+      if (
+        options.timeout &&
+        (providedTimeout === undefined || !Number.isFinite(providedTimeout) || providedTimeout <= 0)
+      ) {
+        console.error(formatError('Timeout must be a positive integer', format));
         process.exit(1);
       }
 

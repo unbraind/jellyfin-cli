@@ -94,6 +94,16 @@ describe('config', () => {
       expect(getConfig().outputFormat).toBe('json');
     });
 
+    it('should read yaml output format from env', () => {
+      process.env.JELLYFIN_OUTPUT_FORMAT = 'yaml';
+      expect(getConfig().outputFormat).toBe('yaml');
+    });
+
+    it('should read markdown output format from env', () => {
+      process.env.JELLYFIN_OUTPUT_FORMAT = 'markdown';
+      expect(getConfig().outputFormat).toBe('markdown');
+    });
+
     it('should handle invalid output format from env', () => {
       process.env.JELLYFIN_OUTPUT_FORMAT = 'invalid';
       expect(getConfig().outputFormat).toBe('toon'); // default fallback

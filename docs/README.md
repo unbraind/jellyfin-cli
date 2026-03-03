@@ -66,7 +66,7 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_PASSWORD` | Password for authentication |
 | `JELLYFIN_USER_ID` | User ID |
 | `JELLYFIN_TIMEOUT` | Request timeout (ms) |
-| `JELLYFIN_OUTPUT_FORMAT` | Output format (toon, json, table, raw) |
+| `JELLYFIN_OUTPUT_FORMAT` | Output format (`toon`, `json`, `table`, `raw`, `yaml`, `markdown`) |
 
 ### Configuration File
 
@@ -111,13 +111,33 @@ The CLI supports multiple output formats:
 | `json` | Standard JSON output | Programmatic processing |
 | `table` | Human-readable table | Interactive use |
 | `raw` | Raw API response | Debugging |
+| `yaml` | Standard YAML output | YAML-native tooling |
+| `markdown` | Markdown tables/text | Human-readable reports |
 
 ```bash
 # Use different formats
 jf users list --format json
 jf library list --format table
 jf system info --format raw
+jf users list --format yaml
+jf items list --format markdown
 ```
+
+## Read-Only Live E2E Testing
+
+Use the existing live E2E suite in `tests/e2e/cli.test.ts` for full command smoke validation against a real server.
+
+```bash
+JELLYFIN_SERVER_URL=http://<host>:8096 \
+JELLYFIN_API_KEY=<api-key> \
+JELLYFIN_USER_ID=<user-id> \
+bun test tests/e2e/cli.test.ts
+```
+
+Notes:
+- Tests are designed to be read-only for safety.
+- Write endpoints are validated via `--help` checks or skipped patterns.
+- If the server is unavailable, the suite auto-skips.
 
 ## Command Categories
 

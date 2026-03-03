@@ -1,32 +1,46 @@
 import { Command } from 'commander';
 import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
+import { Writable } from 'node:stream';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
 import { toon } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
+import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import chalk from 'chalk';
 
+class MutedOutput extends Writable {
+  private muted = false;
+
+  public setMuted(state: boolean): void {
+    this.muted = state;
+  }
+
+  public override _write(
+    chunk: string | Uint8Array,
+    encoding: BufferEncoding,
+    callback: (error?: Error | null) => void,
+  ): void {
+    if (!this.muted) {
+      output.write(chunk, encoding);
+    }
+    callback();
+  }
+}
+
 async function prompt(question: string, hidden = false): Promise<string> {
-  const rl = readline.createInterface({ input, output });
   if (hidden) {
-    // Mute output for password (basic implementation)
-    let isMuted = false;
-    // @ts-expect-error - hacking the output stream for simple hidden input
-    const originalWrite = rl.output.write.bind(rl.output);
-    // @ts-expect-error - hacking the output stream for simple hidden input
-    rl.output.write = (data: string | Buffer, ...args: unknown[]) => {
-      if (!isMuted) return originalWrite(data, ...args);
-      return true;
-    };
+    const hiddenOutput = new MutedOutput();
+    const rl = readline.createInterface({ input, output: hiddenOutput });
     process.stdout.write(question);
-    isMuted = true;
+    hiddenOutput.setMuted(true);
     const answer = await rl.question('');
-    isMuted = false;
+    hiddenOutput.setMuted(false);
     process.stdout.write('\n');
     rl.close();
     return answer;
   } else {
+    const rl = readline.createInterface({ input, output });
     const answer = await rl.question(question);
     rl.close();
     return answer;
@@ -45,9 +59,16 @@ export function createSetupCommand(): Command {
     .option('--name <name>', 'Server name for this config')
     .option('--default', 'Set as default server')
     .option('-f, --format <format>', 'Output format')
+    .option('-o, --output-format <format>', `Persist default output format (${outputFormatChoices()})`)
+    .option('--timeout <ms>', 'Persist request timeout in milliseconds')
     .option('--non-interactive', 'Do not prompt for missing values')
     .action(async (options) => {
       const existingConfig = getConfig(options.name);
+      const outputFormat = parseOutputFormat(
+        options.outputFormat,
+        existingConfig.outputFormat ?? 'toon',
+      );
+      const timeout = options.timeout ? parseInt(options.timeout, 10) : existingConfig.timeout ?? 30000;
       let serverUrl = options.server ?? existingConfig.serverUrl;
       let apiKey = options.apiKey ?? existingConfig.apiKey;
       let username = options.username ?? existingConfig.username;
@@ -63,6 +84,14 @@ export function createSetupCommand(): Command {
 
       if (!serverUrl) {
         console.error(toon.formatError('Server URL is required. Use --server <url> or set JELLYFIN_SERVER_URL'));
+        process.exit(1);
+      }
+      if (options.outputFormat && outputFormat !== options.outputFormat) {
+        console.error(toon.formatError(`Invalid output format: ${options.outputFormat}. Use one of: ${outputFormatChoices()}`));
+        process.exit(1);
+      }
+      if (options.timeout && (!Number.isFinite(timeout) || timeout <= 0)) {
+        console.error(toon.formatError('Timeout must be a positive integer.'));
         process.exit(1);
       }
 
@@ -122,9 +151,14 @@ export function createSetupCommand(): Command {
       try {
         const users = await testClient.getUsers();
         if (!userId && users.length > 0) {
+          const matchedUser = username
+            ? users.find((u) => u.Name?.toLowerCase() === username.toLowerCase())
+            : undefined;
           const adminUser = users.find((u) => u.Policy?.IsAdministrator);
-          userId = adminUser?.Id ?? users[0]?.Id ?? undefined;
-          username = adminUser?.Name ?? users[0]?.Name ?? username;
+          userId = matchedUser?.Id ?? adminUser?.Id ?? users[0]?.Id ?? undefined;
+          if (!username) {
+            username = matchedUser?.Name ?? adminUser?.Name ?? users[0]?.Name ?? username;
+          }
         }
 
         const newConfig = {
@@ -133,8 +167,8 @@ export function createSetupCommand(): Command {
           username,
           password,
           userId,
-          outputFormat: existingConfig.outputFormat ?? 'toon',
-          timeout: existingConfig.timeout ?? 30000,
+          outputFormat,
+          timeout,
         };
 
         saveConfig(newConfig, options.name, options.default);

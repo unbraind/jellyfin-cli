@@ -16,6 +16,9 @@ settings.json
 *.api-keys.json
 ```
 
+Credentials for this CLI are expected in `~/.jellyfin-cli/settings.json` and/or environment variables.
+Never place real credentials in repository files.
+
 ### API Keys vs Passwords
 
 | Method | Security Level | Best For |
@@ -60,6 +63,14 @@ echo "Using key: $JELLYFIN_API_KEY"
 if [ -z "$JELLYFIN_API_KEY" ]; then
   echo "API key not set"
 fi
+```
+
+Before commit/push, verify no secrets are tracked:
+
+```bash
+git status --short
+git diff --cached
+git grep -n "JELLYFIN_API_KEY\\|JELLYFIN_PASSWORD\\|192\\.168\\." .
 ```
 
 ### Configuration File Security

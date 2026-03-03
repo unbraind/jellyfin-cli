@@ -1,8 +1,19 @@
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
+import { toon } from '../formatters/index.js';
+import { formatOutput } from '../formatters/index.js';
+import type {
+  BaseItemDto,
+  JellyfinConfig,
+  LibraryVirtualFolder,
+  OutputFormat,
+  ScheduledTaskInfo,
+  SearchResult,
+  SessionInfo,
+  SystemInfo,
+  UserDto,
+} from '../types/index.js';
 import { getConfig } from '../utils/config.js';
-import { formatOutput, formatError as formatErr } from '../formatters/index.js';
-import type { OutputFormat } from '../types/index.js';
-import type { UserDto, BaseItemDto, SessionInfo, LibraryVirtualFolder, ScheduledTaskInfo, SystemInfo, JellyfinConfig } from '../types/index.js';
+import { parseOutputFormat } from '../utils/output-format.js';
 
 interface ClientResult {
   client: JellyfinApiClient;
@@ -12,7 +23,7 @@ interface ClientResult {
 
 export async function createApiClient(options: { format?: string; server?: string }): Promise<ClientResult> {
   const config = getConfig(options.server);
-  const format = (options.format as OutputFormat) ?? config.outputFormat ?? 'toon';
+  const format = parseOutputFormat(options.format, config.outputFormat ?? 'toon');
 
   if (!config.serverUrl) {
     console.error('No server URL configured. Use: jf config set --server <url>');
@@ -20,7 +31,9 @@ export async function createApiClient(options: { format?: string; server?: strin
   }
 
   if (!config.apiKey && !config.username) {
-    console.error('No API key or username configured. Use: jf config set --api-key <key> or --username <user>');
+    console.error(
+      'No API key or username configured. Use: jf config set --api-key <key> or --username <user>',
+    );
     process.exit(1);
   }
 
@@ -43,7 +56,7 @@ export async function createApiClient(options: { format?: string; server?: strin
         client.setUserId(userId);
       }
     } catch {
-      // Ignore errors when fetching users
+      // Ignore errors when fetching users.
     }
   }
 
@@ -67,103 +80,101 @@ function formatError(error: string, format: OutputFormat, code?: number, details
   if (format === 'raw') {
     return `Error: ${error}`;
   }
-  return `type: error
-data:
-  error: ${error}${code ? `\n  code: ${code}` : ''}${details ? `\n  details: ${JSON.stringify(details)}` : ''}
-  success: false`;
+  return `type: error\ndata:\n  error: ${error}${code ? `\n  code: ${code}` : ''}${details ? `\n  details: ${JSON.stringify(details)}` : ''}\n  success: false`;
 }
 
 export function output(data: unknown, format: OutputFormat, typeHint?: string): void {
   console.log(formatOutput(data, format, typeHint));
 }
 
-import { toon } from '../formatters/index.js';
-
-export function formatUsers(users: unknown[], format: OutputFormat): string {
+export function formatUsers(users: UserDto[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatUsers(users);
   }
   return formatOutput(users, format, 'users');
 }
 
-export function formatUser(user: unknown, format: OutputFormat): string {
+export function formatUser(user: UserDto, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatUser(user);
   }
   return formatOutput(user, format, 'user');
 }
 
-export function formatItems(items: unknown, format: OutputFormat): string {
+export function formatItems(items: BaseItemDto[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatItems(items);
   }
   return formatOutput(items, format, 'items');
 }
 
-export function formatItem(item: unknown, format: OutputFormat): string {
+export function formatItem(item: BaseItemDto, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatItem(item);
   }
   return formatOutput(item, format, 'item');
 }
 
-export function formatSessions(sessions: unknown[], format: OutputFormat): string {
+export function formatSessions(sessions: SessionInfo[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSessions(sessions);
   }
   return formatOutput(sessions, format, 'sessions');
 }
 
-export function formatSession(session: unknown, format: OutputFormat): string {
+export function formatSession(session: SessionInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSession(session);
   }
   return formatOutput(session, format, 'session');
 }
 
-export function formatLibraries(libraries: unknown[], format: OutputFormat): string {
+export function formatLibraries(libraries: LibraryVirtualFolder[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatLibraries(libraries);
   }
   return formatOutput(libraries, format, 'libraries');
 }
 
-export function formatTasks(tasks: unknown[], format: OutputFormat): string {
+export function formatTasks(tasks: ScheduledTaskInfo[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatTasks(tasks);
   }
   return formatOutput(tasks, format, 'tasks');
 }
 
-export function formatTask(task: unknown, format: OutputFormat): string {
+export function formatTask(task: ScheduledTaskInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatTask(task);
   }
   return formatOutput(task, format, 'task');
 }
 
-export function formatSystemInfo(info: unknown, format: OutputFormat): string {
+export function formatSystemInfo(info: SystemInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSystemInfo(info);
   }
   return formatOutput(info, format, 'system_info');
 }
 
-export function formatConfig(config: unknown, format: OutputFormat): string {
+export function formatConfig(config: JellyfinConfig, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatConfig(config);
   }
   return formatOutput(config, format, 'config');
 }
 
-export function formatServers(servers: unknown[], format: OutputFormat): string {
+export function formatServers(
+  servers: { name: string; config: JellyfinConfig; isDefault: boolean }[],
+  format: OutputFormat,
+): string {
   if (format === 'toon') {
     return toon.formatServers(servers);
   }
   return formatOutput(servers, format, 'servers');
 }
 
-export function formatSearchResult(result: unknown, format: OutputFormat): string {
+export function formatSearchResult(result: SearchResult, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSearchResult(result);
   }

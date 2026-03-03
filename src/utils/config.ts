@@ -1,7 +1,8 @@
 import { existsSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
-import type { JellyfinConfig, OutputFormat } from '../types/index.js';
+import type { JellyfinConfig } from '../types/index.js';
+import { parseOutputFormat } from './output-format.js';
 
 function getConfigDir(): string {
   return process.env.JELLYFIN_CONFIG_DIR || join(homedir(), '.jellyfin-cli');
@@ -81,10 +82,7 @@ function getEnvConfig(): Partial<JellyfinConfig> {
     }
   }
   if (process.env[ENV_KEYS.OUTPUT_FORMAT]) {
-    const format = process.env[ENV_KEYS.OUTPUT_FORMAT] as OutputFormat;
-    if (['toon', 'json', 'table', 'raw'].includes(format)) {
-      config.outputFormat = format;
-    }
+    config.outputFormat = parseOutputFormat(process.env[ENV_KEYS.OUTPUT_FORMAT]);
   }
   
   return config;
