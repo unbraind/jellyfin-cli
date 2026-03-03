@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -101,5 +101,43 @@ describe('config doctor command', () => {
     expect(result.stdout).toContain('operation_count: 3');
     expect(result.stdout).toContain('server_local_address_looks_malformed');
     expect(result.stdout).toContain('local_address: http://127.0.0.1:8096');
+  });
+});
+
+describe('config set command', () => {
+  it('updates active named server when --name is omitted', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: 'http://default.local:8096',
+          apiKey: 'default-key',
+          timeout: 30000,
+          outputFormat: 'toon',
+        },
+        servers: {
+          local: {
+            serverUrl: 'http://local.local:8096',
+            apiKey: 'local-key',
+            timeout: 30000,
+            outputFormat: 'toon',
+          },
+        },
+        currentServer: 'local',
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['config', 'set', '--timeout', '90000']);
+    expect(result.code).toBe(0);
+
+    const settings = JSON.parse(readFileSync(join(testConfigDir, 'settings.json'), 'utf-8')) as {
+      defaultServer?: { timeout?: number };
+      servers?: Record<string, { timeout?: number }>;
+    };
+
+    expect(settings.servers?.local?.timeout).toBe(90000);
+    expect(settings.defaultServer?.timeout).toBe(30000);
   });
 });

@@ -52,6 +52,7 @@ const API_KEY = process.env.JELLYFIN_API_KEY ?? fileAuth.apiKey ?? '';
 const USER_ID = process.env.JELLYFIN_USER_ID ?? fileAuth.userId ?? '';
 
 const HAS_AUTH = Boolean(SERVER_URL && API_KEY && USER_ID);
+const LIVE_E2E_TIMEOUT_MS = process.env.JELLYFIN_TIMEOUT ?? '120000';
 
 // Determine which CLI runner to use (compiled binary is faster).
 const DIST_BIN = new URL('../../dist/cli.js', import.meta.url).pathname;
@@ -95,6 +96,7 @@ async function jf(...args: string[]): Promise<string> {
       JELLYFIN_SERVER_URL: SERVER_URL,
       JELLYFIN_API_KEY: API_KEY,
       JELLYFIN_USER_ID: USER_ID,
+      JELLYFIN_TIMEOUT: LIVE_E2E_TIMEOUT_MS,
     },
     stdout: 'pipe',
     stderr: 'pipe',
@@ -121,6 +123,7 @@ async function runJfWithCode(
       JELLYFIN_SERVER_URL: SERVER_URL,
       JELLYFIN_API_KEY: API_KEY,
       JELLYFIN_USER_ID: USER_ID,
+      JELLYFIN_TIMEOUT: LIVE_E2E_TIMEOUT_MS,
       ...extraEnv,
     },
     stdout: 'pipe',

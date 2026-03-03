@@ -21,6 +21,7 @@ Latest verification run: **March 3, 2026** against Jellyfin **10.11.6**.
 To avoid modifying media library state during validation:
 
 - Live E2E tests execute read-only commands directly.
+- Live E2E tests now force `JELLYFIN_TIMEOUT=120000` during execution to reduce aborts on large libraries.
 - Commands that are write-capable are validated via `--help` checks in E2E where appropriate.
 - Health/auth/schema checks are now available via `jf config doctor`.
 

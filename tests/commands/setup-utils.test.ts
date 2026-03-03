@@ -3,6 +3,7 @@ import {
   isValidServerUrl,
   maskSecret,
   quoteShellValue,
+  resolveSetupSaveServerName,
   sanitizeServerAddress,
 } from '../../src/commands/setup-utils.js';
 
@@ -27,5 +28,16 @@ describe('setup-utils', () => {
     expect(sanitizeServerAddress('https://https://example.com')).toBe('https://example.com');
     expect(sanitizeServerAddress('http://192.168.1.10:8096')).toBe('http://192.168.1.10:8096');
     expect(sanitizeServerAddress(undefined)).toBeUndefined();
+  });
+
+  it('resolves setup save target server name', () => {
+    expect(resolveSetupSaveServerName('prod', [])).toBe('prod');
+    expect(resolveSetupSaveServerName(undefined, [
+      { name: 'default', isDefault: true },
+    ])).toBeUndefined();
+    expect(resolveSetupSaveServerName(undefined, [
+      { name: 'default', isDefault: false },
+      { name: 'local', isDefault: true },
+    ])).toBe('local');
   });
 });

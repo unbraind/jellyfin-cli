@@ -37,6 +37,7 @@ This runs:
 
 ```bash
 export JELLYFIN_READ_ONLY=1
+export JELLYFIN_TIMEOUT=120000
 bun test tests/e2e/cli.test.ts
 ```
 

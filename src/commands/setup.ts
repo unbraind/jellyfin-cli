@@ -3,7 +3,7 @@ import * as readline from 'node:readline/promises';
 import { stdin as input, stdout as output } from 'node:process';
 import { Writable } from 'node:stream';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
-import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
+import { saveConfig, getConfig, getSettingsPath, listServers } from '../utils/config.js';
 import { toon } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
 import { isOutputFormat, outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
@@ -12,6 +12,7 @@ import {
   maskSecret,
   quoteShellValue,
   sanitizeServerAddress,
+  resolveSetupSaveServerName,
 } from './setup-utils.js';
 import chalk from 'chalk';
 
@@ -200,7 +201,8 @@ export function createSetupCommand(): Command {
           timeout,
         };
 
-        saveConfig(newConfig, options.name, options.default);
+        const targetServerName = resolveSetupSaveServerName(options.name, listServers());
+        saveConfig(newConfig, targetServerName, options.default);
 
         const result = {
           config_path: getSettingsPath(),

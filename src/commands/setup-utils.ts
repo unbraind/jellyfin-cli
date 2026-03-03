@@ -23,3 +23,20 @@ export function sanitizeServerAddress(address?: string | null): string | undefin
   }
   return address.replace(/^(https?:\/\/)(https?:\/\/)/i, '$2');
 }
+
+interface ServerEntry {
+  name: string;
+  isDefault: boolean;
+}
+
+export function resolveSetupSaveServerName(
+  explicitName: string | undefined,
+  servers: ServerEntry[],
+): string | undefined {
+  if (explicitName && explicitName.trim().length > 0) {
+    return explicitName;
+  }
+
+  const activeNamed = servers.find((server) => server.isDefault && server.name !== 'default');
+  return activeNamed?.name;
+}

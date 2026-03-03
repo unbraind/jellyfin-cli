@@ -6,6 +6,15 @@ import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.j
 import { promptGithubStar } from '../utils/github-star.js';
 import { addConfigDoctorCommand } from './config-doctor.js';
 
+function resolveConfigSaveServerName(explicitName: string | undefined): string | undefined {
+  if (explicitName && explicitName.trim().length > 0) {
+    return explicitName;
+  }
+
+  const activeNamed = listServers().find((server) => server.isDefault && server.name !== 'default');
+  return activeNamed?.name;
+}
+
 export function createConfigCommand(): Command {
   const cmd = new Command('config');
 
@@ -72,7 +81,8 @@ export function createConfigCommand(): Command {
         }
       }
 
-      saveConfig(newConfig, options.name, options.default);
+      const targetServerName = resolveConfigSaveServerName(options.name);
+      saveConfig(newConfig, targetServerName, options.default);
       console.log(formatSuccess(`Configuration saved to ${getSettingsPath()}`, format));
       await promptGithubStar();
     });
