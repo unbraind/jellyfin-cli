@@ -153,3 +153,28 @@ describe('formatError', () => {
     expect(result).toContain('Something went wrong');
   });
 });
+
+describe('formatMarkdown extended coverage', () => {
+  it('should format empty array as markdown', () => {
+    expect(formatOutput([], 'markdown')).toBe('No items.');
+  });
+  it('should format array of objects as markdown table', () => {
+    expect(formatOutput([{ name: 'A' }, { name: 'B' }], 'markdown')).toContain('| name |');
+  });
+  it('should format array of strings as markdown list', () => {
+    expect(formatOutput(['Item1', 'Item2'], 'markdown')).toContain('- Item1\n- Item2');
+  });
+  it('should format object with Items array as markdown table', () => {
+    expect(formatOutput({ Items: [{ a: 1 }] }, 'markdown')).toContain('| a |');
+  });
+  it('should format object with empty Items array', () => {
+    expect(formatOutput({ Items: [] }, 'markdown')).toContain('No items.');
+  });
+  it('should format object without Items as markdown key-value', () => {
+    expect(formatOutput({ key: 'val' }, 'markdown')).toBe('**key**: val');
+  });
+  it('should format primitives and null as string', () => {
+    expect(formatOutput(123, 'markdown')).toBe('123');
+    expect(formatOutput(null, 'markdown')).toBe('null');
+  });
+});
