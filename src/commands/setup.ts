@@ -7,6 +7,7 @@ import { saveConfig, getConfig, getSettingsPath } from '../utils/config.js';
 import { toon } from '../formatters/index.js';
 import { promptGithubStar } from '../utils/github-star.js';
 import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
+import { isValidServerUrl, maskSecret, quoteShellValue } from './setup-utils.js';
 import chalk from 'chalk';
 
 class MutedOutput extends Writable {
@@ -86,12 +87,24 @@ export function createSetupCommand(): Command {
         console.error(toon.formatError('Server URL is required. Use --server <url> or set JELLYFIN_SERVER_URL'));
         process.exit(1);
       }
+      if (!isValidServerUrl(serverUrl)) {
+        console.error(toon.formatError('Server URL must be a valid http(s) URL.'));
+        process.exit(1);
+      }
       if (options.outputFormat && outputFormat !== options.outputFormat) {
         console.error(toon.formatError(`Invalid output format: ${options.outputFormat}. Use one of: ${outputFormatChoices()}`));
         process.exit(1);
       }
       if (options.timeout && (!Number.isFinite(timeout) || timeout <= 0)) {
         console.error(toon.formatError('Timeout must be a positive integer.'));
+        process.exit(1);
+      }
+      if (apiKey && (username || password)) {
+        console.error(toon.formatError('Use either API key auth OR username/password auth, not both.'));
+        process.exit(1);
+      }
+      if ((username && !password) || (!username && password)) {
+        console.error(toon.formatError('Username and password must be provided together.'));
         process.exit(1);
       }
 
@@ -197,6 +210,36 @@ export function createSetupCommand(): Command {
     });
 
   cmd
+    .command('env')
+    .description('Print environment variables from current configuration')
+    .option('--name <name>', 'Server name')
+    .option('--shell', 'Emit POSIX shell exports (export KEY=value)')
+    .option('--show-secrets', 'Show full API key/password values')
+    .action((options) => {
+      const config = getConfig(options.name);
+      const envValues: Record<string, string | undefined> = {
+        JELLYFIN_SERVER_URL: config.serverUrl || undefined,
+        JELLYFIN_API_KEY: options.showSecrets ? config.apiKey : maskSecret(config.apiKey),
+        JELLYFIN_USERNAME: config.username,
+        JELLYFIN_PASSWORD: options.showSecrets ? config.password : maskSecret(config.password),
+        JELLYFIN_USER_ID: config.userId,
+        JELLYFIN_TIMEOUT: config.timeout ? String(config.timeout) : undefined,
+        JELLYFIN_OUTPUT_FORMAT: config.outputFormat,
+      };
+
+      const lines = Object.entries(envValues)
+        .filter(([, value]) => value !== undefined && value !== '')
+        .map(([key, value]) => {
+          const safeValue = value ?? '';
+          if (options.shell) {
+            return `export ${key}=${quoteShellValue(safeValue)}`;
+          }
+          return `${key}=${safeValue}`;
+        });
+
+      console.log(lines.join('\n'));
+    });
+  cmd
     .command('status')
     .description('Check current setup status')
     .option('--name <name>', 'Server name')
@@ -236,21 +279,6 @@ export function createSetupCommand(): Command {
           error: err instanceof Error ? err.message : 'Connection failed',
         }, 'setup_status'));
       }
-    });
-
-  cmd
-    .command('env')
-    .description('Show environment variable names for configuration')
-    .action(() => {
-      console.log(toon.formatToon({
-        JELLYFIN_SERVER_URL: 'Server URL',
-        JELLYFIN_API_KEY: 'API key for authentication',
-        JELLYFIN_USERNAME: 'Username for authentication',
-        JELLYFIN_PASSWORD: 'Password for authentication',
-        JELLYFIN_USER_ID: 'User ID',
-        JELLYFIN_TIMEOUT: 'Request timeout in milliseconds',
-        JELLYFIN_OUTPUT_FORMAT: 'Output format (toon, json, table, raw, yaml, markdown)',
-      }, 'environment_variables'));
     });
 
   return cmd;

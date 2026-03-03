@@ -43,6 +43,9 @@ jf setup --server http://your-server:8096 --username your-user --password your-p
 # Test connection
 jf config test
 
+# Export config as environment variables (masked by default)
+jf setup env --shell
+
 # List libraries
 jf library list
 

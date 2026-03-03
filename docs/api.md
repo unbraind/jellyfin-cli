@@ -56,6 +56,9 @@ jf setup [options]
 | `--password <password>` | Password |
 | `--name <name>` | Server name for this config |
 | `--default` | Set as default server |
+| `--non-interactive` | Do not prompt for missing values |
+| `--timeout <ms>` | Persist request timeout |
+| `-o, --output-format <format>` | Persist default output format |
 
 ### setup status
 
@@ -69,10 +72,18 @@ Output type: `setup_status`
 
 ### setup env
 
-Show environment variable names for configuration.
+Export environment variables from current configuration.
 
 ```bash
 jf setup env
+```
+
+```bash
+# POSIX shell exports (masked secrets by default)
+jf setup env --shell
+
+# Include raw secret values when needed for local automation
+jf setup env --show-secrets
 ```
 
 ## config
