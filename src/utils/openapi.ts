@@ -1,5 +1,6 @@
 import type { JellyfinConfig } from '../types/index.js';
 import { LOW_SIGNAL_TOKENS, isReadOnlyIntent } from './openapi-intent.js';
+import { tokenizeIntentValue, tokenizePathValue } from './openapi-tokenize.js';
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
 const OPENAPI_CANDIDATES = ['/api-docs/openapi.json', '/openapi.json', '/swagger/v1/swagger.json'] as const;
@@ -207,36 +208,11 @@ export function filterOpenApiOperations(
   });
 }
 
-function tokenizeCommandIntent(value: string): string[] {
-  return value
-    .toLowerCase()
-    .split(/[^a-z0-9]+/g)
-    .map((token) => token.trim())
-    .filter((token) => token.length > 1);
-}
-
-function normalizeToken(token: string): string {
-  if (token.endsWith('s') && token.length > 3) {
-    return token.slice(0, -1);
-  }
-  return token;
-}
-
-function tokenizePathSegments(path: string): Set<string> {
-  const tokens = path
-    .toLowerCase()
-    .split(/[^a-z0-9]+/g)
-    .map((token) => token.trim())
-    .filter((token) => token.length > 1)
-    .map(normalizeToken);
-  return new Set(tokens);
-}
-
 export function matchOperationsForCommandIntent(
   operations: OpenApiOperationEntry[],
   commandPath: string,
 ): CommandOperationMatch[] {
-  const tokens = tokenizeCommandIntent(commandPath).map(normalizeToken);
+  const tokens = tokenizeIntentValue(commandPath);
   if (tokens.length === 0) {
     return [];
   }
@@ -244,8 +220,8 @@ export function matchOperationsForCommandIntent(
   const matches: CommandOperationMatch[] = [];
   const preferReadOnlyMatches = isReadOnlyIntent(tokens);
   for (const operation of operations) {
-    const pathTokens = tokenizePathSegments(operation.path);
-    const tagTokens = new Set(operation.tags.flatMap((tag) => tokenizeCommandIntent(tag)).map(normalizeToken));
+    const pathTokens = tokenizePathValue(operation.path);
+    const tagTokens = new Set(operation.tags.flatMap((tag) => tokenizeIntentValue(tag)));
     const summaryLower = operation.summary?.toLowerCase() ?? '';
     const operationIdLower = operation.operationId?.toLowerCase() ?? '';
     let score = 0;

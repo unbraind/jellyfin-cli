@@ -208,6 +208,21 @@ describe('openapi utils', () => {
     expect(matches[0]?.matchedOn).toEqual(expect.arrayContaining(['tag:metadata', 'meta:lookup']));
   });
 
+  it('matches hyphenated commands to camel-cased OpenAPI paths/tags', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/MediaSegments/{itemId}': {
+          get: { tags: ['MediaSegments'], summary: 'Get item segments', operationId: 'GetItemSegments' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'media segments');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.path).toBe('/MediaSegments/{itemId}');
+    expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
+  });
+
   it('sorts command intent matches by score, then depth, then method/path', () => {
     const operations = extractOpenApiOperations({
       paths: {

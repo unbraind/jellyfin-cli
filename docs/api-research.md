@@ -155,6 +155,18 @@ To avoid modifying media library state during validation:
 - CLI `--version` now reads from `package.json` instead of a hardcoded constant.
 - This keeps distributed binaries aligned with the date+commit versioning policy.
 
+20. OpenAPI intent tokenization accuracy improvements
+
+- Added camel-case aware intent tokenization for command and OpenAPI matching (for example:
+  `MediaSegments` -> `media`, `segments`; `InstantMix` -> `instant`, `mix`).
+- This improves `jf schema coverage` accuracy for already-implemented commands that previously
+  looked unmatched due to token-shape differences.
+- March 4, 2026 verification run against Jellyfin 10.11.6:
+  - read-only scope: `257` operations
+  - mapped: `225`
+  - coverage: `87.55%`
+  - unmatched: `32`
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
