@@ -144,6 +144,58 @@ describe('schema openapi command', () => {
     expect(result.stdout).toContain('matched_on:');
   });
 
+  it('supports read-only-only operation filtering', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Users': {
+                get: { tags: ['Users'], operationId: 'GetUsers', summary: 'List users' },
+                post: { tags: ['Users'], operationId: 'CreateUser', summary: 'Create user' },
+              },
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'openapi',
+      '--include-paths',
+      '--read-only-ops',
+      '--limit',
+      '10',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('read_only_ops: true');
+    expect(result.stdout).toContain('filtered_operation_count: 2');
+    expect(result.stdout).not.toContain('method: POST');
+  });
+
   it('returns error for invalid --limit', async () => {
     const result = await runCli(['schema', 'openapi', '--limit', '0']);
     expect(result.code).toBe(1);

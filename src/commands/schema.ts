@@ -101,6 +101,7 @@ export function createSchemaCommand(): Command {
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
+    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
     .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
@@ -122,6 +123,7 @@ export function createSchemaCommand(): Command {
           pathPrefix: options.pathPrefix as string | undefined,
           tag: options.tag as string | undefined,
           search: options.search as string | undefined,
+          readOnlySafe: options.readOnlyOps ? true : undefined,
         });
         const commandMatches = options.forCommand
           ? matchOperationsForCommandIntent(allOperations, String(options.forCommand))
@@ -135,12 +137,13 @@ export function createSchemaCommand(): Command {
           top_tags: summary.topTags ?? [],
         };
 
-        if (options.method || options.pathPrefix || options.tag || options.search) {
+        if (options.method || options.pathPrefix || options.tag || options.search || options.readOnlyOps) {
           data.operation_filters = {
             method: options.method ?? null,
             path_prefix: options.pathPrefix ?? null,
             tag: options.tag ?? null,
             search: options.search ?? null,
+            read_only_ops: options.readOnlyOps ?? false,
           };
           data.filtered_operation_count = filteredOperations.length;
         }
@@ -219,6 +222,7 @@ export function createSchemaCommand(): Command {
     .option('--method <method>', 'Filter operations by HTTP method')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
+    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
     .option('--limit <number>', 'Unmatched operation sample limit', '50')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
     .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
@@ -247,6 +251,7 @@ export function createSchemaCommand(): Command {
           method: options.method as string | undefined,
           pathPrefix: options.pathPrefix as string | undefined,
           tag: options.tag as string | undefined,
+          readOnlySafe: options.readOnlyOps ? true : undefined,
         });
         const tools = generateCliToolSchemas(root, options.commandPrefix as string | undefined);
         const mappedOperationKeys = new Set<string>();
@@ -282,6 +287,7 @@ export function createSchemaCommand(): Command {
             method: options.method ?? null,
             path_prefix: options.pathPrefix ?? null,
             tag: options.tag ?? null,
+            read_only_ops: options.readOnlyOps ?? false,
           },
           operation_scope_count: filteredOperations.length,
           mapped_operation_count: mappedOperationKeys.size,

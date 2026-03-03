@@ -487,9 +487,9 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema <type>` - Output JSON schema for a specific type
 - `jf schema list` - List all available output types
 - `jf schema validate [type] [--from auto|json|yaml|toon] [--input <payload>]` - Validate output payloads against CLI schemas (stdin or inline)
-- `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
+- `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
 - `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
-- `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--command-prefix items] [--min-score 3] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set
+- `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--read-only-ops] [--command-prefix items] [--min-score 3] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set
 
 ## Agent/LLM Optimization
 

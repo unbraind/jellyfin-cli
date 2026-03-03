@@ -14,7 +14,7 @@ Latest verification run: **March 3, 2026** against Jellyfin **10.11.6**.
 
 - OpenAPI paths: `356`
 - OpenAPI operations (standard HTTP methods across all paths): `429`
-- Verified with: `jf schema openapi --method GET --for-command "items list" --limit 10`.
+- Verified with: `jf schema openapi --method GET --read-only-ops --for-command "items list" --limit 10`.
 
 ## Read-Only Validation Strategy
 
@@ -57,6 +57,7 @@ To avoid modifying media library state during validation:
 
 - Adds intent-based OpenAPI coverage estimation for the current CLI command surface.
 - Supports method/tag/path filtering and command-domain scoping via `--command-prefix`.
+- Supports `--read-only-ops` filtering to restrict analysis to non-mutating endpoints.
 - Emits deterministic `unmatched_operations` samples for backlog and release planning.
 
 6. Schema/global format consistency

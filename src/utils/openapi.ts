@@ -51,6 +51,7 @@ export type OpenApiOperationFilter = {
   pathPrefix?: string | undefined;
   tag?: string | undefined;
   search?: string | undefined;
+  readOnlySafe?: boolean | undefined;
 };
 
 export type CommandOperationMatch = OpenApiOperationEntry & {
@@ -176,6 +177,7 @@ export function filterOpenApiOperations(
   const pathPrefix = filters.pathPrefix?.trim().toLowerCase();
   const tag = filters.tag?.trim().toLowerCase();
   const search = filters.search?.trim().toLowerCase();
+  const readOnlySafe = filters.readOnlySafe;
 
   return operations.filter((operation) => {
     if (method && operation.method !== method) {
@@ -197,6 +199,9 @@ export function filterOpenApiOperations(
       if (!haystack.includes(search)) {
         return false;
       }
+    }
+    if (typeof readOnlySafe === 'boolean' && operation.readOnlySafe !== readOnlySafe) {
+      return false;
     }
     return true;
   });

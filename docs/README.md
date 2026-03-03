@@ -49,7 +49,7 @@ jf config test
 jf config doctor
 
 # Inspect live OpenAPI surface for agent planning
-jf schema openapi --include-paths --method GET --tag Users --for-command "users list" --limit 25
+jf schema openapi --include-paths --method GET --tag Users --read-only-ops --for-command "users list" --limit 25
 
 # Export tool schemas for function-calling agents
 jf schema tools --command items --limit 20
@@ -58,7 +58,7 @@ jf schema tools --command items --limit 20
 jf items list --limit 1 | jf schema validate items --from toon
 
 # Estimate uncovered OpenAPI operations for a command domain
-jf schema coverage --method GET --command-prefix items --min-score 3 --limit 25
+jf schema coverage --method GET --read-only-ops --command-prefix items --min-score 3 --limit 25
 
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info

@@ -101,6 +101,25 @@ describe('openapi utils', () => {
     expect(filtered[0]?.method).toBe('GET');
   });
 
+  it('filters operations by read-only safety', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Users': {
+          get: { tags: ['Users'], summary: 'List users' },
+          post: { tags: ['Users'], summary: 'Create user' },
+        },
+      },
+    });
+
+    const readOnly = filterOpenApiOperations(operations, { readOnlySafe: true });
+    expect(readOnly).toHaveLength(1);
+    expect(readOnly[0]?.method).toBe('GET');
+
+    const mutating = filterOpenApiOperations(operations, { readOnlySafe: false });
+    expect(mutating).toHaveLength(1);
+    expect(mutating[0]?.method).toBe('POST');
+  });
+
   it('matches operations for command intent with ranked scores', () => {
     const operations = extractOpenApiOperations({
       paths: {
