@@ -159,7 +159,7 @@ jf system info --format raw
 
 - `jf setup` - Interactive setup wizard
 - `jf setup status` - Check setup status
-- `jf setup env` - Show environment variables
+- `jf setup env` - Show environment variables (`--shell` or structured `--format json`)
 - `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)
 - `jf config set` - Set configuration values
 - `jf config get` - Display current configuration

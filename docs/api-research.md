@@ -3,7 +3,7 @@
 ## Scope
 
 This document summarizes live API discovery work used to improve `jellyfin-cli` agent workflows
-without mutating server data. Latest verification run: **March 3, 2026** against Jellyfin
+without mutating server data. Latest verification run: **March 4, 2026** against Jellyfin
 **10.11.6**.
 
 ## Verified Discovery Endpoint
@@ -117,9 +117,15 @@ To avoid modifying media library state during validation:
   for unmatched API operations.
 - On the March 3, 2026 verification run against Jellyfin 10.11.6:
   - read-only scope: `257` operations
-  - mapped: `216`
-  - coverage: `84.05%`
-  - unmatched: `41`
+  - mapped: `217`
+  - coverage: `84.44%`
+  - unmatched: `40`
+
+17. `jf setup env --format <format>`
+
+- Added structured output support for setup environment exports while preserving legacy plain output.
+- `jf setup env --format json` now emits machine-parseable payloads with masked/secret metadata.
+- `jf setup env --shell` remains unchanged for direct POSIX export usage.
 
 15. Global option propagation for agent workflows
 

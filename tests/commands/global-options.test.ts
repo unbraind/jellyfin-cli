@@ -110,4 +110,124 @@ describe('global CLI option propagation', () => {
     expect(result.stdout).toContain('"success":true');
     expect(result.stdout).toContain('Server health: Healthy');
   });
+
+  it('applies global --format json to system info output', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/System/Info': Response.json({
+          ServerName: 'Test Server',
+          Version: '10.11.6',
+          Id: 'server-1',
+          LocalAddress: `http://127.0.0.1:${0}`,
+          HasPendingRestart: false,
+          CanSelfRestart: true,
+        }),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['--format', 'json', 'system', 'info']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.ServerName).toBe('Test Server');
+    expect(parsed.Version).toBe('10.11.6');
+  });
+
+  it('applies global --format json to users me output', async () => {
+    const userId = 'user-1';
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/Users/user-1': Response.json({
+          Id: userId,
+          Name: 'steve',
+          ServerId: 'server-1',
+        }),
+      },
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Users') {
+          return Response.json([{ Id: userId, Name: 'steve' }]);
+        }
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId,
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['--format', 'json', 'users', 'me']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.Id).toBe(userId);
+    expect(parsed.Name).toBe('steve');
+  });
+
+  it('applies global --format json to items list output', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/Users/user-1/Items': Response.json({
+          Items: [
+            { Id: 'item-1', Name: 'Movie A', Type: 'Movie' },
+          ],
+          TotalRecordCount: 1,
+        }),
+      },
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Users') {
+          return Response.json([{ Id: 'user-1', Name: 'steve' }]);
+        }
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId: 'user-1',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['--format', 'json', 'items', 'list', '--limit', '1']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(Array.isArray(parsed)).toBe(true);
+    expect(parsed[0].Id).toBe('item-1');
+  });
 });

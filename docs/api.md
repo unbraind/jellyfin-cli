@@ -82,6 +82,9 @@ jf setup env
 # POSIX shell exports (masked secrets by default)
 jf setup env --shell
 
+# Structured output for agents/pipelines
+jf setup env --format json
+
 # Include raw secret values when needed for local automation
 jf setup env --show-secrets
 ```

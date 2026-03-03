@@ -62,6 +62,45 @@ describe('setup command', () => {
     expect(result.stdout).not.toContain('top-secret-password');
   });
 
+  it('prints structured setup env output when --format is provided', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: 'http://example.local:8096',
+        apiKey: 'super-secret-api-key',
+        username: 'agent-user',
+        password: 'top-secret-password',
+        userId: 'user-1',
+        timeout: 45000,
+        outputFormat: 'toon',
+      },
+    }), 'utf-8');
+
+    const result = await runCli(['setup', 'env', '--format', 'json']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.masked).toBe(true);
+    expect(parsed.variable_count).toBeGreaterThan(0);
+    expect(parsed.variables.JELLYFIN_SERVER_URL).toBe('http://example.local:8096');
+    expect(parsed.variables.JELLYFIN_API_KEY).toBe('supe...ey');
+    expect(parsed.variables.JELLYFIN_PASSWORD).toBe('top-...rd');
+  });
+
+  it('prints shell exports from setup env', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: 'http://example.local:8096',
+        apiKey: "abc'def",
+        outputFormat: 'toon',
+      },
+    }), 'utf-8');
+
+    const result = await runCli(['setup', 'env', '--shell', '--show-secrets']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain("export JELLYFIN_API_KEY='abc'\\''def'");
+  });
+
   it('rejects invalid setup URL values before network calls', async () => {
     const result = await runCli(
       [

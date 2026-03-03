@@ -70,6 +70,9 @@ export JELLYFIN_READ_ONLY=1
 # Export config as environment variables (masked by default)
 jf setup env --shell
 
+# Structured export for agent workflows
+jf setup env --format json
+
 # List libraries
 jf library list
 

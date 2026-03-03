@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
+import { formatMessage, formatToon, formatUser, formatUsers } from './utils.js';
 import { addAdminCommands } from './users-admin.js';
 
 export function createUsersCommand(): Command {
@@ -14,7 +14,7 @@ export function createUsersCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const users = await client.getUsers();
-        console.log(toon.formatUsers(users));
+        console.log(formatUsers(users, format));
       } catch (err) {
         handleError(err, format);
       }
@@ -28,7 +28,7 @@ export function createUsersCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const user = await client.getUserById(userId);
-        console.log(toon.formatUser(user));
+        console.log(formatUser(user, format));
       } catch (err) {
         handleError(err, format);
       }
@@ -42,7 +42,7 @@ export function createUsersCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const user = await client.getCurrentUser();
-        console.log(toon.formatUser(user));
+        console.log(formatUser(user, format));
       } catch (err) {
         handleError(err, format);
       }
@@ -58,10 +58,10 @@ export function createUsersCommand(): Command {
         const users = await client.getUsers();
         const user = users.find((u) => u.Name?.toLowerCase() === username.toLowerCase());
         if (!user) {
-          console.error(toon.formatError(`User '${username}' not found`));
+          console.error(formatMessage(`User '${username}' not found`, format, false));
           process.exit(1);
         }
-        console.log(toon.formatUser(user));
+        console.log(formatUser(user, format));
       } catch (err) {
         handleError(err, format);
       }
@@ -76,12 +76,18 @@ export function createUsersCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const result = await client.createUser({ Name: username, Password: options.password });
-        console.log(toon.formatToon({
-          id: result.Id,
-          name: result.Name,
-          server_id: result.ServerId,
-          created: true,
-        }, 'user_created'));
+        console.log(
+          formatToon(
+            {
+              id: result.Id,
+              name: result.Name,
+              server_id: result.ServerId,
+              created: true,
+            },
+            format,
+            'user_created',
+          ),
+        );
       } catch (err) {
         handleError(err, format);
       }
@@ -100,7 +106,7 @@ export function createUsersCommand(): Command {
           CurrentPw: options.current,
           NewPw: options.new,
         });
-        console.log(toon.formatMessage(`Password updated for user ${userId}`, true));
+        console.log(formatMessage(`Password updated for user ${userId}`, format, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -119,7 +125,7 @@ export function createUsersCommand(): Command {
       }
       try {
         await client.deleteUser(userId);
-        console.log(toon.formatMessage(`User ${userId} deleted`, true));
+        console.log(formatMessage(`User ${userId} deleted`, format, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -133,7 +139,7 @@ export function createUsersCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const users = await client.getPublicUsers();
-        console.log(toon.formatUsers(users));
+        console.log(formatUsers(users, format));
       } catch (err) { handleError(err, format); }
     });
 

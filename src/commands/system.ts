@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { formatSuccess, toon } from '../formatters/index.js';
+import { formatMessage, formatSystemInfo, formatToon } from './utils.js';
 
 export function createSystemCommand(): Command {
   const cmd = new Command('system');
@@ -15,15 +15,21 @@ export function createSystemCommand(): Command {
       try {
         if (options.public) {
           const info = await client.getPublicSystemInfo();
-          console.log(toon.formatToon({
-            name: info.ServerName,
-            ver: info.Version,
-            id: info.Id,
-            url: info.LocalAddress,
-          }, 'sys_public'));
+          console.log(
+            formatToon(
+              {
+                name: info.ServerName,
+                ver: info.Version,
+                id: info.Id,
+                url: info.LocalAddress,
+              },
+              format,
+              'sys_public',
+            ),
+          );
         } else {
           const info = await client.getSystemInfo();
-          console.log(toon.formatSystemInfo(info));
+          console.log(formatSystemInfo(info, format));
         }
       } catch (err) { handleError(err, format); }
     });
@@ -36,7 +42,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         await client.getHealth();
-        console.log(toon.formatToon({ status: 'ok', reachable: true }, 'ping'));
+        console.log(formatToon({ status: 'ok', reachable: true }, format, 'ping'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -48,7 +54,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const health = await client.getHealth();
-        console.log(formatSuccess(`Server health: ${health}`, format));
+        console.log(formatMessage(`Server health: ${health}`, format, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -60,9 +66,17 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const logs = await client.getSystemLogs();
-        console.log(toon.formatToon(logs.map((l) => ({
-          name: l.Name, date: l.DateCreated, size: l.Size,
-        })), 'log_files'));
+        console.log(
+          formatToon(
+            logs.map((l) => ({
+              name: l.Name,
+              date: l.DateCreated,
+              size: l.Size,
+            })),
+            format,
+            'log_files',
+          ),
+        );
       } catch (err) { handleError(err, format); }
     });
 
@@ -81,7 +95,13 @@ export function createSystemCommand(): Command {
         if (format === 'raw') {
           console.log(result.join('\n'));
         } else {
-          console.log(toon.formatToon({ name, total_lines: lines.length, showing: result.length, content: result }, 'log_content'));
+          console.log(
+            formatToon(
+              { name, total_lines: lines.length, showing: result.length, content: result },
+              format,
+              'log_content',
+            ),
+          );
         }
       } catch (err) { handleError(err, format); }
     });
@@ -94,13 +114,19 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const storage = await client.getSystemStorageInfo();
-        console.log(toon.formatToon({
-          data_paths: storage.DataPaths,
-          cache_path: storage.CachePath,
-          internal_metadata_path: storage.InternalMetadataPath,
-          log_path: storage.LogPath,
-          transcoding_temp_path: storage.TranscodingTempPath,
-        }, 'storage_info'));
+        console.log(
+          formatToon(
+            {
+              data_paths: storage.DataPaths,
+              cache_path: storage.CachePath,
+              internal_metadata_path: storage.InternalMetadataPath,
+              log_path: storage.LogPath,
+              transcoding_temp_path: storage.TranscodingTempPath,
+            },
+            format,
+            'storage_info',
+          ),
+        );
       } catch (err) { handleError(err, format); }
     });
 
@@ -114,7 +140,7 @@ export function createSystemCommand(): Command {
       if (!options.force) { console.error('Use --force to confirm restart'); process.exit(1); }
       try {
         await client.restartServer();
-        console.log(formatSuccess('Server restart initiated', format));
+        console.log(formatMessage('Server restart initiated', format, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -128,7 +154,7 @@ export function createSystemCommand(): Command {
       if (!options.force) { console.error('Use --force to confirm shutdown'); process.exit(1); }
       try {
         await client.shutdownServer();
-        console.log(formatSuccess('Server shutdown initiated', format));
+        console.log(formatMessage('Server shutdown initiated', format, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -149,7 +175,7 @@ export function createSystemCommand(): Command {
           minDate: options.minDate,
           hasUserId: options.hasUser,
         });
-        console.log(toon.formatActivityLog(result.Items ?? []));
+        console.log(formatToon(result.Items ?? [], format, 'activity_log'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -161,10 +187,16 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const timeInfo = await client.getUtcTime();
-        console.log(toon.formatToon({
-          request_received: timeInfo.RequestReceptionTime,
-          response_sent: timeInfo.ResponseTransmissionTime,
-        }, 'server_time'));
+        console.log(
+          formatToon(
+            {
+              request_received: timeInfo.RequestReceptionTime,
+              response_sent: timeInfo.ResponseTransmissionTime,
+            },
+            format,
+            'server_time',
+          ),
+        );
       } catch (err) { handleError(err, format); }
     });
 
@@ -176,7 +208,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const config = await client.getServerConfiguration();
-        console.log(toon.formatToon(config, 'server_config'));
+        console.log(formatToon(config, format, 'server_config'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -188,7 +220,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const section = await client.getNamedConfiguration(key);
-        console.log(toon.formatToon(section, `config_${key}`));
+        console.log(formatToon(section, format, `config_${key}`));
       } catch (err) { handleError(err, format); }
     });
 
@@ -200,7 +232,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const ep = await client.getSystemEndpoint();
-        console.log(toon.formatToon({ is_local: ep.IsLocal, is_in_network: ep.IsInNetwork }, 'endpoint'));
+        console.log(formatToon({ is_local: ep.IsLocal, is_in_network: ep.IsInNetwork }, format, 'endpoint'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -217,12 +249,18 @@ export function createSystemCommand(): Command {
         await client.testBitrate(sizeByes);
         const elapsed = Date.now() - start;
         const bitsPerSecond = (sizeByes * 8) / (elapsed / 1000);
-        console.log(toon.formatToon({
-          size_bytes: sizeByes,
-          elapsed_ms: elapsed,
-          bitrate_bps: Math.round(bitsPerSecond),
-          bitrate_mbps: Math.round(bitsPerSecond / 1_000_000 * 100) / 100,
-        }, 'bitrate_test'));
+        console.log(
+          formatToon(
+            {
+              size_bytes: sizeByes,
+              elapsed_ms: elapsed,
+              bitrate_bps: Math.round(bitsPerSecond),
+              bitrate_mbps: Math.round((bitsPerSecond / 1_000_000) * 100) / 100,
+            },
+            format,
+            'bitrate_test',
+          ),
+        );
       } catch (err) { handleError(err, format); }
     });
 
@@ -232,7 +270,7 @@ export function createSystemCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const opts = await client.getDefaultMetadataOptions();
-        console.log(toon.formatToon(opts, 'metadata_options'));
+        console.log(formatToon(opts, format, 'metadata_options'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -252,7 +290,7 @@ export function createSystemCommand(): Command {
         });
         const config = JSON.parse(raw) as Record<string, unknown>;
         await client.updateServerConfiguration(config);
-        console.log(formatSuccess('Server configuration updated', format));
+        console.log(formatMessage('Server configuration updated', format, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -272,7 +310,7 @@ export function createSystemCommand(): Command {
         });
         const data = JSON.parse(raw) as unknown;
         await client.updateNamedConfiguration(key, data);
-        console.log(formatSuccess(`Configuration section '${key}' updated`, format));
+        console.log(formatMessage(`Configuration section '${key}' updated`, format, true));
       } catch (err) { handleError(err, format); }
     });
 

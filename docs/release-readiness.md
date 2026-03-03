@@ -16,6 +16,7 @@ You can inspect exported values without revealing secrets:
 
 ```bash
 jf setup env --shell
+jf setup env --format json
 ```
 
 ## 2) Sync date+commit version
