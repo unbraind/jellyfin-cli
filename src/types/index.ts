@@ -52,6 +52,8 @@ export type {
   UserView,
   UserViewGroupingOption,
   UtcTimeResponse,
+  StartupConfiguration,
+  StartupFirstUser,
 } from './extended.js';
 export type {
   AddVirtualFolderParams,

@@ -297,3 +297,15 @@ export interface UtcTimeResponse {
   RequestReceptionTime?: string | null;
   ResponseTransmissionTime?: string | null;
 }
+
+export interface StartupConfiguration {
+  UICulture?: string | null;
+  MetadataCountryCode?: string | null;
+  PreferredMetadataLanguage?: string | null;
+}
+
+export interface StartupFirstUser {
+  Name?: string | null;
+  Password?: string | null;
+  PasswordHint?: string | null;
+}

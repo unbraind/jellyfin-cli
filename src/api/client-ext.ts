@@ -10,6 +10,8 @@ import type {
   QueryResult,
   BaseItemDto,
   VirtualFolderInfo,
+  StartupConfiguration,
+  StartupFirstUser,
 } from '../types/index.js';
 import { CoreApi } from './core-api.js';
 
@@ -109,4 +111,15 @@ export class JellyfinExtensions extends CoreApi {
 
   async getPhysicalPaths(): Promise<string[]> { return this.request<string[]>('GET', '/Library/PhysicalPaths'); }
   async getMediaFolders(isHidden?: boolean): Promise<QueryResult<BaseItemDto>> { return this.request<QueryResult<BaseItemDto>>('GET', '/Library/MediaFolders', { isHidden }); }
+
+  // Startup wizard state (read-only)
+  async getStartupConfiguration(): Promise<StartupConfiguration> {
+    return this.request<StartupConfiguration>('GET', '/Startup/Configuration');
+  }
+  async getStartupFirstUser(): Promise<StartupFirstUser> {
+    return this.request<StartupFirstUser>('GET', '/Startup/FirstUser');
+  }
+  async isStartupComplete(): Promise<boolean> {
+    return this.request<boolean>('GET', '/Startup/Complete');
+  }
 }

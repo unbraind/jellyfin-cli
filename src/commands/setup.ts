@@ -17,6 +17,7 @@ import {
 import chalk from 'chalk';
 import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 import { attachSetupStatusSubcommand } from './setup-status.js';
+import { attachSetupStartupSubcommand } from './setup-startup.js';
 
 type SetupCommandOptions = FormatOptions & {
   apiKey?: string | undefined;
@@ -310,6 +311,7 @@ export function createSetupCommand(): Command {
       console.log(lines.join('\n'));
     });
   attachSetupStatusSubcommand(cmd);
+  attachSetupStartupSubcommand(cmd);
 
   return cmd;
 }

@@ -94,4 +94,99 @@ describe('setup command', () => {
     const parsed = JSON.parse(result.stderr);
     expect(parsed.error).toContain('Server URL must be a valid http(s) URL');
   });
+
+  it('setup startup reports startup wizard state for configured server', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Startup/Configuration') {
+          return Response.json({
+            UICulture: 'en-US',
+            MetadataCountryCode: 'US',
+            PreferredMetadataLanguage: 'en',
+          });
+        }
+        if (url.pathname === '/Startup/FirstUser') {
+          return Response.json({ Name: 'admin', PasswordHint: 'hint' });
+        }
+        if (url.pathname === '/Startup/Complete') {
+          return Response.json(false);
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${server.port}`,
+          apiKey: 'test-key',
+          outputFormat: 'toon',
+        },
+      }), 'utf-8');
+
+      const result = await runCli(['setup', 'startup', '--format', 'json']);
+      expect(result.code).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.startup_complete).toBe(false);
+      expect(parsed.setup_wizard_required).toBe(true);
+      expect(parsed.configuration.ui_culture).toBe('en-US');
+      expect(parsed.first_user.has_name).toBe(true);
+      expect(parsed.first_user.has_password_hint).toBe(true);
+    } finally {
+      server.stop(true);
+    }
+  });
+
+  it('setup startup fails when no server is configured', async () => {
+    const result = await runCli(['setup', 'startup', '--format', 'json']);
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stderr);
+    expect(parsed.error).toContain('No server configured');
+  });
+
+  it('setup startup tolerates /Startup/Complete returning 405', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Startup/Configuration') {
+          return Response.json({
+            UICulture: 'en-US',
+            MetadataCountryCode: 'US',
+            PreferredMetadataLanguage: 'en',
+          });
+        }
+        if (url.pathname === '/Startup/FirstUser') {
+          return Response.json({ Name: 'admin' });
+        }
+        if (url.pathname === '/Startup/Complete') {
+          return new Response('method not allowed', { status: 405 });
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${server.port}`,
+          apiKey: 'test-key',
+          outputFormat: 'toon',
+        },
+      }), 'utf-8');
+
+      const result = await runCli(['setup', 'startup', '--format', 'json']);
+      expect(result.code).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.startup_complete).toBeNull();
+      expect(parsed.setup_wizard_required).toBeNull();
+      expect(parsed.warnings).toContain('startup_complete_endpoint_not_available');
+    } finally {
+      server.stop(true);
+    }
+  });
 });

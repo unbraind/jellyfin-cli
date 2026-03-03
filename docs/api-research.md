@@ -129,6 +129,15 @@ To avoid modifying media library state during validation:
   (for example: `jf --format json --server prod system health`).
 - Added regression tests in `tests/commands/global-options.test.ts`.
 
+16. Setup startup diagnostics (`jf setup startup`)
+
+- Added read-only startup-state coverage for:
+  - `GET /Startup/Configuration`
+  - `GET /Startup/FirstUser`
+  - `GET /Startup/Complete`
+- Added `jf setup startup` to emit structured startup wizard diagnostics for agent automation.
+- Added client unit tests and command/E2E coverage for the new setup startup workflow.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

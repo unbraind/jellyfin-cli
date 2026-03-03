@@ -37,6 +37,7 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('system info')).toBe(false);
     expect(isCommandBlockedInReadOnly('items list')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup status')).toBe(false);
+    expect(isCommandBlockedInReadOnly('setup startup')).toBe(false);
   });
 
   it('blocks common mutating command paths', () => {

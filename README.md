@@ -61,6 +61,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Type-Safe**: Full TypeScript implementation
 - **Bun-Powered**: Fast package management and builds with Bun
 - **Setup Wizard**: Interactive configuration wizard
+- **Startup Diagnostics**: `jf setup startup` reports startup wizard state in structured output
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
 - **Explain Mode**: global `--explain` or `JELLYFIN_EXPLAIN=1` prints redacted request metadata to `stderr`
@@ -159,6 +160,7 @@ jf system info --format raw
 - `jf setup` - Interactive setup wizard
 - `jf setup status` - Check setup status
 - `jf setup env` - Show environment variables
+- `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)
 - `jf config set` - Set configuration values
 - `jf config get` - Display current configuration
 - `jf config path` - Show configuration file path

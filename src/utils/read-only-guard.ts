@@ -177,6 +177,7 @@ const READ_ONLY_ALLOWED = new Set([
   'sessions get',
   'sessions list',
   'setup env',
+  'setup startup',
   'setup status',
   'stats activity',
   'stats counts',

@@ -190,6 +190,7 @@ Notes:
 | `jf setup` | Interactive setup wizard |
 | `jf setup status` | Check setup status |
 | `jf setup env` | Show environment variables |
+| `jf setup startup` | Inspect startup wizard state (read-only) |
 | `jf config set` | Set configuration values |
 | `jf config get` | Display current configuration |
 | `jf config path` | Show configuration file path |

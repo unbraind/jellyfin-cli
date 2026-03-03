@@ -86,6 +86,16 @@ jf setup env --shell
 jf setup env --show-secrets
 ```
 
+### setup startup
+
+Inspect Jellyfin startup wizard state using read-only startup endpoints.
+
+```bash
+jf setup startup [--name <name>] [--format <format>]
+```
+
+Output type: `setup_startup`
+
 ## config
 
 Manage CLI configuration.
