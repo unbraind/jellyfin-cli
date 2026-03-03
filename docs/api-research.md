@@ -53,6 +53,12 @@ To avoid modifying media library state during validation:
 - Emits typed `input_schema` payloads for both positional args and options, including inherited global options.
 - Includes `read_only_safe` metadata per command to help agents select non-mutating tool calls.
 
+5. `jf schema coverage`
+
+- Adds intent-based OpenAPI coverage estimation for the current CLI command surface.
+- Supports method/tag/path filtering and command-domain scoping via `--command-prefix`.
+- Emits deterministic `unmatched_operations` samples for backlog and release planning.
+
 5. `jf config doctor` output normalization
 
 - `server.local_address` is now sanitized when Jellyfin returns malformed duplicated protocol values.
@@ -63,6 +69,11 @@ To avoid modifying media library state during validation:
 - Added `--explain` (or `JELLYFIN_EXPLAIN=1`) to emit request metadata for every API call to `stderr`.
 - Payload includes method, path, redacted query/body preview, timeout, and `read_only_safe` classification.
 - Keeps normal command result output on `stdout`, so pipelines using Toon/JSON/YAML remain stable.
+
+7. Read-only classification hardening
+
+- Mutating verbs now include `restore` and `split`.
+- Hyphenated command tokens are analyzed (`merge-versions`, `delete-alternates`, etc.), preventing false read-only-safe labels in tool schema exports.
 
 ## Recommended Next Enhancements
 

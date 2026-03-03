@@ -49,6 +49,7 @@ The E2E suite is read-only and is designed to avoid mutating media library data.
 jf config doctor
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
 jf schema tools --command system --limit 10
+jf schema coverage --method GET --command-prefix system --min-score 3 --limit 20
 ```
 
 All commands above are read-only and provide machine-parseable discovery output for agent workflows.

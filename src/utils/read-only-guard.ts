@@ -32,6 +32,7 @@ const MUTATING_VERBS = new Set([
   'remove',
   'rename',
   'report',
+  'restore',
   'restart',
   'seek',
   'send',
@@ -51,6 +52,7 @@ const MUTATING_VERBS = new Set([
   'update',
   'upload',
   'volume',
+  'split',
 ]);
 
 const READ_ONLY_ALLOWED = new Set([
@@ -223,8 +225,6 @@ const READ_ONLY_ALLOWED = new Set([
   'users views',
   'videos get-additional',
   'videos local-trailers',
-  'videos merge-versions',
-  'videos remove-alternate-sources',
   'years get',
   'years list',
 ]);
@@ -286,7 +286,12 @@ export function isCommandBlockedInReadOnly(path: string): boolean {
     return true;
   }
 
-  return parts.some((part) => MUTATING_VERBS.has(part));
+  return parts.some((part) =>
+    part
+      .split(/[^a-z0-9]+/g)
+      .filter((segment) => segment.length > 0)
+      .some((segment) => MUTATING_VERBS.has(segment)),
+  );
 }
 
 export function buildReadOnlyError(path: string): string {

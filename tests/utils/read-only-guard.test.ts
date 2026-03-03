@@ -44,6 +44,8 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('users delete')).toBe(true);
     expect(isCommandBlockedInReadOnly('setup')).toBe(true);
     expect(isCommandBlockedInReadOnly('syncplay join')).toBe(true);
+    expect(isCommandBlockedInReadOnly('backup restore')).toBe(true);
+    expect(isCommandBlockedInReadOnly('videos merge-versions')).toBe(true);
   });
 
   it('formats a toon-style read-only error payload', () => {

@@ -184,5 +184,118 @@ export function createSchemaCommand(): Command {
       console.log(formatOutput(data, outputFormat, 'tool_schemas'));
     });
 
+  cmd
+    .command('coverage')
+    .description('Estimate live OpenAPI operation coverage by existing CLI command intents')
+    .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
+    .option('--name <name>', 'Server name')
+    .option('--method <method>', 'Filter operations by HTTP method')
+    .option('--tag <tag>', 'Filter operations by exact tag')
+    .option('--path-prefix <prefix>', 'Filter operations by path prefix')
+    .option('--limit <number>', 'Unmatched operation sample limit', '50')
+    .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
+    .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
+    .action(async function (this: Command, options) {
+      if (!isOutputFormat(options.format)) {
+        console.error(formatToon({ error: `Invalid format: ${options.format}` }, 'error'));
+        process.exit(1);
+      }
+
+      const outputFormat = parseOutputFormat(options.format, 'toon');
+      const limit = parseInt(options.limit, 10);
+      const minScore = parseInt(options.minScore, 10);
+      if (!Number.isFinite(limit) || limit <= 0) {
+        console.error(formatOutput({ error: 'Limit must be a positive integer' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+      if (!Number.isFinite(minScore) || minScore <= 0) {
+        console.error(formatOutput({ error: 'Min score must be a positive integer' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      const config = getConfig(options.name);
+      if (!config.serverUrl) {
+        console.error(formatOutput({ error: 'No server URL configured' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      const root = this.parent?.parent;
+      if (!root) {
+        console.error(formatOutput({ error: 'Could not access root command tree' }, outputFormat, 'error'));
+        process.exit(1);
+      }
+
+      try {
+        const result = await fetchOpenApiDocument(config);
+        const summary = summarizeOpenApi(result.document);
+        const allOperations = extractOpenApiOperations(result.document);
+        const filteredOperations = filterOpenApiOperations(allOperations, {
+          method: options.method as string | undefined,
+          pathPrefix: options.pathPrefix as string | undefined,
+          tag: options.tag as string | undefined,
+        });
+        const tools = generateCliToolSchemas(root, options.commandPrefix as string | undefined);
+        const mappedOperationKeys = new Set<string>();
+        let mappedToolCount = 0;
+
+        for (const tool of tools) {
+          const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
+          const match = matchOperationsForCommandIntent(filteredOperations, commandIntent).find(
+            (candidate) => candidate.score >= minScore,
+          );
+          if (!match) {
+            continue;
+          }
+          mappedToolCount += 1;
+          mappedOperationKeys.add(`${match.method} ${match.path}`);
+        }
+
+        const unmatched = filteredOperations.filter(
+          (operation) => !mappedOperationKeys.has(`${operation.method} ${operation.path}`),
+        );
+        const coverage =
+          filteredOperations.length === 0
+            ? 100
+            : Number(((mappedOperationKeys.size / filteredOperations.length) * 100).toFixed(2));
+
+        const data = {
+          source_path: result.sourcePath,
+          server_url: config.serverUrl,
+          server_version: summary.serverVersion,
+          path_count: summary.pathCount,
+          operation_count: summary.operationCount,
+          filters: {
+            method: options.method ?? null,
+            path_prefix: options.pathPrefix ?? null,
+            tag: options.tag ?? null,
+          },
+          operation_scope_count: filteredOperations.length,
+          mapped_operation_count: mappedOperationKeys.size,
+          unmapped_operation_count: unmatched.length,
+          coverage_percent: coverage,
+          tool_scope_count: tools.length,
+          mapped_tool_count: mappedToolCount,
+          min_score: minScore,
+          command_prefix: options.commandPrefix ?? null,
+          unmatched_operations: unmatched.slice(0, limit).map((operation) => ({
+            method: operation.method,
+            path: operation.path,
+            operation_id: operation.operationId ?? null,
+            tags: operation.tags,
+            read_only_safe: operation.readOnlySafe,
+            deprecated: operation.deprecated,
+          })),
+          unmatched_operations_total: unmatched.length,
+          unmatched_operations_truncated: unmatched.length > limit,
+        };
+
+        console.log(formatOutput(data, outputFormat, 'openapi_coverage'));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'OpenAPI coverage analysis failed';
+        console.error(formatOutput({ error: message }, outputFormat, 'error'));
+        process.exit(1);
+      }
+    });
+
   return cmd;
 }

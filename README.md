@@ -170,6 +170,7 @@ jf system info --format raw
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
 - `jf schema tools` - Export command tool schemas for LLM function-calling
+- `jf schema coverage` - Estimate API coverage and list unmatched OpenAPI operations
 
 ## Release Validation
 
@@ -478,6 +479,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema list` - List all available output types
 - `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
 - `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
+- `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--command-prefix items] [--min-score 3] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set
 
 ## Agent/LLM Optimization
 

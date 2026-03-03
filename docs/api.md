@@ -2891,6 +2891,21 @@ jf schema tools [--command <prefix>] [--limit <number>] [--format <format>]
 
 Output type: `tool_schemas`
 
+### schema coverage
+
+Estimate OpenAPI operation coverage using CLI command intent matching.
+
+```bash
+jf schema coverage [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--command-prefix <prefix>] [--min-score <number>] [--limit <number>] [--format <format>]
+```
+
+Output type: `openapi_coverage`
+
+Notes:
+- Uses live OpenAPI from the configured Jellyfin server.
+- Coverage is intent-based (heuristic) and intended for discovery prioritization.
+- `unmatched_operations` provides a deterministic sample for roadmap planning.
+
 ---
 
 ## auth
