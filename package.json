@@ -1,6 +1,6 @@
 {
   "name": "jellyfin-cli",
-  "version": "2026.3.2",
+  "version": "2026.3.3",
   "description": "Agent-optimized CLI tool for interacting with the Jellyfin API",
   "type": "module",
   "main": "dist/index.js",

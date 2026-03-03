@@ -49,6 +49,38 @@ describe('formatOutput', () => {
     expect(result).toContain('key2: value2');
   });
 
+  it('should format object with various types as table', () => {
+    const data = { 
+      boolTrue: true, 
+      boolFalse: false, 
+      arrSmall: [1, 2], 
+      arrLarge: [1, 2, 3, 4], 
+      objField: { inner: 'val' } 
+    };
+    const result = formatOutput(data, 'table');
+    expect(result).toContain('boolTrue: Yes');
+    expect(result).toContain('boolFalse: No');
+    expect(result).toContain('arrSmall: 1, 2');
+    expect(result).toContain('arrLarge: 1, 2, 3...');
+    expect(result).toContain('objField: [Object]');
+  });
+
+  it('should format list with various types as table', () => {
+    const data = [{
+      boolTrue: true, 
+      boolFalse: false, 
+      arrSmall: [1, 2], 
+      arrLarge: [1, 2, 3, 4], 
+      objField: { inner: 'val' }
+    }];
+    const result = formatOutput(data, 'table');
+    expect(result).toContain('Yes');
+    expect(result).toContain('No');
+    expect(result).toContain('1, 2');
+    expect(result).toContain('1, 2, 3...');
+    expect(result).toContain('[Object]');
+  });
+
   it('should format non-object, non-array data as table', () => {
     const result = formatOutput('just a string', 'table');
     expect(result).toBe('just a string');

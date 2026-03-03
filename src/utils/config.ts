@@ -3,8 +3,13 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import type { JellyfinConfig, OutputFormat } from '../types/index.js';
 
-const CONFIG_DIR = join(homedir(), '.jellyfin-cli');
-const SETTINGS_FILE = join(CONFIG_DIR, 'settings.json');
+function getConfigDir(): string {
+  return process.env.JELLYFIN_CONFIG_DIR || join(homedir(), '.jellyfin-cli');
+}
+
+function getSettingsFile(): string {
+  return join(getConfigDir(), 'settings.json');
+}
 
 export const ENV_KEYS = {
   SERVER_URL: 'JELLYFIN_SERVER_URL',
@@ -24,16 +29,18 @@ interface SettingsFile {
 }
 
 function ensureConfigDir(): void {
-  if (!existsSync(CONFIG_DIR)) {
-    mkdirSync(CONFIG_DIR, { recursive: true });
+  const dir = getConfigDir();
+  if (!existsSync(dir)) {
+    mkdirSync(dir, { recursive: true });
   }
 }
 
 function readSettingsFile(): SettingsFile {
   ensureConfigDir();
-  if (existsSync(SETTINGS_FILE)) {
+  const file = getSettingsFile();
+  if (existsSync(file)) {
     try {
-      const content = readFileSync(SETTINGS_FILE, 'utf-8');
+      const content = readFileSync(file, 'utf-8');
       return JSON.parse(content) as SettingsFile;
     } catch {
       return {};
@@ -44,7 +51,7 @@ function readSettingsFile(): SettingsFile {
 
 function writeSettingsFile(settings: SettingsFile): void {
   ensureConfigDir();
-  writeFileSync(SETTINGS_FILE, JSON.stringify(settings, null, 2), 'utf-8');
+  writeFileSync(getSettingsFile(), JSON.stringify(settings, null, 2), 'utf-8');
 }
 
 export { writeSettingsFile };
@@ -187,7 +194,7 @@ export function setCurrentServer(name: string): boolean {
 }
 
 export function getSettingsPath(): string {
-  return SETTINGS_FILE;
+  return getSettingsFile();
 }
 
 export function isGithubStarred(): boolean {
