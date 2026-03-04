@@ -17,6 +17,18 @@ without mutating server data. Latest verification run: **March 4, 2026** against
 - OpenAPI operations (standard HTTP methods across all paths): `429`
 - Verified with: `jf schema openapi --method GET --read-only-ops --for-command "items list" --limit 10`.
 
+## Latest Coverage Snapshot (March 4, 2026)
+
+Verified with:
+
+```bash
+jf-cli schema research --include-unmatched --limit 40 --format json
+```
+
+- full scope operation coverage: `100%` (`429 / 429`)
+- read-only scope operation coverage: `100%` (`257 / 257`)
+- unmatched operations: `0` (full + read-only)
+
 ## Read-Only Validation Strategy
 
 To avoid modifying media library state during validation:
@@ -238,6 +250,17 @@ To avoid modifying media library state during validation:
 
 - Refined command-intent scoring to treat generic parameter tokens (`id`, `name`, `type`, `index`)
   as low-signal while prioritizing specific subcommand tokens.
+
+28. Read-only setup workflow + 100% live mapping confirmation (March 4, 2026)
+
+- `JELLYFIN_READ_ONLY=1` now allows the base `jf setup` command so local CLI configuration can be
+  updated safely in strict no-server-mutation workflows.
+- Mutating setup commands remain blocked by read-only guardrails (`setup update-configuration`).
+- Verified with installed binary (`jf-cli`) and source runner (`bun run src/cli.ts`) against Jellyfin
+  `10.11.6`.
+- Live `schema research` snapshot now reports:
+  - full scope: `429/429` mapped (`100%`)
+  - read-only scope: `257/257` mapped (`100%`)
 - Added a targeted penalty when a match only aligns with top-level command-domain tokens and misses
   specific trailing intent tokens.
 

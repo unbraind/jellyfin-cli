@@ -1561,6 +1561,16 @@ describe.skipIf(skip)('E2E read-only safety', () => {
     expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
     expect(`${result.stdout}${result.stderr}`).toMatch(/users delete/);
   }, T);
+
+  it('allows setup command in read-only mode (local config only)', async () => {
+    const result = await runJfWithCode(
+      ['setup', '--non-interactive', '--format', 'json'],
+      { JELLYFIN_READ_ONLY: '1', JELLYFIN_PASSWORD: '' },
+    );
+    expect(result.code).toBe(0);
+    expect(`${result.stdout}${result.stderr}`).not.toMatch(/read-?only/i);
+    expect(result.stdout).toMatch(/"setup_complete":\s*true/);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

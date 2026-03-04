@@ -58,6 +58,10 @@ The E2E suite is read-only and is designed to avoid mutating media library data.
 It runs `bun run src/cli.ts` by default; set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
 The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env vars are not set.
 
+When strict read-only mode is enabled, base `jf setup` is still allowed because it only updates
+local CLI config (`~/.jellyfin-cli/settings.json`) and does not mutate server data.
+Mutating setup endpoints (for example `setup update-configuration`) remain blocked.
+
 For explicit installed-binary smoke checks (`jf-cli`) with format/schema validation:
 
 ```bash

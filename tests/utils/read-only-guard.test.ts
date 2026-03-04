@@ -36,6 +36,7 @@ describe('read-only guard', () => {
   it('allows known read-only commands', () => {
     expect(isCommandBlockedInReadOnly('system info')).toBe(false);
     expect(isCommandBlockedInReadOnly('items list')).toBe(false);
+    expect(isCommandBlockedInReadOnly('setup')).toBe(false);
     expect(isCommandBlockedInReadOnly('quickconnect check')).toBe(false);
     expect(isCommandBlockedInReadOnly('livetv channel')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup status')).toBe(false);
@@ -47,7 +48,6 @@ describe('read-only guard', () => {
   it('blocks common mutating command paths', () => {
     expect(isCommandBlockedInReadOnly('items refresh')).toBe(true);
     expect(isCommandBlockedInReadOnly('users delete')).toBe(true);
-    expect(isCommandBlockedInReadOnly('setup')).toBe(true);
     expect(isCommandBlockedInReadOnly('tasks run')).toBe(true);
     expect(isCommandBlockedInReadOnly('tasks running')).toBe(true);
     expect(isCommandBlockedInReadOnly('syncplay join')).toBe(true);

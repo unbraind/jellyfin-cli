@@ -179,6 +179,7 @@ const READ_ONLY_ALLOWED = new Set([
   'schema list',
   'sessions get',
   'sessions list',
+  'setup',
   'setup env',
   'setup configuration',
   'setup startup',
@@ -272,10 +273,6 @@ export function isReadOnlyModeEnabled(option: unknown, envValue: string | undefi
   return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
 }
 
-function firstSegment(path: string): string {
-  return path.split(' ')[0] ?? '';
-}
-
 export function isCommandBlockedInReadOnly(path: string): boolean {
   if (!path) {
     return false;
@@ -286,11 +283,6 @@ export function isCommandBlockedInReadOnly(path: string): boolean {
   }
 
   const parts = path.split(' ');
-  const topLevel = firstSegment(path);
-
-  if (topLevel === 'setup' && parts.length === 1) {
-    return true;
-  }
 
   return parts.some((part) =>
     part
