@@ -134,6 +134,107 @@ describe('setup command', () => {
     expect(parsed.error).toContain('Server URL must be a valid http(s) URL');
   });
 
+  it('accepts api key auth with username to resolve user id', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/System/Info/Public') {
+          return Response.json({
+            ServerName: 'Local Jellyfin',
+            Version: '10.9.0',
+            Id: 'server-1',
+            LocalAddress: `http://127.0.0.1:${server.port}`,
+          });
+        }
+        if (url.pathname === '/Users') {
+          return Response.json([
+            { Id: 'user-steve', Name: 'steve', Policy: { IsAdministrator: false } },
+            { Id: 'user-admin', Name: 'admin', Policy: { IsAdministrator: true } },
+          ]);
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      const result = await runCli([
+        'setup',
+        '--server',
+        `http://127.0.0.1:${server.port}`,
+        '--api-key',
+        'test-api-key',
+        '--username',
+        'steve',
+        '--non-interactive',
+        '--format',
+        'json',
+      ]);
+      expect(result.code).toBe(0);
+      const trimmed = result.stdout.trim();
+      const lastObjectStart = trimmed.lastIndexOf('\n{');
+      const jsonText = lastObjectStart >= 0 ? trimmed.slice(lastObjectStart + 1) : trimmed;
+      const parsed = JSON.parse(jsonText);
+      expect(parsed.has_api_key).toBe(true);
+      expect(parsed.username).toBe('steve');
+      expect(parsed.user_id).toBe('user-steve');
+      expect(parsed.setup_complete).toBe(true);
+    } finally {
+      server.stop(true);
+    }
+  });
+
+  it('ignores inherited password when explicit api key is provided', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/System/Info/Public') {
+          return Response.json({
+            ServerName: 'Local Jellyfin',
+            Version: '10.9.0',
+            Id: 'server-1',
+            LocalAddress: `http://127.0.0.1:${server.port}`,
+          });
+        }
+        if (url.pathname === '/Users') {
+          return Response.json([{ Id: 'user-steve', Name: 'steve', Policy: { IsAdministrator: false } }]);
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(
+        join(testConfigDir, 'settings.json'),
+        JSON.stringify({
+          defaultServer: {
+            serverUrl: `http://127.0.0.1:${server.port}`,
+            password: 'stale-password',
+            outputFormat: 'toon',
+          },
+        }),
+        'utf-8',
+      );
+
+      const result = await runCli([
+        'setup',
+        '--api-key',
+        'test-api-key',
+        '--username',
+        'steve',
+        '--non-interactive',
+        '--format',
+        'json',
+      ]);
+      expect(result.code).toBe(0);
+      expect(result.stderr).not.toContain('Do not combine --api-key with --password');
+    } finally {
+      server.stop(true);
+    }
+  });
+
   it('setup startup reports startup wizard state for configured server', async () => {
     const server = Bun.serve({
       port: 0,

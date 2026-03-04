@@ -94,6 +94,13 @@ export function createSetupCommand(): Command {
       let username = options.username ?? existingConfig.username;
       let password = options.password ?? existingConfig.password;
       let userId = existingConfig.userId;
+      const hasExplicitApiKey = typeof options.apiKey === 'string' && options.apiKey.length > 0;
+      const hasExplicitPassword = typeof options.password === 'string' && options.password.length > 0;
+
+      // Explicit API key setup should not fail because of an inherited saved password.
+      if (hasExplicitApiKey && !hasExplicitPassword) {
+        password = undefined;
+      }
 
       const isInteractive = !options.nonInteractive && process.stdin.isTTY;
 
@@ -145,17 +152,17 @@ export function createSetupCommand(): Command {
         console.error(formatOutput({ error: 'Timeout must be a positive integer.' }, runtimeFormat, 'error'));
         process.exit(1);
       }
-      if (apiKey && (username || password)) {
+      if (apiKey && password) {
         console.error(
           formatOutput(
-            { error: 'Use either API key auth OR username/password auth, not both.' },
+            { error: 'Do not combine --api-key with --password. Use either API key or username/password auth.' },
             runtimeFormat,
             'error',
           ),
         );
         process.exit(1);
       }
-      if ((username && !password) || (!username && password)) {
+      if (!apiKey && ((username && !password) || (!username && password))) {
         console.error(
           formatOutput({ error: 'Username and password must be provided together.' }, runtimeFormat, 'error'),
         );

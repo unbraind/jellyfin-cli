@@ -222,6 +222,16 @@ To avoid modifying media library state during validation:
 - This makes API research output directly actionable for implementation planning by surfacing the
   highest-impact missing endpoint domains first.
 
+26. Setup auth-mode hardening for API key + username (March 4, 2026)
+
+- `jf setup` now supports `--api-key` together with `--username` so user-specific commands can
+  resolve and persist the expected `user_id` without requiring password auth.
+- Explicit API-key setup now clears inherited stale password values unless `--password` is
+  explicitly provided, preventing false validation conflicts from older settings.
+- Validation still blocks `--api-key` + `--password` combinations.
+- Verified live against local Jellyfin `10.11.6` using read-only E2E + full release checks on
+  March 4, 2026.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
