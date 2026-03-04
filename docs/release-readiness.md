@@ -49,6 +49,9 @@ This runs:
 export JELLYFIN_READ_ONLY=1
 export JELLYFIN_TIMEOUT=120000
 bun test tests/e2e/cli.test.ts
+
+# Optional: force compiled CLI (`dist/cli.js`) instead of `bun run src/cli.ts`
+JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts
 ```
 
 The E2E suite is read-only and is designed to avoid mutating media library data.
@@ -61,6 +64,7 @@ The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env var
 jf config doctor
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
 jf schema openapi --endpoint /api-docs/openapi.json --read-only-ops --limit 25
+jf schema research --include-unmatched --limit 20
 jf schema tools --command system --limit 10
 jf schema coverage --method GET --command-prefix system --min-score 3 --limit 20
 ```

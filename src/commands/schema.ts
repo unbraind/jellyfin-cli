@@ -14,6 +14,7 @@ import { suggestCommandFromOperation } from '../utils/openapi-suggestions.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 import { summarizeOperationsByTag } from './schema-coverage.js';
+import { attachSchemaResearchSubcommand } from './schema-research.js';
 
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
@@ -35,16 +36,14 @@ export function createSchemaCommand(): Command {
     });
 
   cmd.addCommand(createSchemaValidateCommand());
+  attachSchemaResearchSubcommand(cmd);
 
   cmd
     .command('list')
     .description('List all available output types')
     .action(function (this: Command) {
       const outputFormat = resolveOutputFormat(this, {});
-      console.log(formatOutput({
-        types: getAvailableTypes(),
-        count: getAvailableTypes().length,
-      }, outputFormat, 'output_types'));
+      console.log(formatOutput({ types: getAvailableTypes(), count: getAvailableTypes().length }, outputFormat, 'output_types'));
     });
 
   cmd
@@ -82,9 +81,7 @@ export function createSchemaCommand(): Command {
           search: options.search as string | undefined,
           readOnlySafe: options.readOnlyOps ? true : undefined,
         });
-        const commandMatches = options.forCommand
-          ? matchOperationsForCommandIntent(filteredOperations, String(options.forCommand))
-          : [];
+        const commandMatches = options.forCommand ? matchOperationsForCommandIntent(filteredOperations, String(options.forCommand)) : [];
         const data: Record<string, unknown> = {
           source_path: result.sourcePath,
           server_url: config.serverUrl,

@@ -3208,6 +3208,20 @@ Notes:
 - Coverage is intent-based (heuristic) and intended for discovery prioritization.
 - `unmatched_operations` provides a deterministic sample for roadmap planning.
 
+### schema research
+
+Generate a consolidated API research snapshot (OpenAPI summary + full/read-only coverage blocks).
+
+```bash
+jf schema research [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--include-unmatched] [--limit <number>] [--format <format>]
+```
+
+Output type: `openapi_research`
+
+Notes:
+- Useful for one-shot API discovery reports in CI/agent workflows.
+- Includes both `full_scope` and `read_only_scope` summaries in one payload.
+
 ---
 
 ## auth

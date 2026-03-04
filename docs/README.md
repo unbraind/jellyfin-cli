@@ -63,6 +63,9 @@ jf schema coverage --method GET --read-only-ops --command-prefix items --min-sco
 jf schema coverage --read-only-ops --suggest-commands --limit 20
 jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --limit 20
 
+# Generate a single API research snapshot (OpenAPI + coverage)
+jf schema research --include-unmatched --limit 20
+
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info
 
@@ -210,6 +213,7 @@ Notes:
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
 | `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
+| `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
 | `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations, and optionally suggest command names |
 | `jf schema validate` | Validate Toon/JSON/YAML payloads against CLI schemas for CI and agent safety |

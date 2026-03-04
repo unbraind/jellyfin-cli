@@ -174,6 +174,7 @@ jf system info --format raw
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
+- `jf schema research` - Emit consolidated OpenAPI + full/read-only coverage snapshot for API research
 - `jf schema tools` - Export command tool schemas for LLM function-calling
 - `jf schema coverage` - Estimate API coverage, list unmatched OpenAPI operations, and suggest command names
 
@@ -526,6 +527,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema list` - List all available output types
 - `jf schema validate [type] [--from auto|json|yaml|toon] [--input <payload>]` - Validate output payloads against CLI schemas (stdin or inline)
 - `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
+- `jf schema research [--method GET] [--tag Users] [--path-prefix /Users] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--include-unmatched] [--limit 20]` - Generate one consolidated OpenAPI + full/read-only coverage snapshot
 - `jf schema tools [--command <prefix> --limit <n>]` - Export command tool schemas with JSON input schema
 - `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--suggest-commands] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set and optionally generate candidate CLI names for unmapped endpoints
 

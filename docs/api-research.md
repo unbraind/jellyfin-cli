@@ -238,6 +238,15 @@ To avoid modifying media library state during validation:
   as low-signal while prioritizing specific subcommand tokens.
 - Added a targeted penalty when a match only aligns with top-level command-domain tokens and misses
   specific trailing intent tokens.
+
+28. Consolidated live research snapshot command (March 4, 2026)
+
+- Added `jf schema research` to emit a single OpenAPI + coverage report for agent planning.
+- Includes both `full_scope` and `read_only_scope` coverage blocks in one response.
+- Supports `--include-unmatched` for backlog sampling and `--command-prefix` for domain-scoped analysis.
+- Verification run against Jellyfin `10.11.6` on March 4, 2026:
+  - read-only scope: `257/257` mapped (`100%`)
+  - full scope: `429/429` mapped (`100%`)
 - Fixed `jf schema openapi --for-command` so inferred `command_matches` now respect active operation
   filters (including `--read-only-ops`, `--method`, `--tag`, `--path-prefix`, `--search`).
 - Added regression coverage:
@@ -383,7 +392,7 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
   - unmatched operations: `0` (both scopes)
 - Release-quality verification also passed on the same run:
  - `bun run validate:release`
- - `1007` tests passing (includes read-only live CLI E2E coverage).
+- `1011` tests passing (includes read-only live CLI E2E coverage).
 
 34. OpenAPI probe resilience + endpoint override for agent workflows (March 4, 2026)
 
