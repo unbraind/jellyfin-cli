@@ -31,3 +31,4 @@ settings.json
 .tool-output/
 test-results/
 .tmp/
+.gemini/

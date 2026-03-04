@@ -13,7 +13,6 @@ jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin me
 | [Agent Integration](agent-integration.md) | Guide for integrating with AI agents and LLMs |
 | [Security](security.md) | Security best practices |
 | [Troubleshooting](troubleshooting.md) | Common issues and solutions |
-| [Improvements](IMPROVEMENTS.md) | Enhancement history and features |
 | [API Research](api-research.md) | Live API discovery notes and agent-focused roadmap |
 | [Release Readiness](release-readiness.md) | Pre-release validation, secret safety, and E2E checklist |
 
