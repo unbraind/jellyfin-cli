@@ -514,4 +514,81 @@ describe('setup command', () => {
       server.stop(true);
     }
   });
+
+  it('setup validate fails strict mode when server is not configured', async () => {
+    const result = await runCli(['setup', 'validate', '--require-all', '--format', 'json']);
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stdout);
+    expect(parsed.configured).toBe(false);
+    expect(parsed.all_ok).toBe(false);
+    expect(parsed.checks.connection_ok).toBe(false);
+  });
+
+  it('setup validate reports all checks passing for a healthy server', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/System/Info/Public') {
+          return Response.json({
+            ServerName: 'Local Jellyfin',
+            Version: '10.11.6',
+            Id: 'server-1',
+          });
+        }
+        if (url.pathname === '/System/Info') {
+          return Response.json({
+            ServerName: 'Local Jellyfin',
+            Version: '10.11.6',
+            Id: 'server-1',
+          });
+        }
+        if (url.pathname === '/api-docs/openapi.json') {
+          return Response.json({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info': { get: { tags: ['System'] } },
+            },
+          });
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(
+        join(testConfigDir, 'settings.json'),
+        JSON.stringify({
+          defaultServer: {
+            serverUrl: `http://127.0.0.1:${server.port}`,
+            apiKey: 'test-key',
+            outputFormat: 'toon',
+          },
+        }),
+        'utf-8',
+      );
+
+      const result = await runCli([
+        'setup',
+        'validate',
+        '--require-all',
+        '--validate-formats',
+        '--format',
+        'json',
+      ]);
+
+      expect(result.code).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.configured).toBe(true);
+      expect(parsed.checks.connection_ok).toBe(true);
+      expect(parsed.checks.auth_ok).toBe(true);
+      expect(parsed.checks.openapi_available).toBe(true);
+      expect(parsed.format_validations.enabled).toBe(true);
+      expect(parsed.format_validations.all_ok).toBe(true);
+      expect(parsed.all_ok).toBe(true);
+    } finally {
+      server.stop(true);
+    }
+  });
 });

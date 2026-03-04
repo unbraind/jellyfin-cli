@@ -78,6 +78,17 @@ jf setup status
 
 Output type: `setup_status`
 
+### setup validate
+
+Validate setup readiness (local config + read-only live checks for connectivity/auth/OpenAPI and
+optional formatter validation).
+
+```bash
+jf setup validate [--name <name>] [--require-all] [--validate-formats] [--format <format>]
+```
+
+Output type: `setup_validate`
+
 ### setup env
 
 Export environment variables from current configuration.

@@ -89,6 +89,7 @@ These commands are read-only and verify that key output formats remain machine-p
 
 ```bash
 jf config doctor
+jf setup validate --require-all --validate-formats --format json
 jf config doctor --validate-formats --format json
 jf config doctor --validate-formats --require-connected --require-auth --require-openapi --require-valid-formats --format json
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25

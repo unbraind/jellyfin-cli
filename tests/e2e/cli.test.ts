@@ -1189,6 +1189,29 @@ describe.skipIf(skip)('E2E subtitles', () => {
 // -------------------------------------------------------------------------
 
 describe.skipIf(skip)('E2E setup', () => {
+  it('setup validate strict gate passes in json mode', async () => {
+    const out = await jf('setup', 'validate', '--require-all', '--validate-formats', '--format', 'json');
+    const payload = JSON.parse(out) as {
+      all_ok?: boolean;
+      checks?: {
+        connection_ok?: boolean;
+        auth_ok?: boolean;
+        openapi_available?: boolean;
+      };
+      format_validations?: {
+        enabled?: boolean;
+        all_ok?: boolean;
+      };
+    };
+
+    expect(payload.all_ok).toBe(true);
+    expect(payload.checks?.connection_ok).toBe(true);
+    expect(payload.checks?.auth_ok).toBe(true);
+    expect(payload.checks?.openapi_available).toBe(true);
+    expect(payload.format_validations?.enabled).toBe(true);
+    expect(payload.format_validations?.all_ok).toBe(true);
+  }, T);
+
   it('setup startup help is available', async () => {
     const out = await jf('setup', 'startup', '--help');
     expect(out).toMatch(/startup|wizard|diagnostics/i);

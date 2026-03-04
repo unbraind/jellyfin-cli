@@ -161,6 +161,7 @@ jf system info --format raw
 - `jf setup` - Interactive setup wizard
 - `jf setup wizard` - Explicit alias for setup wizard workflows
 - `jf setup status` - Check setup status
+- `jf setup validate` - Validate setup readiness (config/connectivity/auth/OpenAPI/output-format checks)
 - `jf setup env` - Show environment variables (`--shell` or structured `--format json`)
 - `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)
 - `jf setup configuration` - Alias of `setup startup` for endpoint-aligned diagnostics
@@ -174,6 +175,7 @@ jf system info --format raw
 - `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
+- `jf setup validate --require-all --validate-formats --format json` - Setup wizard readiness gate for CI/agents
 - `jf config doctor --require-connected --require-auth --require-openapi --require-valid-formats --validate-formats` - Enforce machine-checkable release gates
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
 - `jf schema research` - Emit consolidated OpenAPI + full/read-only coverage snapshot for API research

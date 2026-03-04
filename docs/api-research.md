@@ -69,14 +69,22 @@ This avoids treating local utility commands as API implementation gaps.
 
 ## Latest Agent-Focused Improvement
 
-### `trickplay` format consistency
+### Setup readiness gate for setup wizard workflows
 
-`jf trickplay hls-url` and `jf trickplay tile-url` now honor runtime `--format` instead of always
-forcing Toon output. This keeps programmatic workflows deterministic across JSON/YAML/Markdown/Table.
+Added `jf setup validate` as a read-only setup readiness diagnostic to consolidate:
+
+- local config presence
+- server connectivity (`/System/Info/Public`)
+- auth viability (`/System/Info`)
+- OpenAPI availability (`/api-docs/openapi.json` fallback probing)
+- optional formatter validation for `toon/json/table/raw/yaml/markdown`
+
+It supports `--require-all` for CI/agent pass/fail gating and keeps setup verification in one command
+without mutating server/library data.
 
 Added regression tests:
 
-- `tests/commands/trickplay.test.ts`
+- `tests/commands/setup.test.ts`
 
 ## Repro Commands
 
@@ -89,6 +97,7 @@ jf-cli --format json schema research --include-unmatched --limit 100
 
 # Live safety/format diagnostics
 jf-cli --format json config doctor --validate-formats --require-connected --require-auth --require-openapi --require-valid-formats
+jf-cli --format json setup validate --require-all --validate-formats
 
 # Optional read-only guard for interactive sessions
 export JELLYFIN_READ_ONLY=1

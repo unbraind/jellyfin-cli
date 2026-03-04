@@ -17,6 +17,7 @@ import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 import { attachSetupEnvSubcommand } from './setup-env.js';
 import { attachSetupStatusSubcommand } from './setup-status.js';
 import { attachSetupStartupSubcommand } from './setup-startup.js';
+import { attachSetupValidateSubcommand } from './setup-validate.js';
 
 type SetupCommandOptions = FormatOptions & {
   apiKey?: string | undefined;
@@ -287,6 +288,7 @@ export function createSetupCommand(): Command {
   attachSetupEnvSubcommand(cmd);
   attachSetupStatusSubcommand(cmd);
   attachSetupStartupSubcommand(cmd);
+  attachSetupValidateSubcommand(cmd);
 
   return cmd;
 }

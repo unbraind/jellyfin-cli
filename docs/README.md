@@ -212,6 +212,7 @@ Notes:
 | `jf setup` | Interactive setup wizard |
 | `jf setup wizard` | Explicit alias for setup wizard workflows |
 | `jf setup status` | Check setup status |
+| `jf setup validate` | Validate setup readiness (config/connectivity/auth/OpenAPI/format checks) |
 | `jf setup env` | Show environment variables |
 | `jf setup startup` | Inspect startup wizard state (read-only) |
 | `jf setup configuration` | Alias of `setup startup` for endpoint-aligned diagnostics |
