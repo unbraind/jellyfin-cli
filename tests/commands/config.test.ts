@@ -285,3 +285,50 @@ describe('config set command', () => {
     expect(settings.defaultServer?.timeout).toBe(30000);
   });
 });
+
+describe('config output format support', () => {
+  it('supports structured json output for config path', async () => {
+    const result = await runCli(['config', 'path', '--format', 'json']);
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as { config_path?: string };
+    expect(payload.config_path).toBe(join(testConfigDir, 'settings.json'));
+  });
+
+  it('masks secrets in config get when using structured formats', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: 'http://127.0.0.1:8096',
+          apiKey: 'real-api-key-value',
+          password: 'real-password-value',
+          username: 'steve',
+          userId: 'u1',
+          outputFormat: 'toon',
+          timeout: 5000,
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['config', 'get', '--format', 'json']);
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as {
+      server_url?: string;
+      username?: string | null;
+      user_id?: string | null;
+      has_api_key?: boolean;
+      has_password?: boolean;
+      apiKey?: string;
+      password?: string;
+    };
+    expect(payload.server_url).toBe('http://127.0.0.1:8096');
+    expect(payload.username).toBe('steve');
+    expect(payload.user_id).toBe('u1');
+    expect(payload.has_api_key).toBe(true);
+    expect(payload.has_password).toBe(true);
+    expect(payload.apiKey).toBeUndefined();
+    expect(payload.password).toBeUndefined();
+  });
+});

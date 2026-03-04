@@ -1,10 +1,12 @@
 import { Command } from 'commander';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, deleteServer, writeSettingsFile } from '../utils/config.js';
-import { formatSuccess, formatError, toon } from '../formatters/index.js';
+import { formatSuccess, formatError, formatOutput, toon } from '../formatters/index.js';
 import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { promptGithubStar } from '../utils/github-star.js';
 import { addConfigDoctorCommand } from './config-doctor.js';
+import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import type { JellyfinConfig, OutputFormat } from '../types/index.js';
 
 function resolveConfigSaveServerName(explicitName: string | undefined): string | undefined {
   if (explicitName && explicitName.trim().length > 0) {
@@ -13,6 +15,35 @@ function resolveConfigSaveServerName(explicitName: string | undefined): string |
 
   const activeNamed = listServers().find((server) => server.isDefault && server.name !== 'default');
   return activeNamed?.name;
+}
+
+type ConfigCommandOptions = FormatOptions & {
+  name?: string | undefined;
+};
+
+function resolveConfigRuntimeFormat(thisCommand: Command, options: ConfigCommandOptions): OutputFormat {
+  const fallback = getConfig(options.name).outputFormat ?? 'toon';
+  return resolveOutputFormat(thisCommand, { format: options.format ?? fallback });
+}
+
+function toSafeConfig(config: JellyfinConfig): Record<string, unknown> {
+  return {
+    server_url: config.serverUrl,
+    username: config.username ?? null,
+    user_id: config.userId ?? null,
+    has_api_key: Boolean(config.apiKey),
+    has_password: Boolean(config.password),
+    output_format: config.outputFormat,
+    timeout: config.timeout,
+  };
+}
+
+function printConfigPayload(data: Record<string, unknown>, format: OutputFormat, typeHint: string): void {
+  if (format === 'toon') {
+    console.log(toon.formatToon(data, typeHint));
+    return;
+  }
+  console.log(formatOutput(data, format, typeHint));
 }
 
 export function createConfigCommand(): Command {
@@ -31,9 +62,19 @@ export function createConfigCommand(): Command {
     .option('--timeout <ms>', 'Request timeout in milliseconds')
     .option('--name <name>', 'Server name for this config')
     .option('--default', 'Set as default server')
-    .action(async (options) => {
+    .option('-f, --format <format>', 'Output format')
+    .action(async function (this: Command, options: ConfigCommandOptions & {
+      server?: string | undefined;
+      apiKey?: string | undefined;
+      username?: string | undefined;
+      password?: string | undefined;
+      userId?: string | undefined;
+      outputFormat?: string | undefined;
+      timeout?: string | undefined;
+      default?: boolean | undefined;
+    }) {
       const config = getConfig(options.name);
-      const format = config.outputFormat ?? 'toon';
+      const format = resolveConfigRuntimeFormat(this, options);
       const providedTimeout = options.timeout ? parseInt(options.timeout, 10) : undefined;
       const timeout = providedTimeout ?? config.timeout;
       const outputFormat = parseOutputFormat(options.outputFormat, config.outputFormat ?? 'toon');
@@ -91,24 +132,54 @@ export function createConfigCommand(): Command {
     .command('get')
     .description('Display current configuration')
     .option('--name <name>', 'Server name')
-    .action((options) => {
+    .option('-f, --format <format>', 'Output format')
+    .action(function (this: Command, options: ConfigCommandOptions) {
       const config = getConfig(options.name);
-      console.log(toon.formatConfig(config));
+      const format = resolveConfigRuntimeFormat(this, options);
+      if (format === 'toon') {
+        console.log(toon.formatConfig(config));
+        return;
+      }
+      printConfigPayload(toSafeConfig(config), format, 'config');
     });
 
   cmd
     .command('path')
     .description('Show configuration file path')
-    .action(() => {
-      console.log(getSettingsPath());
+    .option('-f, --format <format>', 'Output format')
+    .action(function (this: Command, options: ConfigCommandOptions) {
+      const path = getSettingsPath();
+      const format = resolveConfigRuntimeFormat(this, options);
+      if (format === 'toon') {
+        console.log(path);
+        return;
+      }
+      printConfigPayload({ config_path: path }, format, 'config_path');
     });
 
   cmd
     .command('list')
     .description('List all configured servers')
-    .action(() => {
+    .option('-f, --format <format>', 'Output format')
+    .action(function (this: Command, options: ConfigCommandOptions) {
       const servers = listServers();
-      console.log(toon.formatServers(servers));
+      const format = resolveConfigRuntimeFormat(this, options);
+      if (format === 'toon') {
+        console.log(toon.formatServers(servers));
+        return;
+      }
+      printConfigPayload(
+        {
+          servers: servers.map((server) => ({
+            name: server.name,
+            server_url: server.config.serverUrl,
+            username: server.config.username ?? null,
+            is_default: server.isDefault,
+          })),
+        },
+        format,
+        'servers',
+      );
     });
 
   cmd
@@ -159,9 +230,10 @@ export function createConfigCommand(): Command {
     .command('test')
     .description('Test connection to Jellyfin server')
     .option('--name <name>', 'Server name')
-    .action(async (options) => {
+    .option('-f, --format <format>', 'Output format')
+    .action(async function (this: Command, options: ConfigCommandOptions) {
       const config = getConfig(options.name);
-      const format = config.outputFormat ?? 'toon';
+      const format = resolveConfigRuntimeFormat(this, options);
 
       if (!config.serverUrl) {
         console.error(formatError('No server URL configured', format));
@@ -171,7 +243,20 @@ export function createConfigCommand(): Command {
       try {
         const client = new JellyfinApiClient(config);
         const info = await client.getPublicSystemInfo();
-        console.log(toon.formatSystemInfo(info));
+        if (format === 'toon') {
+          console.log(toon.formatSystemInfo(info));
+        } else {
+          printConfigPayload(
+            {
+              server_name: info.ServerName,
+              version: info.Version,
+              server_id: info.Id,
+              local_address: info.LocalAddress ?? null,
+            },
+            format,
+            'system_info',
+          );
+        }
         await promptGithubStar();
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Connection failed';

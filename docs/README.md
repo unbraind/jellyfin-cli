@@ -141,12 +141,16 @@ jf config get
 
 # Show config file path
 jf config path
+jf config path --format json
 
 # List all configured servers
 jf config list
 
 # Set configuration
 jf config set --server URL --api-key KEY
+
+# Get masked config in structured output
+jf config get --format json
 ```
 
 ### Multi-Server Configuration
