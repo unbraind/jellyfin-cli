@@ -144,10 +144,21 @@ export function createSchemaCommand(): Command {
     .description('Export command tool schemas for LLM/function-calling workflows')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--command <prefix>', 'Optional command prefix filter, e.g. "items" or "users get"')
+    .option('--name <name>', 'Server name (used with --openapi-match)')
+    .option('--endpoint <path>', 'Preferred OpenAPI path for --openapi-match (e.g. /api-docs/openapi.json)')
+    .option('--openapi-match', 'Attach inferred OpenAPI operation candidates per tool')
+    .option('--openapi-match-limit <number>', 'OpenAPI matches to include per tool when --openapi-match is enabled', '3')
+    .option('--min-score <number>', 'Minimum OpenAPI match score for --openapi-match', '3')
     .option('--limit <number>', 'Schema list limit', '500')
-    .action(function (this: Command, options: FormatOptions & Record<string, unknown>) {
+    .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
       const outputFormat = resolveOutputFormat(this, options);
       const limit = parsePositiveInteger(String(options.limit ?? '500'), 'Limit', outputFormat);
+      const openApiMatchLimit = parsePositiveInteger(
+        String(options.openapiMatchLimit ?? '3'),
+        'OpenAPI match limit',
+        outputFormat,
+      );
+      const minScore = parsePositiveInteger(String(options.minScore ?? '3'), 'Min score', outputFormat);
 
       const root = this.parent?.parent;
       if (!root) {
@@ -155,17 +166,77 @@ export function createSchemaCommand(): Command {
         process.exit(1);
       }
 
-      const allTools = generateCliToolSchemas(root, options.command as string | undefined);
-      const tools = allTools.slice(0, limit);
-      const data = {
-        tool_count: tools.length,
-        total_tool_count: allTools.length,
-        command_prefix: options.command ?? null,
-        truncated: allTools.length > limit,
-        tools,
-      };
+      try {
+        const allTools = generateCliToolSchemas(root, options.command as string | undefined);
+        const sourceTools = allTools.slice(0, limit);
+        let tools = sourceTools;
+        let openApiMatchMeta:
+          | {
+            enabled: true;
+            source_path: string;
+            server_url: string;
+            operation_count: number;
+            min_score: number;
+            match_limit: number;
+          }
+          | { enabled: false } = { enabled: false };
 
-      console.log(formatOutput(data, outputFormat, 'tool_schemas'));
+        if (options.openapiMatch) {
+          const config = getConfig(options.name as string | undefined);
+          if (!config.serverUrl) {
+            console.error(formatOutput({ error: 'No server URL configured' }, outputFormat, 'error'));
+            process.exit(1);
+          }
+
+          const openApiResult = await fetchOpenApiDocumentWithOptions(config, {
+            endpointPath: options.endpoint as string | undefined,
+          });
+          const openApiOperations = extractOpenApiOperations(openApiResult.document);
+          tools = sourceTools.map((tool) => {
+            const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
+            const matches = matchOperationsForCommandIntent(openApiOperations, commandIntent)
+              .filter((candidate) => candidate.score >= minScore)
+              .slice(0, openApiMatchLimit)
+              .map((candidate) => ({
+                method: candidate.method,
+                path: candidate.path,
+                operation_id: candidate.operationId ?? null,
+                tags: candidate.tags,
+                score: candidate.score,
+                matched_on: candidate.matchedOn,
+                read_only_safe: candidate.readOnlySafe,
+              }));
+            return {
+              ...tool,
+              openapi_matches: matches,
+            };
+          });
+
+          openApiMatchMeta = {
+            enabled: true,
+            source_path: openApiResult.sourcePath,
+            server_url: config.serverUrl,
+            operation_count: openApiOperations.length,
+            min_score: minScore,
+            match_limit: openApiMatchLimit,
+          };
+        }
+
+        const data = {
+          tool_count: tools.length,
+          total_tool_count: allTools.length,
+          command_prefix: options.command ?? null,
+          truncated: allTools.length > limit,
+          openapi_matching: openApiMatchMeta,
+          tools,
+        };
+
+        console.log(formatOutput(data, outputFormat, 'tool_schemas'));
+      } catch (err) {
+        const message = err instanceof Error ? err.message : 'Tool schema export failed';
+        console.error(formatOutput({ error: message }, outputFormat, 'error'));
+        process.exit(1);
+      }
     });
 
   return cmd;

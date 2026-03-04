@@ -569,6 +569,71 @@ describe('schema tools command', () => {
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Limit must be a positive integer');
   });
+
+  it('supports OpenAPI match enrichment for tool schemas', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info': {
+                get: { tags: ['System'], operationId: 'GetSystemInfo', summary: 'Get system info' },
+              },
+              '/System/Ping': {
+                get: { tags: ['System'], operationId: 'GetPingSystem', summary: 'Ping' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'tools',
+      '--command',
+      'system info',
+      '--limit',
+      '1',
+      '--openapi-match',
+      '--openapi-match-limit',
+      '2',
+      '--min-score',
+      '3',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('type: tool_schemas');
+    expect(result.stdout).toContain('openapi_matching:');
+    expect(result.stdout).toContain('enabled: true');
+    expect(result.stdout).toContain('openapi_matches:');
+    expect(result.stdout).toContain('method: GET');
+    expect(result.stdout).toContain('path: /System/Info');
+  });
+
+  it('returns error for --openapi-match when no server is configured', async () => {
+    const result = await runCli(['schema', 'tools', '--openapi-match']);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('No server URL configured');
+  });
 });
 
 describe('schema validate command', () => {

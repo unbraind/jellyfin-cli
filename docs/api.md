@@ -3188,10 +3188,14 @@ Notes:
 Export command tool schemas for function-calling and LLM agent workflows.
 
 ```bash
-jf schema tools [--command <prefix>] [--limit <number>] [--format <format>]
+jf schema tools [--command <prefix>] [--name <name>] [--endpoint <path>] [--openapi-match] [--openapi-match-limit <number>] [--min-score <number>] [--limit <number>] [--format <format>]
 ```
 
 Output type: `tool_schemas`
+
+Notes:
+- `--openapi-match` enriches each exported tool entry with ranked endpoint candidates (`openapi_matches`) from the live Jellyfin OpenAPI document.
+- `--name` / `--endpoint` use the same server resolution behavior as other schema OpenAPI commands.
 
 ### schema coverage
 

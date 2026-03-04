@@ -216,7 +216,7 @@ Notes:
 | `jf config doctor --validate-formats` | Adds machine-oriented formatter validation (`toon/json/table/raw/yaml/markdown`) to diagnostics |
 | `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
 | `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
-| `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |
+| `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations, and optionally suggest command names |
 | `jf schema validate` | Validate Toon/JSON/YAML payloads against CLI schemas for CI and agent safety |
 

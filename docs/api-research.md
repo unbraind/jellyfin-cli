@@ -321,8 +321,20 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
-2. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.
-3. Add structured command replay snippets (`curl`, `httpie`) to `--explain` output for rapid debugging.
+2. Add structured command replay snippets (`curl`, `httpie`) to `--explain` output for rapid debugging.
+
+32. `schema tools --openapi-match` enrichment (March 4, 2026)
+
+- Implemented `jf schema tools --openapi-match` so tool schema export can include inferred
+  Jellyfin OpenAPI candidates per command.
+- Added supporting options:
+  - `--openapi-match-limit <number>`
+  - `--min-score <number>`
+  - `--name <name>`
+  - `--endpoint <path>`
+- Output now includes top-level `openapi_matching` metadata plus per-tool `openapi_matches` rows.
+- Added regression coverage in `tests/commands/schema.test.ts` for both success and unconfigured
+  server error paths.
 
 31. `config doctor` global format propagation parity (March 4, 2026)
 
