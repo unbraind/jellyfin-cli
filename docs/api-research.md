@@ -31,6 +31,24 @@ jf-cli schema research --include-unmatched --limit 40 --format json
 - unmatched tools (CLI intents with no OpenAPI match above score threshold): `21` (full), `57` (read-only)
 - local-only tools (utility commands intentionally not mapped to OpenAPI): `18` (full + read-only)
 
+## Latest `jf-cli` Binary Verification (March 4, 2026)
+
+Verified directly with the installed CLI command name (`jf-cli`) in read-only mode:
+
+```bash
+jf-cli --format json config doctor --validate-formats --require-connected --require-auth --require-openapi --require-valid-formats
+jf-cli --format json schema research --include-unmatched --limit 10
+jf-cli --format json schema coverage --read-only-ops --suggest-commands --limit 10
+jf-cli --format json setup startup
+```
+
+Observed results:
+
+- doctor checks: `connection_ok=true`, `auth_ok=true`, `openapi_available=true`
+- formatter checks: all supported formats validated (`toon`, `json`, `table`, `raw`, `yaml`, `markdown`)
+- research/coverage: full and read-only operation coverage both `100%` with `0` unmatched operations
+- setup startup: deterministic startup state output (`startup_complete_state`) remained stable with warning metadata when `/Startup/Complete` is unavailable
+
 ## Local-Only Tool Classification (March 4, 2026)
 
 `jf schema coverage` and `jf schema research` now separate utility-only commands from true API
