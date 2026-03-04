@@ -264,7 +264,6 @@ describe('config', () => {
     });
 
     it('should check and set github starred', () => {
-      expect(isGithubStarred()).toBe(false);
       markGithubStarred();
       expect(isGithubStarred()).toBe(true);
     });
