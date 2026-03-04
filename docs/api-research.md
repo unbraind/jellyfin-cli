@@ -258,6 +258,14 @@ To avoid modifying media library state during validation:
 Verification notes (March 4, 2026, Jellyfin 10.11.6):
 - `jf schema openapi --for-command "media external-id-infos" --read-only-ops` no longer returns
   mutating `/Library/Media/Updated` in `command_matches`.
+
+29. Years listing timeout hardening for large libraries (March 4, 2026)
+
+- `jf years list` now uses `GET /Items/Filters2` first and only falls back to `GET /Years` when needed.
+- This keeps the command read-only while avoiding long `/Years` scans that can exceed CLI/test timeouts.
+- Verified against local Jellyfin `10.11.6` with:
+  - `bun test tests/e2e/cli.test.ts -t "years list"`
+  - `bun run validate:release`
 - Coverage headline remains `92.22%` read-only mapped operations (`237/257`) while command-intent
   diagnostics are more accurate and deterministic for agent planning.
 

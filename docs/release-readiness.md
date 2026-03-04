@@ -67,6 +67,7 @@ export JELLYFIN_TIMEOUT=120000
 jf-cli --format json config doctor
 jf-cli --format yaml system info
 jf-cli --format markdown users me
+jf-cli --format json years list --limit 5
 jf-cli --format toon items list --limit 1 | jf-cli schema validate items --from toon
 # JSON parse check
 jf-cli --format json config doctor | jq '.checks.connection_ok and .checks.auth_ok and .checks.openapi_available'
