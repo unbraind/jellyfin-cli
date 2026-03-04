@@ -77,12 +77,8 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm with provenance (trusted publishing)
-        if: ${{ !inputs.dry_run && secrets.NPM_TOKEN == '' }}
-        run: npm publish --provenance --access public
-
-      - name: Publish to npm with provenance (token fallback)
-        if: ${{ !inputs.dry_run && secrets.NPM_TOKEN != '' }}
+      - name: Publish to npm with provenance
+        if: ${{ !inputs.dry_run }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
