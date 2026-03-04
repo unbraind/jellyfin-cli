@@ -223,13 +223,26 @@ export function createSchemaCommand(): Command {
             continue;
           }
 
-          const uniqueMatch = matches.find(
-            (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
-          );
-          const match = uniqueMatch ?? matches[0];
-
           mappedToolCount += 1;
-          mappedOperationKeys.add(`${match.method} ${match.path}`);
+          const primaryMatch = matches.find(
+            (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
+          ) ?? matches[0];
+          mappedOperationKeys.add(`${primaryMatch.method} ${primaryMatch.path}`);
+
+          const extraScoreThreshold = Math.max(minScore, primaryMatch.score - 2);
+          for (const match of matches) {
+            const key = `${match.method} ${match.path}`;
+            if (key === `${primaryMatch.method} ${primaryMatch.path}`) {
+              continue;
+            }
+            if (match.score < extraScoreThreshold) {
+              continue;
+            }
+            if (match.matchedOn.length < 2) {
+              continue;
+            }
+            mappedOperationKeys.add(key);
+          }
         }
 
         const unmatched = filteredOperations.filter(

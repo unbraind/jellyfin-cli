@@ -319,3 +319,26 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 Verification notes (March 4, 2026, Jellyfin 10.11.6):
 - Live E2E run confirms `jf tvshows similar` returns `type: items` when a series ID is available.
 - The command is read-only and does not mutate library data.
+
+31. Coverage mapping precision for multi-operation commands (March 4, 2026)
+
+- Updated `jf schema coverage` mapping logic so one command intent can map more than one operation
+  when confidence remains high.
+- This fixes undercounting for command families that intentionally cover multiple related endpoints
+  (for example stream/universal variants).
+- Added regression test:
+  - `tests/commands/schema.test.ts`:
+    `maps multiple operations to one command intent when all matches meet the score threshold`
+- Also fixed a setup command quality issue:
+  - `src/commands/setup.ts` indentation around target server save resolution now follows project
+    formatting conventions.
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- Read-only scope: `257/257` mapped (`100%`).
+- Full scope: `424/429` mapped (`98.83%`).
+- Remaining unmatched full-scope operations observed in this run:
+  - `POST /ScheduledTasks/Running/{taskId}`
+  - `GET /Startup/Configuration`
+  - `POST /Startup/Configuration`
+  - `GET /SyncPlay/List`
+  - `POST /SyncPlay/New`

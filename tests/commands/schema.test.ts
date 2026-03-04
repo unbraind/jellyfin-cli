@@ -374,6 +374,63 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('suggested_command: custom list');
     expect(result.stdout).toContain('intent: list');
   });
+
+  it('maps multiple operations to one command intent when all matches meet the score threshold', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Audio/{itemId}/stream': {
+                get: { tags: ['Audio'], operationId: 'GetAudioStream', summary: 'Get audio stream' },
+              },
+              '/Audio/{itemId}/universal': {
+                get: { tags: ['UniversalAudio'], operationId: 'GetUniversalAudioStream', summary: 'Universal audio stream' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'coverage',
+      '--method',
+      'GET',
+      '--command-prefix',
+      'media audio-stream-url',
+      '--min-score',
+      '3',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('operation_scope_count: 2');
+    expect(result.stdout).toContain('mapped_tool_count: 1');
+    expect(result.stdout).toContain('mapped_operation_count: 2');
+    expect(result.stdout).toContain('unmapped_operation_count: 0');
+    expect(result.stdout).toContain('coverage_percent: 100');
+  });
 });
 
 describe('schema tools command', () => {

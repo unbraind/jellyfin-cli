@@ -260,7 +260,7 @@ export function createSetupCommand(): Command {
           timeout,
         };
 
-      const targetServerName = resolveSetupSaveServerName(options.name, listServers());
+        const targetServerName = resolveSetupSaveServerName(options.name, listServers());
         saveConfig(newConfig, targetServerName, options.default);
 
         const result = {
