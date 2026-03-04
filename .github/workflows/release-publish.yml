@@ -93,12 +93,13 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
+          PACKAGE_NAME="$(node -p 'require("./package.json").name')"
           VERSION="$(node -p 'require("./package.json").version')"
-          for i in $(seq 1 12); do
-            if npx --yes "jellyfin-cli@${VERSION}" --version; then
+          for i in $(seq 1 30); do
+            if npx --yes --package "${PACKAGE_NAME}@${VERSION}" jf --version; then
               exit 0
             fi
-            echo "npx verification not ready yet (attempt ${i}/12); retrying in 10s..."
+            echo "npx verification not ready yet (attempt ${i}/30); retrying in 10s..."
             sleep 10
           done
           echo "npx verification failed after retries."
@@ -108,12 +109,13 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
+          PACKAGE_NAME="$(node -p 'require("./package.json").name')"
           VERSION="$(node -p 'require("./package.json").version')"
-          for i in $(seq 1 12); do
-            if bunx "jellyfin-cli@${VERSION}" --version; then
+          for i in $(seq 1 30); do
+            if bunx --package "${PACKAGE_NAME}@${VERSION}" jf --version; then
               exit 0
             fi
-            echo "bunx verification not ready yet (attempt ${i}/12); retrying in 10s..."
+            echo "bunx verification not ready yet (attempt ${i}/30); retrying in 10s..."
             sleep 10
           done
           echo "bunx verification failed after retries."
