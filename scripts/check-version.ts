@@ -17,8 +17,8 @@ function getGitTags(cwd: string): string[] {
 
 function toUtcDatePart(input: Date): string {
   const year = String(input.getUTCFullYear());
-  const month = String(input.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(input.getUTCDate()).padStart(2, '0');
+  const month = String(input.getUTCMonth() + 1);
+  const day = String(input.getUTCDate());
   return `${year}.${month}.${day}`;
 }
 
@@ -28,7 +28,7 @@ function getTodayReleaseCount(cwd: string, todayPart: string): number {
 
   for (const tag of tags) {
     const normalized = tag.startsWith('v') ? tag.slice(1) : tag;
-    const match = /^(\d{4}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))(?:-(\d+))?$/.exec(
+    const match = /^(\d{4}\.(?:[1-9]|1[0-2])\.(?:[1-9]|[12]\d|3[01]))(?:-(\d+))?$/.exec(
       normalized,
     );
     if (!match) {
@@ -55,7 +55,7 @@ function getTodayReleaseCount(cwd: string, todayPart: string): number {
 }
 
 function parseVersion(value: string): { datePart: string; releaseIndex: number; hasSuffix: boolean } | null {
-  const VERSION_PATTERN = /^(\d{4}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))(?:-(\d+))?$/;
+  const VERSION_PATTERN = /^(\d{4}\.(?:[1-9]|1[0-2])\.(?:[1-9]|[12]\d|3[01]))(?:-(\d+))?$/;
   const match = VERSION_PATTERN.exec(value);
   if (!match) {
     return null;
@@ -92,7 +92,7 @@ if (!version || typeof version !== 'string') {
 const parsed = parseVersion(version);
 if (!parsed) {
   console.error(`Invalid version format: ${version}`);
-  console.error('Expected format: YYYY.MM.DD or YYYY.MM.DD-<N> (N >= 2).');
+  console.error('Expected format: YYYY.M.D or YYYY.M.D-<N> (N >= 2).');
   process.exit(1);
 }
 
@@ -103,7 +103,7 @@ if (parsed.datePart !== todayPart) {
 }
 
 if (parsed.releaseIndex === 1 && parsed.hasSuffix) {
-  console.error('Version release index 1 must not include a suffix. Use YYYY.MM.DD only.');
+  console.error('Version release index 1 must not include a suffix. Use YYYY.M.D only.');
   process.exit(1);
 }
 

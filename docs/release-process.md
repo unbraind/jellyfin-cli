@@ -7,7 +7,7 @@ Use this process for the first release and all future releases.
 
 - `main` is protected and required checks are green.
 - No private data appears in working tree or history.
-- Version follows `YYYY.MM.DD` or `YYYY.MM.DD-<N>` (UTC day, no `-1` suffix).
+- Version follows `YYYY.M.D` or `YYYY.M.D-<N>` (UTC day, no `-1` suffix).
 
 ## 2) Validate locally
 
@@ -36,6 +36,7 @@ Expected artifacts:
 node -p "require('./package.json').name"
 node -p "require('./package.json').version"
 bun run smoke:npx
+bun run smoke:bunx
 ```
 
 ## 5) Publish (manual, guarded)

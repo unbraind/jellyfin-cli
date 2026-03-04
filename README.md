@@ -207,7 +207,7 @@ bun run validate:release
 ```
 
 This syncs/enforces the version policy and runs typecheck, lint, tests, build, dist smoke checks, TypeScript code-length enforcement (<=300 lines excluding comments), tracked-file secret scan, and git-history secret scan.
-It also validates npm packaging (`npm pack --dry-run`) and a local `npx` smoke run from the packed tarball.
+It also validates npm packaging (`npm pack --dry-run`) plus local `npx` and `bunx` smoke runs from the packed tarball.
 
 ## CI/CD and Release Operations
 
@@ -230,12 +230,12 @@ Contributor and governance standards:
 
 ### Version Policy
 
-- Version format is mandatory: `YYYY.MM.DD` or `YYYY.MM.DD-<N>`
-- Example (first release of day): `2026.03.04`
-- Example (third release on same day): `2026.03.04-3`
+- Version format is mandatory: `YYYY.M.D` or `YYYY.M.D-<N>`
+- Example (first release of day): `2026.3.4`
+- Example (third release on same day): `2026.3.4-3`
 - Date uses UTC day
 - `N` is the release index for that UTC day
-- `-1` is not allowed (use `YYYY.MM.DD` without suffix)
+- `-1` is not allowed (use `YYYY.M.D` without suffix)
 - Use `bun run version:sync` before preparing a release
 
 ## Read-Only Mode

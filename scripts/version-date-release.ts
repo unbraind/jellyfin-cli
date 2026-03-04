@@ -17,8 +17,8 @@ function getGitTags(cwd: string): string[] {
 
 function toUtcDatePart(date: Date): string {
   const year = String(date.getUTCFullYear());
-  const month = String(date.getUTCMonth() + 1).padStart(2, '0');
-  const day = String(date.getUTCDate()).padStart(2, '0');
+  const month = String(date.getUTCMonth() + 1);
+  const day = String(date.getUTCDate());
   return `${year}.${month}.${day}`;
 }
 
@@ -28,7 +28,7 @@ function getTodayReleaseCount(cwd: string, todayPart: string): number {
 
   for (const tag of tags) {
     const normalized = tag.startsWith('v') ? tag.slice(1) : tag;
-    const match = /^(\d{4}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))(?:-(\d+))?$/.exec(
+    const match = /^(\d{4}\.(?:[1-9]|1[0-2])\.(?:[1-9]|[12]\d|3[01]))(?:-(\d+))?$/.exec(
       normalized,
     );
     if (!match) {

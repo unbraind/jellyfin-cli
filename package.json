@@ -28,7 +28,7 @@
     "lint:fix": "eslint src tests --ext .ts --fix",
     "lint:cache": "eslint src tests --ext .ts --cache --cache-location .eslintcache",
     "typecheck": "tsc --noEmit",
-    "version:sync": "bun run scripts/version-date-commit.ts",
+    "version:sync": "bun run scripts/version-date-release.ts",
     "check:version": "bun run scripts/check-version.ts",
     "check:file-length": "bun run scripts/check-file-length.ts",
     "check:secrets": "bun run scripts/check-secrets.ts",
@@ -36,7 +36,8 @@
     "smoke:dist": "node dist/cli.js --help && node dist/cli.js --version",
     "pack:dry-run": "npm pack --dry-run",
     "smoke:npx": "sh -c 'PKG=\"$(npm pack --silent)\" && npm exec --yes --package \"./$PKG\" jf -- --version && rm -f \"$PKG\"'",
-    "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run build && bun run smoke:dist && bun run check:file-length && bun run check:secrets && bun run check:secrets:history && bun run pack:dry-run && bun run smoke:npx",
+    "smoke:bunx": "sh -c 'PKG=\"$(npm pack --silent)\" && ABS=\"$(pwd)/$PKG\" && bunx --package \"file://$ABS\" jellyfin-cli --version && rm -f \"$PKG\"'",
+    "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run build && bun run smoke:dist && bun run check:file-length && bun run check:secrets && bun run check:secrets:history && bun run pack:dry-run && bun run smoke:npx && bun run smoke:bunx",
     "release:check": "bun run validate:release",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build"
@@ -77,6 +78,7 @@
   "files": [
     "dist",
     "README.md",
-    "CHANGELOG.md"
+    "CHANGELOG.md",
+    "LICENSE"
   ]
 }

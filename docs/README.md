@@ -130,9 +130,9 @@ Settings are stored in `~/.jellyfin-cli/settings.json`.
 
 ### Versioning Policy
 
-- Project version must follow: `YYYY.MM.DD` or `YYYY.MM.DD-<N>`
-- Example (first release of day): `2026.03.04`
-- Example (second release of day): `2026.03.04-2`
+- Project version must follow: `YYYY.M.D` or `YYYY.M.D-<N>`
+- Example (first release of day): `2026.3.4`
+- Example (second release of day): `2026.3.4-2`
 - Date is UTC
 - `N` is release number for that UTC date
 - `-1` is invalid (omit suffix for first release)

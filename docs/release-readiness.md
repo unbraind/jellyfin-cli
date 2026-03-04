@@ -43,7 +43,7 @@ jf setup env --format json
 bun run version:sync
 ```
 
-Version format is required: `YYYY.MM.DD` or `YYYY.MM.DD-<N>` (example: `2026.03.04` or `2026.03.04-2`).
+Version format is required: `YYYY.M.D` or `YYYY.M.D-<N>` (example: `2026.3.4` or `2026.3.4-2`).
 Use no suffix for the first release of a UTC day; use `-N` for release 2+ on that day.
 
 ## 3) Run full release validation
@@ -65,6 +65,7 @@ This runs:
 - Secret scan on full git history (`bun run check:secrets:history`)
 - npm packaging dry-run (`bun run pack:dry-run`)
 - `npx` execution smoke from local package tarball (`bun run smoke:npx`)
+- `bunx` execution smoke from local package tarball (`bun run smoke:bunx`)
 
 ## 4) Run live read-only CLI E2E checks
 
