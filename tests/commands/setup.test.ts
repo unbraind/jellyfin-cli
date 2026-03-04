@@ -146,6 +146,25 @@ describe('setup command', () => {
     expect(parsed.error).toContain('Server URL must be a valid http(s) URL');
   });
 
+  it('setup wizard alias mirrors base setup validation behavior', async () => {
+    const result = await runCli(
+      [
+        'setup',
+        'wizard',
+        '--api-key',
+        'abc',
+        '--non-interactive',
+        '--format',
+        'json',
+      ],
+      { JELLYFIN_SERVER_URL: 'not-a-url' },
+    );
+
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stderr);
+    expect(parsed.error).toContain('Server URL must be a valid http(s) URL');
+  });
+
   it('accepts api key auth with username to resolve user id', async () => {
     const server = Bun.serve({
       port: 0,

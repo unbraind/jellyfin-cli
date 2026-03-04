@@ -210,6 +210,7 @@ Notes:
 | Command | Description |
 |---------|-------------|
 | `jf setup` | Interactive setup wizard |
+| `jf setup wizard` | Explicit alias for setup wizard workflows |
 | `jf setup status` | Check setup status |
 | `jf setup env` | Show environment variables |
 | `jf setup startup` | Inspect startup wizard state (read-only) |

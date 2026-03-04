@@ -159,6 +159,7 @@ jf system info --format raw
 ### Setup & Configuration
 
 - `jf setup` - Interactive setup wizard
+- `jf setup wizard` - Explicit alias for setup wizard workflows
 - `jf setup status` - Check setup status
 - `jf setup env` - Show environment variables (`--shell` or structured `--format json`)
 - `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)

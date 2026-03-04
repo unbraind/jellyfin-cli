@@ -42,6 +42,7 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('setup status')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup configuration')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup startup')).toBe(false);
+    expect(isCommandBlockedInReadOnly('setup wizard')).toBe(false);
     expect(isCommandBlockedInReadOnly('syncplay groups')).toBe(false);
   });
 

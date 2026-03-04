@@ -16,7 +16,7 @@ This document provides detailed information about the Jellyfin CLI commands and 
 
 | Option | Description |
 |--------|-------------|
-| `-f, --format <format>` | Output format (toon, json, table, raw) |
+| `-f, --format <format>` | Output format (toon, json, table, raw, yaml, markdown) |
 | `-s, --server <name>` | Server name from config |
 | `-v, --version` | Show version number |
 | | `-h, --help` | Show help |
@@ -59,6 +59,14 @@ jf setup [options]
 | `--non-interactive` | Do not prompt for missing values |
 | `--timeout <ms>` | Persist request timeout |
 | `-o, --output-format <format>` | Persist default output format |
+
+### setup wizard
+
+Explicit alias of `setup` that runs the same setup flow and options.
+
+```bash
+jf setup wizard [options]
+```
 
 ### setup status
 
@@ -138,7 +146,7 @@ jf config set [options]
 | `-u, --username <username>` | Username |
 | `-p, --password <password>` | Password |
 | `--user-id <id>` | User ID |
-| `-o, --output-format <format>` | Default output format (toon, json, table, raw) |
+| `-o, --output-format <format>` | Default output format (toon, json, table, raw, yaml, markdown) |
 | `--timeout <ms>` | Request timeout |
 | `--name <name>` | Server name |
 | `--default` | Set as default server |
