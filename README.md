@@ -173,6 +173,7 @@ jf system info --format raw
 - `jf config reset --force` - Reset all configuration
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
+- `jf config doctor --require-connected --require-auth --require-openapi --require-valid-formats --validate-formats` - Enforce machine-checkable release gates
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
 - `jf schema research` - Emit consolidated OpenAPI + full/read-only coverage snapshot for API research
 - `jf schema tools` - Export command tool schemas for LLM function-calling, with optional live OpenAPI endpoint matches

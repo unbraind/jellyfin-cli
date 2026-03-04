@@ -30,6 +30,31 @@ type FormatValidationSummary = {
   formats: Record<OutputFormat, FormatValidationResult>;
 };
 
+type DoctorRequirementFlags = {
+  requireAuth: boolean;
+  requireConnected: boolean;
+  requireOpenapi: boolean;
+  requireValidFormats: boolean;
+};
+
+type DoctorCheckResults = {
+  authOk: boolean;
+  connectionOk: boolean;
+  openapiAvailable: boolean;
+  formatValidationsOk: boolean | null;
+};
+
+type RequirementStatus = {
+  enabled: DoctorRequirementFlags;
+  all_met: boolean;
+  checks: {
+    auth_ok: boolean | null;
+    connection_ok: boolean | null;
+    openapi_available: boolean | null;
+    valid_formats: boolean | null;
+  };
+};
+
 const VALIDATION_FORMATS: OutputFormat[] = ['toon', 'json', 'table', 'raw', 'yaml', 'markdown'];
 
 function validateRenderedOutput(format: OutputFormat, rendered: string): void {
@@ -97,6 +122,38 @@ function buildFormatValidationSummary(payload: Record<string, unknown>): FormatV
   };
 }
 
+function buildRequirementStatus(
+  requirements: DoctorRequirementFlags,
+  checks: DoctorCheckResults,
+): RequirementStatus | undefined {
+  const status: RequirementStatus = {
+    enabled: requirements,
+    all_met: true,
+    checks: {
+      auth_ok: requirements.requireAuth ? checks.authOk : null,
+      connection_ok: requirements.requireConnected ? checks.connectionOk : null,
+      openapi_available: requirements.requireOpenapi ? checks.openapiAvailable : null,
+      valid_formats: requirements.requireValidFormats ? checks.formatValidationsOk : null,
+    },
+  };
+
+  if (requirements.requireAuth && !checks.authOk) {
+    status.all_met = false;
+  }
+  if (requirements.requireConnected && !checks.connectionOk) {
+    status.all_met = false;
+  }
+  if (requirements.requireOpenapi && !checks.openapiAvailable) {
+    status.all_met = false;
+  }
+  if (requirements.requireValidFormats && checks.formatValidationsOk !== true) {
+    status.all_met = false;
+  }
+
+  const hasRequirements = Object.values(requirements).some((value) => value);
+  return hasRequirements ? status : undefined;
+}
+
 export function addConfigDoctorCommand(cmd: Command): void {
   cmd
     .command('doctor')
@@ -106,6 +163,10 @@ export function addConfigDoctorCommand(cmd: Command): void {
       '--validate-formats',
       'Validate toon/json/table/raw/yaml/markdown formatter outputs for automation safety',
     )
+    .option('--require-connected', 'Exit non-zero when connectivity checks fail')
+    .option('--require-auth', 'Exit non-zero when auth checks fail')
+    .option('--require-openapi', 'Exit non-zero when OpenAPI schema is unavailable')
+    .option('--require-valid-formats', 'Exit non-zero when formatter validation is not all-ok')
     .option('--name <name>', 'Server name')
     .action(
       async function (
@@ -113,12 +174,22 @@ export function addConfigDoctorCommand(cmd: Command): void {
         options: FormatOptions & {
           name?: string | undefined;
           validateFormats?: boolean | undefined;
+          requireAuth?: boolean | undefined;
+          requireConnected?: boolean | undefined;
+          requireOpenapi?: boolean | undefined;
+          requireValidFormats?: boolean | undefined;
         },
       ) {
       const config = getConfig(options.name);
       const runtimeFormat = resolveOutputFormat(this, { format: options.format ?? config.outputFormat });
       const authMode = detectAuthMode(config);
       const warnings: string[] = [];
+      const requirements: DoctorRequirementFlags = {
+        requireAuth: Boolean(options.requireAuth),
+        requireConnected: Boolean(options.requireConnected),
+        requireOpenapi: Boolean(options.requireOpenapi),
+        requireValidFormats: Boolean(options.requireValidFormats),
+      };
 
       if (!config.serverUrl) {
         const payload: Record<string, unknown> = {
@@ -127,12 +198,27 @@ export function addConfigDoctorCommand(cmd: Command): void {
           auth_mode: authMode,
           message: 'No server URL configured',
         };
+        let formatValidationsOk: boolean | null = null;
         if (options.validateFormats) {
-          payload.format_validations = buildFormatValidationSummary(payload);
+          const summary = buildFormatValidationSummary(payload);
+          payload.format_validations = summary;
+          formatValidationsOk = summary.all_ok;
+        }
+        const requirementStatus = buildRequirementStatus(requirements, {
+          authOk: false,
+          connectionOk: false,
+          openapiAvailable: false,
+          formatValidationsOk,
+        });
+        if (requirementStatus) {
+          payload.requirements = requirementStatus;
         }
         console.log(
           formatOutput(payload, runtimeFormat, 'config_doctor'),
         );
+        if (requirementStatus && !requirementStatus.all_met) {
+          process.exit(1);
+        }
         return;
       }
 
@@ -204,11 +290,27 @@ export function addConfigDoctorCommand(cmd: Command): void {
         warnings,
       };
 
+      let formatValidationsOk: boolean | null = null;
       if (options.validateFormats) {
-        payload.format_validations = buildFormatValidationSummary(payload);
+        const summary = buildFormatValidationSummary(payload);
+        payload.format_validations = summary;
+        formatValidationsOk = summary.all_ok;
+      }
+
+      const requirementStatus = buildRequirementStatus(requirements, {
+        authOk: authMode === 'none' ? false : authOk,
+        connectionOk,
+        openapiAvailable: openapi.available,
+        formatValidationsOk,
+      });
+      if (requirementStatus) {
+        payload.requirements = requirementStatus;
       }
 
       console.log(formatOutput(payload, runtimeFormat, 'config_doctor'));
+      if (requirementStatus && !requirementStatus.all_met) {
+        process.exit(1);
+      }
     },
     );
 }

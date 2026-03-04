@@ -165,6 +165,75 @@ describe('config doctor command', () => {
     expect(payload.format_validations?.formats.table?.ok).toBe(true);
     expect(payload.format_validations?.formats.raw?.ok).toBe(true);
   });
+
+  it('exits non-zero when --require-connected is set and config is missing', async () => {
+    const result = await runCli(['config', 'doctor', '--require-connected', '--format', 'json']);
+    expect(result.code).toBe(1);
+    const payload = JSON.parse(result.stdout) as {
+      configured: boolean;
+      requirements?: {
+        all_met: boolean;
+        checks: {
+          connection_ok: boolean | null;
+        };
+      };
+    };
+    expect(payload.configured).toBe(false);
+    expect(payload.requirements?.all_met).toBe(false);
+    expect(payload.requirements?.checks.connection_ok).toBe(false);
+  });
+
+  it('exits non-zero when --require-openapi is set and OpenAPI is unavailable', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/System/Info/Public': new Response(
+          JSON.stringify({
+            ServerName: 'Test Jellyfin',
+            Version: '10.11.6',
+            LocalAddress: 'http://127.0.0.1:8096',
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+        '/Users': new Response(JSON.stringify([{ Id: 'u1', Name: 'steve' }]), {
+          headers: { 'content-type': 'application/json' },
+        }),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId: 'u1',
+          outputFormat: 'toon',
+          timeout: 5000,
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['config', 'doctor', '--require-openapi', '--format', 'json']);
+    expect(result.code).toBe(1);
+    const payload = JSON.parse(result.stdout) as {
+      checks?: { openapi_available: boolean };
+      requirements?: {
+        all_met: boolean;
+        checks: {
+          openapi_available: boolean | null;
+        };
+      };
+    };
+    expect(payload.checks?.openapi_available).toBe(false);
+    expect(payload.requirements?.all_met).toBe(false);
+    expect(payload.requirements?.checks.openapi_available).toBe(false);
+  });
 });
 
 describe('config set command', () => {
