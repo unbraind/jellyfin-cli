@@ -28,7 +28,23 @@ jf-cli schema research --include-unmatched --limit 40 --format json
 - full scope operation coverage: `100%` (`429 / 429`)
 - read-only scope operation coverage: `100%` (`257 / 257`)
 - unmatched operations: `0` (full + read-only)
-- unmatched tools (CLI intents with no OpenAPI match above score threshold): `34` (full), `71` (read-only)
+- unmatched tools (CLI intents with no OpenAPI match above score threshold): `21` (full), `57` (read-only)
+- local-only tools (utility commands intentionally not mapped to OpenAPI): `18` (full + read-only)
+
+## Local-Only Tool Classification (March 4, 2026)
+
+`jf schema coverage` and `jf schema research` now separate utility-only commands from true API
+intent gaps:
+
+- new fields:
+  - `local_only_tools_total`
+  - `local_only_tools_truncated`
+  - `local_only_tools`
+- existing `unmatched_tools*` fields now focus on commands that should map to API operations but do
+  not currently match above the score threshold.
+
+This prevents local config/schema/setup helper commands from obscuring actionable API coverage
+signals in agent automation reports.
 
 ## Latest Addition (March 4, 2026)
 

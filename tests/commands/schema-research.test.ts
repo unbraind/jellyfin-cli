@@ -86,7 +86,9 @@ describe('schema research command', () => {
     expect(result.stdout).toContain('operation_scope_count: 3');
     expect(result.stdout).toContain('operation_scope_count: 2');
     expect(result.stdout).toContain('unmatched_tools_total:');
+    expect(result.stdout).toContain('local_only_tools_total:');
     expect(result.stdout).toContain('unmatched_tools:');
+    expect(result.stdout).toContain('local_only_tools:');
     expect(result.stdout).toContain('include_unmatched: true');
   });
 
@@ -128,8 +130,16 @@ describe('schema research command', () => {
     expect(result.code).toBe(0);
     const parsed = JSON.parse(result.stdout) as {
       source_path: string;
-      full_scope: { operation_scope_count: number; unmatched_tools_total: number };
-      read_only_scope: { operation_scope_count: number; unmatched_tools_total: number };
+      full_scope: {
+        operation_scope_count: number;
+        unmatched_tools_total: number;
+        local_only_tools_total: number;
+      };
+      read_only_scope: {
+        operation_scope_count: number;
+        unmatched_tools_total: number;
+        local_only_tools_total: number;
+      };
     };
 
     expect(parsed.source_path).toBe('/custom/openapi.json');
@@ -137,6 +147,8 @@ describe('schema research command', () => {
     expect(parsed.read_only_scope.operation_scope_count).toBe(1);
     expect(parsed.full_scope.unmatched_tools_total).toBeGreaterThanOrEqual(0);
     expect(parsed.read_only_scope.unmatched_tools_total).toBeGreaterThanOrEqual(0);
+    expect(parsed.full_scope.local_only_tools_total).toBeGreaterThanOrEqual(0);
+    expect(parsed.read_only_scope.local_only_tools_total).toBeGreaterThanOrEqual(0);
   });
 
   it('supports coverage requirement checks and fails when unmet', async () => {

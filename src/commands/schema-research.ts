@@ -30,12 +30,19 @@ type CoverageSnapshot = {
   unmatched_operations_total: number;
   unmatched_tools_total: number;
   unmatched_tools_truncated: boolean;
+  local_only_tools_total: number;
+  local_only_tools_truncated: boolean;
   unmatched_by_tag_total: number;
   unmatched_by_tag: Array<{ tag: string; operations: number; sample_paths: string[] }>;
   unmatched_tools?: Array<{
     command: string;
     read_only_safe: boolean;
-    reason: 'no_openapi_match_above_min_score';
+    reason: 'no_openapi_match_above_min_score' | 'local_only_command';
+  }>;
+  local_only_tools?: Array<{
+    command: string;
+    read_only_safe: boolean;
+    reason: 'no_openapi_match_above_min_score' | 'local_only_command';
   }>;
   unmatched_operations?: Array<{
     method: string;
@@ -78,9 +85,12 @@ function buildCoverageSnapshot(
     unmatched_operations_total: unmatched.length,
     unmatched_tools_total: coverageMapping.unmatchedTools.length,
     unmatched_tools_truncated: coverageMapping.unmatchedTools.length > unmatchedLimit,
+    local_only_tools_total: coverageMapping.localOnlyTools.length,
+    local_only_tools_truncated: coverageMapping.localOnlyTools.length > unmatchedLimit,
     unmatched_by_tag_total: unmatchedByTag.length,
     unmatched_by_tag: unmatchedByTag,
     unmatched_tools: coverageMapping.unmatchedTools.slice(0, unmatchedLimit),
+    local_only_tools: coverageMapping.localOnlyTools.slice(0, unmatchedLimit),
     unmatched_operations: includeUnmatched
       ? unmatched.slice(0, unmatchedLimit).map((operation) => ({
         method: operation.method,

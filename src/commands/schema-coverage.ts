@@ -15,14 +15,40 @@ type TagBucket = {
 export type UnmatchedToolSummary = {
   command: string;
   read_only_safe: boolean;
-  reason: 'no_openapi_match_above_min_score';
+  reason: 'no_openapi_match_above_min_score' | 'local_only_command';
 };
 
 export type CoverageMappingResult = {
   mappedOperationKeys: Set<string>;
   mappedToolCount: number;
   unmatchedTools: UnmatchedToolSummary[];
+  localOnlyTools: UnmatchedToolSummary[];
 };
+
+const LOCAL_ONLY_COMMANDS = new Set([
+  'jf config delete',
+  'jf config doctor',
+  'jf config get',
+  'jf config list',
+  'jf config path',
+  'jf config reset',
+  'jf config set',
+  'jf config test',
+  'jf config use',
+  'jf schema coverage',
+  'jf schema list',
+  'jf schema openapi',
+  'jf schema research',
+  'jf schema suggest',
+  'jf schema tools',
+  'jf schema validate',
+  'jf setup env',
+  'jf setup status',
+]);
+
+function isLocalOnlyCommand(command: string): boolean {
+  return LOCAL_ONLY_COMMANDS.has(command);
+}
 
 export function mapOpenApiCoverageToTools(
   operations: OpenApiOperationEntry[],
@@ -32,8 +58,18 @@ export function mapOpenApiCoverageToTools(
   const mappedOperationKeys = new Set<string>();
   let mappedToolCount = 0;
   const unmatchedTools: UnmatchedToolSummary[] = [];
+  const localOnlyTools: UnmatchedToolSummary[] = [];
 
   for (const tool of tools) {
+    if (isLocalOnlyCommand(tool.command)) {
+      localOnlyTools.push({
+        command: tool.command,
+        read_only_safe: tool.read_only_safe,
+        reason: 'local_only_command',
+      });
+      continue;
+    }
+
     const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
     const matches = matchOperationsForCommandIntent(operations, commandIntent).filter(
       (candidate) => candidate.score >= minScore,
@@ -70,6 +106,7 @@ export function mapOpenApiCoverageToTools(
     mappedOperationKeys,
     mappedToolCount,
     unmatchedTools,
+    localOnlyTools,
   };
 }
 

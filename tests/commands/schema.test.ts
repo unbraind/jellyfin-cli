@@ -323,6 +323,7 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('unmatched_operations:');
     expect(result.stdout).toContain('unmatched_tools_total: 0');
     expect(result.stdout).toContain('unmapped_tool_count: 0');
+    expect(result.stdout).toContain('local_only_tools_total: 0');
     expect(result.stdout).toContain('unmatched_by_tag:');
     expect(result.stdout).toContain('summary:');
     expect(result.stdout).toContain('coverage_percent:');
@@ -378,6 +379,48 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('unmatched_tools:');
     expect(result.stdout).toContain('reason: no_openapi_match_above_min_score');
     expect(result.stdout).toContain('unmapped_tool_count:');
+    expect(result.stdout).toContain('local_only_tools_total: 0');
+  });
+
+  it('classifies local-only utility commands separately from unmatched API tools', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['schema', 'coverage', '--command-prefix', 'config', '--limit', '5']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('unmatched_tools_total: 0');
+    expect(result.stdout).toContain('local_only_tools_total:');
+    expect(result.stdout).toContain('reason: local_only_command');
   });
 
   it('returns error for invalid --min-score', async () => {
