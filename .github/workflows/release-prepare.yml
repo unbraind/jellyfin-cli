@@ -46,7 +46,7 @@ jobs:
       - name: Create release metadata
         run: |
           mkdir -p artifacts
-          VERSION="$(node -p "require('./package.json').version")"
+          VERSION="$(node -p 'require("./package.json").version')"
           LAST_TAG="$(git describe --tags --abbrev=0 2>/dev/null || true)"
 
           {

@@ -62,8 +62,8 @@ jobs:
 
       - name: Print package identity
         run: |
-          echo "name=$(node -p \"require('./package.json').name\")"
-          echo "version=$(node -p \"require('./package.json').version\")"
+          echo "name=$(node -p 'require(\"./package.json\").name')"
+          echo "version=$(node -p 'require(\"./package.json\").version')"
 
       - name: Dry run publish
         if: ${{ inputs.dry_run }}
@@ -87,7 +87,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
-          VERSION="$(node -p "require('./package.json').version")"
+          VERSION="$(node -p 'require("./package.json").version')"
           for i in $(seq 1 12); do
             if npx --yes "jellyfin-cli@${VERSION}" --version; then
               exit 0
@@ -102,7 +102,7 @@ jobs:
         if: ${{ !inputs.dry_run }}
         run: |
           set -euo pipefail
-          VERSION="$(node -p "require('./package.json').version")"
+          VERSION="$(node -p 'require("./package.json").version')"
           for i in $(seq 1 12); do
             if bunx "jellyfin-cli@${VERSION}" --version; then
               exit 0

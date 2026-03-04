@@ -50,7 +50,7 @@ jobs:
         id: tag
         run: |
           set -euo pipefail
-          VERSION="$(node -p \"require('./package.json').version\")"
+          VERSION="$(node -p 'require("./package.json").version')"
           EXPECTED_TAG="v${VERSION}"
           INPUT_TAG='${{ inputs.tag }}'
 
