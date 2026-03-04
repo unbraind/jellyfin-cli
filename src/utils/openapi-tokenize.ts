@@ -36,6 +36,26 @@ function expandTokenAliases(token: string): string[] {
       return ['syncplay', 'sync', 'play'];
     case 'userdata':
       return ['userdata', 'user', 'data'];
+    case 'clientlog':
+      return ['clientlog', 'client', 'log', 'document'];
+    case 'chapter':
+      return ['chapter', 'segment'];
+    case 'identify':
+      return ['identify', 'search', 'lookup', 'remote'];
+    case 'notification':
+      return ['notification', 'notify', 'message'];
+    case 'unshare':
+      return ['unshare', 'share', 'remove'];
+    case 'run':
+      return ['run', 'running', 'start', 'execute'];
+    case 'transcoding':
+      return ['transcoding', 'encoding', 'transcode'];
+    case 'mute':
+      return ['mute', 'command'];
+    case 'unmute':
+      return ['unmute', 'command'];
+    case 'volume':
+      return ['volume', 'level', 'command'];
     default:
       return [token];
   }

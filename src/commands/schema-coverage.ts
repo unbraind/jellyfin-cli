@@ -44,6 +44,7 @@ const LOCAL_ONLY_COMMANDS = new Set([
   'jf schema validate',
   'jf setup env',
   'jf setup status',
+  'jf setup wizard',
 ]);
 
 function isLocalOnlyCommand(command: string): boolean {

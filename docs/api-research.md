@@ -26,7 +26,7 @@ Observed:
 - Full-scope operation coverage: `100%` (`429/429`)
 - Read-only operation coverage: `100%` (`257/257`)
 - Unmapped operations: `0` in both scopes
-- Full-scope unmatched tools above `min_score=3`: `14` (down from `22` after intent alias tuning)
+- Full-scope unmatched tools above `min_score=3`: `2` (down from `14` after additional intent alias tuning)
 
 ## Live Readiness Checks
 
@@ -106,11 +106,22 @@ Improved tokenization/matching so command-intent mapping is more resilient for a
 
 Validation outcomes:
 
-- full-scope unmatched-tool count improved from `22` to `14` (same server + same threshold)
+- full-scope unmatched-tool count improved from `14` to `2` (same server + same threshold)
 - no change to operation coverage (remains `100%`)
 - new regression tests in:
   - `tests/utils/openapi-tokenize.test.ts`
   - `tests/utils/openapi.test.ts`
+
+### Top-level help audit for global option discoverability
+
+Added a full top-level command help audit test to ensure every `jf [command] --help` includes root
+global options (`--format`, `--server`, `--explain`, `--read-only`).
+
+Validation outcomes:
+
+- every top-level command help surface shows `Global Options`
+- regression test added:
+  - `tests/commands/help-global-options-all.test.ts`
 
 ### Setup readiness gate for setup wizard workflows
 

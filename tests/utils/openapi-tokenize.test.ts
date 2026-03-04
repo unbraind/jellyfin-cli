@@ -25,6 +25,21 @@ describe('openapi tokenize utils', () => {
 
     const userDataTokens = tokenizeIntentValue('userdata get');
     expect(userDataTokens).toEqual(expect.arrayContaining(['userdata', 'user', 'data', 'get']));
+
+    const clientlogTokens = tokenizeIntentValue('clientlog send');
+    expect(clientlogTokens).toEqual(expect.arrayContaining(['clientlog', 'client', 'log', 'document']));
+
+    const identifyTokens = tokenizeIntentValue('items identify');
+    expect(identifyTokens).toEqual(expect.arrayContaining(['identify', 'search', 'lookup', 'remote']));
+
+    const runTokens = tokenizeIntentValue('tasks run');
+    expect(runTokens).toEqual(expect.arrayContaining(['run', 'running', 'start', 'execute']));
+
+    const transcodingTokens = tokenizeIntentValue('videos cancel-transcoding');
+    expect(transcodingTokens).toEqual(expect.arrayContaining(['transcoding', 'encoding', 'transcode']));
+
+    const volumeTokens = tokenizeIntentValue('sessions volume');
+    expect(volumeTokens).toEqual(expect.arrayContaining(['volume', 'level', 'command']));
   });
 
   it('deduplicates repeated tokens from mixed casing and separators', () => {
