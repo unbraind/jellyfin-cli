@@ -34,5 +34,22 @@ export function createAuthCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('keys')
+    .description('List API keys (read-only alias for auth key inventory)')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getApiKeys();
+        console.log(toon.formatToon((result.Items ?? []).map((entry) => ({
+          app_name: entry.AppName,
+          key: entry.AccessToken,
+          created: entry.DateCreated,
+          last_activity: entry.DateLastActivity,
+          is_active: entry.IsActive,
+        })), 'api_keys'));
+      } catch (err) { handleError(err, format); }
+    });
+
   return cmd;
 }

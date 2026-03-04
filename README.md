@@ -399,6 +399,12 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf quickconnect check <secret>` - Check connection status
 - `jf quickconnect authorize <code>` - Authorize request
 
+### Auth
+
+- `jf auth providers` - List authentication providers
+- `jf auth password-reset-providers` - List password reset providers
+- `jf auth keys` - List API keys (read-only alias)
+
 ### Backup
 
 - `jf backup list` - List backups

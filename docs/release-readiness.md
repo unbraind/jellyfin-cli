@@ -52,6 +52,7 @@ bun test tests/e2e/cli.test.ts
 ```
 
 The E2E suite is read-only and is designed to avoid mutating media library data.
+It runs `bun run src/cli.ts` by default; set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
 
 ## 5) Run discovery diagnostics against live server
 

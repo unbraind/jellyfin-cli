@@ -174,6 +174,17 @@ To avoid modifying media library state during validation:
 - Fixed read-only allowlist mismatch for QuickConnect status checks by allowing `quickconnect check`.
 - `jf setup startup` now emits a deterministic `startup_complete_state` (`complete` | `required` | `unknown`) to keep agent pipelines stable when `/Startup/Complete` is unavailable (405).
 
+22. Intent matching + auth key alias improvements (March 4, 2026)
+
+- Added token alias expansion in OpenAPI intent matching for domain terms (`apikey`, `quickconnect`, `livetv`) and safer singularization (`libraries` -> `library`, while keeping `status` intact).
+- Added `jf auth keys` as a read-only alias to list API keys through the auth command namespace.
+- Updated live E2E defaults to run `bun run src/cli.ts` unless `JELLYFIN_E2E_USE_DIST=1` is set, preventing stale `dist/` mismatches.
+- March 4, 2026 verification run against Jellyfin 10.11.6:
+  - read-only scope: `257` operations
+  - mapped: `230`
+  - coverage: `89.49%`
+  - unmatched: `27`
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

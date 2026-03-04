@@ -243,6 +243,24 @@ describe('openapi utils', () => {
     expect(methodsForLibrary).toEqual(['GET', 'POST']);
   });
 
+  it('sorts same-score/same-depth matches by path name', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Alpha': {
+          get: { tags: ['Media'], summary: 'Inspect media', operationId: 'InspectMediaAlpha' },
+        },
+        '/Beta': {
+          get: { tags: ['Media'], summary: 'Inspect media', operationId: 'InspectMediaBeta' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'media inspect');
+    expect(matches).toHaveLength(2);
+    expect(matches[0]?.path).toBe('/Alpha');
+    expect(matches[1]?.path).toBe('/Beta');
+  });
+
   it('prefers read-only operations for read-only command intents', () => {
     const operations = extractOpenApiOperations({
       paths: {

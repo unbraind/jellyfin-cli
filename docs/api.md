@@ -3010,6 +3010,16 @@ jf auth password-reset-providers [-f format]
 
 Output type: `password_reset_providers`
 
+### auth keys
+
+List API keys through the auth namespace (read-only alias).
+
+```bash
+jf auth keys [-f format]
+```
+
+Output type: `api_keys`
+
 ---
 
 ## reports

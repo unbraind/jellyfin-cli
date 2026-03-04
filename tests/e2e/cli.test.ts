@@ -7,8 +7,8 @@
  *
  * Skipped automatically if the server is not reachable or env vars are missing.
  *
- * The test runner uses the pre-built binary (dist/cli.js) when available
- * for faster startup, falling back to `bun run src/cli.ts`.
+ * By default, tests run `bun run src/cli.ts` to avoid stale dist mismatches.
+ * Set JELLYFIN_E2E_USE_DIST=1 to force using dist/cli.js when desired.
  */
 
 import { describe, it, expect } from 'vitest';
@@ -54,9 +54,9 @@ const USER_ID = process.env.JELLYFIN_USER_ID ?? fileAuth.userId ?? '';
 const HAS_AUTH = Boolean(SERVER_URL && API_KEY && USER_ID);
 const LIVE_E2E_TIMEOUT_MS = process.env.JELLYFIN_TIMEOUT ?? '120000';
 
-// Determine which CLI runner to use (compiled binary is faster).
+// Determine which CLI runner to use.
 const DIST_BIN = new URL('../../dist/cli.js', import.meta.url).pathname;
-const USE_COMPILED = existsSync(DIST_BIN);
+const USE_COMPILED = process.env.JELLYFIN_E2E_USE_DIST === '1' && existsSync(DIST_BIN);
 const CLI_CMD: string[] = USE_COMPILED ? ['node', DIST_BIN] : ['bun', 'run', 'src/cli.ts'];
 
 async function checkReachable(): Promise<boolean> {
@@ -419,6 +419,11 @@ describe.skipIf(skip)('E2E misc', () => {
   it('auth password-reset-providers returns list', async () => {
     const out = await jf('auth', 'password-reset-providers');
     expect(out).toMatch(/^type: password_reset_providers/m);
+  }, T);
+
+  it('auth keys returns api_keys type', async () => {
+    const out = await jf('auth', 'keys');
+    expect(out).toMatch(/^type: api_keys/m);
   }, T);
 
   it('favorites list returns items', async () => {

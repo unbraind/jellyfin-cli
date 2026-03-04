@@ -181,6 +181,8 @@ Or run directly from `~/.jellyfin-cli/settings.json` (no env vars needed) after 
 
 Notes:
 - Tests are designed to be read-only for safety.
+- E2E runs `bun run src/cli.ts` by default to avoid stale `dist/` mismatches.
+- Set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
 - Write endpoints are validated via `--help` checks or skipped patterns.
 - If the server is unavailable, the suite auto-skips.
 
@@ -252,6 +254,7 @@ Notes:
 | `jf users redeem-pin <pin>` | Redeem a forgot-password PIN |
 | `jf auth providers` | List auth providers |
 | `jf auth password-reset-providers` | List password reset providers |
+| `jf auth keys` | List API keys via auth namespace (read-only alias) |
 
 ### Content Management
 
