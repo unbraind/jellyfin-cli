@@ -363,6 +363,26 @@ describe('openapi utils', () => {
     expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
   });
 
+  it('maps devices rename intent to the device options endpoint', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Devices': {
+          delete: { tags: ['Devices'], summary: 'Delete device', operationId: 'DeleteDevice' },
+          get: { tags: ['Devices'], summary: 'List devices', operationId: 'GetDevices' },
+        },
+        '/Devices/Options': {
+          post: { tags: ['Devices'], summary: 'Update device options', operationId: 'UpdateDeviceOptions' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'devices rename');
+    expect(matches).toHaveLength(3);
+    expect(matches[0]?.path).toBe('/Devices/Options');
+    expect(matches[0]?.method).toBe('POST');
+    expect(matches[0]?.score).toBeGreaterThan(matches[1]?.score ?? 0);
+  });
+
   it('filters out operations when tag or search terms do not match', () => {
     const operations = extractOpenApiOperations({
       paths: {

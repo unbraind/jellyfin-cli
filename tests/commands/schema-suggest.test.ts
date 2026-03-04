@@ -130,8 +130,8 @@ describe('schema suggest command', () => {
               '/System/Info/Public': {
                 get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
               },
-              '/TotallyCustom/Foo': {
-                get: { tags: ['Custom'], operationId: 'GetFoo', summary: 'Get foo' },
+              '/Xyzzy/Entropy': {
+                get: { tags: ['Xyzzy'], operationId: 'GetEntropy', summary: 'Compute entropy matrix' },
               },
             },
           }),
@@ -154,7 +154,7 @@ describe('schema suggest command', () => {
 
     expect(parsed.mode).toBe('coverage_gap');
     expect(parsed.unmatched_operation_count).toBeGreaterThanOrEqual(1);
-    expect(parsed.suggestions.some((entry) => entry.path === '/TotallyCustom/Foo')).toBe(true);
+    expect(parsed.suggestions.some((entry) => entry.path === '/Xyzzy/Entropy')).toBe(true);
     expect(
       parsed.suggestions.some((entry) => entry.suggested_command.length > 0),
     ).toBe(true);

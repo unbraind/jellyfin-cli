@@ -32,6 +32,9 @@ describe('openapi tokenize utils', () => {
     const identifyTokens = tokenizeIntentValue('items identify');
     expect(identifyTokens).toEqual(expect.arrayContaining(['identify', 'search', 'lookup', 'remote']));
 
+    const renameTokens = tokenizeIntentValue('devices rename');
+    expect(renameTokens).toEqual(expect.arrayContaining(['rename', 'update', 'option', 'custom', 'name']));
+
     const runTokens = tokenizeIntentValue('tasks run');
     expect(runTokens).toEqual(expect.arrayContaining(['run', 'running', 'start', 'execute']));
 

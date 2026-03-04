@@ -449,8 +449,8 @@ describe('schema coverage command', () => {
           JSON.stringify({
             info: { version: '10.11.6' },
             paths: {
-              '/Custom/Unmapped': {
-                get: { tags: ['Custom'], operationId: 'GetCustomThing', summary: 'Get custom thing' },
+              '/Xyzzy/Entropy': {
+                get: { tags: ['Xyzzy'], operationId: 'GetEntropy', summary: 'Compute entropy matrix' },
               },
             },
           }),
@@ -478,8 +478,8 @@ describe('schema coverage command', () => {
     const result = await runCli(['schema', 'coverage', '--suggest-commands', '--limit', '5']);
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('suggested_commands:');
-    expect(result.stdout).toContain('suggested_command: custom list');
-    expect(result.stdout).toContain('intent: list');
+    expect(result.stdout).toContain('path: /Xyzzy/Entropy');
+    expect(result.stdout).toContain('suggested_command: xyzzy list');
   });
 
   it('maps multiple operations to one command intent when all matches meet the score threshold', async () => {

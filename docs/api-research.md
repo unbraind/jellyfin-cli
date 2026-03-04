@@ -26,7 +26,7 @@ Observed:
 - Full-scope operation coverage: `100%` (`429/429`)
 - Read-only operation coverage: `100%` (`257/257`)
 - Unmapped operations: `0` in both scopes
-- Full-scope unmatched tools above `min_score=3`: `2` (down from `14` after additional intent alias tuning)
+- Full-scope unmatched tools above `min_score=3`: `1` (down from `2` after additional intent alias tuning)
 
 ## Live Readiness Checks
 
@@ -69,8 +69,8 @@ bun run test:coverage
 
 Observed (latest):
 
-- `1052` passing, `0` failing
-- Coverage: `99.63%` lines, `94.54%` functions
+- `1056` passing, `0` failing
+- Coverage: `99.36%` lines, `94.54%` functions
 - `src/utils/schema-validate.ts`: `100%` lines and functions
 
 ## Help UX Verification
@@ -103,14 +103,26 @@ Improved tokenization/matching so command-intent mapping is more resilient for a
 - `health` now aliases to `ping` (`system health` maps to `/System/Ping`)
 - `userdata` now expands to `user` + `data` for endpoint matching
 - `url` treated as low-signal token to avoid false penalties in score ranking
+- `rename` now expands to `update + option + custom + name` so `devices rename` maps to
+  `POST /Devices/Options`
 
 Validation outcomes:
 
-- full-scope unmatched-tool count improved from `14` to `2` (same server + same threshold)
+- full-scope unmatched-tool count improved from `2` to `1` on Jellyfin `10.11.6` at `min_score=3`
 - no change to operation coverage (remains `100%`)
 - new regression tests in:
   - `tests/utils/openapi-tokenize.test.ts`
   - `tests/utils/openapi.test.ts`
+
+### Remaining OpenAPI documentation gap (server-side)
+
+The last unmatched full-scope tool is:
+
+- `jf notifications list`
+
+This command works against the live server, but its endpoint does not score above threshold against
+the published OpenAPI schema on this Jellyfin build. This is treated as an OpenAPI documentation
+gap rather than a CLI implementation gap.
 
 ### Top-level help audit for global option discoverability
 

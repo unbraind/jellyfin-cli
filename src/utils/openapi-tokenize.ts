@@ -42,6 +42,8 @@ function expandTokenAliases(token: string): string[] {
       return ['chapter', 'segment'];
     case 'identify':
       return ['identify', 'search', 'lookup', 'remote'];
+    case 'rename':
+      return ['rename', 'update', 'option', 'custom', 'name'];
     case 'notification':
       return ['notification', 'notify', 'message'];
     case 'unshare':
