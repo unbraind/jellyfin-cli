@@ -213,6 +213,15 @@ To avoid modifying media library state during validation:
   - coverage: `92.22%`
   - unmatched: `20`
 
+25. OpenAPI gap prioritization by tag (March 4, 2026)
+
+- Enhanced `jf schema coverage` output with `unmatched_by_tag` summaries.
+- New fields:
+  - `unmatched_by_tag_total`
+  - `unmatched_by_tag` (top tags with operation counts + sample paths)
+- This makes API research output directly actionable for implementation planning by surfacing the
+  highest-impact missing endpoint domains first.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

@@ -269,6 +269,8 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('mapped_operation_count: 1');
     expect(result.stdout).toContain('unmapped_operation_count: 2');
     expect(result.stdout).toContain('unmatched_operations:');
+    expect(result.stdout).toContain('unmatched_by_tag:');
+    expect(result.stdout).toContain('tag: Custom');
     expect(result.stdout).toContain('/Custom/Unmapped');
   });
 

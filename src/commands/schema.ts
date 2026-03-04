@@ -13,6 +13,7 @@ import {
 import { suggestCommandFromOperation } from '../utils/openapi-suggestions.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import { summarizeOperationsByTag } from './schema-coverage.js';
 
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
@@ -234,6 +235,7 @@ export function createSchemaCommand(): Command {
         const unmatched = filteredOperations.filter(
           (operation) => !mappedOperationKeys.has(`${operation.method} ${operation.path}`),
         );
+        const unmatchedByTag = summarizeOperationsByTag(unmatched);
         const coverage =
           filteredOperations.length === 0
             ? 100
@@ -272,6 +274,8 @@ export function createSchemaCommand(): Command {
           })),
           unmatched_operations_total: unmatched.length,
           unmatched_operations_truncated: unmatched.length > limit,
+          unmatched_by_tag_total: unmatchedByTag.length,
+          unmatched_by_tag: unmatchedByTag,
           suggested_commands: options.suggestCommands
             ? unmatched.slice(0, limit).map((operation) => {
               const suggestion = suggestCommandFromOperation(operation);
