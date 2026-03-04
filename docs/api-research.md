@@ -315,6 +315,14 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 2. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.
 3. Add structured command replay snippets (`curl`, `httpie`) to `--explain` output for rapid debugging.
 
+31. `config doctor` global format propagation parity (March 4, 2026)
+
+- Fixed output-format parity for `config doctor` so global runtime format flags are respected:
+  - `jf-cli --format json config doctor`
+  - `jf-cli --format yaml config doctor`
+  - `jf-cli --format markdown config doctor`
+- Added regression coverage to prevent fallback-to-Toon regressions in automated pipelines.
+
 30. TV Similar Shows endpoint coverage (March 4, 2026)
 
 - Added `jf tvshows similar <itemId> [--limit <number>]` as a read-only command mapped to

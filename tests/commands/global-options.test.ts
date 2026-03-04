@@ -230,4 +230,47 @@ describe('global CLI option propagation', () => {
     expect(Array.isArray(parsed)).toBe(true);
     expect(parsed[0].Id).toBe('item-1');
   });
+
+  it('applies global --format json to config doctor output', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/System/Info/Public': Response.json({
+          ServerName: 'Test Server',
+          Version: '10.11.6',
+          LocalAddress: 'http://127.0.0.1:8096',
+        }),
+        '/Users': Response.json([{ Id: 'user-1', Name: 'steve' }]),
+        '/api-docs/openapi.json': Response.json({
+          paths: {
+            '/Users': { get: {} },
+          },
+        }),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId: 'user-1',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['--format', 'json', 'config', 'doctor']);
+    expect(result.code).toBe(0);
+    const parsed = JSON.parse(result.stdout);
+    const payload = parsed.data ?? parsed;
+    expect(payload.configured).toBe(true);
+    expect(payload.checks.connection_ok).toBe(true);
+  });
 });

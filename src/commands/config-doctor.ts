@@ -1,10 +1,11 @@
 import { Command } from 'commander';
 import { JellyfinApiClient } from '../api/client.js';
-import { toon } from '../formatters/index.js';
+import { formatOutput } from '../formatters/index.js';
 import { getConfig, getSettingsPath } from '../utils/config.js';
 import { getOpenApiStats } from '../utils/openapi.js';
 import type { JellyfinConfig } from '../types/index.js';
 import { sanitizeServerAddress } from './setup-utils.js';
+import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 
 function detectAuthMode(config: JellyfinConfig): 'api_key' | 'username_password' | 'none' {
   if (config.apiKey) {
@@ -20,21 +21,24 @@ export function addConfigDoctorCommand(cmd: Command): void {
   cmd
     .command('doctor')
     .description('Run config/auth/connectivity diagnostics for agent-safe automation')
+    .option('-f, --format <format>', 'Output format')
     .option('--name <name>', 'Server name')
-    .action(async (options) => {
+    .action(async function (this: Command, options: FormatOptions & { name?: string | undefined }) {
       const config = getConfig(options.name);
+      const runtimeFormat = resolveOutputFormat(this, { format: options.format ?? config.outputFormat });
       const authMode = detectAuthMode(config);
       const warnings: string[] = [];
 
       if (!config.serverUrl) {
         console.log(
-          toon.formatToon(
+          formatOutput(
             {
               configured: false,
               settings_path: getSettingsPath(),
               auth_mode: authMode,
               message: 'No server URL configured',
             },
+            runtimeFormat,
             'config_doctor',
           ),
         );
@@ -83,7 +87,7 @@ export function addConfigDoctorCommand(cmd: Command): void {
       }
 
       console.log(
-        toon.formatToon(
+        formatOutput(
           {
             configured: true,
             settings_path: getSettingsPath(),
@@ -110,6 +114,7 @@ export function addConfigDoctorCommand(cmd: Command): void {
             },
             warnings,
           },
+          runtimeFormat,
           'config_doctor',
         ),
       );

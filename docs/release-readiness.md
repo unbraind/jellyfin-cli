@@ -58,6 +58,26 @@ The E2E suite is read-only and is designed to avoid mutating media library data.
 It runs `bun run src/cli.ts` by default; set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
 The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env vars are not set.
 
+For explicit installed-binary smoke checks (`jf-cli`) with format/schema validation:
+
+```bash
+export JELLYFIN_READ_ONLY=1
+export JELLYFIN_TIMEOUT=120000
+
+jf-cli --format json config doctor
+jf-cli --format yaml system info
+jf-cli --format markdown users me
+jf-cli --format toon items list --limit 1 | jf-cli schema validate items --from toon
+# JSON parse check
+jf-cli --format json config doctor | jq '.checks.connection_ok and .checks.auth_ok and .checks.openapi_available'
+
+# YAML parse check (via Bun + yaml parser dependency)
+jf-cli --format yaml system info \
+  | bun -e "import YAML from 'yaml'; const s=await new Response(Bun.stdin.stream()).text(); const d=YAML.parse(s); if (!d?.ServerName || !d?.Version) process.exit(1)"
+```
+
+These commands are read-only and verify that key output formats remain machine-parseable.
+
 ## 5) Run discovery diagnostics against live server
 
 ```bash
