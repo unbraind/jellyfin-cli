@@ -7,7 +7,6 @@ import {
   extractOpenApiOperations,
   fetchOpenApiDocumentWithOptions,
   filterOpenApiOperations,
-  matchOperationsForCommandIntent,
   summarizeOpenApi,
   type OpenApiOperationEntry,
 } from '../utils/openapi.js';
@@ -18,18 +17,26 @@ import {
   resolveOutputFormat,
   type FormatOptions,
 } from './schema-utils.js';
-import { summarizeOperationsByTag } from './schema-coverage.js';
+import { mapOpenApiCoverageToTools, summarizeOperationsByTag } from './schema-coverage.js';
 
 type CoverageSnapshot = {
   operation_scope_count: number;
   mapped_operation_count: number;
   unmapped_operation_count: number;
+  unmapped_tool_count: number;
   coverage_percent: number;
   tool_scope_count: number;
   mapped_tool_count: number;
   unmatched_operations_total: number;
+  unmatched_tools_total: number;
+  unmatched_tools_truncated: boolean;
   unmatched_by_tag_total: number;
   unmatched_by_tag: Array<{ tag: string; operations: number; sample_paths: string[] }>;
+  unmatched_tools?: Array<{
+    command: string;
+    read_only_safe: boolean;
+    reason: 'no_openapi_match_above_min_score';
+  }>;
   unmatched_operations?: Array<{
     method: string;
     path: string;
@@ -49,54 +56,31 @@ function buildCoverageSnapshot(
   unmatchedLimit: number,
 ): CoverageSnapshot {
   const tools = generateCliToolSchemas(root, commandIntentFilter);
-  const mappedOperationKeys = new Set<string>();
-  let mappedToolCount = 0;
+  const coverageMapping = mapOpenApiCoverageToTools(operations, tools, minScore);
 
-  for (const tool of tools) {
-    const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
-    const matches = matchOperationsForCommandIntent(operations, commandIntent).filter(
-      (candidate) => candidate.score >= minScore,
-    );
-    if (matches.length === 0) {
-      continue;
-    }
-
-    mappedToolCount += 1;
-    const primaryMatch = matches.find(
-      (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
-    ) ?? matches[0];
-    mappedOperationKeys.add(`${primaryMatch.method} ${primaryMatch.path}`);
-
-    const extraScoreThreshold = Math.max(minScore, primaryMatch.score - 2);
-    for (const match of matches) {
-      const key = `${match.method} ${match.path}`;
-      if (key === `${primaryMatch.method} ${primaryMatch.path}`) {
-        continue;
-      }
-      if (match.score < extraScoreThreshold || match.matchedOn.length < 2) {
-        continue;
-      }
-      mappedOperationKeys.add(key);
-    }
-  }
-
-  const unmatched = operations.filter((operation) => !mappedOperationKeys.has(`${operation.method} ${operation.path}`));
+  const unmatched = operations.filter(
+    (operation) => !coverageMapping.mappedOperationKeys.has(`${operation.method} ${operation.path}`),
+  );
   const unmatchedByTag = summarizeOperationsByTag(unmatched);
   const coveragePercent =
     operations.length === 0
       ? 100
-      : Number(((mappedOperationKeys.size / operations.length) * 100).toFixed(2));
+      : Number(((coverageMapping.mappedOperationKeys.size / operations.length) * 100).toFixed(2));
 
   return {
     operation_scope_count: operations.length,
-    mapped_operation_count: mappedOperationKeys.size,
+    mapped_operation_count: coverageMapping.mappedOperationKeys.size,
     unmapped_operation_count: unmatched.length,
+    unmapped_tool_count: coverageMapping.unmatchedTools.length,
     coverage_percent: coveragePercent,
     tool_scope_count: tools.length,
-    mapped_tool_count: mappedToolCount,
+    mapped_tool_count: coverageMapping.mappedToolCount,
     unmatched_operations_total: unmatched.length,
+    unmatched_tools_total: coverageMapping.unmatchedTools.length,
+    unmatched_tools_truncated: coverageMapping.unmatchedTools.length > unmatchedLimit,
     unmatched_by_tag_total: unmatchedByTag.length,
     unmatched_by_tag: unmatchedByTag,
+    unmatched_tools: coverageMapping.unmatchedTools.slice(0, unmatchedLimit),
     unmatched_operations: includeUnmatched
       ? unmatched.slice(0, unmatchedLimit).map((operation) => ({
         method: operation.method,

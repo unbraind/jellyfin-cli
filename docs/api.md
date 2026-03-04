@@ -3202,7 +3202,7 @@ Notes:
 Estimate OpenAPI operation coverage using CLI command intent matching.
 
 ```bash
-jf schema coverage [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--limit <number>] [--format <format>]
+jf schema coverage [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--read-only-ops] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--suggest-commands] [--limit <number>] [--format <format>]
 ```
 
 Output type: `openapi_coverage`
@@ -3211,6 +3211,7 @@ Notes:
 - Uses live OpenAPI from the configured Jellyfin server.
 - Coverage is intent-based (heuristic) and intended for discovery prioritization.
 - `unmatched_operations` provides a deterministic sample for roadmap planning.
+- `unmatched_tools` provides a deterministic sample of CLI commands that did not map above the active `--min-score`, with `reason` metadata for agent automation.
 
 ### schema research
 
@@ -3225,6 +3226,7 @@ Output type: `openapi_research`
 Notes:
 - Useful for one-shot API discovery reports in CI/agent workflows.
 - Includes both `full_scope` and `read_only_scope` summaries in one payload.
+- Scope summaries include both unmatched operations and unmatched CLI-tool samples (`unmatched_tools_total`, `unmatched_tools`).
 - `--save <path>` persists the same payload to a JSON file and returns `saved_to` in stdout output.
 
 ---

@@ -321,11 +321,63 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('mapped_operation_count: 1');
     expect(result.stdout).toContain('unmapped_operation_count: 2');
     expect(result.stdout).toContain('unmatched_operations:');
+    expect(result.stdout).toContain('unmatched_tools_total: 0');
+    expect(result.stdout).toContain('unmapped_tool_count: 0');
     expect(result.stdout).toContain('unmatched_by_tag:');
     expect(result.stdout).toContain('summary:');
     expect(result.stdout).toContain('coverage_percent:');
     expect(result.stdout).toContain('tag: Custom');
     expect(result.stdout).toContain('/Custom/Unmapped');
+  });
+
+  it('reports unmatched tools when command intents have no matching operations', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Custom/Unmapped': {
+                get: { tags: ['Custom'], operationId: 'GetCustomThing', summary: 'Unmapped operation' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'coverage',
+      '--command-prefix',
+      'users',
+      '--min-score',
+      '10',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('unmatched_tools:');
+    expect(result.stdout).toContain('reason: no_openapi_match_above_min_score');
+    expect(result.stdout).toContain('unmapped_tool_count:');
   });
 
   it('returns error for invalid --min-score', async () => {
@@ -429,6 +481,7 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('mapped_tool_count: 1');
     expect(result.stdout).toContain('mapped_operation_count: 2');
     expect(result.stdout).toContain('unmapped_operation_count: 0');
+    expect(result.stdout).toContain('unmapped_tool_count:');
     expect(result.stdout).toContain('coverage_percent: 100');
   });
 

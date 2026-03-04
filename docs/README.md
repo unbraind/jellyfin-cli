@@ -63,6 +63,8 @@ jf items list --limit 1 | jf schema validate items --from toon
 jf schema coverage --method GET --read-only-ops --command-prefix items --min-score 3 --require-coverage 100 --limit 25
 jf schema coverage --read-only-ops --suggest-commands --require-coverage 100 --limit 20
 jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --limit 20
+# Include unmatched CLI-tool samples (commands that did not map above min-score)
+jf schema coverage --read-only-ops --limit 20 --format json
 
 # Generate a single API research snapshot (OpenAPI + coverage)
 jf schema research --include-unmatched --require-coverage 100 --limit 20
@@ -220,7 +222,7 @@ Notes:
 | `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
 | `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
 | `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
-| `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations, and optionally suggest command names |
+| `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
 | `jf schema validate` | Validate Toon/JSON/YAML payloads against CLI schemas for CI and agent safety |
 
 ### System Administration

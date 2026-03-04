@@ -1,4 +1,5 @@
-import type { OpenApiOperationEntry } from '../utils/openapi.js';
+import { matchOperationsForCommandIntent, type OpenApiOperationEntry } from '../utils/openapi.js';
+import type { CliToolSchema } from '../utils/tool-schema.js';
 
 export type UnmatchedTagSummary = {
   tag: string;
@@ -10,6 +11,67 @@ type TagBucket = {
   count: number;
   samplePaths: Set<string>;
 };
+
+export type UnmatchedToolSummary = {
+  command: string;
+  read_only_safe: boolean;
+  reason: 'no_openapi_match_above_min_score';
+};
+
+export type CoverageMappingResult = {
+  mappedOperationKeys: Set<string>;
+  mappedToolCount: number;
+  unmatchedTools: UnmatchedToolSummary[];
+};
+
+export function mapOpenApiCoverageToTools(
+  operations: OpenApiOperationEntry[],
+  tools: CliToolSchema[],
+  minScore: number,
+): CoverageMappingResult {
+  const mappedOperationKeys = new Set<string>();
+  let mappedToolCount = 0;
+  const unmatchedTools: UnmatchedToolSummary[] = [];
+
+  for (const tool of tools) {
+    const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
+    const matches = matchOperationsForCommandIntent(operations, commandIntent).filter(
+      (candidate) => candidate.score >= minScore,
+    );
+    if (matches.length === 0) {
+      unmatchedTools.push({
+        command: tool.command,
+        read_only_safe: tool.read_only_safe,
+        reason: 'no_openapi_match_above_min_score',
+      });
+      continue;
+    }
+
+    mappedToolCount += 1;
+    const primaryMatch = matches.find(
+      (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
+    ) ?? matches[0];
+    mappedOperationKeys.add(`${primaryMatch.method} ${primaryMatch.path}`);
+
+    const extraScoreThreshold = Math.max(minScore, primaryMatch.score - 2);
+    for (const match of matches) {
+      const key = `${match.method} ${match.path}`;
+      if (key === `${primaryMatch.method} ${primaryMatch.path}`) {
+        continue;
+      }
+      if (match.score < extraScoreThreshold || match.matchedOn.length < 2) {
+        continue;
+      }
+      mappedOperationKeys.add(key);
+    }
+  }
+
+  return {
+    mappedOperationKeys,
+    mappedToolCount,
+    unmatchedTools,
+  };
+}
 
 export function summarizeOperationsByTag(
   operations: OpenApiOperationEntry[],

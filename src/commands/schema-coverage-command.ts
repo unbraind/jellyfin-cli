@@ -5,12 +5,11 @@ import {
   extractOpenApiOperations,
   fetchOpenApiDocumentWithOptions,
   filterOpenApiOperations,
-  matchOperationsForCommandIntent,
   summarizeOpenApi,
 } from '../utils/openapi.js';
 import { suggestCommandFromOperation } from '../utils/openapi-suggestions.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
-import { summarizeOperationsByTag } from './schema-coverage.js';
+import { mapOpenApiCoverageToTools, summarizeOperationsByTag } from './schema-coverage.js';
 import {
   parseCoveragePercent,
   parsePositiveInteger,
@@ -68,45 +67,17 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           readOnlySafe: options.readOnlyOps ? true : undefined,
         });
         const tools = generateCliToolSchemas(root, options.commandPrefix as string | undefined);
-        const mappedOperationKeys = new Set<string>();
-        let mappedToolCount = 0;
-
-        for (const tool of tools) {
-          const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
-          const matches = matchOperationsForCommandIntent(filteredOperations, commandIntent).filter(
-            (candidate) => candidate.score >= minScore,
-          );
-          if (matches.length === 0) {
-            continue;
-          }
-
-          mappedToolCount += 1;
-          const primaryMatch = matches.find(
-            (candidate) => !mappedOperationKeys.has(`${candidate.method} ${candidate.path}`),
-          ) ?? matches[0];
-          mappedOperationKeys.add(`${primaryMatch.method} ${primaryMatch.path}`);
-
-          const extraScoreThreshold = Math.max(minScore, primaryMatch.score - 2);
-          for (const match of matches) {
-            const key = `${match.method} ${match.path}`;
-            if (key === `${primaryMatch.method} ${primaryMatch.path}`) {
-              continue;
-            }
-            if (match.score < extraScoreThreshold || match.matchedOn.length < 2) {
-              continue;
-            }
-            mappedOperationKeys.add(key);
-          }
-        }
+        const coverageMapping = mapOpenApiCoverageToTools(filteredOperations, tools, minScore);
+        const unmatchedTools = coverageMapping.unmatchedTools;
 
         const unmatched = filteredOperations.filter(
-          (operation) => !mappedOperationKeys.has(`${operation.method} ${operation.path}`),
+          (operation) => !coverageMapping.mappedOperationKeys.has(`${operation.method} ${operation.path}`),
         );
         const unmatchedByTag = summarizeOperationsByTag(unmatched);
         const coverage =
           filteredOperations.length === 0
             ? 100
-            : Number(((mappedOperationKeys.size / filteredOperations.length) * 100).toFixed(2));
+            : Number(((coverageMapping.mappedOperationKeys.size / filteredOperations.length) * 100).toFixed(2));
 
         const data = {
           source_path: result.sourcePath,
@@ -121,11 +92,12 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
             read_only_ops: options.readOnlyOps ?? false,
           },
           operation_scope_count: filteredOperations.length,
-          mapped_operation_count: mappedOperationKeys.size,
+          mapped_operation_count: coverageMapping.mappedOperationKeys.size,
           unmapped_operation_count: unmatched.length,
+          unmapped_tool_count: unmatchedTools.length,
           coverage_percent: coverage,
           tool_scope_count: tools.length,
-          mapped_tool_count: mappedToolCount,
+          mapped_tool_count: coverageMapping.mappedToolCount,
           min_score: minScore,
           required_coverage_percent: requiredCoverage ?? null,
           coverage_requirement_met: requiredCoverage === undefined ? null : coverage >= requiredCoverage,
@@ -143,15 +115,19 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           })),
           unmatched_operations_total: unmatched.length,
           unmatched_operations_truncated: unmatched.length > limit,
+          unmatched_tools: unmatchedTools.slice(0, limit),
+          unmatched_tools_total: unmatchedTools.length,
+          unmatched_tools_truncated: unmatchedTools.length > limit,
           unmatched_by_tag_total: unmatchedByTag.length,
           unmatched_by_tag: unmatchedByTag,
           summary: {
             operation_scope_count: filteredOperations.length,
-            mapped_operation_count: mappedOperationKeys.size,
+            mapped_operation_count: coverageMapping.mappedOperationKeys.size,
             unmapped_operation_count: unmatched.length,
+            unmapped_tool_count: unmatchedTools.length,
             coverage_percent: coverage,
             tool_scope_count: tools.length,
-            mapped_tool_count: mappedToolCount,
+            mapped_tool_count: coverageMapping.mappedToolCount,
           },
           suggested_commands: options.suggestCommands
             ? unmatched.slice(0, limit).map((operation) => {

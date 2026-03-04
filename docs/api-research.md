@@ -28,6 +28,7 @@ jf-cli schema research --include-unmatched --limit 40 --format json
 - full scope operation coverage: `100%` (`429 / 429`)
 - read-only scope operation coverage: `100%` (`257 / 257`)
 - unmatched operations: `0` (full + read-only)
+- unmatched tools (CLI intents with no OpenAPI match above score threshold): `34` (full), `71` (read-only)
 
 ## Read-Only Validation Strategy
 
@@ -258,6 +259,18 @@ To avoid modifying media library state during validation:
 - Mutating setup commands remain blocked by read-only guardrails (`setup update-configuration`).
 - Verified with installed binary (`jf-cli`) and source runner (`bun run src/cli.ts`) against Jellyfin
   `10.11.6`.
+
+29. Bidirectional OpenAPI research snapshots (`schema coverage` + `schema research`) (March 4, 2026)
+
+- Coverage output now includes unmatched CLI tool samples in addition to unmatched API operations.
+- New machine-readable fields:
+  - `unmapped_tool_count`
+  - `unmatched_tools_total`
+  - `unmatched_tools_truncated`
+  - `unmatched_tools[]` with `command`, `read_only_safe`, and `reason`
+- This gives agents a two-way planning view:
+  - API operations still missing command coverage
+  - CLI commands whose intent does not currently map to OpenAPI
 - Live `schema research` snapshot now reports:
   - full scope: `429/429` mapped (`100%`)
   - read-only scope: `257/257` mapped (`100%`)
