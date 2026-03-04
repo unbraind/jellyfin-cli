@@ -10,6 +10,7 @@ import {
 } from './utils.js';
 import type { ItemsQueryParams } from '../types/index.js';
 import { addMetadataCommands } from './items-metadata.js';
+import { parseNonNegativeInt, parsePositiveInt } from './number-options.js';
 
 export function createItemsCommand(): Command {
   const cmd = new Command('items');
@@ -32,14 +33,16 @@ export function createItemsCommand(): Command {
     .action(async (options) => {
       const { client, format } = await createApiClient(options);
       try {
+        const limit = parsePositiveInt(options.limit, 'Limit');
+        const offset = parseNonNegativeInt(options.offset, 'Offset');
         const params: ItemsQueryParams = {
           parentId: options.parent,
           includeItemTypes: options.types?.split(','),
           genres: options.genres?.split(','),
           years: options.years?.split(',').map((y: string) => parseInt(y, 10)),
           searchTerm: options.search,
-          limit: parseInt(options.limit, 10),
-          startIndex: parseInt(options.offset, 10),
+          limit,
+          startIndex: offset,
           sortBy: options.sort,
           sortOrder: options.order,
           recursive: options.recursive,
@@ -47,7 +50,9 @@ export function createItemsCommand(): Command {
           isPlayed: options.played ? true : options.unplayed ? false : undefined,
         };
         const result = await client.getItems(params);
-        console.log(formatItems(result.Items ?? [], format));
+        const items = result.Items ?? [];
+        // Some servers may return more than requested; clamp to the requested limit.
+        console.log(formatItems(items.slice(0, limit), format));
       } catch (err) { handleError(err, format); }
     });
 

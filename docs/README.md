@@ -90,6 +90,9 @@ jf setup env --shell
 # Structured export for agent workflows
 jf setup env --format json
 
+# Write a reusable env file (0600 permissions)
+jf setup env --write-file ./.jellyfin.env --format json
+
 # List libraries
 jf library list
 

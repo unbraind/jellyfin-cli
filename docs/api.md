@@ -106,6 +106,9 @@ jf setup env --format json
 
 # Include raw secret values when needed for local automation
 jf setup env --show-secrets
+
+# Write rendered env output to a file (mode 0600)
+jf setup env --write-file ./.jellyfin.env --format json
 ```
 
 ### setup startup

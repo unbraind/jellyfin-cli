@@ -162,7 +162,7 @@ jf system info --format raw
 - `jf setup wizard` - Explicit alias for setup wizard workflows
 - `jf setup status` - Check setup status
 - `jf setup validate` - Validate setup readiness (config/connectivity/auth/OpenAPI/output-format checks)
-- `jf setup env` - Show environment variables (`--shell` or structured `--format json`)
+- `jf setup env` - Show/export environment variables (`--shell`, structured `--format json`, or `--write-file <path>`)
 - `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)
 - `jf setup configuration` - Alias of `setup startup` for endpoint-aligned diagnostics
 - `jf setup update-configuration` - Update startup wizard configuration values
