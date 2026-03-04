@@ -31,8 +31,6 @@ function toSafeConfig(config: JellyfinConfig): Record<string, unknown> {
     server_url: config.serverUrl,
     username: config.username ?? null,
     user_id: config.userId ?? null,
-    has_api_key: Boolean(config.apiKey),
-    has_password: Boolean(config.password),
     output_format: config.outputFormat,
     timeout: config.timeout,
   };

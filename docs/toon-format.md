@@ -116,8 +116,6 @@ data:
   user_id: "user-1"
   timeout: 30000
   output_format: "toon"
-  has_api_key: true
-  has_password: true
 meta:
   timestamp: "2024-01-01T00:00:00.000Z"
   format: toon

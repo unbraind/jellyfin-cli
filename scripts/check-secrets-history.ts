@@ -1,4 +1,4 @@
-import { execSync } from 'node:child_process';
+import { execFileSync, execSync } from 'node:child_process';
 
 interface SecretPattern {
   reason: string;
@@ -35,7 +35,7 @@ const SECRET_PATTERNS: SecretPattern[] = [
   },
   {
     reason: 'Possible hardcoded credential value',
-    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+/-=]{12,})['"]/g,
+    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+/=-]{12,})['"]/g,
   },
   {
     reason: 'Credentials embedded in URL',
@@ -92,19 +92,27 @@ function scanHistory(rootDir: string): HistoryFinding[] {
 
   for (const commit of getAllCommits(rootDir)) {
     for (const pattern of SECRET_PATTERNS) {
-      const escapedPattern = pattern.regex.source.replace(/"/g, '\\"');
-      const command = [
-        `git grep -I -nE \"${escapedPattern}\" ${commit}`,
-        "-- . ':(exclude)tests/**' ':(exclude)*.example'",
-      ].join(' ');
-
       let output = '';
       try {
-        output = execSync(command, {
-          cwd: rootDir,
-          encoding: 'utf-8',
-          maxBuffer: 10 * 1024 * 1024,
-        });
+        output = execFileSync(
+          'git',
+          [
+            'grep',
+            '-I',
+            '-nE',
+            pattern.regex.source,
+            commit,
+            '--',
+            '.',
+            ':(exclude)tests/**',
+            ':(exclude)*.example',
+          ],
+          {
+            cwd: rootDir,
+            encoding: 'utf-8',
+            maxBuffer: 10 * 1024 * 1024,
+          },
+        );
       } catch (error) {
         const exitCode = (error as { status?: number }).status;
         if (exitCode === 1) {

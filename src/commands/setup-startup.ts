@@ -62,10 +62,6 @@ async function runStartupDiagnostics(thisCommand: Command, options: SetupStartup
           },
           first_user: {
             has_name: Boolean(startupFirstUser.Name && startupFirstUser.Name.length > 0),
-            has_password: Boolean(startupFirstUser.Password && startupFirstUser.Password.length > 0),
-            has_password_hint: Boolean(
-              startupFirstUser.PasswordHint && startupFirstUser.PasswordHint.length > 0,
-            ),
           },
           warnings,
         },

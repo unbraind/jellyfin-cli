@@ -318,16 +318,14 @@ describe('config output format support', () => {
       server_url?: string;
       username?: string | null;
       user_id?: string | null;
-      has_api_key?: boolean;
-      has_password?: boolean;
       apiKey?: string;
       password?: string;
     };
     expect(payload.server_url).toBe('http://127.0.0.1:8096');
     expect(payload.username).toBe('steve');
     expect(payload.user_id).toBe('u1');
-    expect(payload.has_api_key).toBe(true);
-    expect(payload.has_password).toBe(true);
+    expect(Object.prototype.hasOwnProperty.call(payload, 'has_api_key')).toBe(false);
+    expect(Object.prototype.hasOwnProperty.call(payload, 'has_password')).toBe(false);
     expect(payload.apiKey).toBeUndefined();
     expect(payload.password).toBeUndefined();
   });

@@ -38,7 +38,7 @@ jf setup --server https://your-server:8096 --api-key YOUR_API_KEY
 
 # API keys are masked in output
 jf config get
-# Output: has_api_key: true (key not shown)
+# Output: server/user metadata only (secret values never shown)
 ```
 
 ### Using Environment Variables

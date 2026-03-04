@@ -349,7 +349,8 @@ describe('setup command', () => {
       expect(parsed.setup_wizard_required).toBe(true);
       expect(parsed.configuration.ui_culture).toBe('en-US');
       expect(parsed.first_user.has_name).toBe(true);
-      expect(parsed.first_user.has_password_hint).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(parsed.first_user, 'has_password_hint')).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(parsed.first_user, 'has_password')).toBe(false);
     } finally {
       server.stop(true);
     }

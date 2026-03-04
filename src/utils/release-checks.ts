@@ -35,7 +35,7 @@ const SECRET_PATTERNS: { regex: RegExp; reason: string }[] = [
     reason: 'Possible hardcoded JELLYFIN_API_KEY value',
   },
   {
-    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+/-=]{12,})['"]/g,
+    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+/=-]{12,})['"]/g,
     reason: 'Possible hardcoded credential value',
   },
   {

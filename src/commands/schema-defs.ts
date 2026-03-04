@@ -111,7 +111,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'config' },
-      data: { type: 'object', properties: { server_url: { type: 'string' }, username: { type: 'string' }, output_format: { type: 'string' }, has_api_key: { type: 'boolean' } }, required: ['server_url', 'output_format'] },
+      data: { type: 'object', properties: { server_url: { type: 'string' }, username: { type: 'string' }, output_format: { type: 'string' }, user_id: { type: ['string', 'null'] }, timeout: { type: 'number' } }, required: ['server_url', 'output_format'] },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
