@@ -259,7 +259,13 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 - `jf schema openapi --for-command "media external-id-infos" --read-only-ops` no longer returns
   mutating `/Library/Media/Updated` in `command_matches`.
 
-29. Years listing timeout hardening for large libraries (March 4, 2026)
+29. Persisted research snapshots for CI/agents (March 4, 2026)
+
+- Added `jf schema research --save <path>` to write the consolidated OpenAPI + coverage snapshot
+  to disk as JSON for deterministic automation workflows.
+- The command output now includes `saved_to` when a snapshot file is written.
+
+30. Years listing timeout hardening for large libraries (March 4, 2026)
 
 - `jf years list` now uses `GET /Items/Filters2` first and only falls back to `GET /Years` when needed.
 - This keeps the command read-only while avoiding long `/Years` scans that can exceed CLI/test timeouts.

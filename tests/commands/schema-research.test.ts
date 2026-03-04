@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it } from 'vitest';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 
@@ -198,5 +198,61 @@ describe('schema research command', () => {
     expect(parsed.full_scope.coverage_percent).toBeLessThan(100);
     expect(parsed.read_only_scope.coverage_percent).toBeGreaterThanOrEqual(0);
     expect(result.stderr).toContain('Coverage requirement not met');
+  });
+
+  it('supports saving the research snapshot to a JSON file', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const savePath = join(testConfigDir, 'reports', 'schema-research.json');
+    const result = await runCli(['--format', 'json', 'schema', 'research', '--save', savePath]);
+    expect(result.code).toBe(0);
+
+    const parsed = JSON.parse(result.stdout) as {
+      saved_to: string | null;
+      source_path: string;
+      operation_count: number;
+    };
+    expect(parsed.saved_to).toBe(savePath);
+    expect(existsSync(savePath)).toBe(true);
+
+    const savedPayload = JSON.parse(readFileSync(savePath, 'utf-8')) as {
+      source_path: string;
+      operation_count: number;
+      saved_to: string | null;
+    };
+    expect(savedPayload.source_path).toBe('/api-docs/openapi.json');
+    expect(savedPayload.operation_count).toBe(1);
+    expect(savedPayload.saved_to).toBeNull();
   });
 });

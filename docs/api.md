@@ -3217,7 +3217,7 @@ Notes:
 Generate a consolidated API research snapshot (OpenAPI summary + full/read-only coverage blocks).
 
 ```bash
-jf schema research [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--include-unmatched] [--limit <number>] [--format <format>]
+jf schema research [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--include-unmatched] [--limit <number>] [--save <path>] [--format <format>]
 ```
 
 Output type: `openapi_research`
@@ -3225,6 +3225,7 @@ Output type: `openapi_research`
 Notes:
 - Useful for one-shot API discovery reports in CI/agent workflows.
 - Includes both `full_scope` and `read_only_scope` summaries in one payload.
+- `--save <path>` persists the same payload to a JSON file and returns `saved_to` in stdout output.
 
 ---
 

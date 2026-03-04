@@ -67,6 +67,9 @@ jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --limit 20
 # Generate a single API research snapshot (OpenAPI + coverage)
 jf schema research --include-unmatched --require-coverage 100 --limit 20
 
+# Persist the research snapshot to JSON for CI/agent pipelines
+jf schema research --include-unmatched --save ./artifacts/openapi-research.json --format json
+
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info
 

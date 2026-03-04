@@ -1,4 +1,6 @@
 import { Command } from 'commander';
+import { mkdirSync, writeFileSync } from 'node:fs';
+import { dirname, resolve } from 'node:path';
 import { formatOutput } from '../formatters/index.js';
 import { getConfig } from '../utils/config.js';
 import {
@@ -123,6 +125,7 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
     .option('--require-coverage <percent>', 'Exit with code 1 when full/read-only coverage is below threshold')
     .option('--include-unmatched', 'Include unmatched operation sample arrays in output')
     .option('--limit <number>', 'Unmatched operation sample limit', '20')
+    .option('--save <path>', 'Write snapshot payload to a JSON file for CI/automation workflows')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
       const outputFormat = resolveOutputFormat(this, options);
       const minScore = parsePositiveInteger(String(options.minScore ?? '3'), 'Min score', outputFormat);
@@ -196,7 +199,16 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
           include_unmatched: includeUnmatched,
           full_scope: fullCoverage,
           read_only_scope: readOnlyCoverage,
+          saved_to: null as string | null,
         };
+
+        const savePath = options.save as string | undefined;
+        if (savePath) {
+          const resolvedSavePath = resolve(savePath);
+          mkdirSync(dirname(resolvedSavePath), { recursive: true });
+          writeFileSync(`${resolvedSavePath}`, `${JSON.stringify(data, null, 2)}\n`, 'utf-8');
+          data.saved_to = resolvedSavePath;
+        }
 
         console.log(formatOutput(data, outputFormat, 'openapi_research'));
         if (
