@@ -26,6 +26,7 @@ Observed:
 - Full-scope operation coverage: `100%` (`429/429`)
 - Read-only operation coverage: `100%` (`257/257`)
 - Unmapped operations: `0` in both scopes
+- Full-scope unmatched tools above `min_score=3`: `14` (down from `22` after intent alias tuning)
 
 ## Live Readiness Checks
 
@@ -53,10 +54,10 @@ The full live E2E suite (`tests/e2e/cli.test.ts`) was executed against the local
 read-only-safe coverage patterns:
 
 ```bash
-bun test tests/e2e/cli.test.ts
+JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts
 ```
 
-Latest run result: `176` passing, `0` failing.
+Latest run result: `177` passing, `0` failing.
 
 ## Full Test + Coverage Validation
 
@@ -68,7 +69,7 @@ bun run test:coverage
 
 Observed (latest):
 
-- `1043` passing, `0` failing
+- `1050` passing, `0` failing
 - Coverage: `99.62%` lines, `94.54%` functions
 - `src/utils/schema-validate.ts`: `100%` lines and functions
 
@@ -82,6 +83,22 @@ Observed (latest):
 This avoids treating local utility commands as API implementation gaps.
 
 ## Latest Agent-Focused Improvement
+
+### OpenAPI intent alias tuning for command coverage mapping
+
+Improved tokenization/matching so command-intent mapping is more resilient for agent workflows:
+
+- `health` now aliases to `ping` (`system health` maps to `/System/Ping`)
+- `userdata` now expands to `user` + `data` for endpoint matching
+- `url` treated as low-signal token to avoid false penalties in score ranking
+
+Validation outcomes:
+
+- full-scope unmatched-tool count improved from `22` to `14` (same server + same threshold)
+- no change to operation coverage (remains `100%`)
+- new regression tests in:
+  - `tests/utils/openapi-tokenize.test.ts`
+  - `tests/utils/openapi.test.ts`
 
 ### Setup readiness gate for setup wizard workflows
 

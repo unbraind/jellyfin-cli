@@ -8,6 +8,7 @@ export const LOW_SIGNAL_TOKENS = new Set([
   'info',
   'status',
   'show',
+  'url',
   'id',
   'name',
   'type',

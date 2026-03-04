@@ -19,6 +19,12 @@ describe('openapi tokenize utils', () => {
 
     const syncPlayTokens = tokenizeIntentValue('syncplay list');
     expect(syncPlayTokens).toEqual(expect.arrayContaining(['syncplay', 'sync', 'play', 'list']));
+
+    const healthTokens = tokenizeIntentValue('system health');
+    expect(healthTokens).toEqual(expect.arrayContaining(['health', 'ping']));
+
+    const userDataTokens = tokenizeIntentValue('userdata get');
+    expect(userDataTokens).toEqual(expect.arrayContaining(['userdata', 'user', 'data', 'get']));
   });
 
   it('deduplicates repeated tokens from mixed casing and separators', () => {

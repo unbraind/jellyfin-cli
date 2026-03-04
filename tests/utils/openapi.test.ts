@@ -318,6 +318,51 @@ describe('openapi utils', () => {
     expect(matches[0]?.readOnlySafe).toBe(true);
   });
 
+  it('maps health command intent to ping endpoints via alias expansion', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/System/Ping': {
+          get: { tags: ['System'], summary: 'Ping system', operationId: 'GetPingSystem' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'system health');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.path).toBe('/System/Ping');
+    expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
+  });
+
+  it('treats url token as low-signal to avoid penalizing intent matches', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/Items/{itemId}/Images/{imageType}': {
+          get: { tags: ['Image'], summary: 'Get image by URL', operationId: 'GetItemImage' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'images url');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.path).toBe('/Items/{itemId}/Images/{imageType}');
+    expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
+  });
+
+  it('expands userdata intent token to map user-data endpoints', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/UserItems/{itemId}/UserData': {
+          get: { tags: ['UserData'], summary: 'Get user data', operationId: 'GetItemUserData' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'userdata get');
+    expect(matches).toHaveLength(1);
+    expect(matches[0]?.path).toBe('/UserItems/{itemId}/UserData');
+    expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
+  });
+
   it('filters out operations when tag or search terms do not match', () => {
     const operations = extractOpenApiOperations({
       paths: {

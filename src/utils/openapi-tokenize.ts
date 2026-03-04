@@ -26,12 +26,16 @@ function expandTokenAliases(token: string): string[] {
   switch (token) {
     case 'apikey':
       return ['apikey', 'api', 'key', 'auth'];
+    case 'health':
+      return ['health', 'ping'];
     case 'quickconnect':
       return ['quickconnect', 'quick', 'connect'];
     case 'livetv':
       return ['livetv', 'live', 'tv'];
     case 'syncplay':
       return ['syncplay', 'sync', 'play'];
+    case 'userdata':
+      return ['userdata', 'user', 'data'];
     default:
       return [token];
   }
