@@ -69,6 +69,40 @@ export function attachMediaUrlCommands(cmd: Command): void {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('audio-hls-master-url <itemId>').description('Get HLS audio master playlist URL')
+    .option('-f, --format <format>', 'Output format')
+    .option('--media-source <id>', 'Media source ID')
+    .option('--audio-stream <index>', 'Audio stream index')
+    .option('--max-bitrate <bps>', 'Max streaming bitrate')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const url = client.getAudioHlsMasterPlaylistUrl(itemId, {
+          mediaSourceId: options.mediaSource,
+          audioStreamIndex: parseOptionalInt(options.audioStream),
+          maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
+        });
+        console.log(toon.formatToon({ url, item_id: itemId }, 'audio_hls_master_url'));
+      } catch (err) { handleError(err, format); }
+    });
+
+  cmd.command('audio-hls-variant-url <itemId>').description('Get HLS audio variant playlist URL')
+    .option('-f, --format <format>', 'Output format')
+    .option('--media-source <id>', 'Media source ID')
+    .option('--audio-stream <index>', 'Audio stream index')
+    .option('--max-bitrate <bps>', 'Max streaming bitrate')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const url = client.getAudioHlsVariantPlaylistUrl(itemId, {
+          mediaSourceId: options.mediaSource,
+          audioStreamIndex: parseOptionalInt(options.audioStream),
+          maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
+        });
+        console.log(toon.formatToon({ url, item_id: itemId }, 'audio_hls_variant_url'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('hls-legacy-url <itemId> <playlistId>').description('Get legacy HLS playlist URL')
     .option('-f, --format <format>', 'Output format')
     .option('--media-source <id>', 'Media source ID')

@@ -58,6 +58,26 @@ export class JellyfinExtensions extends CoreApi {
     })}`;
   }
 
+  getAudioHlsMasterPlaylistUrl(
+    itemId: string,
+    params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number },
+  ): string {
+    return `${this.getBackendUrl()}/Audio/${itemId}/master.m3u8${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getAudioHlsVariantPlaylistUrl(
+    itemId: string,
+    params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number },
+  ): string {
+    return `${this.getBackendUrl()}/Audio/${itemId}/main.m3u8${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
   getLegacyHlsVideoPlaylistUrl(
     itemId: string,
     playlistId: string,

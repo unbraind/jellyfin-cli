@@ -1929,6 +1929,26 @@ jf media audio-stream-url <itemId> [--container <container>] [--universal] [--me
 
 Output type: `audio_stream_url`
 
+### media audio-hls-master-url
+
+Get HLS audio master playlist URL.
+
+```bash
+jf media audio-hls-master-url <itemId> [--media-source <id>] [--audio-stream <index>] [--max-bitrate <bps>]
+```
+
+Output type: `audio_hls_master_url`
+
+### media audio-hls-variant-url
+
+Get HLS audio variant playlist URL.
+
+```bash
+jf media audio-hls-variant-url <itemId> [--media-source <id>] [--audio-stream <index>] [--max-bitrate <bps>]
+```
+
+Output type: `audio_hls_variant_url`
+
 ### media hls-legacy-url
 
 Get legacy HLS video playlist URL.

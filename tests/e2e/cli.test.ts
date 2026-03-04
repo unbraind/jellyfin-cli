@@ -1440,6 +1440,24 @@ describe.skipIf(skip)('E2E media segments', () => {
     expect(out).toMatch(/\/Audio\/.*\/universal/);
   }, T);
 
+  it('media audio-hls-master-url returns audio_hls_master_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Audio', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('media', 'audio-hls-master-url', idMatch[1]);
+    expect(out).toMatch(/^type: audio_hls_master_url/m);
+    expect(out).toMatch(/\/Audio\/.*\/master\.m3u8/);
+  }, T);
+
+  it('media audio-hls-variant-url returns audio_hls_variant_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Audio', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('media', 'audio-hls-variant-url', idMatch[1]);
+    expect(out).toMatch(/^type: audio_hls_variant_url/m);
+    expect(out).toMatch(/\/Audio\/.*\/main\.m3u8/);
+  }, T);
+
   it('media item-file-url returns item_file_url type', async () => {
     const listOut = await jf('items', 'list', '--limit', '1');
     const idMatch = listOut.match(/id: ([a-f0-9]{32})/);

@@ -328,6 +328,8 @@ Notes:
 | `jf media hls-url <itemId>` | Get HLS master playlist URL |
 | `jf media video-stream-url <itemId>` | Get direct video stream URL |
 | `jf media audio-stream-url <itemId>` | Get direct audio stream URL |
+| `jf media audio-hls-master-url <itemId>` | Get HLS audio master playlist URL |
+| `jf media audio-hls-variant-url <itemId>` | Get HLS audio variant playlist URL |
 | `jf media hls-legacy-url <itemId> <playlistId>` | Get legacy HLS video playlist URL |
 | `jf media hls-audio-segment-url <itemId> <segmentId>` | Get legacy HLS audio segment URL |
 | `jf media item-file-url <itemId>` | Get direct item file URL |

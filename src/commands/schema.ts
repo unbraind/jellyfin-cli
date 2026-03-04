@@ -276,6 +276,14 @@ export function createSchemaCommand(): Command {
           unmatched_operations_truncated: unmatched.length > limit,
           unmatched_by_tag_total: unmatchedByTag.length,
           unmatched_by_tag: unmatchedByTag,
+          summary: {
+            operation_scope_count: filteredOperations.length,
+            mapped_operation_count: mappedOperationKeys.size,
+            unmapped_operation_count: unmatched.length,
+            coverage_percent: coverage,
+            tool_scope_count: tools.length,
+            mapped_tool_count: mappedToolCount,
+          },
           suggested_commands: options.suggestCommands
             ? unmatched.slice(0, limit).map((operation) => {
               const suggestion = suggestCommandFromOperation(operation);

@@ -276,6 +276,28 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 - Read-only schema coverage currently remains `89.49%` (`230/257`) because current intent matching
   does not yet fully map `media ...-url` commands to all `Audio`/`Videos` tag operations.
 
+29. Audio HLS URL endpoint support + coverage summary contract (March 4, 2026)
+
+- Added new read-only audio HLS URL commands:
+  - `jf media audio-hls-master-url <itemId>` for `GET /Audio/{itemId}/master.m3u8`
+  - `jf media audio-hls-variant-url <itemId>` for `GET /Audio/{itemId}/main.m3u8`
+- Added typed client URL helper methods:
+  - `getAudioHlsMasterPlaylistUrl`
+  - `getAudioHlsVariantPlaylistUrl`
+- Added a stable nested `summary` object in `jf schema coverage` output to simplify machine parsing
+  in agent/CI workflows.
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- Targeted E2E tests pass for both new audio HLS commands against the local read-only workflow.
+- `jf schema coverage --read-only-ops --format json` now includes:
+  - `summary.operation_scope_count`
+  - `summary.mapped_operation_count`
+  - `summary.unmapped_operation_count`
+  - `summary.coverage_percent`
+  - `summary.tool_scope_count`
+  - `summary.mapped_tool_count`
+- Current read-only coverage result observed in this run: `90.27%` (`232/257`).
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

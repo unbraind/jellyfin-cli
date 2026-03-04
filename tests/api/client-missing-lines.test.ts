@@ -102,6 +102,14 @@ describe('JellyfinApiClient Missing Lines', () => {
     const universalAudioUrl = client.getUniversalAudioStreamUrl('item-1');
     expect(universalAudioUrl).toContain('/Audio/item-1/universal');
     expect(universalAudioUrl).toContain('userId=u1');
+
+    const audioMasterUrl = client.getAudioHlsMasterPlaylistUrl('item-1');
+    expect(audioMasterUrl).toContain('/Audio/item-1/master.m3u8');
+    expect(audioMasterUrl).toContain('userId=u1');
+
+    const audioVariantUrl = client.getAudioHlsVariantPlaylistUrl('item-1');
+    expect(audioVariantUrl).toContain('/Audio/item-1/main.m3u8');
+    expect(audioVariantUrl).toContain('userId=u1');
   });
 
   it('should generate legacy hls, item file, kodi, and branding urls', () => {
