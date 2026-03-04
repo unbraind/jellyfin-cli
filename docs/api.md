@@ -2172,7 +2172,7 @@ Output type: `item_images`
 
 ### images url
 
-Get image URL.
+Get item image URL.
 
 ```bash
 jf images url <itemId> <imageType> [options]
@@ -2186,6 +2186,56 @@ jf images url <itemId> <imageType> [options]
 | `--index <number>` | Image index |
 
 Output type: `image_url`
+
+### images artist-url
+
+Get artist image URL by artist name.
+
+```bash
+jf images artist-url <artistName> <imageType> [--max-width <pixels>] [--max-height <pixels>] [--index <number>]
+```
+
+Output type: `artist_image_url`
+
+### images genre-url
+
+Get genre image URL by genre name.
+
+```bash
+jf images genre-url <genreName> <imageType> [--max-width <pixels>] [--max-height <pixels>] [--index <number>]
+```
+
+Output type: `genre_image_url`
+
+### images music-genre-url
+
+Get music genre image URL by music genre name.
+
+```bash
+jf images music-genre-url <genreName> <imageType> [--max-width <pixels>] [--max-height <pixels>] [--index <number>]
+```
+
+Output type: `music_genre_image_url`
+
+### images person-url
+
+Get person image URL by person name.
+
+```bash
+jf images person-url <personName> <imageType> [--max-width <pixels>] [--max-height <pixels>] [--index <number>]
+```
+
+Output type: `person_image_url`
+
+### images studio-url
+
+Get studio image URL by studio name.
+
+```bash
+jf images studio-url <studioName> <imageType> [--max-width <pixels>] [--max-height <pixels>] [--index <number>]
+```
+
+Output type: `studio_image_url`
 
 ### images delete
 
@@ -2202,6 +2252,8 @@ Get user profile image URL.
 ```bash
 jf images user <userId> [--max-width <pixels>] [--max-height <pixels>]
 ```
+
+Supports optional `--index <number>`.
 
 Output type: `user_image_url`
 

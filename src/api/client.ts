@@ -70,6 +70,11 @@ export class JellyfinApiClient extends JellyfinExtensions {
   // Images
   async getItemImages(itemId: string): Promise<ItemImageInfo[]> { return this.images.getItemImages(itemId); }
   getItemImage(itemId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; quality?: number; imageIndex?: number }): string { return this.images.getItemImage(itemId, imageType, params); }
+  getArtistImage(artistId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string { return this.images.getArtistImage(artistId, imageType, params); }
+  getGenreImage(genreId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string { return this.images.getGenreImage(genreId, imageType, params); }
+  getMusicGenreImage(musicGenreId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string { return this.images.getMusicGenreImage(musicGenreId, imageType, params); }
+  getPersonImage(personId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string { return this.images.getPersonImage(personId, imageType, params); }
+  getStudioImage(studioId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string { return this.images.getStudioImage(studioId, imageType, params); }
   async deleteItemImage(itemId: string, imageType: string, imageIndex?: number): Promise<void> { return this.images.deleteItemImage(itemId, imageType, imageIndex); }
   async deleteUserImage(userId: string, imageType: string): Promise<void> { return this.images.deleteUserImage(userId, imageType); }
   getUserImage(userId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; imageIndex?: number }): string { return this.images.getUserImage(userId, imageType, params); }

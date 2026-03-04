@@ -470,6 +470,11 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 - `jf images list <itemId>` - List item images
 - `jf images url <itemId> <type>` - Get image URL
+- `jf images artist-url <artistName> <type>` - Get artist image URL by name
+- `jf images genre-url <genreName> <type>` - Get genre image URL by name
+- `jf images music-genre-url <genreName> <type>` - Get music genre image URL by name
+- `jf images person-url <personName> <type>` - Get person image URL by name
+- `jf images studio-url <studioName> <type>` - Get studio image URL by name
 - `jf images delete <itemId> <type>` - Delete image
 - `jf images user <userId>` - Get user profile image URL
 

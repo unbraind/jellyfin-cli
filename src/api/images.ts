@@ -11,11 +11,10 @@ export interface ItemImageInfo {
 }
 
 export class ImagesApi extends ApiClientBase {
-  async getItemImages(itemId: string): Promise<ItemImageInfo[]> {
-    return this.request<ItemImageInfo[]>('GET', `/Items/${itemId}/Images`);
-  }
-
-  getItemImage(itemId: string, imageType: string, params?: { tag?: string; maxWidth?: number; maxHeight?: number; width?: number; height?: number; quality?: number; fillWidth?: number; fillHeight?: number; cropWhitespace?: boolean; addPlayedIndicator?: boolean; blur?: number; backgroundColor?: string; foregroundLayer?: string; imageIndex?: number }): string {
+  private buildImageUrl(
+    path: string,
+    params?: Record<string, string | number | boolean | null | undefined>,
+  ): string {
     const searchParams = new URLSearchParams();
     if (params) {
       for (const [key, value] of Object.entries(params)) {
@@ -25,7 +24,30 @@ export class ImagesApi extends ApiClientBase {
       }
     }
     const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Items/${itemId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+    return `${this.getBackendUrl()}${path}${qs ? `?${qs}` : ''}`;
+  }
+
+  async getItemImages(itemId: string): Promise<ItemImageInfo[]> {
+    return this.request<ItemImageInfo[]>('GET', `/Items/${itemId}/Images`);
+  }
+
+  getItemImage(itemId: string, imageType: string, params?: {
+    tag?: string;
+    maxWidth?: number;
+    maxHeight?: number;
+    width?: number;
+    height?: number;
+    quality?: number;
+    fillWidth?: number;
+    fillHeight?: number;
+    cropWhitespace?: boolean;
+    addPlayedIndicator?: boolean;
+    blur?: number;
+    backgroundColor?: string;
+    foregroundLayer?: string;
+    imageIndex?: number;
+  }): string {
+    return this.buildImageUrl(`/Items/${itemId}/Images/${imageType}`, params);
   }
 
   async deleteItemImage(itemId: string, imageType: string, imageIndex?: number): Promise<void> {
@@ -72,81 +94,87 @@ export class ImagesApi extends ApiClientBase {
     }
   }
 
-  getArtistImage(artistId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Artists/${artistId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+  getArtistImage(artistId: string, imageType: string, params?: {
+    maxWidth?: number;
+    maxHeight?: number;
+    tag?: string;
+    imageIndex?: number;
+  }): string {
+    const path = params?.imageIndex !== undefined
+      ? `/Artists/${artistId}/Images/${imageType}/${params.imageIndex}`
+      : `/Artists/${artistId}/Images/${imageType}`;
+    return this.buildImageUrl(path, {
+      maxWidth: params?.maxWidth,
+      maxHeight: params?.maxHeight,
+      tag: params?.tag,
+    });
   }
 
-  getGenreImage(genreId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Genres/${genreId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+  getGenreImage(genreId: string, imageType: string, params?: {
+    maxWidth?: number;
+    maxHeight?: number;
+    tag?: string;
+    imageIndex?: number;
+  }): string {
+    const path = params?.imageIndex !== undefined
+      ? `/Genres/${genreId}/Images/${imageType}/${params.imageIndex}`
+      : `/Genres/${genreId}/Images/${imageType}`;
+    return this.buildImageUrl(path, {
+      maxWidth: params?.maxWidth,
+      maxHeight: params?.maxHeight,
+      tag: params?.tag,
+    });
   }
 
-  getMusicGenreImage(musicGenreId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/MusicGenres/${musicGenreId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+  getMusicGenreImage(musicGenreId: string, imageType: string, params?: {
+    maxWidth?: number;
+    maxHeight?: number;
+    tag?: string;
+    imageIndex?: number;
+  }): string {
+    const path = params?.imageIndex !== undefined
+      ? `/MusicGenres/${musicGenreId}/Images/${imageType}/${params.imageIndex}`
+      : `/MusicGenres/${musicGenreId}/Images/${imageType}`;
+    return this.buildImageUrl(path, {
+      maxWidth: params?.maxWidth,
+      maxHeight: params?.maxHeight,
+      tag: params?.tag,
+    });
   }
 
-  getPersonImage(personId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Persons/${personId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+  getPersonImage(personId: string, imageType: string, params?: {
+    maxWidth?: number;
+    maxHeight?: number;
+    tag?: string;
+    imageIndex?: number;
+  }): string {
+    const path = params?.imageIndex !== undefined
+      ? `/Persons/${personId}/Images/${imageType}/${params.imageIndex}`
+      : `/Persons/${personId}/Images/${imageType}`;
+    return this.buildImageUrl(path, {
+      maxWidth: params?.maxWidth,
+      maxHeight: params?.maxHeight,
+      tag: params?.tag,
+    });
   }
 
-  getStudioImage(studioId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Studios/${studioId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+  getStudioImage(studioId: string, imageType: string, params?: {
+    maxWidth?: number;
+    maxHeight?: number;
+    tag?: string;
+    imageIndex?: number;
+  }): string {
+    const path = params?.imageIndex !== undefined
+      ? `/Studios/${studioId}/Images/${imageType}/${params.imageIndex}`
+      : `/Studios/${studioId}/Images/${imageType}`;
+    return this.buildImageUrl(path, {
+      maxWidth: params?.maxWidth,
+      maxHeight: params?.maxHeight,
+      tag: params?.tag,
+    });
   }
 
   getUserImage(userId: string, imageType: string, params?: { maxWidth?: number; maxHeight?: number; tag?: string; imageIndex?: number }): string {
-    const searchParams = new URLSearchParams();
-    if (params) {
-      for (const [key, value] of Object.entries(params)) {
-        if (value !== undefined && value !== null) {
-          searchParams.append(key, String(value));
-        }
-      }
-    }
-    const qs = searchParams.toString();
-    return `${this.getBackendUrl()}/Users/${userId}/Images/${imageType}${qs ? `?${qs}` : ''}`;
+    return this.buildImageUrl(`/Users/${userId}/Images/${imageType}`, params);
   }
 }

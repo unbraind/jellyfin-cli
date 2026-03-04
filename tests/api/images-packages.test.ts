@@ -132,6 +132,12 @@ describe('ImagesApi', () => {
       expect(url).toContain('/Artists/artist-1/Images/Primary');
       expect(url).toContain('maxWidth=500');
     });
+    
+    it('should build artist image URL with indexed path', () => {
+      const url = api.getArtistImage('artist-1', 'Primary', { imageIndex: 2, maxHeight: 300 });
+      expect(url).toContain('/Artists/artist-1/Images/Primary/2');
+      expect(url).toContain('maxHeight=300');
+    });
 
     it('should build genre image URL', () => {
       const url = api.getGenreImage('genre-1', 'Primary');
@@ -144,6 +150,11 @@ describe('ImagesApi', () => {
       expect(url).toContain('maxHeight=300');
       expect(url).toContain('tag=abc123');
     });
+    
+    it('should build genre image URL with indexed path', () => {
+      const url = api.getGenreImage('genre-1', 'Primary', { imageIndex: 1 });
+      expect(url).toContain('/Genres/genre-1/Images/Primary/1');
+    });
 
     it('should build music genre image URL', () => {
       const url = api.getMusicGenreImage('mg-1', 'Primary');
@@ -153,6 +164,11 @@ describe('ImagesApi', () => {
     it('should build music genre image URL with params', () => {
       const url = api.getMusicGenreImage('mg-1', 'Backdrop', { maxWidth: 1280 });
       expect(url).toContain('maxWidth=1280');
+    });
+    
+    it('should build music genre image URL with indexed path', () => {
+      const url = api.getMusicGenreImage('mg-1', 'Primary', { imageIndex: 4 });
+      expect(url).toContain('/MusicGenres/mg-1/Images/Primary/4');
     });
 
     it('should build person image URL', () => {
@@ -165,6 +181,11 @@ describe('ImagesApi', () => {
       expect(url).toContain('maxWidth=400');
       expect(url).toContain('maxHeight=600');
     });
+    
+    it('should build person image URL with indexed path', () => {
+      const url = api.getPersonImage('person-1', 'Primary', { imageIndex: 3 });
+      expect(url).toContain('/Persons/person-1/Images/Primary/3');
+    });
 
     it('should build studio image URL', () => {
       const url = api.getStudioImage('studio-1', 'Primary');
@@ -174,6 +195,11 @@ describe('ImagesApi', () => {
     it('should build studio image URL with params', () => {
       const url = api.getStudioImage('studio-1', 'Logo', { tag: 'xyztag' });
       expect(url).toContain('tag=xyztag');
+    });
+    
+    it('should build studio image URL with indexed path', () => {
+      const url = api.getStudioImage('studio-1', 'Logo', { imageIndex: 5 });
+      expect(url).toContain('/Studios/studio-1/Images/Logo/5');
     });
 
     it('should build user image URL', () => {

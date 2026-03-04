@@ -197,6 +197,22 @@ To avoid modifying media library state during validation:
   - coverage: `90.27%`
   - unmatched: `25`
 
+24. Named image endpoint command coverage + formatter consistency (March 4, 2026)
+
+- Added read-only named image URL commands:
+  - `jf images artist-url <artistName> <imageType>`
+  - `jf images genre-url <genreName> <imageType>`
+  - `jf images music-genre-url <genreName> <imageType>`
+  - `jf images person-url <personName> <imageType>`
+  - `jf images studio-url <studioName> <imageType>`
+- Added indexed path support (`--index`) in typed named image URL builders.
+- Updated `images` command output paths to honor `--format` consistently for list/url/user/delete outputs.
+- March 4, 2026 verification run against Jellyfin 10.11.6:
+  - read-only scope: `257` operations
+  - mapped: `237`
+  - coverage: `92.22%`
+  - unmatched: `20`
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

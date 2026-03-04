@@ -1214,6 +1214,27 @@ describe.skipIf(skip)('E2E images', () => {
     expect(out).toMatch(/^type: user_image_url/m);
     expect(out).toMatch(/url:/);
   }, T);
+
+  it('images list honors json output format', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('images', 'list', idMatch[1], '--format', 'json');
+    const parsed = JSON.parse(out) as unknown[];
+    expect(Array.isArray(parsed)).toBe(true);
+  }, T);
+
+  it('images person-url returns person_image_url type', async () => {
+    const out = await jf('images', 'person-url', 'Tom Hanks', 'Primary', '--index', '0');
+    expect(out).toMatch(/^type: person_image_url/m);
+    expect(out).toMatch(/url: http/);
+  }, T);
+
+  it('images genre-url returns genre_image_url type', async () => {
+    const out = await jf('images', 'genre-url', 'Action', 'Primary', '--index', '0');
+    expect(out).toMatch(/^type: genre_image_url/m);
+    expect(out).toMatch(/url: http/);
+  }, T);
 });
 
 // -------------------------------------------------------------------------
