@@ -14,6 +14,7 @@ import { generateCliToolSchemas } from '../utils/tool-schema.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 import { attachSchemaResearchSubcommand } from './schema-research.js';
 import { attachSchemaCoverageSubcommand } from './schema-coverage-command.js';
+import { attachSchemaSuggestSubcommand } from './schema-suggest.js';
 
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
@@ -37,6 +38,7 @@ export function createSchemaCommand(): Command {
   cmd.addCommand(createSchemaValidateCommand());
   attachSchemaResearchSubcommand(cmd);
   attachSchemaCoverageSubcommand(cmd);
+  attachSchemaSuggestSubcommand(cmd);
 
   cmd
     .command('list')

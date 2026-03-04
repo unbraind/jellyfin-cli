@@ -178,6 +178,7 @@ jf system info --format raw
 - `jf schema research` - Emit consolidated OpenAPI + full/read-only coverage snapshot for API research
 - `jf schema tools` - Export command tool schemas for LLM function-calling, with optional live OpenAPI endpoint matches
 - `jf schema coverage` - Estimate API coverage, list unmatched OpenAPI operations, and suggest command names
+- `jf schema suggest` - Generate candidate CLI command patterns from OpenAPI intent matches or coverage gaps
 
 ## Release Validation
 
@@ -531,6 +532,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema research [--method GET] [--tag Users] [--path-prefix /Users] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--require-coverage 100] [--include-unmatched] [--limit 20]` - Generate one consolidated OpenAPI + full/read-only coverage snapshot
 - `jf schema tools [--command <prefix> --limit <n> --openapi-match --name <server>]` - Export tool schemas with input schema, read-only metadata, and optional live OpenAPI endpoint matches per command
 - `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--require-coverage 100] [--suggest-commands] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set and optionally generate candidate CLI names for unmapped endpoints
+- `jf schema suggest [--for-command "users list"] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--min-score 3] [--limit 20]` - Generate structured CLI command suggestions from live OpenAPI (intent mode with `--for-command`, or uncovered operation mode without it)
 
 ## Agent/LLM Optimization
 

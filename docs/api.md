@@ -3213,6 +3213,21 @@ Notes:
 - `unmatched_operations` provides a deterministic sample for roadmap planning.
 - `unmatched_tools` provides a deterministic sample of CLI commands that did not map above the active `--min-score`, with `reason` metadata for agent automation.
 
+### schema suggest
+
+Generate CLI command suggestions from live OpenAPI metadata.
+
+```bash
+jf schema suggest [--name <name>] [--for-command <path>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--search <text>] [--read-only-ops] [--endpoint <path>] [--min-score <number>] [--limit <number>] [--format <format>]
+```
+
+Output type: `openapi_command_suggestions`
+
+Notes:
+- With `--for-command`, runs intent mode and returns ranked endpoint matches with inferred command names.
+- Without `--for-command`, runs coverage-gap mode and suggests candidate command names for uncovered operations.
+- Supports the same OpenAPI filter flags used by `schema openapi`/`schema coverage`.
+
 ### schema research
 
 Generate a consolidated API research snapshot (OpenAPI summary + full/read-only coverage blocks).

@@ -61,6 +61,24 @@ jf schema sessions
 jf schema
 ```
 
+### OpenAPI-Aware Command Discovery
+
+Use live server metadata to keep agent plans aligned with actual Jellyfin capabilities:
+
+```bash
+# Summarize/filter live OpenAPI operations
+jf schema openapi --read-only-ops --for-command "items list" --limit 20
+
+# Export machine-usable CLI tool schemas
+jf schema tools --openapi-match --openapi-match-limit 3 --limit 20
+
+# Suggest command patterns from intent
+jf schema suggest --for-command "users list" --limit 10
+
+# Suggest command candidates for uncovered endpoints
+jf schema suggest --read-only-ops --limit 20
+```
+
 ## Integration Patterns
 
 ### Pattern 1: Direct Execution

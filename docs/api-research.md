@@ -30,6 +30,13 @@ jf-cli schema research --include-unmatched --limit 40 --format json
 - unmatched operations: `0` (full + read-only)
 - unmatched tools (CLI intents with no OpenAPI match above score threshold): `34` (full), `71` (read-only)
 
+## Latest Addition (March 4, 2026)
+
+- Added `jf schema suggest` to improve agent workflow ergonomics:
+  - `--for-command "<intent>"` returns ranked OpenAPI matches plus inferred command names.
+  - Without `--for-command`, it reports suggestion candidates for uncovered OpenAPI operations.
+  - Output type: `openapi_command_suggestions` (machine-friendly for CI/automation backlogs).
+
 ## Read-Only Validation Strategy
 
 To avoid modifying media library state during validation:
