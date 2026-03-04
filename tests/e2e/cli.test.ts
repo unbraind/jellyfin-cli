@@ -1114,6 +1114,10 @@ describe.skipIf(skip)('E2E livetv', () => {
   it('livetv schedules-direct-countries returns countries type', async () => {
     const out = await jf('livetv', 'schedules-direct-countries');
     expect(out).toMatch(/^type: schedules_direct_countries/m);
+    if (/MAX_NO_TOKEN_REQUESTS/i.test(out)) {
+      expect(out).toMatch(/code:\s*1050/);
+      return;
+    }
     expect(out).toMatch(/North America|Europe|Asia|Africa|Oceania|South America/i);
   }, T);
 

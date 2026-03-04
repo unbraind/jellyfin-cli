@@ -6,6 +6,17 @@ import { tmpdir } from 'node:os';
 const testConfigDir = join(tmpdir(), `jellyfin-cli-schema-suggest-test-${Date.now()}`);
 const cliCommand = ['bun', 'run', 'src/cli.ts'];
 let mockServer: Bun.Server | undefined;
+const isolatedJellyfinEnv: Record<string, string> = {
+  JELLYFIN_SERVER_URL: '',
+  JELLYFIN_API_KEY: '',
+  JELLYFIN_USERNAME: '',
+  JELLYFIN_PASSWORD: '',
+  JELLYFIN_USER_ID: '',
+  JELLYFIN_TIMEOUT: '',
+  JELLYFIN_OUTPUT_FORMAT: '',
+  JELLYFIN_READ_ONLY: '',
+  JELLYFIN_EXPLAIN: '',
+};
 
 async function runCli(
   args: string[],
@@ -14,6 +25,7 @@ async function runCli(
   const proc = Bun.spawn([...cliCommand, ...args], {
     env: {
       ...process.env,
+      ...isolatedJellyfinEnv,
       JELLYFIN_CONFIG_DIR: testConfigDir,
       ...env,
     },

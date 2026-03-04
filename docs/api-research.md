@@ -6,6 +6,26 @@ This document summarizes live API discovery work used to improve `jellyfin-cli` 
 without mutating server data. Latest verification run: **March 4, 2026** against Jellyfin
 **10.11.6**.
 
+## Latest Live Verification (March 4, 2026)
+
+Validated against a local Jellyfin server in read-only-safe mode using local auth from
+`~/.jellyfin-cli/settings.json` and runtime env vars (no repository secrets).
+
+- `schema research` live snapshot:
+  - OpenAPI source path: `/api-docs/openapi.json`
+  - paths: `356`
+  - operations: `429`
+  - full-scope operation coverage: `100%` (`429 / 429`)
+  - read-only operation coverage: `100%` (`257 / 257`)
+- full live CLI E2E run: `176/176` passing (`bun test tests/e2e/cli.test.ts`)
+- compiled-binary smoke check via `dist/cli.js` passed:
+  - `config doctor --validate-formats --require-connected --require-auth --require-openapi --require-valid-formats`
+
+Read-only safety note:
+- one LiveTV endpoint (`schedules-direct-countries`) can return quota responses from Schedules Direct
+  (`MAX_NO_TOKEN_REQUESTS`, code `1050`) without indicating CLI regressions; E2E assertions now
+  accept this server-side rate-limit response.
+
 ## Verified Discovery Endpoint
 
 - OpenAPI JSON was reachable at `GET /api-docs/openapi.json`.

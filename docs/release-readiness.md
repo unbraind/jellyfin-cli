@@ -57,6 +57,8 @@ JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts
 The E2E suite is read-only and is designed to avoid mutating media library data.
 It runs `bun run src/cli.ts` by default; set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
 The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env vars are not set.
+For unit/coverage runs, prefer not exporting `JELLYFIN_*` globally; command tests use isolated env,
+and live checks should be run explicitly as above.
 
 When strict read-only mode is enabled, base `jf setup` is still allowed because it only updates
 local CLI config (`~/.jellyfin-cli/settings.json`) and does not mutate server data.

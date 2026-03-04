@@ -5,11 +5,23 @@ import { tmpdir } from 'node:os';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-years-test-${Date.now()}`);
 const cliCommand = ['bun', 'run', 'src/cli.ts'];
+const isolatedJellyfinEnv: Record<string, string> = {
+  JELLYFIN_SERVER_URL: '',
+  JELLYFIN_API_KEY: '',
+  JELLYFIN_USERNAME: '',
+  JELLYFIN_PASSWORD: '',
+  JELLYFIN_USER_ID: '',
+  JELLYFIN_TIMEOUT: '',
+  JELLYFIN_OUTPUT_FORMAT: '',
+  JELLYFIN_READ_ONLY: '',
+  JELLYFIN_EXPLAIN: '',
+};
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
   const proc = Bun.spawn([...cliCommand, ...args], {
     env: {
       ...process.env,
+      ...isolatedJellyfinEnv,
       JELLYFIN_CONFIG_DIR: testConfigDir,
     },
     stdout: 'pipe',

@@ -5,11 +5,23 @@ import { tmpdir } from 'node:os';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-setup-test-${Date.now()}`);
 const cliCommand = ['bun', 'run', 'src/cli.ts'];
+const isolatedJellyfinEnv: Record<string, string> = {
+  JELLYFIN_SERVER_URL: '',
+  JELLYFIN_API_KEY: '',
+  JELLYFIN_USERNAME: '',
+  JELLYFIN_PASSWORD: '',
+  JELLYFIN_USER_ID: '',
+  JELLYFIN_TIMEOUT: '',
+  JELLYFIN_OUTPUT_FORMAT: '',
+  JELLYFIN_READ_ONLY: '',
+  JELLYFIN_EXPLAIN: '',
+};
 
 async function runCli(args: string[], env: Record<string, string | undefined> = {}): Promise<{ code: number; stdout: string; stderr: string }> {
   const proc = Bun.spawn([...cliCommand, ...args], {
     env: {
       ...process.env,
+      ...isolatedJellyfinEnv,
       JELLYFIN_CONFIG_DIR: testConfigDir,
       ...env,
     },
@@ -228,6 +240,49 @@ describe('setup command', () => {
         '--format',
         'json',
       ]);
+      expect(result.code).toBe(0);
+      expect(result.stderr).not.toContain('Do not combine --api-key with --password');
+    } finally {
+      server.stop(true);
+    }
+  });
+
+  it('ignores inherited password when saved config already has api key', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/System/Info/Public') {
+          return Response.json({
+            ServerName: 'Local Jellyfin',
+            Version: '10.9.0',
+            Id: 'server-1',
+            LocalAddress: `http://127.0.0.1:${server.port}`,
+          });
+        }
+        if (url.pathname === '/Users') {
+          return Response.json([{ Id: 'user-steve', Name: 'steve', Policy: { IsAdministrator: false } }]);
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(
+        join(testConfigDir, 'settings.json'),
+        JSON.stringify({
+          defaultServer: {
+            serverUrl: `http://127.0.0.1:${server.port}`,
+            apiKey: 'saved-api-key',
+            password: 'stale-password',
+            outputFormat: 'toon',
+          },
+        }),
+        'utf-8',
+      );
+
+      const result = await runCli(['setup', '--non-interactive', '--format', 'json']);
       expect(result.code).toBe(0);
       expect(result.stderr).not.toContain('Do not combine --api-key with --password');
     } finally {

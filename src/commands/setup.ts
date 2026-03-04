@@ -94,11 +94,13 @@ export function createSetupCommand(): Command {
       let username = options.username ?? existingConfig.username;
       let password = options.password ?? existingConfig.password;
       let userId = existingConfig.userId;
-      const hasExplicitApiKey = typeof options.apiKey === 'string' && options.apiKey.length > 0;
       const hasExplicitPassword = typeof options.password === 'string' && options.password.length > 0;
 
-      // Explicit API key setup should not fail because of an inherited saved password.
-      if (hasExplicitApiKey && !hasExplicitPassword) {
+      // API key auth should not fail because of an inherited saved password.
+      // Preserve explicit password intent to allow username/password setup flows.
+      const hasResolvedApiKey = typeof apiKey === 'string' && apiKey.length > 0;
+      const hasResolvedPassword = typeof password === 'string' && password.length > 0;
+      if (hasResolvedApiKey && hasResolvedPassword && !hasExplicitPassword) {
         password = undefined;
       }
 
