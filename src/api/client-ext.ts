@@ -222,6 +222,9 @@ export class JellyfinExtensions extends CoreApi {
   async getStartupConfiguration(): Promise<StartupConfiguration> {
     return this.request<StartupConfiguration>('GET', '/Startup/Configuration');
   }
+  async updateStartupConfiguration(config: StartupConfiguration): Promise<void> {
+    await this.request<void>('POST', '/Startup/Configuration', undefined, config);
+  }
   async getStartupFirstUser(): Promise<StartupFirstUser> {
     return this.request<StartupFirstUser>('GET', '/Startup/FirstUser');
   }

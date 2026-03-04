@@ -62,6 +62,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Bun-Powered**: Fast package management and builds with Bun
 - **Setup Wizard**: Interactive configuration wizard
 - **Startup Diagnostics**: `jf setup startup` reports startup wizard state in structured output
+- **Startup Wizard Configuration**: `jf setup update-configuration` updates `/Startup/Configuration`
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
 - **Explain Mode**: global `--explain` or `JELLYFIN_EXPLAIN=1` prints redacted request metadata to `stderr`
@@ -161,6 +162,8 @@ jf system info --format raw
 - `jf setup status` - Check setup status
 - `jf setup env` - Show environment variables (`--shell` or structured `--format json`)
 - `jf setup startup` - Inspect Jellyfin startup wizard state (read-only)
+- `jf setup configuration` - Alias of `setup startup` for endpoint-aligned diagnostics
+- `jf setup update-configuration` - Update startup wizard configuration values
 - `jf config set` - Set configuration values
 - `jf config get` - Display current configuration
 - `jf config path` - Show configuration file path
@@ -313,6 +316,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf tasks list` - List all scheduled tasks
 - `jf tasks get <taskId>` - Get task by ID
 - `jf tasks run <taskId>` - Start a task
+- `jf tasks running <taskId>` - Alias of `tasks run`
 - `jf tasks stop <taskId>` - Stop a running task
 - `jf tasks triggers <taskId>` - List task triggers
 - `jf tasks add-trigger <taskId>` - Add a task trigger
@@ -386,6 +390,9 @@ Mutating operations are blocked with a structured Toon error while read operatio
 ### SyncPlay
 
 - `jf syncplay list` - List SyncPlay groups
+- `jf syncplay groups` - Alias of `syncplay list`
+- `jf syncplay create [--name <name>]` - Create a group
+- `jf syncplay new [--name <name>]` - Alias of `syncplay create`
 - `jf syncplay join <groupId>` - Join a group
 - `jf syncplay leave` - Leave group
 - `jf syncplay pause` - Pause group playback

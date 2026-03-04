@@ -99,6 +99,26 @@ jf setup startup [--name <name>] [--format <format>]
 
 Output type: `setup_startup`
 
+### setup configuration
+
+Alias of `setup startup` for endpoint-aligned startup diagnostics.
+
+```bash
+jf setup configuration [--name <name>] [--format <format>]
+```
+
+Output type: `setup_startup`
+
+### setup update-configuration
+
+Update startup wizard configuration (`POST /Startup/Configuration`).
+
+```bash
+jf setup update-configuration [--name <name>] [--ui-culture <culture>] [--metadata-country-code <code>] [--preferred-metadata-language <language>] [--format <format>]
+```
+
+Output type: `setup_startup_configuration_updated`
+
 ## config
 
 Manage CLI configuration.
@@ -1200,6 +1220,14 @@ Start a scheduled task.
 jf tasks run <taskId>
 ```
 
+### tasks running
+
+Alias of `tasks run`.
+
+```bash
+jf tasks running <taskId>
+```
+
 ### tasks stop
 
 Stop a running task.
@@ -1607,6 +1635,16 @@ List SyncPlay groups.
 
 ```bash
 jf syncplay list
+```
+
+Output type: `syncplay_groups`
+
+### syncplay groups
+
+Alias of `syncplay list`.
+
+```bash
+jf syncplay groups
 ```
 
 Output type: `syncplay_groups`
@@ -3595,6 +3633,16 @@ Create a new SyncPlay group.
 
 ```bash
 jf syncplay create [--name <groupName>] [-f format]
+```
+
+Output type: `message`
+
+## syncplay new
+
+Alias of `syncplay create`.
+
+```bash
+jf syncplay new [--name <groupName>] [-f format]
 ```
 
 Output type: `message`

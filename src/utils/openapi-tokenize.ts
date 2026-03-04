@@ -30,6 +30,8 @@ function expandTokenAliases(token: string): string[] {
       return ['quickconnect', 'quick', 'connect'];
     case 'livetv':
       return ['livetv', 'live', 'tv'];
+    case 'syncplay':
+      return ['syncplay', 'sync', 'play'];
     default:
       return [token];
   }

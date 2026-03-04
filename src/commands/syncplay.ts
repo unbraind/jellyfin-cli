@@ -4,26 +4,45 @@ import { toon } from '../formatters/index.js';
 
 export function createSyncPlayCommand(): Command {
   const cmd = new Command('syncplay');
+  type SyncPlayCommandOptions = {
+    explain?: boolean | string | undefined;
+    format?: string | undefined;
+    name?: string | undefined;
+    server?: string | undefined;
+  };
+
+  const listGroups = async (options: SyncPlayCommandOptions) => {
+    const { client, format } = await createApiClient(options);
+    try {
+      const groups = await client.getSyncPlayGroups();
+      console.log(
+        toon.formatToon(
+          groups.map((g) => ({
+            group_id: g.GroupId,
+            playing_item: g.PlayingItemName,
+            position_ticks: g.PositionTicks,
+            is_paused: g.IsPaused,
+            participants: g.Participants?.map((p) => ({
+              user_id: p.UserId,
+              user_name: p.UserName,
+              is_in_group: p.IsInGroup,
+            })),
+          })),
+          'syncplay_groups',
+        ),
+      );
+    } catch (err) {
+      handleError(err, format);
+    }
+  };
 
   cmd.command('list').description('List SyncPlay groups')
     .option('-f, --format <format>', 'Output format')
-    .action(async (options) => {
-      const { client, format } = await createApiClient(options);
-      try {
-        const groups = await client.getSyncPlayGroups();
-        console.log(toon.formatToon(groups.map((g) => ({
-          group_id: g.GroupId,
-          playing_item: g.PlayingItemName,
-          position_ticks: g.PositionTicks,
-          is_paused: g.IsPaused,
-          participants: g.Participants?.map((p) => ({
-            user_id: p.UserId,
-            user_name: p.UserName,
-            is_in_group: p.IsInGroup,
-          })),
-        })), 'syncplay_groups'));
-      } catch (err) { handleError(err, format); }
-    });
+    .action(listGroups);
+
+  cmd.command('groups').description('Alias for syncplay list')
+    .option('-f, --format <format>', 'Output format')
+    .action(listGroups);
 
   cmd.command('join <groupId>').description('Join a SyncPlay group')
     .option('-f, --format <format>', 'Output format')
@@ -75,16 +94,25 @@ export function createSyncPlayCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  const createGroup = async (options: SyncPlayCommandOptions) => {
+    const { client, format } = await createApiClient(options);
+    try {
+      await client.syncPlayCreate(options.name);
+      console.log(toon.formatMessage('SyncPlay group created', true));
+    } catch (err) {
+      handleError(err, format);
+    }
+  };
+
   cmd.command('create').description('Create a new SyncPlay group')
     .option('-f, --format <format>', 'Output format')
     .option('--name <name>', 'Group name')
-    .action(async (options) => {
-      const { client, format } = await createApiClient(options);
-      try {
-        await client.syncPlayCreate(options.name);
-        console.log(toon.formatMessage('SyncPlay group created', true));
-      } catch (err) { handleError(err, format); }
-    });
+    .action(createGroup);
+
+  cmd.command('new').description('Alias for syncplay create')
+    .option('-f, --format <format>', 'Output format')
+    .option('--name <name>', 'Group name')
+    .action(createGroup);
 
   cmd.command('get <groupId>').description('Get SyncPlay group details')
     .option('-f, --format <format>', 'Output format')

@@ -16,6 +16,9 @@ describe('openapi tokenize utils', () => {
 
     const liveTokens = tokenizeIntentValue('/LiveTv/Channels');
     expect(liveTokens).toEqual(expect.arrayContaining(['live', 'tv', 'channel']));
+
+    const syncPlayTokens = tokenizeIntentValue('syncplay list');
+    expect(syncPlayTokens).toEqual(expect.arrayContaining(['syncplay', 'sync', 'play', 'list']));
   });
 
   it('deduplicates repeated tokens from mixed casing and separators', () => {

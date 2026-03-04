@@ -39,13 +39,17 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('quickconnect check')).toBe(false);
     expect(isCommandBlockedInReadOnly('livetv channel')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup status')).toBe(false);
+    expect(isCommandBlockedInReadOnly('setup configuration')).toBe(false);
     expect(isCommandBlockedInReadOnly('setup startup')).toBe(false);
+    expect(isCommandBlockedInReadOnly('syncplay groups')).toBe(false);
   });
 
   it('blocks common mutating command paths', () => {
     expect(isCommandBlockedInReadOnly('items refresh')).toBe(true);
     expect(isCommandBlockedInReadOnly('users delete')).toBe(true);
     expect(isCommandBlockedInReadOnly('setup')).toBe(true);
+    expect(isCommandBlockedInReadOnly('tasks run')).toBe(true);
+    expect(isCommandBlockedInReadOnly('tasks running')).toBe(true);
     expect(isCommandBlockedInReadOnly('syncplay join')).toBe(true);
     expect(isCommandBlockedInReadOnly('backup restore')).toBe(true);
     expect(isCommandBlockedInReadOnly('videos merge-versions')).toBe(true);

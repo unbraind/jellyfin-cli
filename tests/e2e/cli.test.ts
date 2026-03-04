@@ -1143,8 +1143,18 @@ describe.skipIf(skip)('E2E syncplay', () => {
     expect(out).toMatch(/syncplay|group/i);
   }, T);
 
+  it('syncplay groups alias help is available', async () => {
+    const out = await jf('syncplay', 'groups', '--help');
+    expect(out).toMatch(/syncplay|group/i);
+  }, T);
+
   it('syncplay create help is available', async () => {
     const out = await jf('syncplay', 'create', '--help');
+    expect(out).toMatch(/create|group/i);
+  }, T);
+
+  it('syncplay new alias help is available', async () => {
+    const out = await jf('syncplay', 'new', '--help');
     expect(out).toMatch(/create|group/i);
   }, T);
 });
@@ -1173,6 +1183,23 @@ describe.skipIf(skip)('E2E subtitles', () => {
 // -------------------------------------------------------------------------
 // Config (local config — no API call, just reads settings file)
 // -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E setup', () => {
+  it('setup startup help is available', async () => {
+    const out = await jf('setup', 'startup', '--help');
+    expect(out).toMatch(/startup|wizard|diagnostics/i);
+  }, T);
+
+  it('setup configuration alias help is available', async () => {
+    const out = await jf('setup', 'configuration', '--help');
+    expect(out).toMatch(/startup|configuration/i);
+  }, T);
+
+  it('setup update-configuration help is available', async () => {
+    const out = await jf('setup', 'update-configuration', '--help');
+    expect(out).toMatch(/startup|configuration|metadata/i);
+  }, T);
+});
 
 describe.skipIf(skip)('E2E config', () => {
   it('config get returns config type', async () => {
@@ -1384,6 +1411,11 @@ describe.skipIf(skip)('E2E tasks extended', () => {
     // GET /ScheduledTasks/{id}/Triggers returns 405 on this Jellyfin version (POST only)
     const out = await jf('tasks', 'triggers', '--help');
     expect(out).toMatch(/trigger/i);
+  }, T);
+
+  it('tasks running alias help is available', async () => {
+    const out = await jf('tasks', 'running', '--help');
+    expect(out).toMatch(/task|start/i);
   }, T);
 });
 

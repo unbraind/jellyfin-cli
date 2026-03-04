@@ -281,6 +281,49 @@ describe('setup command', () => {
     }
   });
 
+  it('setup configuration alias reports startup diagnostics', async () => {
+    const server = Bun.serve({
+      port: 0,
+      fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Startup/Configuration') {
+          return Response.json({
+            UICulture: 'de-AT',
+            MetadataCountryCode: 'AT',
+            PreferredMetadataLanguage: 'de',
+          });
+        }
+        if (url.pathname === '/Startup/FirstUser') {
+          return Response.json({ Name: 'admin' });
+        }
+        if (url.pathname === '/Startup/Complete') {
+          return Response.json(true);
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${server.port}`,
+          apiKey: 'test-key',
+          outputFormat: 'toon',
+        },
+      }), 'utf-8');
+
+      const result = await runCli(['setup', 'configuration', '--format', 'json']);
+      expect(result.code).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.startup_complete_state).toBe('complete');
+      expect(parsed.configuration.ui_culture).toBe('de-AT');
+      expect(parsed.first_user.has_name).toBe(true);
+    } finally {
+      server.stop(true);
+    }
+  });
+
   it('setup startup fails when no server is configured', async () => {
     const result = await runCli(['setup', 'startup', '--format', 'json']);
     expect(result.code).toBe(1);
@@ -327,6 +370,72 @@ describe('setup command', () => {
       expect(parsed.startup_complete).toBeNull();
       expect(parsed.setup_wizard_required).toBeNull();
       expect(parsed.warnings).toContain('startup_complete_endpoint_not_available');
+    } finally {
+      server.stop(true);
+    }
+  });
+
+  it('setup update-configuration requires at least one field option', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: 'http://127.0.0.1:8096',
+        apiKey: 'test-key',
+        outputFormat: 'toon',
+      },
+    }), 'utf-8');
+
+    const result = await runCli(['setup', 'update-configuration', '--format', 'json']);
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stderr);
+    expect(parsed.error).toContain('At least one option is required');
+  });
+
+  it('setup update-configuration posts startup configuration', async () => {
+    let receivedBody: unknown;
+    const server = Bun.serve({
+      port: 0,
+      async fetch(request) {
+        const url = new URL(request.url);
+        if (url.pathname === '/Startup/Configuration' && request.method === 'POST') {
+          receivedBody = await request.json();
+          return new Response(null, { status: 204 });
+        }
+        return new Response('not found', { status: 404 });
+      },
+    });
+
+    try {
+      mkdirSync(testConfigDir, { recursive: true });
+      writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${server.port}`,
+          apiKey: 'test-key',
+          outputFormat: 'toon',
+        },
+      }), 'utf-8');
+
+      const result = await runCli([
+        'setup',
+        'update-configuration',
+        '--ui-culture',
+        'en-US',
+        '--metadata-country-code',
+        'US',
+        '--preferred-metadata-language',
+        'en',
+        '--format',
+        'json',
+      ]);
+      expect(result.code).toBe(0);
+      expect(receivedBody).toEqual({
+        UICulture: 'en-US',
+        MetadataCountryCode: 'US',
+        PreferredMetadataLanguage: 'en',
+      });
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed.updated).toBe(true);
+      expect(parsed.configuration.ui_culture).toBe('en-US');
     } finally {
       server.stop(true);
     }

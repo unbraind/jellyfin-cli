@@ -196,6 +196,8 @@ Notes:
 | `jf setup status` | Check setup status |
 | `jf setup env` | Show environment variables |
 | `jf setup startup` | Inspect startup wizard state (read-only) |
+| `jf setup configuration` | Alias of `setup startup` for endpoint-aligned diagnostics |
+| `jf setup update-configuration` | Update startup wizard configuration (`POST /Startup/Configuration`) |
 | `jf config set` | Set configuration values |
 | `jf config get` | Display current configuration |
 | `jf config path` | Show configuration file path |
@@ -227,6 +229,7 @@ Notes:
 | `jf backup restore <path>` | Restore from backup |
 | `jf tasks list` | List scheduled tasks |
 | `jf tasks run <taskId>` | Run a task |
+| `jf tasks running <taskId>` | Alias of `tasks run` |
 | `jf environment drives` | List available drives |
 | `jf environment logs` | List log files |
 | `jf environment log <name>` | Get log file content |
@@ -377,7 +380,9 @@ Notes:
 | `jf sessions user-add` | Add user to session |
 | `jf sessions user-remove` | Remove user from session |
 | `jf syncplay list` | List SyncPlay groups |
+| `jf syncplay groups` | Alias of `syncplay list` |
 | `jf syncplay create` | Create a SyncPlay group |
+| `jf syncplay new` | Alias of `syncplay create` |
 | `jf syncplay seek` | Seek in SyncPlay group |
 | `jf syncplay next/previous` | Skip tracks in SyncPlay |
 | `jf syncplay set-repeat <mode>` | Set SyncPlay repeat mode |

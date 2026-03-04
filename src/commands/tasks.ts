@@ -4,6 +4,20 @@ import { toon } from '../formatters/index.js';
 
 export function createTasksCommand(): Command {
   const cmd = new Command('tasks');
+  type TaskCommandOptions = {
+    explain?: boolean | string | undefined;
+    format?: string | undefined;
+    server?: string | undefined;
+  };
+  const runTask = async (taskId: string, options: TaskCommandOptions): Promise<void> => {
+    const { client, format } = await createApiClient(options);
+    try {
+      await client.startTask(taskId);
+      console.log(toon.formatMessage('Task started'));
+    } catch (err) {
+      handleError(err, format);
+    }
+  };
 
   cmd
     .command('list')
@@ -39,13 +53,15 @@ export function createTasksCommand(): Command {
     .description('Start a scheduled task')
     .option('-f, --format <format>', 'Output format')
     .action(async (taskId, options) => {
-      const { client, format } = await createApiClient(options);
-      try {
-        await client.startTask(taskId);
-        console.log(toon.formatMessage('Task started'));
-      } catch (err) {
-        handleError(err, format);
-      }
+      await runTask(taskId, options);
+    });
+
+  cmd
+    .command('running <taskId>')
+    .description('Alias for tasks run; starts a scheduled task')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (taskId, options) => {
+      await runTask(taskId, options);
     });
 
   cmd

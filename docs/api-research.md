@@ -342,3 +342,27 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
   - `POST /Startup/Configuration`
   - `GET /SyncPlay/List`
   - `POST /SyncPlay/New`
+
+32. Endpoint-aligned alias and startup update coverage closure (March 4, 2026)
+
+- Added endpoint-aligned command aliases for improved OpenAPI intent matching and agent discoverability:
+  - `jf syncplay groups` (alias of `syncplay list`)
+  - `jf syncplay new` (alias of `syncplay create`)
+  - `jf tasks running <taskId>` (alias of `tasks run`)
+  - `jf setup configuration` (alias of `setup startup`)
+- Added startup wizard configuration update command:
+  - `jf setup update-configuration --ui-culture <culture> --metadata-country-code <code> --preferred-metadata-language <language>`
+  - maps to `POST /Startup/Configuration`
+- Hardened read-only guard classification for task execution verbs:
+  - added `run` / `running` mutating verb detection so task-start commands are blocked by `--read-only` / `JELLYFIN_READ_ONLY=1`.
+- Improved intent token alias expansion:
+  - added `syncplay` token expansion (`syncplay`, `sync`, `play`) for better command-to-operation mapping.
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- `jf schema coverage --format json`: full operation scope now `429/429` mapped (`100%`).
+- `jf schema coverage --read-only-ops --format json`: read-only scope remains `257/257` mapped (`100%`).
+- Added regression coverage:
+  - `tests/commands/setup.test.ts`
+  - `tests/utils/read-only-guard.test.ts`
+  - `tests/utils/openapi-tokenize.test.ts`
+  - `tests/e2e/cli.test.ts`
