@@ -5,7 +5,7 @@ import { createSchemaValidateCommand } from './schema-validate.js';
 import { getConfig } from '../utils/config.js';
 import {
   extractOpenApiOperations,
-  fetchOpenApiDocument,
+  fetchOpenApiDocumentWithOptions,
   filterOpenApiOperations,
   matchOperationsForCommandIntent,
   summarizeOpenApi,
@@ -58,6 +58,7 @@ export function createSchemaCommand(): Command {
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
     .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
@@ -71,7 +72,7 @@ export function createSchemaCommand(): Command {
       }
 
       try {
-        const result = await fetchOpenApiDocument(config);
+        const result = await fetchOpenApiDocumentWithOptions(config, { endpointPath: options.endpoint as string | undefined });
         const summary = summarizeOpenApi(result.document);
         const allOperations = extractOpenApiOperations(result.document);
         const filteredOperations = filterOpenApiOperations(allOperations, {
@@ -179,6 +180,7 @@ export function createSchemaCommand(): Command {
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
     .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--limit <number>', 'Unmatched operation sample limit', '50')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
     .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
@@ -201,7 +203,7 @@ export function createSchemaCommand(): Command {
       }
 
       try {
-        const result = await fetchOpenApiDocument(config);
+        const result = await fetchOpenApiDocumentWithOptions(config, { endpointPath: options.endpoint as string | undefined });
         const summary = summarizeOpenApi(result.document);
         const allOperations = extractOpenApiOperations(result.document);
         const filteredOperations = filterOpenApiOperations(allOperations, {

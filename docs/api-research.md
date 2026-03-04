@@ -382,5 +382,30 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
   - full coverage: `100%`
   - unmatched operations: `0` (both scopes)
 - Release-quality verification also passed on the same run:
-  - `bun run validate:release`
-  - `1007` tests passing (includes read-only live CLI E2E coverage).
+ - `bun run validate:release`
+ - `1007` tests passing (includes read-only live CLI E2E coverage).
+
+34. OpenAPI probe resilience + endpoint override for agent workflows (March 4, 2026)
+
+- Added `--endpoint <path>` support to:
+  - `jf schema openapi`
+  - `jf schema coverage`
+- This allows deterministic OpenAPI discovery on installations that expose schema docs at non-default paths.
+- Hardened OpenAPI probe error reporting to include all attempted candidate paths in one message,
+  which makes agent fallback/debug logic easier when schema discovery fails.
+- Added regression coverage:
+  - `tests/utils/openapi.test.ts` (preferred endpoint override + aggregated probe failure message)
+  - `tests/commands/schema.test.ts` (coverage command with custom `--endpoint`)
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- `jf schema openapi --endpoint /api-docs/openapi.json --read-only-ops --format json`
+  returned:
+  - `path_count: 356`
+  - `operation_count: 429`
+  - `filtered_operation_count: 257`
+- `jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --suggest-commands --format json`
+  returned:
+  - read-only operation scope: `257`
+  - mapped operations: `257`
+  - coverage: `100%`
+  - unmatched operations: `0`

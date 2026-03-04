@@ -431,6 +431,53 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('unmapped_operation_count: 0');
     expect(result.stdout).toContain('coverage_percent: 100');
   });
+
+  it('supports a custom OpenAPI endpoint path override', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/custom/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'coverage',
+      '--endpoint',
+      '/custom/openapi.json',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('source_path: /custom/openapi.json');
+    expect(result.stdout).toContain('operation_scope_count: 1');
+  });
 });
 
 describe('schema tools command', () => {

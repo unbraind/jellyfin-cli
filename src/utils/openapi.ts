@@ -37,6 +37,10 @@ export type OpenApiProbeResult = {
   document: OpenApiDocument;
 };
 
+export type OpenApiFetchOptions = {
+  endpointPath?: string | undefined;
+};
+
 export type OpenApiOperationEntry = {
   method: string;
   path: string;
@@ -68,26 +72,47 @@ function authHeader(config: JellyfinConfig): Record<string, string> | undefined 
   return config.apiKey ? { 'X-Emby-Token': config.apiKey } : undefined;
 }
 
-export async function fetchOpenApiDocument(config: JellyfinConfig): Promise<OpenApiProbeResult> {
+function buildCandidatePaths(endpointPath: string | undefined): string[] {
+  const custom = endpointPath?.trim();
+  const normalizedCustom = custom ? (custom.startsWith('/') ? custom : `/${custom}`) : undefined;
+  const candidates = [normalizedCustom, ...OPENAPI_CANDIDATES];
+  const unique: string[] = [];
+  const seen = new Set<string>();
+  for (const candidate of candidates) {
+    if (!candidate || seen.has(candidate)) {
+      continue;
+    }
+    unique.push(candidate);
+    seen.add(candidate);
+  }
+  return unique;
+}
+
+export async function fetchOpenApiDocument(
+  config: JellyfinConfig,
+  options: OpenApiFetchOptions = {},
+): Promise<OpenApiProbeResult> {
   if (!config.serverUrl) {
     throw new Error('Missing server URL');
   }
 
-  let lastError = 'OpenAPI schema not reachable';
-  for (const path of OPENAPI_CANDIDATES) {
+  const probeFailures: string[] = [];
+  const candidates = buildCandidatePaths(options.endpointPath);
+  for (const path of candidates) {
     try {
       const response = await fetch(`${config.serverUrl}${path}`, {
         headers: authHeader(config),
         signal: AbortSignal.timeout(getTimeout(config)),
       });
       if (!response.ok) {
-        lastError = `HTTP ${response.status} at ${path}`;
+        probeFailures.push(`${path} => HTTP ${response.status}`);
         continue;
       }
 
       const document = (await response.json()) as OpenApiDocument;
       if (!document || typeof document !== 'object' || !document.paths || typeof document.paths !== 'object') {
-        throw new Error(`Invalid OpenAPI payload from ${path}`);
+        probeFailures.push(`${path} => Invalid OpenAPI payload`);
+        continue;
       }
 
       return {
@@ -95,12 +120,16 @@ export async function fetchOpenApiDocument(config: JellyfinConfig): Promise<Open
         document,
       };
     } catch (err) {
-      lastError = err instanceof Error ? err.message : 'Unknown OpenAPI probe error';
+      const message = err instanceof Error ? err.message : 'Unknown OpenAPI probe error';
+      probeFailures.push(`${path} => ${message}`);
     }
   }
 
-  throw new Error(lastError);
+  const reason = probeFailures.join('; ');
+  throw new Error(`OpenAPI schema not reachable. Tried ${candidates.length} path(s): ${reason}`);
 }
+
+export const fetchOpenApiDocumentWithOptions = fetchOpenApiDocument;
 
 export function summarizeOpenApi(document: OpenApiDocument): Omit<OpenApiStats, 'available'> {
   const paths = document.paths ?? {};

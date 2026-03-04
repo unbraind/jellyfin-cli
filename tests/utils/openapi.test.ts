@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import {
   extractOpenApiOperations,
   fetchOpenApiDocument,
+  fetchOpenApiDocumentWithOptions,
   filterOpenApiOperations,
   getOpenApiStats,
   matchOperationsForCommandIntent,
@@ -179,7 +180,30 @@ describe('openapi utils', () => {
       .mockResolvedValueOnce(new Response('Not Found', { status: 404 }));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-    await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow('HTTP 404 at /swagger/v1/swagger.json');
+    await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow(
+      /OpenAPI schema not reachable\. Tried 3 path\(s\):.*\/swagger\/v1\/swagger\.json => HTTP 404/,
+    );
+  });
+
+  it('honors preferred endpoint path before default candidates', async () => {
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(
+        new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: { '/Custom/OpenApi': { get: { tags: ['Custom'] } } },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      );
+
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const result = await fetchOpenApiDocumentWithOptions(CONFIG, { endpointPath: 'custom/openapi.json' });
+    expect(result.sourcePath).toBe('/custom/openapi.json');
+    expect(Object.keys(result.document.paths ?? {})).toContain('/Custom/OpenApi');
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe('http://127.0.0.1:8096/custom/openapi.json');
   });
 
   it('returns empty list when intent has no meaningful tokens', () => {

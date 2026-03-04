@@ -60,6 +60,7 @@ The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env var
 ```bash
 jf config doctor
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
+jf schema openapi --endpoint /api-docs/openapi.json --read-only-ops --limit 25
 jf schema tools --command system --limit 10
 jf schema coverage --method GET --command-prefix system --min-score 3 --limit 20
 ```
