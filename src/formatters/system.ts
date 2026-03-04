@@ -62,8 +62,6 @@ export function formatConfig(config: JellyfinConfig): string {
     url: config.serverUrl,
     user: config.username,
     uid: config.userId,
-    key: config.apiKey ? true : undefined,
-    pw: config.password ? true : undefined,
     fmt: config.outputFormat !== 'toon' ? config.outputFormat : undefined,
     timeout: config.timeout !== 30000 ? config.timeout : undefined,
   }, 'config');

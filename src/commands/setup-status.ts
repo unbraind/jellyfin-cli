@@ -43,7 +43,6 @@ export function attachSetupStatusSubcommand(cmd: Command): void {
               server_url: config.serverUrl,
               username: config.username,
               user_id: config.userId,
-              has_api_key: !!config.apiKey,
               output_format: config.outputFormat,
               server_name: info.ServerName,
               server_version: info.Version,

@@ -249,8 +249,8 @@ describe('toon formatters', () => {
       const result = formatConfig(config);
       expect(result).toContain('type: config');
       expect(result).toContain('http://localhost:8096');
-      expect(result).toContain('key: true');
-      expect(result).toContain('pw: true');
+      expect(result).not.toContain('key:');
+      expect(result).not.toContain('pw:');
       expect(result).not.toContain('secret-key-12345');
       expect(result).not.toContain('mySecretPassword123');
     });

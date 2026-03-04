@@ -254,8 +254,6 @@ async function runSetup(thisCommand: Command, options: SetupCommandOptions): Pro
       server_url: serverUrl,
       username,
       user_id: userId,
-      has_api_key: !!apiKey,
-      has_password: !!password,
       output_format: persistedOutputFormat,
       server_name: publicInfo.ServerName,
       server_version: publicInfo.Version,

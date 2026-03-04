@@ -35,7 +35,7 @@ const SECRET_PATTERNS: SecretPattern[] = [
   },
   {
     reason: 'Possible hardcoded credential value',
-    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+/=-]{12,})['"]/g,
+    regex: /(api[_-]?key|apiKey|token|password)\s*[:=]\s*['"]([A-Za-z0-9._~+=/]{12,})['"]/g,
   },
   {
     reason: 'Credentials embedded in URL',
@@ -58,7 +58,7 @@ function isPlaceholder(value: string): boolean {
 
 function getBlobContent(rootDir: string, commit: string, filePath: string): string {
   try {
-    return execSync(`git show ${commit}:${filePath}`, {
+    return execFileSync('git', ['show', `${commit}:${filePath}`], {
       cwd: rootDir,
       encoding: 'utf-8',
       maxBuffer: 10 * 1024 * 1024,

@@ -206,7 +206,8 @@ describe('setup command', () => {
       const lastObjectStart = trimmed.lastIndexOf('\n{');
       const jsonText = lastObjectStart >= 0 ? trimmed.slice(lastObjectStart + 1) : trimmed;
       const parsed = JSON.parse(jsonText);
-      expect(parsed.has_api_key).toBe(true);
+      expect(Object.prototype.hasOwnProperty.call(parsed, 'has_api_key')).toBe(false);
+      expect(Object.prototype.hasOwnProperty.call(parsed, 'has_password')).toBe(false);
       expect(parsed.username).toBe('steve');
       expect(parsed.user_id).toBe('user-steve');
       expect(parsed.setup_complete).toBe(true);

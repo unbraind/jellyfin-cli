@@ -52,9 +52,13 @@ function formatMarkdownTable(items: unknown[]): string {
   const first = items[0] as Record<string, unknown>;
   const keys = Object.keys(first).slice(0, 5);
   
-  const rows = items.map(item => {
+  const rows = items.map((item) => {
     const obj = item as Record<string, unknown>;
-    return keys.map((k) => escapeMarkdownTableCell(String(formatValue(obj[k]))));
+    return keys.map((k) =>
+      String(formatValue(obj[k]))
+        .replace(/[\\|]/g, '\\$&')
+        .replace(/\r?\n/g, '<br>'),
+    );
   });
   
   const header = `| ${keys.join(' | ')} |`;
@@ -62,13 +66,6 @@ function formatMarkdownTable(items: unknown[]): string {
   const body = rows.map(row => `| ${row.join(' | ')} |`).join('\n');
   
   return `${header}\n${separator}\n${body}`;
-}
-
-function escapeMarkdownTableCell(value: string): string {
-  return value
-    .replace(/\\/g, '\\\\')
-    .replace(/\|/g, '\\|')
-    .replace(/\r?\n/g, '<br>');
 }
 
 function formatTable(data: unknown): string {
