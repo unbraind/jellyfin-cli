@@ -426,9 +426,15 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf media theme-songs <itemId>` - Get theme songs
 - `jf media theme-videos <itemId>` - Get theme videos
 - `jf media external-ids <itemId>` - Get external IDs
+- `jf media external-id-infos <itemId>` - Alias for external IDs
 - `jf media remote-images <itemId>` - Get remote images
 - `jf media download-image <itemId>` - Download remote image
 - `jf media hls-url <itemId>` - Get HLS playlist URL
+
+### Dashboard
+
+- `jf dashboard pages [--main-menu true|false]` - List dashboard configuration pages
+- `jf dashboard page <name>` - Get dashboard configuration page source
 
 ### Localization
 

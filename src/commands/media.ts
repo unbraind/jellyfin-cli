@@ -89,6 +89,21 @@ export function createMediaCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
+  cmd.command('external-id-infos <itemId>').description('Alias for external-ids')
+    .option('-f, --format <format>', 'Output format')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const ids = await client.getExternalIdInfos(itemId);
+        console.log(toon.formatToon(ids.map((id) => ({
+          name: id.Name,
+          key: id.Key,
+          url: id.Url,
+          type: id.Type,
+        })), 'external_ids'));
+      } catch (err) { handleError(err, format); }
+    });
+
   cmd.command('remote-images <itemId>').description('Get available remote images for an item')
     .option('-f, --format <format>', 'Output format')
     .option('--type <type>', 'Image type')

@@ -1871,6 +1871,16 @@ jf media external-ids <itemId>
 
 Output type: `external_ids`
 
+### media external-id-infos
+
+Alias for `media external-ids`.
+
+```bash
+jf media external-id-infos <itemId>
+```
+
+Output type: `external_ids`
+
 ### media remote-images
 
 Get available remote images for an item.
@@ -1898,6 +1908,30 @@ jf media hls-url <itemId> [--media-source <id>] [--audio-stream <index>] [--subt
 ```
 
 Output type: `hls_url`
+
+## dashboard
+
+Dashboard configuration commands.
+
+### dashboard pages
+
+List dashboard configuration pages.
+
+```bash
+jf dashboard pages [--main-menu true|false]
+```
+
+Output type: `dashboard_pages`
+
+### dashboard page
+
+Get dashboard configuration page source.
+
+```bash
+jf dashboard page <name>
+```
+
+Output type: `dashboard_page`
 
 ## localization
 

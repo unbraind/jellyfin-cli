@@ -17,6 +17,7 @@ import { YearsApi } from './years.js';
 import { MusicGenresApi } from './musicgenres.js';
 import { TrickplayApi } from './trickplay.js';
 import { ChannelsApi, type ChannelFeatures } from './channels.js';
+import { DashboardApi, type DashboardConfigurationPageInfo } from './dashboard.js';
 import { LiveTvApi, type LiveTvTimerParams, type LiveTvSeriesTimerParams, type TunerHostInfo, type ListingProviderInfo } from './livetv.js';
 import { SyncPlayApi } from './syncplay.js';
 import { PluginsExtApi } from './plugins-ext.js';
@@ -32,6 +33,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
   private musicGenres: MusicGenresApi;
   private trickplay: TrickplayApi;
   private channels: ChannelsApi;
+  private dashboard: DashboardApi;
   public livetv: LiveTvApi;
   public syncplay: SyncPlayApi;
   public pluginsExt: PluginsExtApi;
@@ -45,12 +47,13 @@ export class JellyfinApiClient extends JellyfinExtensions {
     this.musicGenres = new MusicGenresApi(config);
     this.trickplay = new TrickplayApi(config);
     this.channels = new ChannelsApi(config);
+    this.dashboard = new DashboardApi(config);
     this.livetv = new LiveTvApi(config);
     this.syncplay = new SyncPlayApi(config);
     this.pluginsExt = new PluginsExtApi(config);
   }
   setUserId(userId: string): void { super.setUserId(userId); this.syncModules(); }
-  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); this.livetv = new LiveTvApi(cfg); this.syncplay = new SyncPlayApi(cfg); this.pluginsExt = new PluginsExtApi(cfg); }
+  private syncModules(): void { const cfg = { serverUrl: this.getBackendUrl(), apiKey: this.apiKey, userId: this.getUserId(), timeout: this.timeout }; this.tvshows = new TvShowsApi(cfg); this.packages = new PackagesApi(cfg); this.images = new ImagesApi(cfg); this.suggestions = new SuggestionsApi(cfg); this.years = new YearsApi(cfg); this.musicGenres = new MusicGenresApi(cfg); this.trickplay = new TrickplayApi(cfg); this.channels = new ChannelsApi(cfg); this.dashboard = new DashboardApi(cfg); this.livetv = new LiveTvApi(cfg); this.syncplay = new SyncPlayApi(cfg); this.pluginsExt = new PluginsExtApi(cfg); }
   // TV Shows
   async getEpisodes(seriesId: string, params?: { seasonId?: string; userId?: string; season?: number; limit?: number; startIndex?: number; isMissing?: boolean; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getEpisodes(seriesId, params); }
   async getSeasons(seriesId: string, params?: { userId?: string; isSpecialSeason?: boolean }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getSeasons(seriesId, params); }
@@ -83,6 +86,13 @@ export class JellyfinApiClient extends JellyfinExtensions {
   async getChannelFeatures(channelId: string): Promise<ChannelFeatures> { return this.channels.getChannelFeatures(channelId); }
   async getChannelItems(channelId: string, params?: { folderId?: string; userId?: string; limit?: number; startIndex?: number; sortBy?: string; sortOrder?: string }): Promise<QueryResult<BaseItemDto>> { return this.channels.getChannelItems(channelId, params); }
   async getLatestChannelItems(channelId: string, userId?: string, limit?: number): Promise<BaseItemDto[]> { return this.channels.getLatestChannelItems(channelId, { userId, limit }); }
+  // Dashboard
+  async getDashboardConfigurationPages(enableInMainMenu?: boolean): Promise<DashboardConfigurationPageInfo[]> {
+    return this.dashboard.getConfigurationPages(enableInMainMenu);
+  }
+  async getDashboardConfigurationPage(name: string): Promise<string> {
+    return this.dashboard.getConfigurationPage(name);
+  }
   // Live TV
   async getLiveTvInfo() { return this.livetv.getLiveTvInfo(); }
   async getLiveTvChannels(params?: Parameters<LiveTvApi['getLiveTvChannels']>[0]) { return this.livetv.getLiveTvChannels(params); }

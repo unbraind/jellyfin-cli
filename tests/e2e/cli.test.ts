@@ -1388,6 +1388,43 @@ describe.skipIf(skip)('E2E media segments', () => {
     const out = await jf('media', 'segments', '--help');
     expect(out).toMatch(/segment/i);
   }, T);
+
+  it('media external-id-infos alias returns external_ids type', async () => {
+    const list = await jf('items', 'list', '--limit', '1', '--format', 'json');
+    const listPayload = JSON.parse(list) as {
+      data?: Array<{ id?: string | null }>;
+    };
+    const itemId = listPayload.data?.[0]?.id;
+    if (!itemId) return;
+
+    const out = await jf('media', 'external-id-infos', itemId);
+    expect(out).toMatch(/^type: external_ids/m);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
+// Dashboard
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E dashboard', () => {
+  it('dashboard pages returns dashboard_pages type', async () => {
+    const out = await jf('dashboard', 'pages');
+    expect(out).toMatch(/^type: dashboard_pages/m);
+  }, T);
+
+  it('dashboard page returns dashboard_page type when a page exists', async () => {
+    const pagesRaw = await jf('dashboard', 'pages', '--format', 'json');
+    const pagesPayload = JSON.parse(pagesRaw) as {
+      data?: Array<{ Name?: string | null }>;
+    };
+    const pageName = pagesPayload.data?.find((p) => Boolean(p.Name))?.Name;
+    if (!pageName) return;
+
+    const out = await jf('dashboard', 'page', pageName, '--format', 'json');
+    const pagePayload = JSON.parse(out) as { type?: string; data?: { name?: string } };
+    expect(pagePayload.type).toBe('dashboard_page');
+    expect(pagePayload.data?.name).toBe(pageName);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

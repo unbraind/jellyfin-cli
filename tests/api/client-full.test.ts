@@ -121,6 +121,33 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
     });
   });
 
+  describe('Dashboard Operations', () => {
+    it('should get dashboard configuration pages', async () => {
+      const mockPages = [{ Name: 'dashboard-home', DisplayName: 'Home' }];
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPages));
+      const result = await client.getDashboardConfigurationPages();
+      expect(result).toHaveLength(1);
+      expect(result[0]?.Name).toBe('dashboard-home');
+    });
+
+    it('should get dashboard configuration pages with main menu filter', async () => {
+      const mockPages = [{ Name: 'dashboard-main', EnableInMainMenu: true }];
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockPages));
+      await client.getDashboardConfigurationPages(true);
+      expect(mockFetch).toHaveBeenCalledWith(
+        expect.stringContaining('/web/ConfigurationPages?enableInMainMenu=true'),
+        expect.any(Object),
+      );
+    });
+
+    it('should get a dashboard configuration page', async () => {
+      const mockContent = '<html>plugin-page</html>';
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockContent, { contentType: 'text/html' }));
+      const result = await client.getDashboardConfigurationPage('plugin-page');
+      expect(result).toContain('plugin-page');
+    });
+  });
+
   describe('Library Operations', () => {
     it('should refresh library', async () => {
       mockFetch.mockResolvedValueOnce(createMockResponse(null, { status: 204 }));

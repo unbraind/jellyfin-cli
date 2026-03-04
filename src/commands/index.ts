@@ -34,6 +34,7 @@ export { createYearsCommand } from './years.js';
 export { createMusicGenresCommand } from './music-genres.js';
 export { createTrickplayCommand } from './trickplay.js';
 export { createChannelsCommand } from './channels.js';
+export { createDashboardCommand } from './dashboard.js';
 export { createSchemaCommand } from './schema.js';
 export { createArtistsCommand } from './artists.js';
 export { createVideosCommand } from './videos.js';

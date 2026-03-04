@@ -185,6 +185,18 @@ To avoid modifying media library state during validation:
   - coverage: `89.49%`
   - unmatched: `27`
 
+23. Dashboard endpoint support + external-id alias coverage bump (March 4, 2026)
+
+- Added `jf dashboard pages [--main-menu true|false]` for `GET /web/ConfigurationPages`.
+- Added `jf dashboard page <name>` for `GET /web/ConfigurationPage?name=...`.
+- Added `jf media external-id-infos <itemId>` as a read-only alias of `media external-ids`.
+- Added client wrappers and unit/E2E tests for dashboard commands.
+- March 4, 2026 verification run against Jellyfin 10.11.6:
+  - read-only scope: `257` operations
+  - mapped: `232`
+  - coverage: `90.27%`
+  - unmatched: `25`
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

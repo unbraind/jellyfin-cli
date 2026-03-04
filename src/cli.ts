@@ -45,6 +45,7 @@ import {
   createMusicGenresCommand,
   createTrickplayCommand,
   createChannelsCommand,
+  createDashboardCommand,
   createSchemaCommand,
   createArtistsCommand,
   createVideosCommand,
@@ -146,6 +147,7 @@ program.addCommand(createYearsCommand());
 program.addCommand(createMusicGenresCommand());
 program.addCommand(createTrickplayCommand());
 program.addCommand(createChannelsCommand());
+program.addCommand(createDashboardCommand());
 program.addCommand(createSchemaCommand());
 program.addCommand(createArtistsCommand());
 program.addCommand(createVideosCommand());

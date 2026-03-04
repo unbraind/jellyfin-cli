@@ -324,9 +324,17 @@ Notes:
 | `jf media theme-songs <itemId>` | Get theme songs |
 | `jf media theme-videos <itemId>` | Get theme videos |
 | `jf media external-ids <itemId>` | Get external IDs |
+| `jf media external-id-infos <itemId>` | Alias for external IDs |
 | `jf media lyrics <itemId>` | Get audio lyrics |
 | `jf trickplay hls-url <itemId> <w>` | Get trickplay HLS URL |
 | `jf trickplay tile-url <itemId> <w> <i>` | Get trickplay tile URL |
+
+### Dashboard
+
+| Command | Description |
+|---------|-------------|
+| `jf dashboard pages [--main-menu true|false]` | List dashboard config pages |
+| `jf dashboard page <name>` | Get dashboard config page source |
 
 ### Videos
 
