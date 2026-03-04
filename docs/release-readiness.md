@@ -8,12 +8,17 @@ Configure branch protection on `main` to require these checks before merge:
 
 - `CI / Quality Gates`
 - `CodeQL / Analyze (javascript-typescript)`
-- `Secret Scan / Tracked File Secret Scan`
+- `Secret Scan / Secret Scanning (Tracked + History)`
+- `Commit Quality / Semantic PR Title`
+- `Commit Quality / Commit Subject Style`
 
 Use manual release workflows for controlled releases:
 
 - `.github/workflows/release-prepare.yml` (validate + build artifacts only)
 - `.github/workflows/release-publish.yml` (manual publish, supports dry run)
+- `.github/workflows/release-github.yml` (manual tag + GitHub release creation)
+
+For npm auth, prefer Trusted Publishing (GitHub OIDC). Keep `NPM_TOKEN` only as fallback.
 
 ## 1) Configure auth outside the repository
 
@@ -32,13 +37,14 @@ jf setup env --shell
 jf setup env --format json
 ```
 
-## 2) Sync date+commit version
+## 2) Sync date+release version
 
 ```bash
 bun run version:sync
 ```
 
-Version format is required: `YYYY.MM.DD-<commitIndex>` (example: `2025.12.31-10`).
+Version format is required: `YYYY.MM.DD` or `YYYY.MM.DD-<N>` (example: `2026.03.04` or `2026.03.04-2`).
+Use no suffix for the first release of a UTC day; use `-N` for release 2+ on that day.
 
 ## 3) Run full release validation
 
@@ -52,9 +58,13 @@ This runs:
 - Lint (`bun run lint`)
 - Full tests (`bun run test`)
 - Build (`bun run build`)
+- Dist smoke check (`bun run smoke:dist`)
 - Version policy check (`bun run check:version`)
 - Source LOC guard (`bun run check:file-length`)
 - Secret scan on tracked files (`bun run check:secrets`)
+- Secret scan on full git history (`bun run check:secrets:history`)
+- npm packaging dry-run (`bun run pack:dry-run`)
+- `npx` execution smoke from local package tarball (`bun run smoke:npx`)
 
 ## 4) Run live read-only CLI E2E checks
 
@@ -126,13 +136,33 @@ Installed binaries:
 - `jellyfin-cli`
 - `jf-cli`
 
+Smoke check executable behavior before release:
+
+```bash
+bun run build
+node dist/cli.js --help
+node dist/cli.js --version
+```
+
+Published package usage (post-publish verification):
+
+```bash
+bunx jellyfin-cli --help
+npx jellyfin-cli --help
+```
+
 ## 7) Final git hygiene
 
 ```bash
 git status
 git diff --stat
 bun run check:secrets
+bun run check:secrets:history
 ```
 
 Confirm there are no local credential files or private values staged for commit.
 If you set temporary env vars in your shell, clear them before release (`unset JELLYFIN_API_KEY JELLYFIN_PASSWORD`).
+
+## 8) Changelog state for first release
+
+This repository is pre-1st-release. Keep [../CHANGELOG.md](../CHANGELOG.md) in the reset state until the first public release is cut.

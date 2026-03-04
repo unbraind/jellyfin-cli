@@ -15,6 +15,8 @@ jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin me
 | [Troubleshooting](troubleshooting.md) | Common issues and solutions |
 | [API Research](api-research.md) | Live API discovery notes and agent-focused roadmap |
 | [Release Readiness](release-readiness.md) | Pre-release validation, secret safety, and E2E checklist |
+| [Release Process](release-process.md) | First-release and recurring release workflow |
+| [Changelog](../CHANGELOG.md) | Release notes (currently reset pre-1.0) |
 
 ## Installation
 
@@ -128,9 +130,12 @@ Settings are stored in `~/.jellyfin-cli/settings.json`.
 
 ### Versioning Policy
 
-- Project version must follow: `YYYY.MM.DD-<commitIndex>`
-- Example: `2025.12.31-10`
+- Project version must follow: `YYYY.MM.DD` or `YYYY.MM.DD-<N>`
+- Example (first release of day): `2026.03.04`
+- Example (second release of day): `2026.03.04-2`
 - Date is UTC
+- `N` is release number for that UTC date
+- `-1` is invalid (omit suffix for first release)
 - Sync before release/commit:
 
 ```bash

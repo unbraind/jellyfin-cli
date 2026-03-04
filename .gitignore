@@ -32,3 +32,5 @@ settings.json
 test-results/
 .tmp/
 .gemini/
+.backup-*/
+*.tgz

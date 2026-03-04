@@ -50,6 +50,45 @@ jobs:
       - name: Check tracked-file secrets
         run: bun run check:secrets
 
+      - name: Check git-history secrets
+        run: bun run check:secrets:history
+
+  npm-compat:
+    name: npm Compatibility
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.3.5'
+
+      - name: Install dependencies with npm
+        run: npm ci
+
+      - name: Validate quality gates with npm scripts
+        run: |
+          npm run typecheck
+          npm run lint
+          npm test
+          npm run build
+          npm run smoke:dist
+          npm run check:file-length
+          npm run check:secrets
+          npm run check:secrets:history
+          npm run pack:dry-run
+          npm run smoke:npx
+
   version-policy:
     name: Version Policy
     runs-on: ubuntu-latest

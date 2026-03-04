@@ -75,6 +75,8 @@ Before commit/push, verify no secrets are tracked:
 git status --short
 git diff --cached
 git grep -n "JELLYFIN_API_KEY\\|JELLYFIN_PASSWORD\\|192\\.168\\." .
+bun run check:secrets
+bun run check:secrets:history
 ```
 
 ### Configuration File Security

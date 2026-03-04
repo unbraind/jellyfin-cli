@@ -7,20 +7,51 @@ type PackageJsonShape = {
   [key: string]: unknown;
 };
 
-function getCommitCount(cwd: string): number {
-  const output = execSync('git rev-list --count HEAD', { cwd, encoding: 'utf-8' }).trim();
-  const parsed = Number.parseInt(output, 10);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    throw new Error(`Invalid git commit count: ${output}`);
-  }
-  return parsed;
+function getGitTags(cwd: string): string[] {
+  const output = execSync('git tag --list', { cwd, encoding: 'utf-8' });
+  return output
+    .split(/\r?\n/)
+    .map((line) => line.trim())
+    .filter((line) => line.length > 0);
 }
 
-function formatDateVersion(date: Date): string {
+function toUtcDatePart(date: Date): string {
   const year = String(date.getUTCFullYear());
   const month = String(date.getUTCMonth() + 1).padStart(2, '0');
   const day = String(date.getUTCDate()).padStart(2, '0');
   return `${year}.${month}.${day}`;
+}
+
+function getTodayReleaseCount(cwd: string, todayPart: string): number {
+  const tags = getGitTags(cwd);
+  let count = 0;
+
+  for (const tag of tags) {
+    const normalized = tag.startsWith('v') ? tag.slice(1) : tag;
+    const match = /^(\d{4}\.(?:0[1-9]|1[0-2])\.(?:0[1-9]|[12]\d|3[01]))(?:-(\d+))?$/.exec(
+      normalized,
+    );
+    if (!match) {
+      continue;
+    }
+
+    if (match[1] !== todayPart) {
+      continue;
+    }
+
+    const suffix = match[2];
+    if (!suffix) {
+      count = Math.max(count, 1);
+      continue;
+    }
+
+    const n = Number.parseInt(suffix, 10);
+    if (Number.isFinite(n) && n >= 2) {
+      count = Math.max(count, n);
+    }
+  }
+
+  return count;
 }
 
 function loadPackageJson(filePath: string): PackageJsonShape {
@@ -33,13 +64,15 @@ function savePackageJson(filePath: string, value: PackageJsonShape): void {
 
 const root = process.cwd();
 const packagePath = join(root, 'package.json');
-const commitCount = getCommitCount(root);
-const commitIndex = commitCount + 1;
-const datePart = formatDateVersion(new Date());
-const version = `${datePart}-${commitIndex}`;
+const datePart = toUtcDatePart(new Date());
+const todayReleaseCount = getTodayReleaseCount(root, datePart);
+const nextReleaseIndex = todayReleaseCount + 1;
+const version = nextReleaseIndex === 1 ? datePart : `${datePart}-${nextReleaseIndex}`;
 
 const pkg = loadPackageJson(packagePath);
 pkg.version = version;
 savePackageJson(packagePath, pkg);
 
-console.log(`Set package.json version to ${version} (date=${datePart}, next_commit_index=${commitIndex}).`);
+console.log(
+  `Set package.json version to ${version} (date=${datePart}, prior_releases_today=${todayReleaseCount}, next_daily_release_index=${nextReleaseIndex}).`,
+);

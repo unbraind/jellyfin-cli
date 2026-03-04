@@ -2,7 +2,7 @@
 
 An agent-optimized CLI tool for interacting with the Jellyfin API.
 
-> **Package Manager**: This project uses [Bun](https://bun.sh) as its package manager and build tool.
+> **Package Manager**: Development uses [Bun](https://bun.sh). Published package execution supports both `bunx` and `npx`.
 
 ## Installation
 
@@ -12,6 +12,12 @@ curl -fsSL https://bun.sh/install | bash
 
 # Install the CLI globally
 bun install -g jellyfin-cli
+
+# Run directly with bunx (no install)
+bunx jellyfin-cli --help
+
+# Run directly with npx (no install)
+npx jellyfin-cli --help
 
 # Or clone and build from source
 git clone https://github.com/unbraind/jellyfin-cli.git
@@ -200,7 +206,8 @@ bun run version:sync
 bun run validate:release
 ```
 
-This syncs/enforces the version policy and runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
+This syncs/enforces the version policy and runs typecheck, lint, tests, build, dist smoke checks, TypeScript code-length enforcement (<=300 lines excluding comments), tracked-file secret scan, and git-history secret scan.
+It also validates npm packaging (`npm pack --dry-run`) and a local `npx` smoke run from the packed tarball.
 
 ## CI/CD and Release Operations
 
@@ -208,9 +215,12 @@ GitHub Actions workflows are configured for professional release management:
 
 - `CI` (`.github/workflows/ci.yml`): PR/push quality gates
 - `CodeQL` (`.github/workflows/codeql.yml`): static security analysis
-- `Secret Scan` (`.github/workflows/secret-scan.yml`): tracked-file secret policy checks
+- `Secret Scan` (`.github/workflows/secret-scan.yml`): tracked-file + git-history + Gitleaks checks
+- `Commit Quality` (`.github/workflows/commit-quality.yml`): PR title + commit subject professionalism checks
 - `Release Prepare` (`.github/workflows/release-prepare.yml`): manual release candidate validation + artifact packaging
 - `Release Publish (Manual)` (`.github/workflows/release-publish.yml`): guarded npm publish workflow (manual only, optional dry-run)
+  - Uses npm Trusted Publishing when configured; falls back to `NPM_TOKEN` secret
+- `GitHub Release (Manual)` (`.github/workflows/release-github.yml`): creates annotated tag + GitHub release from `package.json` version
 
 Contributor and governance standards:
 
@@ -220,11 +230,13 @@ Contributor and governance standards:
 
 ### Version Policy
 
-- Version format is mandatory: `YYYY.MM.DD-<commitIndex>`
-- Example: `2025.12.31-10`
-- `YYYY.MM.DD` uses UTC date
-- `<commitIndex>` must match git commit index (`HEAD` or next commit during pre-commit sync)
-- Use `bun run version:sync` before commit/release
+- Version format is mandatory: `YYYY.MM.DD` or `YYYY.MM.DD-<N>`
+- Example (first release of day): `2026.03.04`
+- Example (third release on same day): `2026.03.04-3`
+- Date uses UTC day
+- `N` is the release index for that UTC day
+- `-1` is not allowed (use `YYYY.MM.DD` without suffix)
+- Use `bun run version:sync` before preparing a release
 
 ## Read-Only Mode
 

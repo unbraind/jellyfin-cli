@@ -1,4 +1,5 @@
 import { execSync } from 'node:child_process';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { findSecretFindings } from '../src/utils/release-checks.js';
 
@@ -13,7 +14,7 @@ function getTrackedFiles(root: string): string[] {
 }
 
 const root = process.cwd();
-const trackedFiles = getTrackedFiles(root);
+const trackedFiles = getTrackedFiles(root).filter((filePath) => existsSync(filePath));
 const findings = findSecretFindings(trackedFiles, root);
 
 if (findings.length > 0) {

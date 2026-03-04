@@ -2,6 +2,14 @@
   "name": "jellyfin-cli",
   "version": "2026.3.4",
   "description": "Agent-optimized CLI tool for interacting with the Jellyfin API",
+  "homepage": "https://github.com/unbraind/jellyfin-cli#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unbraind/jellyfin-cli.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unbraind/jellyfin-cli/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "bin": {
@@ -24,7 +32,11 @@
     "check:version": "bun run scripts/check-version.ts",
     "check:file-length": "bun run scripts/check-file-length.ts",
     "check:secrets": "bun run scripts/check-secrets.ts",
-    "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run build && bun run check:file-length && bun run check:secrets",
+    "check:secrets:history": "bun run scripts/check-secrets-history.ts",
+    "smoke:dist": "node dist/cli.js --help && node dist/cli.js --version",
+    "pack:dry-run": "npm pack --dry-run",
+    "smoke:npx": "sh -c 'PKG=\"$(npm pack --silent)\" && npm exec --yes --package \"./$PKG\" jf -- --version && rm -f \"$PKG\"'",
+    "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run build && bun run smoke:dist && bun run check:file-length && bun run check:secrets && bun run check:secrets:history && bun run pack:dry-run && bun run smoke:npx",
     "release:check": "bun run validate:release",
     "clean": "rm -rf dist",
     "prepublishOnly": "bun run clean && bun run build"
@@ -40,6 +52,9 @@
   ],
   "author": "",
   "license": "MIT",
+  "publishConfig": {
+    "access": "public"
+  },
   "engines": {
     "node": ">=18.0.0"
   },
@@ -61,6 +76,7 @@
   },
   "files": [
     "dist",
-    "README.md"
+    "README.md",
+    "CHANGELOG.md"
   ]
 }

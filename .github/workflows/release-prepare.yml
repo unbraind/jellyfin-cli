@@ -40,6 +40,9 @@ jobs:
       - name: Full release validation
         run: bun run validate:release
 
+      - name: Verify changelog exists
+        run: test -f CHANGELOG.md
+
       - name: Create release metadata
         run: |
           mkdir -p artifacts

@@ -9,6 +9,8 @@ bun install
 bun run dev --help
 ```
 
+npm users can run the same checks after `npm ci` (Bun is still required for runtime/build scripts).
+
 ## Project principles
 
 - Default output must remain agent-parseable (Toon format)
@@ -23,8 +25,12 @@ bun run typecheck
 bun run lint
 bun test
 bun run build
+bun run smoke:dist
 bun run check:file-length
 bun run check:secrets
+bun run check:secrets:history
+bun run pack:dry-run
+bun run smoke:npx
 ```
 
 For release-related changes:
@@ -44,11 +50,20 @@ bun run validate:release
 
 ## Commit messages
 
-Use concise, imperative commit subjects. Examples:
+Use concise, imperative Conventional Commit subjects:
+
+- Format: `<type>(<scope>): <subject>`
+- Keep subject line <= 72 chars
+- Use lowercase type/scope
+- Recommended types: `feat`, `fix`, `docs`, `chore`, `ci`, `build`, `test`, `refactor`, `perf`, `revert`
+
+Examples:
 
 - `feat(schema): add openapi coverage suggestion output`
 - `fix(config): enforce output format validation`
 - `docs: update release readiness checklist`
+
+PR titles are validated in CI to match this style.
 
 ## Security
 

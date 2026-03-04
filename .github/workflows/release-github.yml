@@ -1,0 +1,93 @@
+name: GitHub Release (Manual)
+
+on:
+  workflow_dispatch:
+    inputs:
+      ref:
+        description: 'Git ref to tag and release'
+        required: true
+        default: 'main'
+        type: string
+      tag:
+        description: 'Optional tag override (defaults to v<package.version>)'
+        required: false
+        default: ''
+        type: string
+      confirm_release:
+        description: 'Type YES_RELEASE to create tag + GitHub release'
+        required: true
+        default: 'NO'
+        type: string
+
+permissions:
+  contents: write
+
+concurrency:
+  group: github-release
+  cancel-in-progress: false
+
+jobs:
+  github-release:
+    name: Tag and Create GitHub Release
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    steps:
+      - name: Validate confirmation
+        run: |
+          if [ "${{ inputs.confirm_release }}" != "YES_RELEASE" ]; then
+            echo "Refusing release: confirm_release must be YES_RELEASE"
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.ref }}
+          fetch-depth: 0
+
+      - name: Resolve release tag
+        id: tag
+        run: |
+          set -euo pipefail
+          VERSION="$(node -p \"require('./package.json').version\")"
+          EXPECTED_TAG="v${VERSION}"
+          INPUT_TAG='${{ inputs.tag }}'
+
+          if [ -n "$INPUT_TAG" ]; then
+            TAG="$INPUT_TAG"
+          else
+            TAG="$EXPECTED_TAG"
+          fi
+
+          if [ "$TAG" != "$EXPECTED_TAG" ]; then
+            echo "Tag mismatch: expected ${EXPECTED_TAG}, got ${TAG}"
+            exit 1
+          fi
+
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=${TAG}" >> "$GITHUB_OUTPUT"
+
+      - name: Ensure tag does not already exist
+        run: |
+          if git rev-parse "${{ steps.tag.outputs.tag }}" >/dev/null 2>&1; then
+            echo "Tag already exists: ${{ steps.tag.outputs.tag }}"
+            exit 1
+          fi
+
+      - name: Create and push annotated tag
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "${{ steps.tag.outputs.tag }}" -m "Release ${{ steps.tag.outputs.tag }}"
+          git push origin "${{ steps.tag.outputs.tag }}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ steps.tag.outputs.tag }}
+          target_commitish: ${{ inputs.ref }}
+          generate_release_notes: true
+          draft: false
+          prerelease: false
+          name: Release ${{ steps.tag.outputs.tag }}
