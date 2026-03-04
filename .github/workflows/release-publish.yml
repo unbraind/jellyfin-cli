@@ -32,6 +32,7 @@ jobs:
     name: Publish Package
     runs-on: ubuntu-latest
     timeout-minutes: 30
+    environment: release
 
     steps:
       - name: Checkout
