@@ -223,6 +223,24 @@ describe('openapi utils', () => {
     expect(matches[0]?.score).toBeGreaterThanOrEqual(3);
   });
 
+  it('prioritizes specific subcommand tokens over broad command group matches', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/MediaSegments/{itemId}': {
+          get: { tags: ['MediaSegments'], summary: 'Get item segments', operationId: 'GetItemSegments' },
+        },
+        '/Items/{itemId}/ExternalIdInfos': {
+          get: { tags: ['ItemLookup'], summary: 'Get external IDs', operationId: 'GetExternalIdInfos' },
+        },
+      },
+    });
+
+    const matches = matchOperationsForCommandIntent(operations, 'media external-id-infos');
+    expect(matches).toHaveLength(2);
+    expect(matches[0]?.path).toBe('/Items/{itemId}/ExternalIdInfos');
+    expect(matches[1]?.path).toBe('/MediaSegments/{itemId}');
+  });
+
   it('sorts command intent matches by score, then depth, then method/path', () => {
     const operations = extractOpenApiOperations({
       paths: {

@@ -232,6 +232,24 @@ To avoid modifying media library state during validation:
 - Verified live against local Jellyfin `10.11.6` using read-only E2E + full release checks on
   March 4, 2026.
 
+27. OpenAPI intent precision + filter consistency hardening (March 4, 2026)
+
+- Refined command-intent scoring to treat generic parameter tokens (`id`, `name`, `type`, `index`)
+  as low-signal while prioritizing specific subcommand tokens.
+- Added a targeted penalty when a match only aligns with top-level command-domain tokens and misses
+  specific trailing intent tokens.
+- Fixed `jf schema openapi --for-command` so inferred `command_matches` now respect active operation
+  filters (including `--read-only-ops`, `--method`, `--tag`, `--path-prefix`, `--search`).
+- Added regression coverage:
+  - `tests/utils/openapi.test.ts` (specific subcommand precedence)
+  - `tests/commands/schema.test.ts` (filter application to command-match inference)
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- `jf schema openapi --for-command "media external-id-infos" --read-only-ops` no longer returns
+  mutating `/Library/Media/Updated` in `command_matches`.
+- Coverage headline remains `92.22%` read-only mapped operations (`237/257`) while command-intent
+  diagnostics are more accurate and deterministic for agent planning.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

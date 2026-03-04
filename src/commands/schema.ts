@@ -82,7 +82,7 @@ export function createSchemaCommand(): Command {
           readOnlySafe: options.readOnlyOps ? true : undefined,
         });
         const commandMatches = options.forCommand
-          ? matchOperationsForCommandIntent(allOperations, String(options.forCommand))
+          ? matchOperationsForCommandIntent(filteredOperations, String(options.forCommand))
           : [];
         const data: Record<string, unknown> = {
           source_path: result.sourcePath,

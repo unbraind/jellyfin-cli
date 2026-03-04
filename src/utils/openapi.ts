@@ -219,11 +219,13 @@ export function matchOperationsForCommandIntent(
 
   const matches: CommandOperationMatch[] = [];
   const preferReadOnlyMatches = isReadOnlyIntent(tokens);
+  const tailSignalTokens = tokens.slice(1).filter((token) => !LOW_SIGNAL_TOKENS.has(token));
   for (const operation of operations) {
     const pathTokens = tokenizePathValue(operation.path);
     const tagTokens = new Set(operation.tags.flatMap((tag) => tokenizeIntentValue(tag)));
     const summaryLower = operation.summary?.toLowerCase() ?? '';
     const operationIdLower = operation.operationId?.toLowerCase() ?? '';
+    const matchedTokens = new Set<string>();
     let score = 0;
     const matchedOn: string[] = [];
 
@@ -233,28 +235,39 @@ export function matchOperationsForCommandIntent(
       if (pathTokens.has(token)) {
         score += (lowSignal ? 0 : 3) + domainBoost;
         matchedOn.push(`path:${token}`);
+        matchedTokens.add(token);
         continue;
       }
       if (!lowSignal && tagTokens.has(token)) {
         score += 2 + domainBoost;
         matchedOn.push(`tag:${token}`);
+        matchedTokens.add(token);
         continue;
       }
       if (!lowSignal && (summaryLower.includes(token) || operationIdLower.includes(token))) {
         score += 1;
         matchedOn.push(`meta:${token}`);
+        matchedTokens.add(token);
       }
     }
 
     if (score > 0) {
+      if (tailSignalTokens.length > 0) {
+        const hasSpecificTailMatch = tailSignalTokens.some((token) => matchedTokens.has(token));
+        if (!hasSpecificTailMatch) {
+          score -= 3;
+        }
+      }
       if (preferReadOnlyMatches) {
         score += operation.readOnlySafe ? 1 : -1;
       }
-      matches.push({
-        ...operation,
-        score,
-        matchedOn,
-      });
+      if (score > 0) {
+        matches.push({
+          ...operation,
+          score,
+          matchedOn,
+        });
+      }
     }
   }
 

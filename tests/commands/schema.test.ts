@@ -196,6 +196,58 @@ describe('schema openapi command', () => {
     expect(result.stdout).not.toContain('method: POST');
   });
 
+  it('applies operation filters to --for-command matches', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/Library/Media/Updated': {
+                post: { tags: ['Library'], operationId: 'PostUpdatedMedia', summary: 'Post external media update' },
+              },
+              '/Items/{itemId}/ExternalIdInfos': {
+                get: { tags: ['ItemLookup'], operationId: 'GetExternalIdInfos', summary: 'Get external IDs' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      'schema',
+      'openapi',
+      '--for-command',
+      'media external-id-infos',
+      '--read-only-ops',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('command_matches:');
+    expect(result.stdout).toContain('/Items/{itemId}/ExternalIdInfos');
+    expect(result.stdout).not.toContain('/Library/Media/Updated');
+  });
+
   it('returns error for invalid --limit', async () => {
     const result = await runCli(['schema', 'openapi', '--limit', '0']);
     expect(result.code).toBe(1);

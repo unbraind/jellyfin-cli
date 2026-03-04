@@ -8,6 +8,10 @@ export const LOW_SIGNAL_TOKENS = new Set([
   'info',
   'status',
   'show',
+  'id',
+  'name',
+  'type',
+  'index',
 ]);
 
 const READ_ONLY_INTENT_TOKENS = new Set(['get', 'list', 'info', 'status', 'show']);
