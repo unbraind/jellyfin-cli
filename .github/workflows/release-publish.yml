@@ -77,11 +77,17 @@ jobs:
             exit 1
           fi
 
-      - name: Publish to npm with provenance
-        if: ${{ !inputs.dry_run }}
+      - name: Publish to npm with provenance (public repository)
+        if: ${{ !inputs.dry_run && !github.event.repository.private }}
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
         run: npm publish --provenance --access public
+
+      - name: Publish to npm without provenance (private repository fallback)
+        if: ${{ !inputs.dry_run && github.event.repository.private }}
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: npm publish --access public
 
       - name: Verify install via npx (published package)
         if: ${{ !inputs.dry_run }}
