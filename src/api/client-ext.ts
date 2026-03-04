@@ -14,8 +14,94 @@ import type {
   StartupFirstUser,
 } from '../types/index.js';
 import { CoreApi } from './core-api.js';
+import { buildQueryString } from './types.js';
 
 export class JellyfinExtensions extends CoreApi {
+  // Read-only URL helpers for stream/file endpoints
+  getVideoStreamByContainerUrl(
+    itemId: string,
+    container: string,
+    params?: {
+      mediaSourceId?: string;
+      audioStreamIndex?: number;
+      subtitleStreamIndex?: number;
+      maxStreamingBitrate?: number;
+      static?: boolean;
+    },
+  ): string {
+    const encodedContainer = encodeURIComponent(container);
+    return `${this.getBackendUrl()}/Videos/${itemId}/stream.${encodedContainer}${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getAudioStreamByContainerUrl(
+    itemId: string,
+    container: string,
+    params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number; static?: boolean },
+  ): string {
+    const encodedContainer = encodeURIComponent(container);
+    return `${this.getBackendUrl()}/Audio/${itemId}/stream.${encodedContainer}${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getUniversalAudioStreamUrl(
+    itemId: string,
+    params?: { mediaSourceId?: string; audioStreamIndex?: number; maxStreamingBitrate?: number },
+  ): string {
+    return `${this.getBackendUrl()}/Audio/${itemId}/universal${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getLegacyHlsVideoPlaylistUrl(
+    itemId: string,
+    playlistId: string,
+    params?: { mediaSourceId?: string; maxStreamingBitrate?: number },
+  ): string {
+    const encodedPlaylistId = encodeURIComponent(playlistId);
+    return `${this.getBackendUrl()}/Videos/${itemId}/hls/${encodedPlaylistId}/stream.m3u8${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getLegacyHlsAudioSegmentUrl(
+    itemId: string,
+    segmentId: string,
+    params?: { mediaSourceId?: string; maxStreamingBitrate?: number },
+  ): string {
+    const encodedSegmentId = encodeURIComponent(segmentId);
+    return `${this.getBackendUrl()}/Audio/${itemId}/hls/${encodedSegmentId}/stream.mp3${buildQueryString({
+      ...params,
+      userId: this.userId,
+    })}`;
+  }
+
+  getItemFileUrl(itemId: string): string {
+    return `${this.getBackendUrl()}/Items/${itemId}/File${buildQueryString({
+      api_key: this.apiKey,
+      userId: this.userId,
+    })}`;
+  }
+
+  getKodiStrmUrl(type: string, id: string, parentId?: string): string {
+    const encodedType = encodeURIComponent(type);
+    const encodedId = encodeURIComponent(id);
+    if (!parentId) {
+      return `${this.getBackendUrl()}/Kodi/${encodedType}/${encodedId}/file.strm`;
+    }
+    return `${this.getBackendUrl()}/Kodi/${encodedType}/${encodeURIComponent(parentId)}/${encodedId}/file.strm`;
+  }
+
+  getBrandingCssStaticUrl(): string {
+    return `${this.getBackendUrl()}/Branding/Css.css`;
+  }
+
   // Videos merge/split/subtitle
   async mergeVideoVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/Videos/MergeVersions', { ids: ids.join(',') }); }
   async mergeEpisodeVersions(ids: string[]): Promise<void> { await this.request<void>('POST', '/MergeVersions/MergeEpisodes', undefined, { Ids: ids }); }

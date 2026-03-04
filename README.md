@@ -430,6 +430,13 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf media remote-images <itemId>` - Get remote images
 - `jf media download-image <itemId>` - Download remote image
 - `jf media hls-url <itemId>` - Get HLS playlist URL
+- `jf media video-stream-url <itemId>` - Get direct video stream URL
+- `jf media audio-stream-url <itemId>` - Get direct audio stream/universal URL
+- `jf media hls-legacy-url <itemId> <playlistId>` - Get legacy HLS playlist URL
+- `jf media hls-audio-segment-url <itemId> <segmentId>` - Get legacy HLS audio segment URL
+- `jf media item-file-url <itemId>` - Get direct item file URL
+- `jf media kodi-strm-url <type> <id>` - Get Kodi `.strm` URL
+- `jf media branding-css-url` - Get static branding CSS URL
 
 ### Dashboard
 

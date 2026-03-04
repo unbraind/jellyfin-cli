@@ -1421,6 +1421,33 @@ describe.skipIf(skip)('E2E media segments', () => {
     const out = await jf('media', 'external-id-infos', itemId);
     expect(out).toMatch(/^type: external_ids/m);
   }, T);
+
+  it('media video-stream-url returns video_stream_url type', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Movie', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('media', 'video-stream-url', idMatch[1], '--container', 'mp4');
+    expect(out).toMatch(/^type: video_stream_url/m);
+    expect(out).toMatch(/stream\.mp4/);
+  }, T);
+
+  it('media audio-stream-url returns audio_stream_url type for universal endpoint', async () => {
+    const listOut = await jf('items', 'list', '--types', 'Audio', '--limit', '1', '--recursive');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('media', 'audio-stream-url', idMatch[1], '--universal');
+    expect(out).toMatch(/^type: audio_stream_url/m);
+    expect(out).toMatch(/\/Audio\/.*\/universal/);
+  }, T);
+
+  it('media item-file-url returns item_file_url type', async () => {
+    const listOut = await jf('items', 'list', '--limit', '1');
+    const idMatch = listOut.match(/id: ([a-f0-9]{32})/);
+    if (!idMatch) return;
+    const out = await jf('media', 'item-file-url', idMatch[1]);
+    expect(out).toMatch(/^type: item_file_url/m);
+    expect(out).toMatch(/\/Items\/.*\/File/);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

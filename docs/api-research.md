@@ -250,6 +250,32 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 - Coverage headline remains `92.22%` read-only mapped operations (`237/257`) while command-intent
   diagnostics are more accurate and deterministic for agent planning.
 
+28. Read-only media URL endpoint expansion (March 4, 2026)
+
+- Added new URL-focused read-only media commands:
+  - `jf media video-stream-url <itemId>`
+  - `jf media audio-stream-url <itemId>`
+  - `jf media hls-legacy-url <itemId> <playlistId>`
+  - `jf media hls-audio-segment-url <itemId> <segmentId>`
+  - `jf media item-file-url <itemId>`
+  - `jf media kodi-strm-url <type> <id> [--parent-id <parentId>]`
+  - `jf media branding-css-url`
+- Added typed API client URL helpers for:
+  - `/Videos/{itemId}/stream.{container}`
+  - `/Audio/{itemId}/stream.{container}`
+  - `/Audio/{itemId}/universal`
+  - `/Videos/{itemId}/hls/{playlistId}/stream.m3u8`
+  - `/Audio/{itemId}/hls/{segmentId}/stream.mp3`
+  - `/Items/{itemId}/File`
+  - `/Kodi/{type}/{id}/file.strm` and `/Kodi/{type}/{parentId}/{id}/file.strm`
+  - `/Branding/Css.css`
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- New live E2E tests pass for `media video-stream-url`, `media audio-stream-url`, and
+  `media item-file-url`.
+- Read-only schema coverage currently remains `89.49%` (`230/257`) because current intent matching
+  does not yet fully map `media ...-url` commands to all `Audio`/`Videos` tag operations.
+
 ## Recommended Next Enhancements
 
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.

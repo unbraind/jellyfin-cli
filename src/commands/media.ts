@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
+import { attachMediaUrlCommands } from './media-urls.js';
 
 export function createMediaCommand(): Command {
   const cmd = new Command('media');
@@ -221,6 +222,7 @@ export function createMediaCommand(): Command {
         console.log(toon.formatToon({ url, item_id: itemId }, 'hls_url'));
       } catch (err) { handleError(err, format); }
     });
+  attachMediaUrlCommands(cmd);
 
   return cmd;
 }

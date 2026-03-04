@@ -1909,6 +1909,76 @@ jf media hls-url <itemId> [--media-source <id>] [--audio-stream <index>] [--subt
 
 Output type: `hls_url`
 
+### media video-stream-url
+
+Get direct video stream URL, optionally for a specific container.
+
+```bash
+jf media video-stream-url <itemId> [--container <container>] [--media-source <id>] [--audio-stream <index>] [--subtitle-stream <index>] [--max-bitrate <bps>]
+```
+
+Output type: `video_stream_url`
+
+### media audio-stream-url
+
+Get direct audio stream URL, optionally for a specific container or via universal audio endpoint.
+
+```bash
+jf media audio-stream-url <itemId> [--container <container>] [--universal] [--media-source <id>] [--audio-stream <index>] [--max-bitrate <bps>]
+```
+
+Output type: `audio_stream_url`
+
+### media hls-legacy-url
+
+Get legacy HLS video playlist URL.
+
+```bash
+jf media hls-legacy-url <itemId> <playlistId> [--media-source <id>] [--max-bitrate <bps>]
+```
+
+Output type: `hls_legacy_url`
+
+### media hls-audio-segment-url
+
+Get legacy HLS audio segment URL.
+
+```bash
+jf media hls-audio-segment-url <itemId> <segmentId> [--media-source <id>] [--max-bitrate <bps>]
+```
+
+Output type: `hls_audio_segment_url`
+
+### media item-file-url
+
+Get direct item file URL.
+
+```bash
+jf media item-file-url <itemId>
+```
+
+Output type: `item_file_url`
+
+### media kodi-strm-url
+
+Get Kodi `.strm` URL for a content type/id pair.
+
+```bash
+jf media kodi-strm-url <type> <id> [--parent-id <parentId>]
+```
+
+Output type: `kodi_strm_url`
+
+### media branding-css-url
+
+Get static branding CSS URL.
+
+```bash
+jf media branding-css-url
+```
+
+Output type: `branding_css_url`
+
 ## dashboard
 
 Dashboard configuration commands.

@@ -84,4 +84,48 @@ describe('JellyfinApiClient Missing Lines', () => {
     // @ts-expect-error - mocking private property or method
     expect(client.request).toHaveBeenCalledWith('GET', '/Items/ByPath', { path: '/test/path' });
   });
+
+  it('should generate stream urls for container and universal endpoints', () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test', apiKey: 'k', userId: 'u1' });
+
+    const videoContainerUrl = client.getVideoStreamByContainerUrl('item-1', 'mp4', {
+      maxStreamingBitrate: 3200000,
+    });
+    expect(videoContainerUrl).toContain('/Videos/item-1/stream.mp4');
+    expect(videoContainerUrl).toContain('maxStreamingBitrate=3200000');
+    expect(videoContainerUrl).toContain('userId=u1');
+
+    const audioContainerUrl = client.getAudioStreamByContainerUrl('item-1', 'aac');
+    expect(audioContainerUrl).toContain('/Audio/item-1/stream.aac');
+    expect(audioContainerUrl).toContain('userId=u1');
+
+    const universalAudioUrl = client.getUniversalAudioStreamUrl('item-1');
+    expect(universalAudioUrl).toContain('/Audio/item-1/universal');
+    expect(universalAudioUrl).toContain('userId=u1');
+  });
+
+  it('should generate legacy hls, item file, kodi, and branding urls', () => {
+    const client = new JellyfinApiClient({ serverUrl: 'http://test', apiKey: 'k', userId: 'u1' });
+
+    const legacyHls = client.getLegacyHlsVideoPlaylistUrl('item-1', 'pl-1');
+    expect(legacyHls).toContain('/Videos/item-1/hls/pl-1/stream.m3u8');
+    expect(legacyHls).toContain('userId=u1');
+
+    const legacyAudio = client.getLegacyHlsAudioSegmentUrl('item-1', 'seg-9');
+    expect(legacyAudio).toContain('/Audio/item-1/hls/seg-9/stream.mp3');
+    expect(legacyAudio).toContain('userId=u1');
+
+    const itemFile = client.getItemFileUrl('item-1');
+    expect(itemFile).toContain('/Items/item-1/File');
+    expect(itemFile).toContain('api_key=k');
+
+    const kodiNoParent = client.getKodiStrmUrl('movies', '123');
+    expect(kodiNoParent).toContain('/Kodi/movies/123/file.strm');
+
+    const kodiWithParent = client.getKodiStrmUrl('episodes', '123', 'season-1');
+    expect(kodiWithParent).toContain('/Kodi/episodes/season-1/123/file.strm');
+
+    const brandingCssUrl = client.getBrandingCssStaticUrl();
+    expect(brandingCssUrl).toBe('http://test/Branding/Css.css');
+  });
 });

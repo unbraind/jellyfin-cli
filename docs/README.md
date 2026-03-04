@@ -326,6 +326,13 @@ Notes:
 | `jf media segments <itemId>` | Get media segments |
 | `jf media remote-images <itemId>` | List available remote images |
 | `jf media hls-url <itemId>` | Get HLS master playlist URL |
+| `jf media video-stream-url <itemId>` | Get direct video stream URL |
+| `jf media audio-stream-url <itemId>` | Get direct audio stream URL |
+| `jf media hls-legacy-url <itemId> <playlistId>` | Get legacy HLS video playlist URL |
+| `jf media hls-audio-segment-url <itemId> <segmentId>` | Get legacy HLS audio segment URL |
+| `jf media item-file-url <itemId>` | Get direct item file URL |
+| `jf media kodi-strm-url <type> <id>` | Get Kodi `.strm` URL |
+| `jf media branding-css-url` | Get static branding CSS URL |
 | `jf media theme-songs <itemId>` | Get theme songs |
 | `jf media theme-videos <itemId>` | Get theme videos |
 | `jf media external-ids <itemId>` | Get external IDs |
