@@ -10,7 +10,12 @@ import {
   type OpenApiOperationEntry,
 } from '../utils/openapi.js';
 import { generateCliToolSchemas } from '../utils/tool-schema.js';
-import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import {
+  parseCoveragePercent,
+  parsePositiveInteger,
+  resolveOutputFormat,
+  type FormatOptions,
+} from './schema-utils.js';
 import { summarizeOperationsByTag } from './schema-coverage.js';
 
 type CoverageSnapshot = {
@@ -115,12 +120,17 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
     .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')
     .option('--min-score <number>', 'Minimum operation intent score required for a mapping', '3')
+    .option('--require-coverage <percent>', 'Exit with code 1 when full/read-only coverage is below threshold')
     .option('--include-unmatched', 'Include unmatched operation sample arrays in output')
     .option('--limit <number>', 'Unmatched operation sample limit', '20')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
       const outputFormat = resolveOutputFormat(this, options);
       const minScore = parsePositiveInteger(String(options.minScore ?? '3'), 'Min score', outputFormat);
       const limit = parsePositiveInteger(String(options.limit ?? '20'), 'Limit', outputFormat);
+      const requiredCoverage =
+        options.requireCoverage === undefined
+          ? undefined
+          : parseCoveragePercent(String(options.requireCoverage), outputFormat);
 
       const config = getConfig(options.name as string | undefined);
       if (!config.serverUrl) {
@@ -176,6 +186,12 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
             path_prefix: options.pathPrefix ?? null,
           },
           min_score: minScore,
+          required_coverage_percent: requiredCoverage ?? null,
+          coverage_requirement_met:
+            requiredCoverage === undefined
+              ? null
+              : fullCoverage.coverage_percent >= requiredCoverage &&
+                readOnlyCoverage.coverage_percent >= requiredCoverage,
           command_prefix: commandPrefix ?? null,
           include_unmatched: includeUnmatched,
           full_scope: fullCoverage,
@@ -183,6 +199,26 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
         };
 
         console.log(formatOutput(data, outputFormat, 'openapi_research'));
+        if (
+          requiredCoverage !== undefined &&
+          (fullCoverage.coverage_percent < requiredCoverage ||
+            readOnlyCoverage.coverage_percent < requiredCoverage)
+        ) {
+          console.error(
+            formatOutput(
+              {
+                error:
+                  'Coverage requirement not met for one or more scopes (full_scope/read_only_scope)',
+                required_coverage_percent: requiredCoverage,
+                full_scope_coverage_percent: fullCoverage.coverage_percent,
+                read_only_scope_coverage_percent: readOnlyCoverage.coverage_percent,
+              },
+              outputFormat,
+              'error',
+            ),
+          );
+          process.exit(1);
+        }
       } catch (err) {
         const message = err instanceof Error ? err.message : 'OpenAPI research failed';
         console.error(formatOutput({ error: message }, outputFormat, 'error'));

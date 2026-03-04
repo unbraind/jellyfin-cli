@@ -47,3 +47,14 @@ export function parsePositiveInteger(value: string, label: string, outputFormat:
   }
   return parsed;
 }
+
+export function parseCoveragePercent(value: string, outputFormat: OutputFormat): number {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {
+    console.error(
+      formatOutput({ error: 'Coverage requirement must be a number between 0 and 100' }, outputFormat, 'error'),
+    );
+    process.exit(1);
+  }
+  return Number(parsed.toFixed(2));
+}

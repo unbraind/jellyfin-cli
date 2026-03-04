@@ -478,6 +478,73 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('source_path: /custom/openapi.json');
     expect(result.stdout).toContain('operation_scope_count: 1');
   });
+
+  it('supports coverage requirement checks and exits with code 1 when unmet', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+              '/Custom/Unmapped': {
+                get: { tags: ['Custom'], operationId: 'GetCustomThing', summary: 'Unmapped operation' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      '--format',
+      'json',
+      'schema',
+      'coverage',
+      '--command-prefix',
+      'system',
+      '--require-coverage',
+      '100',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(1);
+    const parsed = JSON.parse(result.stdout) as {
+      required_coverage_percent: number;
+      coverage_requirement_met: boolean;
+      coverage_percent: number;
+    };
+    expect(parsed.required_coverage_percent).toBe(100);
+    expect(parsed.coverage_requirement_met).toBe(false);
+    expect(parsed.coverage_percent).toBeLessThan(100);
+    expect(result.stderr).toContain('below required threshold');
+  });
+
+  it('returns error for invalid --require-coverage', async () => {
+    const result = await runCli(['schema', 'coverage', '--require-coverage', '101']);
+    expect(result.code).toBe(1);
+    expect(result.stderr).toContain('Coverage requirement must be a number between 0 and 100');
+  });
 });
 
 describe('schema tools command', () => {

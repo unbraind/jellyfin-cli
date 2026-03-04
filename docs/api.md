@@ -3198,7 +3198,7 @@ Output type: `tool_schemas`
 Estimate OpenAPI operation coverage using CLI command intent matching.
 
 ```bash
-jf schema coverage [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--command-prefix <prefix>] [--min-score <number>] [--limit <number>] [--format <format>]
+jf schema coverage [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--limit <number>] [--format <format>]
 ```
 
 Output type: `openapi_coverage`
@@ -3213,7 +3213,7 @@ Notes:
 Generate a consolidated API research snapshot (OpenAPI summary + full/read-only coverage blocks).
 
 ```bash
-jf schema research [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--include-unmatched] [--limit <number>] [--format <format>]
+jf schema research [--name <name>] [--method <method>] [--tag <tag>] [--path-prefix <prefix>] [--endpoint <path>] [--command-prefix <prefix>] [--min-score <number>] [--require-coverage <percent>] [--include-unmatched] [--limit <number>] [--format <format>]
 ```
 
 Output type: `openapi_research`

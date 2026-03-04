@@ -59,12 +59,12 @@ jf schema tools --command items --limit 20
 jf items list --limit 1 | jf schema validate items --from toon
 
 # Estimate uncovered OpenAPI operations for a command domain
-jf schema coverage --method GET --read-only-ops --command-prefix items --min-score 3 --limit 25
-jf schema coverage --read-only-ops --suggest-commands --limit 20
+jf schema coverage --method GET --read-only-ops --command-prefix items --min-score 3 --require-coverage 100 --limit 25
+jf schema coverage --read-only-ops --suggest-commands --require-coverage 100 --limit 20
 jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --limit 20
 
 # Generate a single API research snapshot (OpenAPI + coverage)
-jf schema research --include-unmatched --limit 20
+jf schema research --include-unmatched --require-coverage 100 --limit 20
 
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info

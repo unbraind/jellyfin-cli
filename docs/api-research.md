@@ -59,6 +59,7 @@ To avoid modifying media library state during validation:
 - Adds intent-based OpenAPI coverage estimation for the current CLI command surface.
 - Supports method/tag/path filtering and command-domain scoping via `--command-prefix`.
 - Supports `--read-only-ops` filtering to restrict analysis to non-mutating endpoints.
+- Supports `--require-coverage <percent>` to enforce minimum coverage as a non-zero exit gate in CI/release workflows.
 - Emits deterministic `unmatched_operations` samples for backlog and release planning.
 - Supports `--suggest-commands` to generate deterministic candidate CLI command names for unmatched operations, including confidence and rationale metadata for agent planning.
 

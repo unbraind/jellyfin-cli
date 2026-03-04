@@ -134,4 +134,69 @@ describe('schema research command', () => {
     expect(parsed.full_scope.operation_scope_count).toBe(1);
     expect(parsed.read_only_scope.operation_scope_count).toBe(1);
   });
+
+  it('supports coverage requirement checks and fails when unmet', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            info: { version: '10.11.6' },
+            paths: {
+              '/System/Info/Public': {
+                get: { tags: ['System'], operationId: 'GetPublicSystemInfo', summary: 'Public info' },
+              },
+              '/Users': {
+                post: { tags: ['Users'], operationId: 'CreateUser', summary: 'Create user' },
+              },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli([
+      '--format',
+      'json',
+      'schema',
+      'research',
+      '--command-prefix',
+      'system',
+      '--require-coverage',
+      '100',
+      '--limit',
+      '5',
+    ]);
+    expect(result.code).toBe(1);
+
+    const parsed = JSON.parse(result.stdout) as {
+      required_coverage_percent: number;
+      coverage_requirement_met: boolean;
+      full_scope: { coverage_percent: number };
+      read_only_scope: { coverage_percent: number };
+    };
+
+    expect(parsed.required_coverage_percent).toBe(100);
+    expect(parsed.coverage_requirement_met).toBe(false);
+    expect(parsed.full_scope.coverage_percent).toBeLessThan(100);
+    expect(parsed.read_only_scope.coverage_percent).toBeGreaterThanOrEqual(0);
+    expect(result.stderr).toContain('Coverage requirement not met');
+  });
 });
