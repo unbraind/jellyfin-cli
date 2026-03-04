@@ -82,6 +82,7 @@ These commands are read-only and verify that key output formats remain machine-p
 
 ```bash
 jf config doctor
+jf config doctor --validate-formats --format json
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
 jf schema openapi --endpoint /api-docs/openapi.json --read-only-ops --limit 25
 jf schema research --include-unmatched --require-coverage 100 --limit 20

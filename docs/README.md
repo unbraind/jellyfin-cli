@@ -47,6 +47,7 @@ jf config test
 
 # Run diagnostics (safe checks only)
 jf config doctor
+jf config doctor --validate-formats --format json
 
 # Inspect live OpenAPI surface for agent planning
 jf schema openapi --include-paths --method GET --tag Users --read-only-ops --for-command "users list" --limit 25
@@ -212,6 +213,7 @@ Notes:
 | `jf config reset` | Reset all configuration |
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
+| `jf config doctor --validate-formats` | Adds machine-oriented formatter validation (`toon/json/table/raw/yaml/markdown`) to diagnostics |
 | `jf schema openapi` | Fetch/summarize/filter live OpenAPI operations and infer endpoint matches for CLI intents |
 | `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
 | `jf schema tools` | Export command tool schemas with typed input schema and read-only safety flags |

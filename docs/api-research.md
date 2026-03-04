@@ -35,7 +35,8 @@ To avoid modifying media library state during validation:
   - connectivity check status
   - authentication check status
   - OpenAPI availability + path/operation counts
-  - warnings for common pitfalls
+- warnings for common pitfalls
+- optional formatter validation via `jf config doctor --validate-formats` to verify Toon/JSON/YAML/Markdown/Table/Raw output integrity for automation pipelines
 
 2. Settings-aware live E2E bootstrapping
 

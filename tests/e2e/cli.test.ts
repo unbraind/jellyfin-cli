@@ -1222,6 +1222,18 @@ describe.skipIf(skip)('E2E config', () => {
     const out = await jf('config', 'test');
     expect(out).toMatch(/^type: sys/m);
   }, T);
+
+  it('config doctor validate-formats returns all_ok=true in json mode', async () => {
+    const out = await jf('config', 'doctor', '--validate-formats', '--format', 'json');
+    const payload = JSON.parse(out) as {
+      format_validations?: {
+        enabled: boolean;
+        all_ok: boolean;
+      };
+    };
+    expect(payload.format_validations?.enabled).toBe(true);
+    expect(payload.format_validations?.all_ok).toBe(true);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

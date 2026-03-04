@@ -102,6 +102,69 @@ describe('config doctor command', () => {
     expect(result.stdout).toContain('server_local_address_looks_malformed');
     expect(result.stdout).toContain('local_address: http://127.0.0.1:8096');
   });
+
+  it('reports formatter validation status when --validate-formats is enabled', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/System/Info/Public': new Response(
+          JSON.stringify({
+            ServerName: 'Test Jellyfin',
+            Version: '10.11.6',
+            LocalAddress: 'http://127.0.0.1:8096',
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+        '/Users': new Response(JSON.stringify([{ Id: 'u1', Name: 'steve' }]), {
+          headers: { 'content-type': 'application/json' },
+        }),
+        '/api-docs/openapi.json': new Response(
+          JSON.stringify({
+            paths: {
+              '/System/Info/Public': { get: {} },
+            },
+          }),
+          { headers: { 'content-type': 'application/json' } },
+        ),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId: 'u1',
+          outputFormat: 'toon',
+          timeout: 5000,
+        },
+      }),
+      'utf-8',
+    );
+
+    const result = await runCli(['config', 'doctor', '--validate-formats', '--format', 'json']);
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as {
+      format_validations?: {
+        enabled: boolean;
+        all_ok: boolean;
+        formats: Record<string, { ok: boolean }>;
+      };
+    };
+    expect(payload.format_validations?.enabled).toBe(true);
+    expect(payload.format_validations?.all_ok).toBe(true);
+    expect(payload.format_validations?.formats.toon?.ok).toBe(true);
+    expect(payload.format_validations?.formats.json?.ok).toBe(true);
+    expect(payload.format_validations?.formats.yaml?.ok).toBe(true);
+    expect(payload.format_validations?.formats.markdown?.ok).toBe(true);
+    expect(payload.format_validations?.formats.table?.ok).toBe(true);
+    expect(payload.format_validations?.formats.raw?.ok).toBe(true);
+  });
 });
 
 describe('config set command', () => {
