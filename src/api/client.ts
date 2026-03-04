@@ -59,6 +59,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
   async getSeasons(seriesId: string, params?: { userId?: string; isSpecialSeason?: boolean }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getSeasons(seriesId, params); }
   async getNextUpEpisodes(params?: { userId?: string; seriesId?: string; parentId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getNextUpEpisodes(params); }
   async getUpcomingEpisodes(params?: { userId?: string; parentId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getUpcomingEpisodes(params); }
+  async getSimilarShows(itemId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { return this.tvshows.getSimilarShows(itemId, params); }
   // Packages
   async getPackages(): Promise<PackageInfo[]> { return this.packages.getPackages(); }
   async getPackageInfo(packageId: string): Promise<PackageInfo> { return this.packages.getPackageInfo(packageId); }

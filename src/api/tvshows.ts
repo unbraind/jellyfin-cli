@@ -21,4 +21,9 @@ export class TvShowsApi extends ApiClientBase {
     const userId = params?.userId ?? this.userId;
     return this.request<QueryResult<BaseItemDto>>('GET', '/Shows/Upcoming', { ...params, userId });
   }
+
+  async getSimilarShows(itemId: string, params?: { userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> {
+    const userId = params?.userId ?? this.userId;
+    return this.request<QueryResult<BaseItemDto>>('GET', `/Shows/${itemId}/Similar`, { ...params, userId });
+  }
 }

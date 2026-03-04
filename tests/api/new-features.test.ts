@@ -54,6 +54,13 @@ describe('JellyfinApiClient New Features', () => {
       const result = await client.getUpcomingEpisodes({ limit: 10 });
       expect(result.Items).toHaveLength(1);
     });
+
+    it('should get similar shows', async () => {
+      const mockData = { Items: [{ Id: 's2', Name: 'Similar Show' }], TotalRecordCount: 1 };
+      mockFetch.mockResolvedValueOnce(createMockResponse(mockData));
+      const result = await client.getSimilarShows('series-1', { limit: 10 });
+      expect(result.Items).toHaveLength(1);
+    });
   });
 
   describe('Packages', () => {

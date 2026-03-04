@@ -342,6 +342,16 @@ describe.skipIf(skip)('E2E tvshows', () => {
     const out = await jf('tvshows', 'upcoming', '--limit', '3');
     expect(out).toMatch(/^type: items/m);
   }, T);
+
+  it('tvshows similar returns items when a series id is available', async () => {
+    const seed = await jf('items', 'list', '--types', 'Series', '--limit', '1');
+    const idMatch = seed.match(/\bid:\s*([^\n]+)/);
+    if (!idMatch) {
+      return;
+    }
+    const out = await jf('tvshows', 'similar', idMatch[1], '--limit', '3');
+    expect(out).toMatch(/^type: items/m);
+  }, T);
 });
 
 // -------------------------------------------------------------------------

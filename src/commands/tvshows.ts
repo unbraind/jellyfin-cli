@@ -100,5 +100,22 @@ export function createTvshowsCommand(): Command {
       }
     });
 
+  cmd
+    .command('similar <itemId>')
+    .description('Get similar shows for a series or episode')
+    .option('-f, --format <format>', 'Output format')
+    .option('--limit <number>', 'Limit', '25')
+    .action(async (itemId, options) => {
+      const { client, format } = await createApiClient(options);
+      try {
+        const result = await client.getSimilarShows(itemId, {
+          limit: parseInt(options.limit, 10),
+        });
+        console.log(toon.formatItems(result.Items ?? []));
+      } catch (err) {
+        handleError(err, format);
+      }
+    });
+
   return cmd;
 }

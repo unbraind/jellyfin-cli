@@ -2170,6 +2170,16 @@ jf tvshows upcoming [--parent <id>] [--limit <number>]
 
 Output type: `items`
 
+### tvshows similar
+
+Get similar shows for a series or episode.
+
+```bash
+jf tvshows similar <itemId> [--limit <number>]
+```
+
+Output type: `items`
+
 ## packages
 
 Package management commands.

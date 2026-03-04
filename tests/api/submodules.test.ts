@@ -280,6 +280,16 @@ describe('TvShowsApi', () => {
       expect.anything()
     );
   });
+
+  it('should get similar shows', async () => {
+    mockFetch.mockResolvedValueOnce(mockOk({ Items: [{ Id: 'series-2' }], TotalRecordCount: 1 }));
+    const result = await api.getSimilarShows('series-1', { limit: 5 });
+    expect(result.Items).toHaveLength(1);
+    expect(mockFetch).toHaveBeenCalledWith(
+      expect.stringContaining('/Shows/series-1/Similar'),
+      expect.anything()
+    );
+  });
 });
 
 describe('JellyfinApiError', () => {

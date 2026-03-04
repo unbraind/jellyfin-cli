@@ -303,3 +303,19 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
 1. Add a policy profile mode (`--safety-profile`) to enforce granular allow/deny sets beyond binary read-only.
 2. Add optional `schema tools --openapi-match` mode to attach inferred OpenAPI candidates directly per tool schema row.
 3. Add structured command replay snippets (`curl`, `httpie`) to `--explain` output for rapid debugging.
+
+30. TV Similar Shows endpoint coverage (March 4, 2026)
+
+- Added `jf tvshows similar <itemId> [--limit <number>]` as a read-only command mapped to
+  `GET /Shows/{itemId}/Similar`.
+- Added typed API wrappers:
+  - `TvShowsApi.getSimilarShows`
+  - `JellyfinApiClient.getSimilarShows`
+- Added regression coverage:
+  - `tests/api/new-features.test.ts`
+  - `tests/api/submodules.test.ts`
+  - `tests/e2e/cli.test.ts`
+
+Verification notes (March 4, 2026, Jellyfin 10.11.6):
+- Live E2E run confirms `jf tvshows similar` returns `type: items` when a series ID is available.
+- The command is read-only and does not mutate library data.

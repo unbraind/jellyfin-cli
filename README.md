@@ -463,6 +463,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf tvshows seasons <seriesId>` - Get seasons for a series
 - `jf tvshows next-up` - Get next up episodes
 - `jf tvshows upcoming` - Get upcoming episodes
+- `jf tvshows similar <itemId>` - Get similar shows for a series/episode
 
 ### Packages
 
