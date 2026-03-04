@@ -53,6 +53,7 @@ bun test tests/e2e/cli.test.ts
 
 The E2E suite is read-only and is designed to avoid mutating media library data.
 It runs `bun run src/cli.ts` by default; set `JELLYFIN_E2E_USE_DIST=1` to force `dist/cli.js`.
+The suite also auto-loads auth from `~/.jellyfin-cli/settings.json` when env vars are not set.
 
 ## 5) Run discovery diagnostics against live server
 
@@ -78,6 +79,8 @@ Installed binaries:
 ```bash
 git status
 git diff --stat
+bun run check:secrets
 ```
 
 Confirm there are no local credential files or private values staged for commit.
+If you set temporary env vars in your shell, clear them before release (`unset JELLYFIN_API_KEY JELLYFIN_PASSWORD`).

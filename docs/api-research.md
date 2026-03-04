@@ -258,6 +258,7 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
   - `jf media hls-legacy-url <itemId> <playlistId>`
   - `jf media hls-audio-segment-url <itemId> <segmentId>`
   - `jf media item-file-url <itemId>`
+
   - `jf media kodi-strm-url <type> <id> [--parent-id <parentId>]`
   - `jf media branding-css-url`
 - Added typed API client URL helpers for:
@@ -366,3 +367,20 @@ Verification notes (March 4, 2026, Jellyfin 10.11.6):
   - `tests/utils/read-only-guard.test.ts`
   - `tests/utils/openapi-tokenize.test.ts`
   - `tests/e2e/cli.test.ts`
+
+33. Full live OpenAPI intent coverage verification (March 4, 2026)
+
+- Verified against local Jellyfin `10.11.6`:
+  - `jf schema coverage --read-only-ops --suggest-commands --limit 40`
+  - `jf schema coverage --suggest-commands --limit 40`
+- Result:
+  - read-only operation scope: `257`
+  - read-only mapped operations: `257`
+  - read-only coverage: `100%`
+  - full operation scope: `429`
+  - full mapped operations: `429`
+  - full coverage: `100%`
+  - unmatched operations: `0` (both scopes)
+- Release-quality verification also passed on the same run:
+  - `bun run validate:release`
+  - `1007` tests passing (includes read-only live CLI E2E coverage).
