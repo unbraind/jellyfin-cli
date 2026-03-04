@@ -22,6 +22,16 @@ export const ENV_KEYS = {
   OUTPUT_FORMAT: 'JELLYFIN_OUTPUT_FORMAT',
 } as const;
 
+const ENV_ALIASES = {
+  SERVER_URL: [ENV_KEYS.SERVER_URL, 'JF_SERVER_URL'],
+  API_KEY: [ENV_KEYS.API_KEY, 'JF_API_KEY'],
+  USERNAME: [ENV_KEYS.USERNAME, 'JF_USER'],
+  PASSWORD: [ENV_KEYS.PASSWORD, 'JF_PASSWORD'],
+  USER_ID: [ENV_KEYS.USER_ID, 'JF_USER_ID'],
+  TIMEOUT: [ENV_KEYS.TIMEOUT, 'JF_TIMEOUT'],
+  OUTPUT_FORMAT: [ENV_KEYS.OUTPUT_FORMAT, 'JF_FORMAT'],
+} as const;
+
 interface SettingsFile {
   defaultServer?: JellyfinConfig;
   servers?: Record<string, JellyfinConfig>;
@@ -63,34 +73,52 @@ function writeSettingsFile(settings: SettingsFile): void {
 
 export { writeSettingsFile };
 
+function resolveEnvValue(keys: readonly string[]): string | undefined {
+  for (const key of keys) {
+    const value = process.env[key];
+    if (typeof value === 'string' && value.length > 0) {
+      return value;
+    }
+  }
+
+  return undefined;
+}
+
 function getEnvConfig(): Partial<JellyfinConfig> {
   const config: Partial<JellyfinConfig> = {};
-  
-  if (process.env[ENV_KEYS.SERVER_URL]) {
-    config.serverUrl = process.env[ENV_KEYS.SERVER_URL];
+
+  const serverUrl = resolveEnvValue(ENV_ALIASES.SERVER_URL);
+  if (serverUrl) {
+    config.serverUrl = serverUrl;
   }
-  if (process.env[ENV_KEYS.API_KEY]) {
-    config.apiKey = process.env[ENV_KEYS.API_KEY];
+  const apiKey = resolveEnvValue(ENV_ALIASES.API_KEY);
+  if (apiKey) {
+    config.apiKey = apiKey;
   }
-  if (process.env[ENV_KEYS.USERNAME]) {
-    config.username = process.env[ENV_KEYS.USERNAME];
+  const username = resolveEnvValue(ENV_ALIASES.USERNAME);
+  if (username) {
+    config.username = username;
   }
-  if (process.env[ENV_KEYS.PASSWORD]) {
-    config.password = process.env[ENV_KEYS.PASSWORD];
+  const password = resolveEnvValue(ENV_ALIASES.PASSWORD);
+  if (password) {
+    config.password = password;
   }
-  if (process.env[ENV_KEYS.USER_ID]) {
-    config.userId = process.env[ENV_KEYS.USER_ID];
+  const userId = resolveEnvValue(ENV_ALIASES.USER_ID);
+  if (userId) {
+    config.userId = userId;
   }
-  if (process.env[ENV_KEYS.TIMEOUT]) {
-    const timeout = parseInt(process.env[ENV_KEYS.TIMEOUT]!, 10);
+  const timeoutValue = resolveEnvValue(ENV_ALIASES.TIMEOUT);
+  if (timeoutValue) {
+    const timeout = parseInt(timeoutValue, 10);
     if (!Number.isNaN(timeout)) {
       config.timeout = timeout;
     }
   }
-  if (process.env[ENV_KEYS.OUTPUT_FORMAT]) {
-    config.outputFormat = parseOutputFormat(process.env[ENV_KEYS.OUTPUT_FORMAT]);
+  const outputFormat = resolveEnvValue(ENV_ALIASES.OUTPUT_FORMAT);
+  if (outputFormat) {
+    config.outputFormat = parseOutputFormat(outputFormat);
   }
-  
+
   return config;
 }
 

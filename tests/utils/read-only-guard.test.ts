@@ -56,6 +56,10 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('videos merge-versions')).toBe(true);
   });
 
+  it('returns false for empty command paths', () => {
+    expect(isCommandBlockedInReadOnly('')).toBe(false);
+  });
+
   it('formats a toon-style read-only error payload', () => {
     const message = buildReadOnlyError('items refresh');
 

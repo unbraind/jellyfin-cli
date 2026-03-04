@@ -50,6 +50,10 @@ For CI/CD or containerized environments:
 export JELLYFIN_SERVER_URL=https://your-server:8096
 export JELLYFIN_API_KEY=your-api-key
 
+# Equivalent short aliases are also supported
+export JF_SERVER_URL=https://your-server:8096
+export JF_API_KEY=your-api-key
+
 # CLI will use these automatically
 jf users list
 ```

@@ -90,6 +90,16 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_READ_ONLY` | `1/true/on/yes` blocks mutating commands globally |
 | `JELLYFIN_EXPLAIN` | `1/true/on/yes` emits redacted request metadata to stderr |
 
+Short aliases are also supported:
+
+- `JF_SERVER_URL`
+- `JF_API_KEY`
+- `JF_USER`
+- `JF_PASSWORD`
+- `JF_USER_ID`
+- `JF_TIMEOUT`
+- `JF_FORMAT`
+
 ### Configuration File
 
 Settings are stored in `~/.jellyfin-cli/settings.json`.

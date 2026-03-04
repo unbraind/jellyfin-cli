@@ -29,12 +29,19 @@ describe('config', () => {
     
     const envKeys = [
       'JELLYFIN_SERVER_URL',
+      'JF_SERVER_URL',
       'JELLYFIN_API_KEY',
+      'JF_API_KEY',
       'JELLYFIN_USERNAME',
+      'JF_USER',
       'JELLYFIN_PASSWORD',
+      'JF_PASSWORD',
       'JELLYFIN_USER_ID',
+      'JF_USER_ID',
       'JELLYFIN_TIMEOUT',
+      'JF_TIMEOUT',
       'JELLYFIN_OUTPUT_FORMAT',
+      'JF_FORMAT',
     ];
     
     for (const key of envKeys) {
@@ -128,6 +135,39 @@ describe('config', () => {
     it('should ignore invalid timeout from env', () => {
       process.env.JELLYFIN_TIMEOUT = 'invalid';
       expect(getConfig().timeout).toBe(30000); // default fallback
+    });
+
+    it('should read short JF_* alias env values', () => {
+      process.env.JF_SERVER_URL = 'http://short-env:8096';
+      process.env.JF_API_KEY = 'short-api-key';
+      process.env.JF_USER = 'short-user';
+      process.env.JF_PASSWORD = 'short-password';
+      process.env.JF_USER_ID = 'short-user-id';
+      process.env.JF_TIMEOUT = '9876';
+      process.env.JF_FORMAT = 'yaml';
+
+      const config = getConfig();
+      expect(config.serverUrl).toBe('http://short-env:8096');
+      expect(config.apiKey).toBe('short-api-key');
+      expect(config.username).toBe('short-user');
+      expect(config.password).toBe('short-password');
+      expect(config.userId).toBe('short-user-id');
+      expect(config.timeout).toBe(9876);
+      expect(config.outputFormat).toBe('yaml');
+    });
+
+    it('should prefer JELLYFIN_* over JF_* when both are set', () => {
+      process.env.JF_SERVER_URL = 'http://short-env:8096';
+      process.env.JELLYFIN_SERVER_URL = 'http://long-env:8096';
+      process.env.JF_API_KEY = 'short-api-key';
+      process.env.JELLYFIN_API_KEY = 'long-api-key';
+      process.env.JF_TIMEOUT = '2222';
+      process.env.JELLYFIN_TIMEOUT = '3333';
+
+      const config = getConfig();
+      expect(config.serverUrl).toBe('http://long-env:8096');
+      expect(config.apiKey).toBe('long-api-key');
+      expect(config.timeout).toBe(3333);
     });
   });
 

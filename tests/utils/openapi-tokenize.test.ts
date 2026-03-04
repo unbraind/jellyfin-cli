@@ -43,6 +43,24 @@ describe('openapi tokenize utils', () => {
 
     const volumeTokens = tokenizeIntentValue('sessions volume');
     expect(volumeTokens).toEqual(expect.arrayContaining(['volume', 'level', 'command']));
+
+    const liveTvTokens = tokenizeIntentValue('livetv channels');
+    expect(liveTvTokens).toEqual(expect.arrayContaining(['livetv', 'live', 'tv', 'channel']));
+
+    const chapterTokens = tokenizeIntentValue('items chapters');
+    expect(chapterTokens).toEqual(expect.arrayContaining(['chapter', 'segment']));
+
+    const notificationTokens = tokenizeIntentValue('notifications list');
+    expect(notificationTokens).toEqual(expect.arrayContaining(['notification', 'notify']));
+
+    const muteTokens = tokenizeIntentValue('sessions mute');
+    expect(muteTokens).toEqual(expect.arrayContaining(['mute', 'command']));
+
+    const unmuteTokens = tokenizeIntentValue('sessions unmute');
+    expect(unmuteTokens).toEqual(expect.arrayContaining(['unmute', 'command']));
+
+    const unshareTokens = tokenizeIntentValue('playlists unshare');
+    expect(unshareTokens).toEqual(expect.arrayContaining(['unshare', 'share', 'remove']));
   });
 
   it('deduplicates repeated tokens from mixed casing and separators', () => {

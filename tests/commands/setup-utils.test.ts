@@ -12,11 +12,13 @@ describe('setup-utils', () => {
     expect(isValidServerUrl('http://localhost:8096')).toBe(true);
     expect(isValidServerUrl('https://jellyfin.local')).toBe(true);
     expect(isValidServerUrl('ftp://example.com')).toBe(false);
+    expect(isValidServerUrl(':://not-a-url')).toBe(false);
   });
 
   it('masks secret values', () => {
     expect(maskSecret('abcdef123456')).toBe('abcd...56');
     expect(maskSecret('short')).toBe('********');
+    expect(maskSecret(undefined)).toBeUndefined();
   });
 
   it('quotes shell values safely', () => {
@@ -32,6 +34,9 @@ describe('setup-utils', () => {
 
   it('resolves setup save target server name', () => {
     expect(resolveSetupSaveServerName('prod', [])).toBe('prod');
+    expect(resolveSetupSaveServerName('   ', [
+      { name: 'local', isDefault: true },
+    ])).toBe('local');
     expect(resolveSetupSaveServerName(undefined, [
       { name: 'default', isDefault: true },
     ])).toBeUndefined();

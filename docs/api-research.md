@@ -8,6 +8,7 @@ This document captures the latest live Jellyfin API discovery and CLI coverage v
 - Verification date: **March 4, 2026**
 - Server used: local Jellyfin **10.11.6**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
+- Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
 - Safety mode: read-only command selection for live checks (no media/library mutations)
 
 ## Live Discovery Results

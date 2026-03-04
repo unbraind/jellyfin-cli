@@ -119,6 +119,10 @@ jf sessions play SESSION_ID ITEM_ID
 | `JELLYFIN_OUTPUT_FORMAT` | Output format (`toon`, `json`, `table`, `raw`, `yaml`, `markdown`) |
 | `JELLYFIN_EXPLAIN` | Emit redacted request metadata to stderr (`1`/`true`) |
 
+Short aliases are also supported:
+
+- `JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`
+
 ### Configuration File
 
 Settings are stored in `~/.jellyfin-cli/settings.json`.
