@@ -68,6 +68,13 @@ const VERSION = packageJson.version;
 
 const program = new Command();
 
+function enableGlobalHelpOptions(command: Command): void {
+  command.configureHelp({ showGlobalOptions: true });
+  for (const subcommand of command.commands) {
+    enableGlobalHelpOptions(subcommand);
+  }
+}
+
 program
   .name('jellyfin-cli')
   .alias('jf')
@@ -163,5 +170,7 @@ program.addCommand(createClientlogCommand());
 program.addCommand(createTrailersCommand());
 program.addCommand(createPluginsExtCommand());
 program.addCommand(createLibraryNotifyCommand());
+
+enableGlobalHelpOptions(program);
 
 program.parse();

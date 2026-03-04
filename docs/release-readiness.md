@@ -73,6 +73,8 @@ export JELLYFIN_TIMEOUT=120000
 jf-cli --format json config doctor
 jf-cli --format yaml system info
 jf-cli --format markdown users me
+jf-cli system --help
+jf-cli system info --help
 jf-cli --format json years list --limit 5
 jf-cli --format toon items list --limit 1 | jf-cli schema validate items --from toon
 # JSON parse check
@@ -84,6 +86,7 @@ jf-cli --format yaml system info \
 ```
 
 These commands are read-only and verify that key output formats remain machine-parseable.
+The `--help` checks above ensure global flags are discoverable from every command surface.
 
 ## 5) Run discovery diagnostics against live server
 

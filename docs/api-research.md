@@ -69,9 +69,21 @@ bun run test:coverage
 
 Observed (latest):
 
-- `1050` passing, `0` failing
-- Coverage: `99.62%` lines, `94.54%` functions
+- `1052` passing, `0` failing
+- Coverage: `99.63%` lines, `94.54%` functions
 - `src/utils/schema-validate.ts`: `100%` lines and functions
+
+## Help UX Verification
+
+To keep command discovery consistent for humans and agents, every `jf [command] --help` now shows
+root/global flags (`--format`, `--server`, `--explain`, `--read-only`) under `Global Options`.
+
+Validation:
+
+- Added tests: `tests/commands/help-global-options.test.ts`
+- Verified live help output:
+  - `jf-cli system --help`
+  - `jf-cli system info --help`
 
 ## Coverage Reporting Interpretation
 

@@ -546,6 +546,7 @@ bun run lint
 ## Getting Help
 
 - Use `jf <command> --help` for command-specific help
+- Global flags are shown in every command help under `Global Options` (`--format`, `--server`, `--explain`, `--read-only`)
 - Check [Troubleshooting](troubleshooting.md) for common issues
 - Review [API Reference](api.md) for detailed command documentation
 
