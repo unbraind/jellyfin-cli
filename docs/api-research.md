@@ -58,6 +58,20 @@ bun test tests/e2e/cli.test.ts
 
 Latest run result: `176` passing, `0` failing.
 
+## Full Test + Coverage Validation
+
+Command:
+
+```bash
+bun run test:coverage
+```
+
+Observed (latest):
+
+- `1043` passing, `0` failing
+- Coverage: `99.62%` lines, `94.54%` functions
+- `src/utils/schema-validate.ts`: `100%` lines and functions
+
 ## Coverage Reporting Interpretation
 
 `schema research` and `schema coverage` report two useful classes for agent planning:

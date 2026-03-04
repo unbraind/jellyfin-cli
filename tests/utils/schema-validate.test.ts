@@ -92,4 +92,74 @@ describe('schema validate utils', () => {
     expect(result.valid).toBe(false);
     expect(result.errors[0]?.message).toContain('unresolved schema reference');
   });
+
+  it('covers primitive and union type branches', () => {
+    const schema = {
+      type: 'object',
+      required: ['arr', 'nullable', 'flag', 'count', 'mode'],
+      properties: {
+        arr: { type: 'array', items: { type: 'string', pattern: '^ok$' } },
+        nullable: { type: ['null', 'string'] },
+        flag: { type: 'boolean' },
+        count: { type: 'number' },
+        mode: { type: 'mystery' },
+      },
+    };
+
+    const valid = validateJsonSchema(
+      {
+        arr: ['ok', 'ok'],
+        nullable: null,
+        flag: true,
+        count: 10,
+        mode: 'any-value',
+      },
+      schema,
+    );
+
+    expect(valid.valid).toBe(true);
+    expect(valid.errors).toHaveLength(0);
+
+    const invalid = validateJsonSchema(
+      {
+        arr: ['bad'],
+        nullable: 'value',
+        flag: 'true',
+        count: Number.POSITIVE_INFINITY,
+        mode: 'still-allowed',
+      },
+      schema,
+    );
+
+    expect(invalid.valid).toBe(false);
+    expect(invalid.errors.some((error) => error.path === '$.arr[0]')).toBe(true);
+    expect(invalid.errors.some((error) => error.path === '$.flag')).toBe(true);
+    expect(invalid.errors.some((error) => error.path === '$.count')).toBe(true);
+  });
+
+  it('rejects non-pointer refs and const mismatches', () => {
+    const nonPointerRef = validateJsonSchema(
+      { id: 'x' },
+      {
+        type: 'object',
+        properties: {
+          id: { $ref: 'definitions/id' },
+        },
+      },
+    );
+    expect(nonPointerRef.valid).toBe(false);
+    expect(nonPointerRef.errors[0]?.message).toContain('unresolved schema reference');
+
+    const constMismatch = validateJsonSchema(
+      { status: 'warning' },
+      {
+        type: 'object',
+        properties: {
+          status: { const: 'ok' },
+        },
+      },
+    );
+    expect(constMismatch.valid).toBe(false);
+    expect(constMismatch.errors[0]?.message).toContain('must equal constant');
+  });
 });

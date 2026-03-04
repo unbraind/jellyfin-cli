@@ -15,6 +15,16 @@ function mockOk(data: unknown) {
   };
 }
 
+function mockNoContent() {
+  return {
+    ok: true,
+    status: 204,
+    statusText: 'No Content',
+    headers: { get: () => null },
+    text: () => Promise.resolve(''),
+  };
+}
+
 describe('JellyfinApiClient startup state APIs', () => {
   let client: JellyfinApiClient;
 
@@ -73,5 +83,23 @@ describe('JellyfinApiClient startup state APIs', () => {
     expect(url).toContain('/Startup/Complete');
     expect(opts).toMatchObject({ method: 'GET' });
     expect(result).toBe(true);
+  });
+
+  it('updates startup configuration', async () => {
+    mockFetch.mockResolvedValueOnce(mockNoContent());
+
+    const payload = {
+      UICulture: 'en-GB',
+      MetadataCountryCode: 'GB',
+      PreferredMetadataLanguage: 'en',
+    };
+    const result = await client.updateStartupConfiguration(payload);
+    const [url, opts] = mockFetch.mock.calls[0];
+    const body = JSON.parse((opts.body as string) ?? '{}');
+
+    expect(url).toContain('/Startup/Configuration');
+    expect(opts).toMatchObject({ method: 'POST' });
+    expect(body).toMatchObject(payload);
+    expect(result).toBeUndefined();
   });
 });
