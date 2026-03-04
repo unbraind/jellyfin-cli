@@ -6,7 +6,7 @@ import { tmpdir } from 'node:os';
 const testConfigDir = join(tmpdir(), 'jellyfin-cli-test-' + Date.now());
 const testSettingsFile = join(testConfigDir, 'settings.json');
 
-import { getConfig, saveConfig, listServers, deleteServer, setCurrentServer, getSettingsPath, isGithubStarred, markGithubStarred } from '../../src/utils/config.js';
+import { getConfig, saveConfig, listServers, deleteServer, setCurrentServer, getSettingsPath, markGithubStarred } from '../../src/utils/config.js';
 
 function createTestConfig() {
   if (!existsSync(testConfigDir)) {
