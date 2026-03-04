@@ -1,0 +1,59 @@
+name: Bug report
+description: Report a reproducible bug in jellyfin-cli
+title: "bug: "
+labels: [bug]
+body:
+  - type: textarea
+    id: summary
+    attributes:
+      label: Summary
+      description: Clear and concise description of the problem.
+    validations:
+      required: true
+
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Exact commands and sequence.
+      placeholder: |
+        1. Run `jf ...`
+        2. Observe output
+    validations:
+      required: true
+
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected behavior
+    validations:
+      required: true
+
+  - type: textarea
+    id: actual
+    attributes:
+      label: Actual behavior / output
+    validations:
+      required: true
+
+  - type: input
+    id: version
+    attributes:
+      label: jellyfin-cli version
+      placeholder: "e.g. 2026.03.04-107"
+    validations:
+      required: true
+
+  - type: input
+    id: jellyfin
+    attributes:
+      label: Jellyfin server version
+      placeholder: "e.g. 10.11.6"
+    validations:
+      required: false
+
+  - type: textarea
+    id: env
+    attributes:
+      label: Environment
+      description: OS, Bun version, and any relevant setup details.

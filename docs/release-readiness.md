@@ -2,6 +2,19 @@
 
 Use this checklist before creating a GitHub release or publishing to npm.
 
+## CI/CD baseline (recommended)
+
+Configure branch protection on `main` to require these checks before merge:
+
+- `CI / Quality Gates`
+- `CodeQL / Analyze (javascript-typescript)`
+- `Secret Scan / Tracked File Secret Scan`
+
+Use manual release workflows for controlled releases:
+
+- `.github/workflows/release-prepare.yml` (validate + build artifacts only)
+- `.github/workflows/release-publish.yml` (manual publish, supports dry run)
+
 ## 1) Configure auth outside the repository
 
 Store credentials only in env vars or in `~/.jellyfin-cli/settings.json`:

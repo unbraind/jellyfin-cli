@@ -202,6 +202,22 @@ bun run validate:release
 
 This syncs/enforces the version policy and runs typecheck, lint, tests, build, TypeScript code-length enforcement (<=300 lines excluding comments), and a tracked-file secret scan.
 
+## CI/CD and Release Operations
+
+GitHub Actions workflows are configured for professional release management:
+
+- `CI` (`.github/workflows/ci.yml`): PR/push quality gates
+- `CodeQL` (`.github/workflows/codeql.yml`): static security analysis
+- `Secret Scan` (`.github/workflows/secret-scan.yml`): tracked-file secret policy checks
+- `Release Prepare` (`.github/workflows/release-prepare.yml`): manual release candidate validation + artifact packaging
+- `Release Publish (Manual)` (`.github/workflows/release-publish.yml`): guarded npm publish workflow (manual only, optional dry-run)
+
+Contributor and governance standards:
+
+- [CONTRIBUTING.md](CONTRIBUTING.md)
+- [SECURITY.md](SECURITY.md)
+- [CODE_OF_CONDUCT.md](CODE_OF_CONDUCT.md)
+
 ### Version Policy
 
 - Version format is mandatory: `YYYY.MM.DD-<commitIndex>`

@@ -1,0 +1,8 @@
+# Replace with maintainers for stricter ownership gates
+* @unbraind
+
+# Security and release files should require maintainer review
+/.github/workflows/ @unbraind
+/SECURITY.md @unbraind
+/package.json @unbraind
+/bun.lock @unbraind
