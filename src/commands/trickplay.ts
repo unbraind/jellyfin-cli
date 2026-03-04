@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
+import { formatOutput } from '../formatters/index.js';
 
 export function createTrickplayCommand(): Command {
   const cmd = new Command('trickplay');
@@ -16,7 +16,7 @@ export function createTrickplayCommand(): Command {
         const url = client.getTrickplayHlsPlaylistUrl(itemId, parseInt(width, 10), {
           mediaSourceId: options.mediaSource,
         });
-        console.log(toon.formatToon({ url, item_id: itemId, width }, 'trickplay_hls_url'));
+        console.log(formatOutput({ url, item_id: itemId, width }, format, 'trickplay_hls_url'));
       } catch (err) {
         handleError(err, format);
       }
@@ -33,7 +33,7 @@ export function createTrickplayCommand(): Command {
         const url = client.getTrickplayTileImageUrl(itemId, parseInt(width, 10), parseInt(index, 10), {
           mediaSourceId: options.mediaSource,
         });
-        console.log(toon.formatToon({ url, item_id: itemId, width, index }, 'trickplay_tile_url'));
+        console.log(formatOutput({ url, item_id: itemId, width, index }, format, 'trickplay_tile_url'));
       } catch (err) {
         handleError(err, format);
       }
