@@ -5,7 +5,7 @@ import { tmpdir } from 'node:os';
 import { createProgram } from '../../src/cli-program.js';
 
 describe('CLI github-star prompt hook', () => {
-  const originalEnv = { ...process.env };
+  const originalConfigDir = process.env.JELLYFIN_CONFIG_DIR;
   const tempDirs: string[] = [];
   const promptGithubStar = vi.fn().mockResolvedValue(undefined);
 
@@ -14,8 +14,11 @@ describe('CLI github-star prompt hook', () => {
   });
 
   afterEach(() => {
-    process.env = { ...originalEnv };
-    vi.restoreAllMocks();
+    if (typeof originalConfigDir === 'string') {
+      process.env.JELLYFIN_CONFIG_DIR = originalConfigDir;
+    } else {
+      delete process.env.JELLYFIN_CONFIG_DIR;
+    }
     for (const dir of tempDirs.splice(0)) {
       rmSync(dir, { recursive: true, force: true });
     }
