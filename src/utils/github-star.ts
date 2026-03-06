@@ -1,6 +1,6 @@
 import { spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline';
-import { isGithubStarred, markGithubStarred } from './config.js';
+import { isGithubStarPrompted, isGithubStarred, markGithubStarPrompted, markGithubStarred } from './config.js';
 
 const REPO = 'unbraind/jellyfin-cli';
 const REPO_URL = 'https://github.com/unbraind/jellyfin-cli';
@@ -40,6 +40,12 @@ function prompt(question: string): Promise<string> {
   });
 }
 
+function printManualStarMessage(reason: string): void {
+  console.log(`\n⭐  If you find jellyfin-cli useful, please star it on GitHub!`);
+  console.log(`   ${reason}`);
+  console.log(`   ${REPO_URL}\n`);
+}
+
 /**
  * Checks if the user has starred the jellyfin-cli GitHub repo and prompts them
  * to do so if they haven't. Only runs when:
@@ -51,15 +57,25 @@ export async function promptGithubStar(): Promise<void> {
   // Skip in non-interactive / piped environments
   if (!isTTY()) return;
 
-  // Check local cache first to avoid slow API calls on every run
-  if (isGithubStarred()) return;
+  // Check local cache first to avoid slow API calls on every run.
+  if (isGithubStarred() || isGithubStarPrompted()) return;
 
-  // gh CLI must be available and authenticated
-  if (!isGhAvailable() || !isGhLoggedIn()) return;
+  // gh CLI must be available and authenticated.
+  if (!isGhAvailable()) {
+    printManualStarMessage('gh is not installed, so open this link manually:');
+    markGithubStarPrompted();
+    return;
+  }
+  if (!isGhLoggedIn()) {
+    printManualStarMessage('gh is not authenticated, so open this link manually:');
+    markGithubStarPrompted();
+    return;
+  }
 
-  // Check the actual star status via GitHub API
+  // Check the actual star status via GitHub API.
   if (isRepoStarred()) {
     markGithubStarred();
+    markGithubStarPrompted();
     return;
   }
 
@@ -72,10 +88,13 @@ export async function promptGithubStar(): Promise<void> {
     if (starRepo()) {
       console.log('   ✓ Starred! Thank you — it really helps 🙏\n');
       markGithubStarred();
+      markGithubStarPrompted();
     } else {
       console.log(`   Could not star automatically. Visit: ${REPO_URL}\n`);
+      markGithubStarPrompted();
     }
   } else {
     console.log(`   No problem! You can star later at: ${REPO_URL}\n`);
+    markGithubStarPrompted();
   }
 }

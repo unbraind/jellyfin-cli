@@ -6,7 +6,18 @@ import { tmpdir } from 'node:os';
 const testConfigDir = join(tmpdir(), 'jellyfin-cli-test-' + Date.now());
 const testSettingsFile = join(testConfigDir, 'settings.json');
 
-import { getConfig, saveConfig, listServers, deleteServer, setCurrentServer, getSettingsPath, markGithubStarred } from '../../src/utils/config.js';
+import {
+  getConfig,
+  saveConfig,
+  listServers,
+  deleteServer,
+  setCurrentServer,
+  getSettingsPath,
+  isGithubStarred,
+  isGithubStarPrompted,
+  markGithubStarred,
+  markGithubStarPrompted,
+} from '../../src/utils/config.js';
 
 function createTestConfig() {
   if (!existsSync(testConfigDir)) {
@@ -264,7 +275,15 @@ describe('config', () => {
     });
 
     it('should check and set github starred', () => {
+      expect(isGithubStarred()).toBe(false);
       expect(() => markGithubStarred()).not.toThrow();
+      expect(isGithubStarred()).toBe(true);
+    });
+
+    it('should check and set github star prompt cache', () => {
+      expect(isGithubStarPrompted()).toBe(false);
+      expect(() => markGithubStarPrompted()).not.toThrow();
+      expect(isGithubStarPrompted()).toBe(true);
     });
 
     it('should handle malformed settings file', () => {

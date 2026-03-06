@@ -37,6 +37,7 @@ interface SettingsFile {
   servers?: Record<string, JellyfinConfig>;
   currentServer?: string;
   githubStarred?: boolean;
+  githubStarPrompted?: boolean;
 }
 
 function ensureConfigDir(): void {
@@ -236,5 +237,15 @@ export function isGithubStarred(): boolean {
 export function markGithubStarred(): void {
   const settings = readSettingsFile();
   settings.githubStarred = true;
+  writeSettingsFile(settings);
+}
+
+export function isGithubStarPrompted(): boolean {
+  return readSettingsFile().githubStarPrompted === true;
+}
+
+export function markGithubStarPrompted(): void {
+  const settings = readSettingsFile();
+  settings.githubStarPrompted = true;
   writeSettingsFile(settings);
 }

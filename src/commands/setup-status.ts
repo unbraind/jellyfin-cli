@@ -2,7 +2,6 @@ import { Command } from 'commander';
 import { JellyfinApiClient } from '../api/client.js';
 import { formatOutput } from '../formatters/index.js';
 import { getConfig } from '../utils/config.js';
-import { promptGithubStar } from '../utils/github-star.js';
 import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 
 type SetupStatusOptions = FormatOptions & {
@@ -52,7 +51,6 @@ export function attachSetupStatusSubcommand(cmd: Command): void {
             'setup_status',
           ),
         );
-        await promptGithubStar();
       } catch (err) {
         console.log(
           formatOutput(

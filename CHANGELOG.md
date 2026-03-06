@@ -8,6 +8,14 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 No changes yet.
 
+## [2026.3.6] - 2026-03-06
+
+### Added
+- Command-level hook coverage tests for CLI post-action behavior.
+
+### Changed
+- Refactored CLI bootstrap wiring into a reusable program builder for improved maintainability and testability.
+
 ## [2026.3.4] - 2026-03-04
 
 ### Added

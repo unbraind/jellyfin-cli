@@ -5,7 +5,6 @@ import { Writable } from 'node:stream';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { saveConfig, getConfig, getSettingsPath, listServers } from '../utils/config.js';
 import { formatOutput } from '../formatters/index.js';
-import { promptGithubStar } from '../utils/github-star.js';
 import { isOutputFormat, outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import {
   isValidServerUrl,
@@ -261,7 +260,6 @@ async function runSetup(thisCommand: Command, options: SetupCommandOptions): Pro
     };
 
     console.log(formatOutput(result, runtimeFormat, 'setup_complete'));
-    await promptGithubStar();
   } catch (err) {
     const message = err instanceof JellyfinApiError ? err.message : 'Setup validation failed. API Key might be invalid.';
     console.error(formatOutput({ error: message }, runtimeFormat, 'error'));

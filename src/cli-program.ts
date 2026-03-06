@@ -1,0 +1,184 @@
+import { Command } from 'commander';
+import {
+  buildReadOnlyError,
+  getCommandPath,
+  isCommandBlockedInReadOnly,
+  isReadOnlyModeEnabled,
+} from './utils/read-only-guard.js';
+import { EXPLAIN_ENV_KEY, isExplainModeEnabled } from './utils/explain.js';
+import { promptGithubStar } from './utils/github-star.js';
+import {
+  createConfigCommand,
+  createSystemCommand,
+  createUsersCommand,
+  createItemsCommand,
+  createSessionsCommand,
+  createLibraryCommand,
+  createUserDataCommand,
+  createTasksCommand,
+  createPlaylistsCommand,
+  createLivetvCommand,
+  createLivetvAdminCommand,
+  createDiscoverCommand,
+  createSetupCommand,
+  createPluginsCommand,
+  createDevicesCommand,
+  createBrandingCommand,
+  createStatsCommand,
+  createApikeysCommand,
+  createNotificationsCommand,
+  createCollectionsCommand,
+  createFavoritesCommand,
+  createSyncPlayCommand,
+  createQuickConnectCommand,
+  createBackupCommand,
+  createSubtitlesCommand,
+  createMediaCommand,
+  createLocalizationCommand,
+  createEnvironmentCommand,
+  createTvshowsCommand,
+  createPackagesCommand,
+  createImagesCommand,
+  createSuggestionsCommand,
+  createYearsCommand,
+  createMusicGenresCommand,
+  createTrickplayCommand,
+  createChannelsCommand,
+  createDashboardCommand,
+  createSchemaCommand,
+  createArtistsCommand,
+  createVideosCommand,
+  createAuthCommand,
+  createReportsCommand,
+  createUsageStatsCommand,
+  createFontsCommand,
+  createLiveStreamsCommand,
+  createGenresCommand,
+  createStudiosCommand,
+  createPersonsCommand,
+  createClientlogCommand,
+  createTrailersCommand,
+  createPluginsExtCommand,
+  createLibraryNotifyCommand,
+} from './commands/index.js';
+import packageJson from '../package.json' with { type: 'json' };
+
+const VERSION = packageJson.version;
+type CliProgramDeps = {
+  promptGithubStar?: () => Promise<void> | void;
+};
+
+function enableGlobalHelpOptions(command: Command): void {
+  command.configureHelp({ showGlobalOptions: true });
+  for (const subcommand of command.commands) {
+    enableGlobalHelpOptions(subcommand);
+  }
+}
+
+export function createProgram(deps: CliProgramDeps = {}): Command {
+  const promptGithubStarHook = deps.promptGithubStar ?? promptGithubStar;
+  const program = new Command();
+
+  program
+    .name('jellyfin-cli')
+    .alias('jf')
+    .description('Agent-optimized CLI tool for interacting with the Jellyfin API')
+    .version(VERSION)
+    .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
+    .option('-s, --server <name>', 'Server name from config')
+    .option('--explain', 'Print resolved Jellyfin API request metadata to stderr')
+    .option('--read-only', 'Block mutating commands (or set JELLYFIN_READ_ONLY=1)');
+
+  program.hook('preAction', (thisCommand, actionCommand) => {
+    const effectiveFormat = thisCommand.optsWithGlobals().format as unknown;
+    if (typeof effectiveFormat === 'string' && effectiveFormat.trim().length > 0) {
+      actionCommand.setOptionValue('format', effectiveFormat);
+    }
+
+    const effectiveServer = thisCommand.optsWithGlobals().server as unknown;
+    if (typeof effectiveServer === 'string' && effectiveServer.trim().length > 0) {
+      actionCommand.setOptionValue('server', effectiveServer);
+    }
+
+    const explainOption = thisCommand.optsWithGlobals().explain as unknown;
+    if (isExplainModeEnabled(explainOption, process.env[EXPLAIN_ENV_KEY])) {
+      process.env[EXPLAIN_ENV_KEY] = '1';
+    } else {
+      delete process.env[EXPLAIN_ENV_KEY];
+    }
+
+    const readOnlyOption = thisCommand.optsWithGlobals().readOnly as unknown;
+    const readOnlyEnabled = isReadOnlyModeEnabled(readOnlyOption, process.env.JELLYFIN_READ_ONLY);
+    if (!readOnlyEnabled) {
+      return;
+    }
+
+    const commandPath = getCommandPath(actionCommand);
+    if (!isCommandBlockedInReadOnly(commandPath)) {
+      return;
+    }
+
+    console.error(buildReadOnlyError(commandPath));
+    process.exit(1);
+  });
+
+  program.hook('postAction', () => {
+    void promptGithubStarHook();
+  });
+
+  program.addCommand(createSetupCommand());
+  program.addCommand(createConfigCommand());
+  program.addCommand(createSystemCommand());
+  program.addCommand(createUsersCommand());
+  program.addCommand(createItemsCommand());
+  program.addCommand(createSessionsCommand());
+  program.addCommand(createLibraryCommand());
+  program.addCommand(createUserDataCommand());
+  program.addCommand(createTasksCommand());
+  program.addCommand(createPlaylistsCommand());
+  program.addCommand(createLivetvCommand());
+  program.addCommand(createLivetvAdminCommand());
+  program.addCommand(createDiscoverCommand());
+  program.addCommand(createPluginsCommand());
+  program.addCommand(createDevicesCommand());
+  program.addCommand(createBrandingCommand());
+  program.addCommand(createStatsCommand());
+  program.addCommand(createApikeysCommand());
+  program.addCommand(createNotificationsCommand());
+  program.addCommand(createCollectionsCommand());
+  program.addCommand(createFavoritesCommand());
+  program.addCommand(createSyncPlayCommand());
+  program.addCommand(createQuickConnectCommand());
+  program.addCommand(createBackupCommand());
+  program.addCommand(createSubtitlesCommand());
+  program.addCommand(createMediaCommand());
+  program.addCommand(createLocalizationCommand());
+  program.addCommand(createEnvironmentCommand());
+  program.addCommand(createTvshowsCommand());
+  program.addCommand(createPackagesCommand());
+  program.addCommand(createImagesCommand());
+  program.addCommand(createSuggestionsCommand());
+  program.addCommand(createYearsCommand());
+  program.addCommand(createMusicGenresCommand());
+  program.addCommand(createTrickplayCommand());
+  program.addCommand(createChannelsCommand());
+  program.addCommand(createDashboardCommand());
+  program.addCommand(createSchemaCommand());
+  program.addCommand(createArtistsCommand());
+  program.addCommand(createVideosCommand());
+  program.addCommand(createAuthCommand());
+  program.addCommand(createReportsCommand());
+  program.addCommand(createUsageStatsCommand());
+  program.addCommand(createFontsCommand());
+  program.addCommand(createLiveStreamsCommand());
+  program.addCommand(createGenresCommand());
+  program.addCommand(createStudiosCommand());
+  program.addCommand(createPersonsCommand());
+  program.addCommand(createClientlogCommand());
+  program.addCommand(createTrailersCommand());
+  program.addCommand(createPluginsExtCommand());
+  program.addCommand(createLibraryNotifyCommand());
+
+  enableGlobalHelpOptions(program);
+  return program;
+}
