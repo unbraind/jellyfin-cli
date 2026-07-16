@@ -2,21 +2,28 @@ id: jf-kpor
 title: "Audit repository for additional security, correctness, quality, and release issues"
 description: "Perform a code- and configuration-level audit beyond the reported GitHub items: dependency hygiene, unsafe logging or secret handling, filesystem/network boundaries, output contracts, test gaps, type safety, workflow permissions, packaging, documentation drift, and release automation. Fix actionable findings in this tranche and document any intentionally deferred roadmap work as child items."
 type: Task
-status: in_progress
+status: closed
 priority: 1
 tags[4]: audit,quality,release,security
 created_at: "2026-07-16T16:49:04.749Z"
-updated_at: "2026-07-16T17:00:05.071Z"
+updated_at: "2026-07-16T17:08:49.880Z"
+closed_at: "2026-07-16T17:08:49.879Z"
 author: codex
 acceptance_criteria: "Static checks and targeted source review cover security-sensitive and user-facing boundaries.; Every confirmed actionable finding is either fixed with evidence or captured as a detailed pm child item.; No secrets, cache, temporary, or generated-only artifacts are committed."
 goal: jf-mqpo
 parent: jf-zifk
 risk: high
 confidence: medium
-notes[1]{created_at,author,text}:
+resolution: "Audited dependency, workflow, release, output, documentation, secret, packaging, and test surfaces; fixed confirmed findings and created a detailed coverage roadmap item."
+expected_result: "All confirmed actionable findings are fixed or explicitly tracked, with complete merged-head release proof."
+actual_result: PR #25 merged; release validation and GitHub security surfaces are clean; jf-mkzh records the bounded follow-up improvement.
+notes[3]{created_at,author,text}:
   "2026-07-16T17:00:05.053Z",codex,"Audit evidence: full release gate passes after date-version sync; coverage run reports 888 pass and 177 credential-dependent E2E skips; code and secret scanning APIs were clear at orientation; npm audit is zero."
+  "2026-07-16T17:08:49.565Z",codex,"Default-branch proof at daa3eee: validate:release passes 888 tests with 0 failures and 177 credential-gated live E2E skips; build,dist smoke,npm and Bun package execution,file-length,version,lint,typecheck,and tracked/history secret scans pass. GitHub has zero open issues,PRs,Dependabot alerts,CodeQL alerts,or secret-scanning alerts."
+  "2026-07-16T17:08:49.565Z",codex,"The one non-remediation improvement discovered is retained as detailed roadmap feature jf-mkzh: isolated command-layer coverage ratcheting above the current 59.26 percent line baseline."
 learnings[1]{created_at,author,text}:
   "2026-07-16T17:00:05.053Z",codex,ESLint 10 surfaced three dead initial assignments; simplifying them preserved behavior and kept the stronger rule enabled.
 tests[1]{command,path,scope,timeout_seconds}:
   "bun run validate:release",package.json,project,1200
+close_reason: Broad repository audit completed; actionable findings fixed and the remaining coverage improvement is fully captured as jf-mkzh.
 body: ""
