@@ -1,0 +1,21 @@
+id: jf-ff4n
+title: Modernize GitHub Actions and compatible direct dependency majors
+description: Consolidate the stale Dependabot PR backlog by updating GitHub Actions to maintained majors and upgrading compatible direct packages/tooling together so the repository has one coherent verification surface instead of many conflicting bot branches.
+type: Task
+status: in_progress
+priority: 1
+tags[3]: dependencies,github-actions,toolchain
+created_at: "2026-07-16T16:49:04.518Z"
+updated_at: "2026-07-16T17:00:04.834Z"
+author: codex
+acceptance_criteria: "Workflow actions use current maintained majors with valid configuration.; Direct dependency majors are upgraded where compatible; deliberate holds are documented.; Lint, typecheck, tests, builds, and package smoke tests remain green."
+goal: jf-mqpo
+parent: jf-zifk
+risk: medium
+confidence: high
+notes[2]{created_at,author,text}:
+  "2026-07-16T16:49:04.518Z",codex,"Source: open Dependabot PRs 1 3 7 8 9 10 13 14 15 17 18 19 20 21 and 22."
+  "2026-07-16T17:00:04.816Z",codex,"Modernized checkout v6,setup-node v6,upload-artifact v7,semantic-pull-request v6,gitleaks action v3,action-gh-release v3,Node 22.13,Bun 1.3.11,Commander 15,ESLint 10 flat config,and Vitest 4.1.10."
+files[1]{path,scope,note}:
+  .github/workflows,project,CI and release workflows
+body: ""

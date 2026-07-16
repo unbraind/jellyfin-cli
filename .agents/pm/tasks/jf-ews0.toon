@@ -1,0 +1,27 @@
+id: jf-ews0
+title: Remediate npm dependency vulnerabilities and stale direct dependencies
+description: "Upgrade the npm dependency graph to patched releases for 12 live Dependabot alerts: Vitest UI arbitrary file execution, Vite filesystem and websocket vulnerabilities, esbuild file disclosure, js-yaml alias DoS, picomatch method injection, flatted prototype pollution, and yaml deep-nesting stack overflow. Align package.json, package-lock.json, and bun.lock, then verify npm audit and release checks."
+type: Task
+status: in_progress
+priority: 0
+tags[3]: dependabot,dependencies,security
+created_at: "2026-07-16T16:49:04.012Z"
+updated_at: "2026-07-16T17:00:04.237Z"
+author: codex
+acceptance_criteria: npm audit reports zero vulnerabilities.; Every currently open Dependabot alert resolves against the pushed lockfile.; Runtime and development dependencies remain compatible with supported Node versions.
+goal: jf-mqpo
+parent: jf-zifk
+risk: critical
+confidence: high
+notes[2]{created_at,author,text}:
+  "2026-07-16T16:49:04.012Z",codex,"Live references: GitHub Dependabot alerts 3 5 6 8 9 10 12 14 15 17 18 and 20."
+  "2026-07-16T17:00:04.200Z",codex,"Local remediation evidence: upgraded direct and transitive npm graph; npm audit --audit-level=low reports 0 vulnerabilities; package-lock.json and bun.lock are aligned."
+learnings[1]{created_at,author,text}:
+  "2026-07-16T17:00:04.200Z",codex,"Vitest 4.1.10 pulls patched Vite 7.3.6,esbuild 0.28.1,picomatch 4.0.4,js-yaml 4.2.0,and flatted 3.4.2,closing the live advisory families together."
+files[3]{path,scope,note}:
+  package.json,project,direct dependency policy
+  package-lock.json,project,canonical npm resolution graph
+  bun.lock,project,Bun resolution graph
+tests[1]{command,path,scope}:
+  npm audit --audit-level=low,package-lock.json,project
+body: ""

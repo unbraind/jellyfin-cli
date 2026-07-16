@@ -25,6 +25,7 @@ describe('formatSessions', () => {
     expect(result).toContain('session-1');
     expect(result).toContain('TestUser');
     expect(result).toContain('Test Movie');
+    expect(result).toContain('is_playing: true');
   });
 
   it('should format sessions without now playing', () => {
@@ -43,6 +44,7 @@ describe('formatSessions', () => {
     const result = formatSessions(sessions);
     expect(result).toContain('session-2');
     expect(result).toContain('AnotherUser');
+    expect(result).toContain('is_playing: false');
   });
 });
 

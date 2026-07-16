@@ -1,5 +1,5 @@
 import { Command } from 'commander';
-import { createApiClient, handleError } from './utils.js';
+import { createApiClient, formatSession, formatSessions, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 import { addReportingCommands } from './sessions-reporting.js';
 
@@ -14,7 +14,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const sessions = await client.getSessions();
-        console.log(toon.formatSessions(sessions));
+        console.log(formatSessions(sessions, format));
       } catch (err) {
         handleError(err, format);
       }
@@ -28,7 +28,7 @@ export function createSessionsCommand(): Command {
       const { client, format } = await createApiClient(options);
       try {
         const session = await client.getSessionById(sessionId);
-        console.log(toon.formatSession(session));
+        console.log(formatSession(session, format));
       } catch (err) {
         handleError(err, format);
       }

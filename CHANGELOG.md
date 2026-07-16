@@ -6,7 +6,23 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ## [Unreleased]
 
-No changes yet.
+### Added
+- Repository-local `pm` project governance with detailed goals, epics, issues, tasks, evidence, and append-only history.
+- Explicit active-playback indicators and richer current-item/play-state details for session output.
+
+### Changed
+- `sessions list` and `sessions get` now honor all documented global and command-local output formats.
+- Runtime support now starts at Node.js 22.13; CI and release workflows use Node 22.13 and Bun 1.3.11.
+- Runtime and development dependencies, ESLint flat configuration, and GitHub Actions were upgraded to maintained releases.
+- Removed the unused `ora` runtime dependency.
+
+### Fixed
+- Stale release documentation that still described the project as unreleased.
+- Existing dead assignments surfaced by the updated lint toolchain.
+
+### Security
+- Updated the npm resolution graph to patched versions with zero `npm audit` findings.
+- Prevented manual release inputs from being interpolated directly into privileged workflow shell scripts.
 
 ## [2026.3.6] - 2026-03-06
 

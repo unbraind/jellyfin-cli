@@ -1,0 +1,29 @@
+id: jf-n0m4
+title: Prevent shell injection through manual release workflow inputs
+description: "Manual release workflows interpolate workflow_dispatch inputs directly into run-script source. A ref, tag, or confirmation value containing quotes or shell metacharacters can change the generated shell program. Pass all GitHub expression values through step-level environment variables, quote shell expansions, and add workflow lint/static validation."
+type: Issue
+status: closed
+priority: 0
+tags[4]: github-actions,release,security,workflow-injection
+created_at: "2026-07-16T16:51:57.099Z"
+updated_at: "2026-07-16T17:00:22.677Z"
+closed_at: "2026-07-16T17:00:22.676Z"
+author: codex
+acceptance_criteria: "No workflow_dispatch input is interpolated directly inside a run script.; Release confirmation, tag, ref, and metadata behavior remains unchanged for valid inputs."
+goal: jf-mqpo
+parent: jf-kpor
+severity: high
+environment: "GitHub Actions workflow_dispatch in release-github.yml, release-publish.yml, and release-prepare.yml"
+repro_steps: Inspect run blocks containing direct workflow input expression interpolation; supply a value containing a single quote and shell operator.
+resolution: "Moved confirmation, tag, and ref values into step environment variables and quoted all shell reads."
+expected_result: Dispatch inputs are data rather than generated shell source.
+actual_result: No workflow run block directly interpolates workflow_dispatch input expressions.
+customer_impact: An authorized workflow dispatcher can unintentionally or maliciously execute altered commands with release workflow permissions.
+notes[1]{created_at,author,text}:
+  "2026-07-16T17:00:05.312Z",codex,All workflow_dispatch values used by shell scripts now enter through step env variables; no direct input expressions remain inside run-script source.
+files[3]{path,scope,note}:
+  .github/workflows/release-github.yml,project,tag and confirmation input boundary
+  .github/workflows/release-publish.yml,project,publish confirmation boundary
+  .github/workflows/release-prepare.yml,project,release metadata ref boundary
+close_reason: Manual release input shell boundaries are hardened.
+body: ""

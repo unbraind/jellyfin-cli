@@ -34,26 +34,28 @@ jobs:
 
     steps:
       - name: Validate confirmation
+        env:
+          CONFIRM_RELEASE: ${{ inputs.confirm_release }}
         run: |
-          if [ "${{ inputs.confirm_release }}" != "YES_RELEASE" ]; then
+          if [ "$CONFIRM_RELEASE" != "YES_RELEASE" ]; then
             echo "Refusing release: confirm_release must be YES_RELEASE"
             exit 1
           fi
 
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           ref: ${{ inputs.ref }}
           fetch-depth: 0
 
       - name: Resolve release tag
         id: tag
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
         run: |
           set -euo pipefail
           VERSION="$(node -p 'require("./package.json").version')"
           EXPECTED_TAG="v${VERSION}"
-          INPUT_TAG='${{ inputs.tag }}'
-
           if [ -n "$INPUT_TAG" ]; then
             TAG="$INPUT_TAG"
           else
@@ -83,7 +85,7 @@ jobs:
           git push origin "${{ steps.tag.outputs.tag }}"
 
       - name: Create GitHub release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           tag_name: ${{ steps.tag.outputs.tag }}
           target_commitish: ${{ inputs.ref }}

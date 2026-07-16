@@ -1,0 +1,24 @@
+id: jf-fdh1
+title: Correct stale post-release documentation and runtime prerequisites
+description: "The release process and readiness guide still describe jellyfin-cli as unreleased and tell maintainers to keep the changelog in a first-release reset state despite published v2026.3.4 and v2026.3.6 releases. The dependency modernization also raises the supported runtime floor, which must be explicit in setup and contributor docs."
+type: Issue
+status: closed
+priority: 2
+tags[4]: documentation,maintenance,node,release
+created_at: "2026-07-16T16:55:50.930Z"
+updated_at: "2026-07-16T17:00:22.428Z"
+closed_at: "2026-07-16T17:00:22.427Z"
+author: codex
+acceptance_criteria: No active release documentation claims the project is pre-first-release.; Node and Bun prerequisites match CI and package metadata.; Session JSON and Toon playback fields are documented.
+goal: jf-mqpo
+parent: jf-kpor
+severity: medium
+environment: "README.md, CONTRIBUTING.md, docs/release-process.md, docs/release-readiness.md, docs/api.md, and docs/toon-format.md"
+resolution: "Documented Node 22.13 and Bun 1.3.11, corrected published-release lifecycle guidance, documented session playback formats, and updated the changelog."
+expected_result: "Maintainer and user docs reflect current runtime, output, and release state."
+actual_result: All identified stale release/runtime statements were corrected and the child Toon contract issue is closed.
+customer_impact: Maintainers can follow obsolete release instructions and users may install on unsupported Node versions or miss machine-readable playback behavior.
+notes[1]{created_at,author,text}:
+  "2026-07-16T17:00:05.556Z",codex,"Updated Node/Bun prerequisites,session output docs,release lifecycle language,release readiness guidance,and Unreleased changelog."
+close_reason: Release and runtime documentation is current.
+body: ""

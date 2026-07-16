@@ -8,7 +8,7 @@ Toon is a YAML-based structured output format that provides:
 
 - **Type Information**: Every output includes a `type` field
 - **Consistent Structure**: Predictable data organization
-- **Metadata**: Timestamp, format version, and other context
+- **Compact Envelope**: Stable `type` and `data` fields without synthetic metadata
 - **Human Readable**: YAML format is easy to read and debug
 - **Machine Parseable**: Easy to parse with any YAML library
 
@@ -18,10 +18,6 @@ Toon is a YAML-based structured output format that provides:
 type: <output_type>
 data:
   <structured_data>
-meta:
-  timestamp: <ISO_8601_timestamp>
-  format: toon
-  version: <semver>
 ```
 
 ## Getting Schemas
@@ -57,10 +53,6 @@ type: message
 data:
   message: "Operation completed successfully"
   success: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### error
@@ -75,10 +67,6 @@ data:
   details:
     itemId: "abc123"
   success: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### System Types
@@ -98,10 +86,6 @@ data:
   has_pending_restart: false
   can_self_restart: true
   web_socket_port: 8096
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### config
@@ -116,10 +100,6 @@ data:
   user_id: "user-1"
   timeout: 30000
   output_format: "toon"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### activity_log
@@ -135,10 +115,6 @@ data:
     date: "2024-01-01T00:00:00.000Z"
     user_id: "user-1"
     severity: "Info"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### User Types
@@ -164,10 +140,6 @@ data:
     is_hidden: false
     last_login: null
     has_password: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### user
@@ -197,10 +169,6 @@ data:
     enable_live_tv: true
     enable_playback: true
     enable_transcoding: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### user_policy
@@ -220,10 +188,6 @@ data:
   enable_video_playback_transcoding: true
   enable_content_deletion: false
   enable_all_folders: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### user_config
@@ -238,10 +202,6 @@ data:
   play_default_audio_track: true
   hide_played_in_latest: false
   enable_next_episode_auto_play: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Item Types
@@ -281,10 +241,6 @@ data:
     favorite: true
     play_count: 0
     unplayed_count: 62
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### item
@@ -372,10 +328,6 @@ data:
     position_ticks: 0
   child_count: null
   recursive_item_count: null
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### search_result
@@ -409,10 +361,6 @@ data:
       artists: null
       index: null
       parent_index: null
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### chapters
@@ -430,10 +378,6 @@ data:
     name: "Chapter 2"
     start_position_ticks: 36000000000
     has_image: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### filters
@@ -464,10 +408,6 @@ data:
   persons:
     - name: "Tom Hanks"
       id: "person-1"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Session Types
@@ -480,29 +420,25 @@ List of active sessions.
 type: sessions
 data:
   - id: "session-1"
-    user_id: "user-1"
-    user_name: "admin"
+    uid: "user-1"
+    user: "admin"
     client: "Jellyfin Web"
-    device_name: "Chrome"
-    device_id: "chrome-123"
-    application_version: "10.8.13"
-    last_activity: "2024-01-01T00:00:00.000Z"
-    is_active: true
-    supports_remote_control: true
-    now_playing:
+    device: "Chrome"
+    rc: true
+    active: true
+    is_playing: true
+    now:
       id: "item-1"
       name: "The Matrix"
       type: "Movie"
-    play_state:
-      is_paused: false
-      is_muted: false
-      position_ticks: 36000000000
-      repeat_mode: "RepeatNone"
-      shuffle: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
+    rt: 81600000000
+    state:
+      paused: false
+      muted: false
+    pos: 36000000000
+    vol: 80
+    method: DirectPlay
+    repeat: RepeatNone
 ```
 
 #### session
@@ -513,51 +449,26 @@ Single session details.
 type: session
 data:
   id: "session-1"
-  user_id: "user-1"
-  user_name: "admin"
+  uid: "user-1"
+  user: "admin"
   client: "Jellyfin Web"
-  device_name: "Chrome"
-  device_id: "chrome-123"
-  application_version: "10.8.13"
-  last_activity: "2024-01-01T00:00:00.000Z"
-  last_playback_check_in: "2024-01-01T00:00:00.000Z"
-  is_active: true
-  supports_remote_control: true
-  supports_media_control: true
-  remote_endpoint: "192.168.1.50"
-  playable_media_types:
-    - "Audio"
-    - "Video"
-  capabilities:
-    playable_media_types:
-      - "Audio"
-      - "Video"
-    supported_commands:
-      - "VolumeUp"
-      - "VolumeDown"
-      - "Mute"
-      - "Unpause"
-    supports_media_control: true
-  now_playing:
+  device: "Chrome"
+  ver: "10.8.13"
+  active: "2024-01-01T00:00:00.000Z"
+  rc: true
+  is_playing: true
+  now:
     id: "item-1"
     name: "The Matrix"
     type: "Movie"
-    run_time_ticks: 82800000000
-  play_state:
-    is_paused: false
-    is_muted: false
-    position_ticks: 36000000000
-    can_seek: true
-    volume_level: 80
-    audio_stream_index: 1
-    subtitle_stream_index: 2
-    repeat_mode: "RepeatNone"
-    playback_order: "Default"
-  now_playing_queue: []
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
+  rt: 82800000000
+  state:
+    paused: false
+    muted: false
+  pos: 36000000000
+  vol: 80
+  method: DirectPlay
+  repeat: RepeatNone
 ```
 
 ### Library Types
@@ -581,10 +492,6 @@ data:
     locations:
       - "/media/tvshows"
     refresh_status: "Idle"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Task Types
@@ -613,10 +520,6 @@ data:
         interval_ticks: 864000000000
         time_of_day_ticks: null
         day_of_week: null
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### task
@@ -634,10 +537,6 @@ data:
   description: "Scans your media library for new files"
   current_progress: 45
   is_hidden: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### task_triggers
@@ -655,10 +554,6 @@ data:
     type: "DailyTrigger"
     time_of_day_ticks: 216000000000
     max_runs: null
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Plugin Types
@@ -680,10 +575,6 @@ data:
     version: "2.0.0"
     status: "Active"
     description: "Track playback activity"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Media Types
@@ -703,10 +594,6 @@ data:
       supports_direct_play: true
       supports_direct_stream: true
       supports_transcoding: true
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### stream_url
@@ -718,10 +605,6 @@ type: stream_url
 data:
   url: "http://server:8096/videos/item-1/stream?..."
   item_id: "item-1"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### audio_url
@@ -733,10 +616,6 @@ type: audio_url
 data:
   url: "http://server:8096/audio/item-1/stream?..."
   item_id: "item-1"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### subtitle_url
@@ -749,10 +628,6 @@ data:
   url: "http://server:8096/videos/item-1/subtitles/2?..."
   item_id: "item-1"
   stream_index: 2
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### image_url
@@ -764,10 +639,6 @@ type: image_url
 data:
   url: "http://server:8096/Items/item-1/Images/Primary?..."
   item_id: "item-1"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ### Other Types
@@ -787,10 +658,6 @@ data:
         name: "The Matrix Reloaded"
       - id: "item-3"
         name: "The Matrix Revolutions"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### item_counts
@@ -805,10 +672,6 @@ data:
   episodes: 2500
   albums: 200
   songs: 3000
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 #### live_tv_info
@@ -825,10 +688,6 @@ data:
   guide_info:
     last_update: "2024-01-01T00:00:00.000Z"
     status: "Ok"
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 ## Parsing Examples
@@ -910,11 +769,6 @@ import { execSync } from 'child_process';
 interface ToonOutput<T> {
   type: string;
   data: T;
-  meta: {
-    timestamp: string;
-    format: 'toon';
-    version: string;
-  };
 }
 
 interface SearchHint {
@@ -957,10 +811,6 @@ data:
   code: 404
   details: {}
   success: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
 ```
 
 Always check the `type` field to determine how to process the output.

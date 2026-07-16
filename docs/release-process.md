@@ -1,7 +1,6 @@
 # Release Process
 
-This project has not had a public release yet.
-Use this process for the first release and all future releases.
+Use this process for every release after the current published baseline.
 
 ## 1) Preconditions
 

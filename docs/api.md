@@ -746,6 +746,16 @@ jf sessions list [-f format]
 
 Output type: `sessions`
 
+The requested global or command-local format is honored. JSON, YAML, table, raw, and Markdown
+retain the Jellyfin session fields and add `isPlaying`, derived from the presence of
+`NowPlayingItem`. Toon emits the equivalent compact `is_playing` field plus current item and
+play-state details. Both flag positions are supported:
+
+```bash
+jf --format json sessions list
+jf sessions list --format json
+```
+
 ### sessions get
 
 Get session by ID.

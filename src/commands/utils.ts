@@ -134,14 +134,21 @@ export function formatSessions(sessions: SessionInfo[], format: OutputFormat): s
   if (format === 'toon') {
     return toon.formatSessions(sessions);
   }
-  return formatOutput(sessions, format, 'sessions');
+  return formatOutput(sessions.map(withPlaybackIndicator), format, 'sessions');
 }
 
 export function formatSession(session: SessionInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSession(session);
   }
-  return formatOutput(session, format, 'session');
+  return formatOutput(withPlaybackIndicator(session), format, 'session');
+}
+
+function withPlaybackIndicator(session: SessionInfo): SessionInfo & { isPlaying: boolean } {
+  return {
+    ...session,
+    isPlaying: session.NowPlayingItem !== undefined && session.NowPlayingItem !== null,
+  };
 }
 
 export function formatLibraries(libraries: LibraryVirtualFolder[], format: OutputFormat): string {

@@ -1,0 +1,27 @@
+id: jf-w5ow
+title: Align Toon documentation with the emitted type and data envelope
+description: "The Toon guide promises a meta object containing timestamp, format, and version, and repeats it in 31 examples. The actual formatter emits only the stable type and compact data envelope. This false contract can break consumers that require nonexistent fields."
+type: Issue
+status: closed
+priority: 1
+tags[4]: agents,documentation,output-contract,toon
+created_at: "2026-07-16T16:57:06.816Z"
+updated_at: "2026-07-16T17:00:22.194Z"
+closed_at: "2026-07-16T17:00:22.193Z"
+author: codex
+acceptance_criteria: Overview and structure sections describe only type and data.; No example includes the nonexistent meta envelope.
+goal: jf-mqpo
+parent: jf-fdh1
+severity: high
+environment: docs/toon-format.md versus src/formatters/base.ts
+resolution: "Removed all 31 nonexistent meta examples, corrected the overview and TypeScript interface, and retained the canonical type/data contract."
+expected_result: Documentation demonstrates only fields emitted by formatToon.
+actual_result: Guide and formatter are aligned; repository search finds no stale meta envelope claims.
+customer_impact: Automation may reject valid CLI output or rely on timestamp/version fields that are always absent.
+notes[1]{created_at,author,text}:
+  "2026-07-16T17:00:05.814Z",codex,"Removed the nonexistent meta contract from the guide overview,TypeScript interface,and all 31 repeated output examples."
+files[2]{path,scope,note}:
+  docs/toon-format.md,project,public Toon output contract
+  src/formatters/base.ts,project,canonical formatter implementation
+close_reason: Toon guide now matches the emitted compact envelope.
+body: ""

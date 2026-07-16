@@ -1,0 +1,23 @@
+id: jf-mkzh
+title: Ratchet command-layer coverage above the 59 percent baseline
+description: "The July 16 modernization run established 888 passing tests and 59.26% aggregate line coverage. Core API and formatter modules are near-complete, but many Commander action callbacks are exercised only by optional live-server E2E tests and remain low-coverage in isolated CI. Add dependency-injected command harnesses in coherent slices, establish a non-regressing coverage floor, and raise it incrementally without requiring live Jellyfin credentials."
+type: Feature
+status: open
+priority: 2
+tags[4]: coverage,quality,roadmap,testing
+created_at: "2026-07-16T17:00:03.971Z"
+updated_at: "2026-07-16T17:00:03.971Z"
+author: codex
+acceptance_criteria: Record and enforce a non-regressing baseline for functions and lines.; Add isolated command tests by domain until aggregate line coverage exceeds 80 percent.; Keep changed command/formatter modules at or near 100 percent and retain read-only live E2E coverage.
+goal: jf-mqpo
+value: Prevent regressions in user-facing command orchestration while preserving fast isolated CI.
+impact: "Makes global option propagation, validation, error formatting, and request wiring measurable across every command family."
+outcome: A ratcheted repository-wide coverage policy with command modules covered by isolated tests and live E2E retained as supplemental proof.
+parent: jf-mqpo
+risk: medium
+confidence: high
+notes[1]{created_at,author,text}:
+  "2026-07-16T17:00:03.971Z",codex,"Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
+tests[1]{command,path,scope,timeout_seconds}:
+  "bun run test:coverage",package.json,project,1200
+body: ""
