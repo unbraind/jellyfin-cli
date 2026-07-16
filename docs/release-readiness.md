@@ -164,6 +164,7 @@ bun run check:secrets:history
 Confirm there are no local credential files or private values staged for commit.
 If you set temporary env vars in your shell, clear them before release (`unset JELLYFIN_API_KEY JELLYFIN_PASSWORD`).
 
-## 8) Changelog state for first release
+## 8) Changelog state
 
-This repository is pre-1st-release. Keep [../CHANGELOG.md](../CHANGELOG.md) in the reset state until the first public release is cut.
+Keep an `Unreleased` section in [../CHANGELOG.md](../CHANGELOG.md), document user-visible and
+security-relevant changes there, and move those entries under the dated version when publishing.

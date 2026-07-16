@@ -4,6 +4,11 @@ An agent-optimized CLI tool for interacting with the Jellyfin API.
 
 > **Package Manager**: Development uses [Bun](https://bun.sh). Published package execution supports both `bunx` and `npx`.
 
+## Requirements
+
+- Node.js 22.13 or newer for installed/npm execution
+- Bun 1.3.11 or newer for source builds and contributor workflows
+
 ## Installation
 
 ```bash
@@ -303,7 +308,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 ### Sessions
 
-- `jf sessions list` - List all active sessions
+- `jf sessions list` - List active sessions with explicit playback state and current item details
 - `jf sessions get <sessionId>` - Get session by ID
 - `jf sessions play <sessionId> <itemIds...>` - Play items
 - `jf sessions pause <sessionId>` - Pause playback

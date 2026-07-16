@@ -243,6 +243,63 @@ describe('global CLI option propagation', () => {
     expect(parsed[0].Id).toBe('item-1');
   });
 
+  it('honors session list format before and after the subcommand and exposes playback state', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/Sessions': Response.json([
+          {
+            Id: 'session-1',
+            UserId: 'user-1',
+            UserName: 'steve',
+            Client: 'Jellyfin Web',
+            NowPlayingItem: {
+              Id: 'item-1',
+              Name: 'Episode One',
+              Type: 'Episode',
+              SeriesName: 'Example Series',
+            },
+            PlayState: { IsPaused: false, PositionTicks: 12345 },
+          },
+        ]),
+      },
+      fetch() {
+        return new Response('Not Found', { status: 404 });
+      },
+    });
+
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(
+      join(testConfigDir, 'settings.json'),
+      JSON.stringify({
+        defaultServer: {
+          serverUrl: `http://127.0.0.1:${mockServer.port}`,
+          apiKey: 'test-api-key',
+          userId: 'user-1',
+          outputFormat: 'toon',
+        },
+      }),
+      'utf-8',
+    );
+
+    for (const args of [
+      ['--format', 'json', 'sessions', 'list'],
+      ['sessions', 'list', '--format', 'json'],
+    ]) {
+      const result = await runCli(args);
+      expect(result.code).toBe(0);
+      const parsed = JSON.parse(result.stdout);
+      expect(parsed[0].Id).toBe('session-1');
+      expect(parsed[0].isPlaying).toBe(true);
+      expect(parsed[0].NowPlayingItem).toMatchObject({
+        Id: 'item-1',
+        Name: 'Episode One',
+        Type: 'Episode',
+      });
+      expect(parsed[0].PlayState.IsPaused).toBe(false);
+    }
+  });
+
   it('applies global --format json to config doctor output', async () => {
     mockServer = Bun.serve({
       port: 0,

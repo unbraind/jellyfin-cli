@@ -1,0 +1,31 @@
+{
+  "definitions": [
+    {
+      "name": "Goal",
+      "folder": "goals",
+      "aliases": [
+        "goal"
+      ],
+      "description": "Strategic project outcome grouping epics and measurable work",
+      "default_status": "open"
+    },
+    {
+      "name": "Spike",
+      "folder": "spikes",
+      "aliases": [
+        "research-spike"
+      ],
+      "description": "Time-boxed investigation used to reduce uncertainty before implementation.",
+      "default_status": "open"
+    },
+    {
+      "name": "Story",
+      "folder": "stories",
+      "aliases": [
+        "user-story"
+      ],
+      "description": "User-facing outcome or capability slice expressed from a stakeholder perspective.",
+      "default_status": "open"
+    }
+  ]
+}

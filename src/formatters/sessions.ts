@@ -9,16 +9,24 @@ export function formatSessions(sessions: SessionInfo[]): string {
     client: s.Client,
     device: s.DeviceName,
     rc: s.SupportsRemoteControl,
+    active: s.IsActive,
+    is_playing: s.NowPlayingItem !== undefined && s.NowPlayingItem !== null,
     now: s.NowPlayingItem ? {
       id: s.NowPlayingItem.Id,
       name: s.NowPlayingItem.Name,
       type: s.NowPlayingItem.Type,
+      series: s.NowPlayingItem.SeriesName,
+      season: s.NowPlayingItem.ParentIndexNumber,
+      episode: s.NowPlayingItem.IndexNumber,
     } : undefined,
+    rt: s.NowPlayingItem?.RunTimeTicks,
     state: s.PlayState ? {
       paused: s.PlayState.IsPaused,
       muted: s.PlayState.IsMuted,
     } : undefined,
     pos: s.PlayState?.PositionTicks,
+    vol: s.PlayState?.VolumeLevel,
+    method: s.PlayState?.PlayMethod,
     repeat: s.PlayState?.RepeatMode,
     shuffle: s.PlayState?.PlaybackOrder === 'Shuffle' ? true : undefined,
   })), 'sessions');
@@ -34,10 +42,14 @@ export function formatSession(session: SessionInfo): string {
     ver: session.ApplicationVersion,
     active: session.LastActivityDate,
     rc: session.SupportsRemoteControl,
+    is_playing: session.NowPlayingItem !== undefined && session.NowPlayingItem !== null,
     now: session.NowPlayingItem ? {
       id: session.NowPlayingItem.Id,
       name: session.NowPlayingItem.Name,
       type: session.NowPlayingItem.Type,
+      series: session.NowPlayingItem.SeriesName,
+      season: session.NowPlayingItem.ParentIndexNumber,
+      episode: session.NowPlayingItem.IndexNumber,
     } : undefined,
     rt: session.NowPlayingItem?.RunTimeTicks,
     state: session.PlayState ? {
@@ -46,6 +58,7 @@ export function formatSession(session: SessionInfo): string {
     } : undefined,
     pos: session.PlayState?.PositionTicks,
     vol: session.PlayState?.VolumeLevel,
+    method: session.PlayState?.PlayMethod,
     repeat: session.PlayState?.RepeatMode,
   }, 'session');
 }

@@ -223,7 +223,7 @@ export function addConfigDoctorCommand(cmd: Command): void {
       }
 
       const client = new JellyfinApiClient(config);
-      let connectionOk = false;
+      let connectionOk: boolean;
       let authOk = false;
       let serverName: string | null | undefined;
       let serverVersion: string | null | undefined;

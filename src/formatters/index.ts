@@ -69,7 +69,7 @@ function formatMarkdownTable(items: unknown[]): string {
 }
 
 function formatTable(data: unknown): string {
-  let tableData: unknown[] = [];
+  let tableData: unknown[];
   
   if (Array.isArray(data)) {
     tableData = data;

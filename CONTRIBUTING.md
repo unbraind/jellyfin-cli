@@ -4,6 +4,8 @@ Thanks for contributing.
 
 ## Development setup
 
+Use Node.js 22.13 or newer and Bun 1.3.11 or newer.
+
 ```bash
 bun install
 bun run dev --help

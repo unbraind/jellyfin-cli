@@ -1,0 +1,16 @@
+id: jf-zifk
+title: "Security, dependency, correctness, and governance remediation"
+description: "Coordinated remediation tranche covering the current GitHub dependency-alert backlog, stale dependency PRs, session-output correctness issue #23, workflow modernization, deeper repository audit findings, and end-to-end release proof."
+type: Epic
+status: in_progress
+priority: 0
+tags[5]: ci,correctness,dependencies,pm,security
+created_at: "2026-07-16T16:49:03.778Z"
+updated_at: "2026-07-16T16:49:03.778Z"
+author: codex
+acceptance_criteria: "All current Dependabot alerts are closed by patched dependency resolutions.; Issue #23 has regression tests and correct human/machine-readable output.; Repository checks, package smoke tests, and GitHub checks pass on the pushed head."
+goal: jf-mqpo
+parent: jf-mqpo
+risk: high
+confidence: high
+body: ""

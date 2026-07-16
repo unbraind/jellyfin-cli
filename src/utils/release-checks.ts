@@ -60,8 +60,7 @@ export function countCodeLines(content: string): number {
       inBlockComment = false;
     }
 
-    let hasInlineComments = true;
-    while (hasInlineComments) {
+    while (true) {
       const blockStart = current.indexOf('/*');
       const lineComment = current.indexOf('//');
 
@@ -71,7 +70,6 @@ export function countCodeLines(content: string): number {
       }
 
       if (blockStart === -1) {
-        hasInlineComments = false;
         break;
       }
 

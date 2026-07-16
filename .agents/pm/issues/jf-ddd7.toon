@@ -1,0 +1,27 @@
+id: jf-ddd7
+title: Fix sessions list output format and active playback fields
+description: "GitHub issue #23 reports that sessions list bypasses the global output-format contract and omits active playback data. Reproduce against command wiring and formatters, route results through the shared output formatter, preserve machine-readable formats, and expose useful NowPlayingItem/PlayState details without leaking sensitive fields."
+type: Issue
+status: in_progress
+priority: 1
+tags[4]: bug,github-23,output-format,sessions
+created_at: "2026-07-16T16:49:04.255Z"
+updated_at: "2026-07-16T17:00:04.524Z"
+author: codex
+acceptance_criteria: "JSON, YAML, TOON, table, and default output follow the shared output contract.; Active playback fields are present when supplied and absent safely when not supplied.; Focused regression tests cover both formatting and playback projection."
+goal: jf-mqpo
+parent: jf-zifk
+severity: high
+environment: jellyfin-cli v2026.3.6 on main
+repro_steps: Run sessions list with --output json or another global format; observe human-specific rendering and missing playback details.
+expected_result: sessions list honors the requested global format and reports active playback fields consistently.
+actual_result: output format is ignored and active playback context is omitted.
+customer_impact: Agents cannot reliably parse session state and operators cannot see current playback context.
+notes[2]{created_at,author,text}:
+  "2026-07-16T16:49:04.255Z",codex,"Source: https://github.com/unbraind/jellyfin-cli/issues/23"
+  "2026-07-16T17:00:04.494Z",codex,"Regression proof: focused session/global-option suite passes 15 tests; global and command-local JSON flags both parse,expose isPlaying,preserve NowPlayingItem,and include PlayState.IsPaused."
+files[1]{path,scope,note}:
+  src/commands/sessions.ts,project,session command implementation
+tests[1]{command,path,scope}:
+  bun test tests/formatters/sessions.test.ts tests/commands,tests,project
+body: ""
