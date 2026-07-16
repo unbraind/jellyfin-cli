@@ -2,15 +2,22 @@ id: jf-zifk
 title: "Security, dependency, correctness, and governance remediation"
 description: "Coordinated remediation tranche covering the current GitHub dependency-alert backlog, stale dependency PRs, session-output correctness issue #23, workflow modernization, deeper repository audit findings, and end-to-end release proof."
 type: Epic
-status: in_progress
+status: closed
 priority: 0
 tags[5]: ci,correctness,dependencies,pm,security
 created_at: "2026-07-16T16:49:03.778Z"
-updated_at: "2026-07-16T16:49:03.778Z"
+updated_at: "2026-07-16T17:08:50.812Z"
+closed_at: "2026-07-16T17:08:50.811Z"
 author: codex
 acceptance_criteria: "All current Dependabot alerts are closed by patched dependency resolutions.; Issue #23 has regression tests and correct human/machine-readable output.; Repository checks, package smoke tests, and GitHub checks pass on the pushed head."
 goal: jf-mqpo
 parent: jf-mqpo
 risk: high
 confidence: high
+resolution: Delivered the coordinated remediation tranche and verified all direct children on the merged default branch.
+expected_result: "Zero actionable alerts, fixed issue #23, green release validation, and durable repository-local pm tracking."
+actual_result: "All direct children closed; GitHub queues and alerts are empty; merged-head validate:release passes."
+notes[1]{created_at,author,text}:
+  "2026-07-16T17:08:50.243Z",codex,Remediation tranche delivered by PR #25 at merge daa3eee. All four direct child work items are closed with item-specific evidence; live GitHub security and work queues are empty.
+close_reason: "Security, dependency, correctness, workflow, documentation, and governance remediation shipped in PR #25."
 body: ""
