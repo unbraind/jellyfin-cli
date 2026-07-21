@@ -1,3 +1,6 @@
+/**
+ * Defines the user dto contract used across typed Jellyfin boundaries.
+ */
 export interface UserDto {
   Name?: string | null;
   ServerId?: string | null;
@@ -13,6 +16,21 @@ export interface UserDto {
   Policy?: UserPolicy;
 }
 
+/**
+ * Response returned by Jellyfin after username/password authentication.
+ * The access token authorizes subsequent requests while `User` identifies the
+ * authenticated account. All fields are nullable in Jellyfin's OpenAPI schema.
+ */
+export interface AuthenticationResult {
+  User?: UserDto | null;
+  SessionInfo?: SessionInfo | null;
+  AccessToken?: string | null;
+  ServerId?: string | null;
+}
+
+/**
+ * Defines the user configuration contract used across typed Jellyfin boundaries.
+ */
 export interface UserConfiguration {
   PlayDefaultAudioTrack?: boolean;
   SubtitleLanguagePreference?: string | null;
@@ -25,6 +43,9 @@ export interface UserConfiguration {
   EnableNextEpisodeAutoPlay?: boolean;
 }
 
+/**
+ * Defines the user policy contract used across typed Jellyfin boundaries.
+ */
 export interface UserPolicy {
   IsAdministrator?: boolean;
   IsHidden?: boolean;
@@ -43,4 +64,8 @@ export interface UserPolicy {
   EnablePlaybackRemuxing?: boolean;
 }
 
+/**
+ * Represents the subtitle playback mode values accepted by the typed Jellyfin interface.
+ */
 export type SubtitlePlaybackMode = 'Default' | 'Always' | 'OnlyForced' | 'None' | 'Smart';
+import type { SessionInfo } from './sessions.js';

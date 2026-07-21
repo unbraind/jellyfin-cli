@@ -12,6 +12,10 @@ import type { ItemsQueryParams } from '../types/index.js';
 import { addMetadataCommands } from './items-metadata.js';
 import { parseNonNegativeInt, parsePositiveInt } from './number-options.js';
 
+/**
+ * Builds the items command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createItemsCommand(): Command {
   const cmd = new Command('items');
 

@@ -1,3 +1,6 @@
+/**
+ * Defines the api key info contract used across typed Jellyfin boundaries.
+ */
 export interface ApiKeyInfo {
   Id?: number | null;
   AccessToken?: string | null;
@@ -11,6 +14,9 @@ export interface ApiKeyInfo {
   DateLastActivity?: string | null;
 }
 
+/**
+ * Defines the api key creation contract used across typed Jellyfin boundaries.
+ */
 export interface ApiKeyCreation {
   Name?: string | null;
   AppName?: string | null;

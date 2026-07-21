@@ -59,6 +59,10 @@ function addNamedImageUrlCommand(
     });
 }
 
+/**
+ * Builds the images command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createImagesCommand(): Command {
   const cmd = new Command('images');
 

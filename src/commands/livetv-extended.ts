@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Implements attach livetv extended commands for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachLivetvExtendedCommands(cmd: Command): void {
   cmd
     .command('create-timer')

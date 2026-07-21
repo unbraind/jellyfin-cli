@@ -267,6 +267,10 @@ async function runSetup(thisCommand: Command, options: SetupCommandOptions): Pro
   }
 }
 
+/**
+ * Builds the setup command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createSetupCommand(): Command {
   const cmd = new Command('setup');
 

@@ -60,6 +60,14 @@ jf setup [options]
 | `--timeout <ms>` | Persist request timeout |
 | `-o, --output-format <format>` | Persist default output format |
 
+Username/password authentication sends Jellyfin's required `MediaBrowser`
+client-identification header to `/Users/AuthenticateByName`, unwraps the
+documented `AuthenticationResult`, and keeps the returned access token only in
+the running process unless setup is explicitly saving a profile. For CI and
+other ephemeral automation, prefer `JELLYFIN_USERNAME` and
+`JELLYFIN_PASSWORD`; avoid putting passwords on command lines or in tracked
+files. API keys remain the recommended non-interactive credential.
+
 ### setup wizard
 
 Explicit alias of `setup` that runs the same setup flow and options.

@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { formatMessage, formatSystemInfo, formatToon } from './utils.js';
 
+/**
+ * Builds the system command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createSystemCommand(): Command {
   const cmd = new Command('system');
 

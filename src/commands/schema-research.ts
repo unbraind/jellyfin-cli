@@ -104,6 +104,10 @@ function buildCoverageSnapshot(
   };
 }
 
+/**
+ * Implements attach schema research subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSchemaResearchSubcommand(cmd: Command): void {
   cmd
     .command('research')
@@ -173,6 +177,8 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
 
         const data = {
           source_path: result.sourcePath,
+          source_kind: result.sourceKind,
+          cache_path: result.cachePath ?? null,
           server_url: config.serverUrl,
           server_version: summary.serverVersion,
           path_count: summary.pathCount,

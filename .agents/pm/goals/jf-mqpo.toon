@@ -6,11 +6,245 @@ status: open
 priority: 0
 tags[4]: governance,maintenance,quality,security
 created_at: "2026-07-16T16:49:03.573Z"
-updated_at: "2026-07-16T16:49:03.573Z"
+updated_at: "2026-07-21T20:10:31.162Z"
 author: codex
+estimated_minutes: 10080
 acceptance_criteria: "Repository-local .agents/pm is initialized and committed with durable .toon items and .jsonl history.; All actionable security, dependency, code, CI, and documentation findings are fixed or explicitly documented with rationale.; The final pushed head passes the complete release verification surface."
 value: Protect users and maintainers while keeping the agent-oriented Jellyfin CLI dependable and releasable.
 impact: "Eliminates known dependency exposure, fixes user-visible output defects, and creates durable project lineage."
 outcome: "Zero actionable dependency alerts, green release validation, resolved product defects, and complete repository-local pm history."
 why_now: GitHub reports critical/high dependency alerts and issue #23 documents broken session output behavior.
+comments[2]{created_at,author,text}:
+  "2026-07-21T19:52:52.955Z",codex-jellyfin,"The full project graph is connected (38 nodes, 56 edges, no active isolates or sparse active nodes). This delivery lane has verified the local Jellyfin 10.11.11 contract safely; production readiness is not claimed while coverage and remaining quality-gate features are still active."
+  "2026-07-21T20:04:32.102Z",codex-jellyfin,"Project ownership validation is now complete: all 206 curated repository artifacts are linked through this goal, required metadata is complete, pm validation has no warnings, and the 38-node relationship graph has no audit findings. Four implementation/interface items closed with exact acceptance evidence; coverage and the full static-analysis matrix remain active."
+files[212]{path,scope,note}:
+  .github/workflows/auto-release.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  .github/workflows/ci.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  .github/workflows/codeql.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  .github/workflows/commit-quality.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  .github/workflows/release.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  .github/workflows/secret-scan.yml,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  bun.lock,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  eslint.config.js,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  LICENSE,project,Project license governed by the production-readiness goal
+  package-lock.json,project,Project-wide npm compatibility lockfile governed by the production-readiness goal
+  package.json,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/check-file-length.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/check-secrets-history.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/check-secrets.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release-version.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/check-changelog.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/ensure-pm-changelog.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/generate-release-notes.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/release-relevance.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/release.test.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/run-release-pipeline.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/utils.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  scripts/release/verify-published-release.mjs,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/base.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/channels.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/client-ext.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/client.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/collections.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/core-api.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/dashboard.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/images.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/items.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/library.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/livetv.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/media.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/musicgenres.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/packages.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/playlists.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/plugins-ext.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/suggestions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/syncplay.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/system.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/trickplay.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/tvshows.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/types.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/userdata.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/users.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/api/years.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/cli-program.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/cli.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/apikeys.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/artists.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/auth.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/backup.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/branding.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/channels.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/clientlog.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/collections.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/config-doctor.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/config.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/dashboard.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/devices.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/discover.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/environment.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/favorites.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/fonts.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/genres.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/images.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/index.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/items-metadata.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/items.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/library-notify.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/library.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/live-streams.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/livetv-admin.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/livetv-extended.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/livetv.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/localization.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/media-urls.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/media.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/music-genres.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/notifications.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/number-options.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/packages.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/persons.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/playlists.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/plugins-ext.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/plugins.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/quickconnect.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/reports.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-coverage-command.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-coverage.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-defs.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-research.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-suggest.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-utils.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema-validate.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/schema.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/sessions-reporting.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/sessions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup-env.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup-startup.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup-status.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup-utils.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup-validate.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/setup.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/stats.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/studios.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/subtitles.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/suggestions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/syncplay.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/system.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/tasks.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/trailers.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/trickplay.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/tvshows.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/usage-stats.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/userdata.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/users-admin.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/users.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/utils.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/videos.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/commands/years.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/base.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/index.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/items.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/sessions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/system.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/formatters/toon.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/index.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/apikeys.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/common.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/config.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/devices.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/extended.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/index.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/items.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/library-admin.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/library.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/media.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/notifications.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/playback.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/plugins.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/profiles.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/server.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/sessions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/system.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/tasks.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/types/user.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/config.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/explain.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/github-star.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/openapi-intent.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/openapi-source.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/openapi-suggestions.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/openapi-tokenize.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/openapi.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/output-format.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/read-only-guard.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/read-only-policy.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/release-checks.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/schema-validate.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  src/utils/tool-schema.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/client-coverage.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/client-extended.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/client-full.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/client-missing-lines.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/client.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/images-packages.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v10.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v11.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v2.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v3.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v4.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v5.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v6.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v7.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v8.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features-v9.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/new-features.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/startup-state.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/api/submodules.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/cli-github-star-hook.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/config.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/global-options.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/help-global-options-all.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/help-global-options.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/items-options.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/schema-research.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/schema-suggest.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/schema.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/setup-env-file.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/setup-utils.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/setup.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/trickplay.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/usage-stats.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/commands/years.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/e2e/cli.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/formatters/base.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/formatters/formatters-coverage.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/formatters/index.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/formatters/sessions.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/formatters/toon.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/config.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/explain.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/github-star.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/openapi-tokenize.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/openapi.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/output-format.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/read-only-guard.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/release-checks.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+  tests/utils/schema-validate.test.ts,project,Project-wide implementation and executable quality surface governed by the production-readiness goal
+docs[16]{path,scope,note}:
+  AGENTS.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  CHANGELOG.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  CODE_OF_CONDUCT.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  CONTRIBUTING.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/agent-integration.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/api-research.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/api.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/README.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/release-process.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/release-readiness.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/RELEASING.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/security.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/toon-format.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  docs/troubleshooting.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  README.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
+  SECURITY.md,project,"Project-wide user, contributor, security, release, and agent documentation governed by the production-readiness goal"
 body: ""

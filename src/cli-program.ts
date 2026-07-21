@@ -1,4 +1,4 @@
-import { Command } from 'commander';
+import { Command, Help, type Option } from 'commander';
 import {
   buildReadOnlyError,
   getCommandPath,
@@ -68,13 +68,38 @@ type CliProgramDeps = {
   promptGithubStar?: () => Promise<void> | void;
 };
 
+class DeduplicatedGlobalOptionsHelp extends Help {
+  /**
+   * Lists inherited options while omitting flags already documented locally.
+   * @param command - The command whose inherited options are being rendered.
+   * @returns Inherited options with local short/long flag collisions removed.
+   */
+  override visibleGlobalOptions(command: Command): Option[] {
+    const localFlags = new Set(
+      this.visibleOptions(command).flatMap((option) => [option.short, option.long].filter(Boolean)),
+    );
+    return super.visibleGlobalOptions(command).filter(
+      (option) => !localFlags.has(option.short) && !localFlags.has(option.long),
+    );
+  }
+}
+
 function enableGlobalHelpOptions(command: Command): void {
-  command.configureHelp({ showGlobalOptions: true });
+  command.createHelp = () => {
+    const help = new DeduplicatedGlobalOptionsHelp();
+    help.showGlobalOptions = true;
+    return help;
+  };
   for (const subcommand of command.commands) {
     enableGlobalHelpOptions(subcommand);
   }
 }
 
+/**
+ * Builds the complete CLI command tree with inherited formatting, safety, and diagnostic options.
+ * @param deps - Optional side-effect hooks used by the executable and isolated tests.
+ * @returns The configured Commander root command.
+ */
 export function createProgram(deps: CliProgramDeps = {}): Command {
   const promptGithubStarHook = deps.promptGithubStar ?? promptGithubStar;
   const program = new Command();

@@ -1,0 +1,44 @@
+id: jf-sylm
+title: Verify and document the complete read-only jf-cli interface
+description: "Exercise the actual globally linked jf-cli command across setup, auth, global help, schema mapping, all formatters, and representative safe Jellyfin reads; refresh docs with sanitized current evidence and agent guidance."
+type: Task
+status: closed
+priority: 1
+tags[6]: agents,docs,e2e,help,read-only,toon
+created_at: "2026-07-21T19:00:06.374Z"
+updated_at: "2026-07-21T20:04:00.973Z"
+closed_at: "2026-07-21T20:04:00.073Z"
+author: codex-jellyfin
+estimated_minutes: 180
+acceptance_criteria: Every top-level and nested command exposes help with global options; Toon remains default and JSON/YAML/Markdown/Table/Raw outputs validate; The complete live E2E suite passes with JELLYFIN_READ_ONLY=1; API research docs reflect Jellyfin 10.11.11 and exact measured coverage
+goal: jf-mqpo
+value: Make the CLI predictable for both interactive users and autonomous agents.
+impact: Reduces unsafe guesses and malformed pipeline output.
+outcome: Sanitized documentation and executable evidence for the complete command interface.
+why_now: The existing research snapshot targets 10.11.6 and is stale relative to the configured 10.11.11 server.
+parent: jf-gn5j
+reviewer: maintainer
+risk: medium
+confidence: high
+sprint: jellyfin-10.11.11
+resolution: "Global help is deduplicated and discoverable; every output format is validated; setup, schema, authentication, and representative API reads are documented and executable."
+expected_result: Humans and agents can discover and safely automate the complete current CLI command interface.
+actual_result: "All help contract tests pass, six output formats parse, setup and schema diagnostics pass, and the compiled read-only suite passes 177 of 177 cases."
+dependencies[2]{id,kind,created_at,author,source_kind}:
+  jf-lpki,related_to,"2026-07-21T19:50:09.738Z",codex-jellyfin,null
+  jf-mkzh,related_to,"2026-07-21T19:50:09.738Z",codex-jellyfin,null
+comments[2]{created_at,author,text}:
+  "2026-07-21T19:00:06.374Z",codex-jellyfin,Live tests are restricted to GET/HEAD/OPTIONS and commands explicitly classified as read-only.
+  "2026-07-21T19:52:51.103Z",codex-jellyfin,"Agent-interface verification now includes one-copy global options in every command help screen, validated Toon/JSON/YAML/Markdown/Table/Raw output, jq/YAML/Toon parsing, schema coverage, configuration diagnostics, and a 177-test compiled read-only server acceptance run."
+files[2]{path,scope,note}:
+  src/cli-program.ts,project,Deduplicated inherited global option help
+  src/utils/openapi-source.ts,project,Agent-visible schema provenance
+tests[2]{command,path,scope,timeout_seconds}:
+  bun test tests/commands/help-global-options.test.ts tests/commands/help-global-options-all.test.ts,tests/commands/help-global-options-all.test.ts,project,120
+  JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts,tests/e2e/cli.test.ts,project,300
+docs[3]{path,scope,note}:
+  docs/api-research.md,project,Sanitized Jellyfin 10.11.11 acceptance evidence
+  docs/release-readiness.md,project,Installed-binary and format validation runbook
+  README.md,project,Safe auth and exact coverage positioning
+close_reason: "Completed the sanitized, compiled, read-only Jellyfin 10.11.11 interface acceptance pass."
+body: ""

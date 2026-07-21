@@ -10,6 +10,11 @@ function normalizedPath(command: Command): string {
     .toLowerCase();
 }
 
+/**
+ * Retrieves or derives command path without mutating Jellyfin state.
+ * @param command - The Commander command whose path or behavior is inspected.
+ * @returns - The normalized string representation.
+ */
 export function getCommandPath(command: Command): string {
   const parts: string[] = [];
   let cursor: Command | null = command;
@@ -25,6 +30,12 @@ export function getCommandPath(command: Command): string {
   return parts.reverse().join(' ').trim();
 }
 
+/**
+ * Produces the validated is read only mode enabled result used by CLI automation.
+ * @param option - The option value required by this operation.
+ * @param envValue - The env value value required by this operation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function isReadOnlyModeEnabled(option: unknown, envValue: string | undefined): boolean {
   if (typeof option === 'boolean' && option) {
     return true;
@@ -38,6 +49,11 @@ export function isReadOnlyModeEnabled(option: unknown, envValue: string | undefi
   return normalized === '1' || normalized === 'true' || normalized === 'yes' || normalized === 'on';
 }
 
+/**
+ * Produces the validated is command blocked in read only result used by CLI automation.
+ * @param path - The API, command, or filesystem path to process.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function isCommandBlockedInReadOnly(path: string): boolean {
   if (!path) {
     return false;
@@ -57,6 +73,11 @@ export function isCommandBlockedInReadOnly(path: string): boolean {
   );
 }
 
+/**
+ * Produces the validated build read only error result used by CLI automation.
+ * @param path - The API, command, or filesystem path to process.
+ * @returns - The normalized string representation.
+ */
 export function buildReadOnlyError(path: string): string {
   return [
     'type: error',

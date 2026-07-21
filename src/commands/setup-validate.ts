@@ -92,6 +92,10 @@ function buildFormatValidationSummary(payload: Record<string, unknown>): Validat
   };
 }
 
+/**
+ * Implements attach setup validate subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSetupValidateSubcommand(cmd: Command): void {
   cmd
     .command('validate')

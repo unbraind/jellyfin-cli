@@ -1,6 +1,11 @@
 import type { BaseItemDto, QueryResult, SearchResult, ActivityLogEntry, LibraryVirtualFolder, LiveTvInfo } from '../types/index.js';
 import { formatToon } from './base.js';
 
+/**
+ * Produces the validated format items result used by CLI automation.
+ * @param items - The items value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatItems(items: BaseItemDto[]): string {
   return formatToon(items.map(i => ({
     id: i.Id,
@@ -17,6 +22,11 @@ export function formatItems(items: BaseItemDto[]): string {
   })), 'items');
 }
 
+/**
+ * Produces the validated format item result used by CLI automation.
+ * @param item - The item value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatItem(item: BaseItemDto): string {
   return formatToon({
     id: item.Id,
@@ -72,6 +82,12 @@ export function formatItem(item: BaseItemDto): string {
   }, 'item');
 }
 
+/**
+ * Produces the validated format query result result used by CLI automation.
+ * @param result - The result value required by this operation.
+ * @param itemFormatter - The item formatter value required by this operation.
+ * @returns - The typed format query result result.
+ */
 export function formatQueryResult<T>(result: QueryResult<T>, itemFormatter?: (item: T) => unknown): string {
   return formatToon({
     total: result.TotalRecordCount,
@@ -82,6 +98,11 @@ export function formatQueryResult<T>(result: QueryResult<T>, itemFormatter?: (it
   }, 'items');
 }
 
+/**
+ * Produces the validated format search result result used by CLI automation.
+ * @param result - The result value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatSearchResult(result: SearchResult): string {
   return formatToon({
     total: result.TotalRecordCount,
@@ -100,6 +121,11 @@ export function formatSearchResult(result: SearchResult): string {
   }, 'search');
 }
 
+/**
+ * Produces the validated format libraries result used by CLI automation.
+ * @param libraries - The libraries value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatLibraries(libraries: LibraryVirtualFolder[]): string {
   return formatToon(libraries.map(l => ({
     name: l.Name,
@@ -110,6 +136,11 @@ export function formatLibraries(libraries: LibraryVirtualFolder[]): string {
   })), 'libs');
 }
 
+/**
+ * Produces the validated format activity log result used by CLI automation.
+ * @param log - The log value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatActivityLog(log: ActivityLogEntry[]): string {
   return formatToon(log.map(e => ({
     type: e.Type,
@@ -121,6 +152,11 @@ export function formatActivityLog(log: ActivityLogEntry[]): string {
   })), 'activity');
 }
 
+/**
+ * Produces the validated format live tv info result used by CLI automation.
+ * @param info - The info value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatLiveTvInfo(info: LiveTvInfo): string {
   return formatToon({
     enabled: info.IsEnabled,

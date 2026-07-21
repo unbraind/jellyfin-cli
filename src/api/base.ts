@@ -1,4 +1,5 @@
 import type { JellyfinConfig } from '../types/index.js';
+import packageJson from '../../package.json' with { type: 'json' };
 import { buildQueryString, JellyfinApiError } from './types.js';
 import {
   buildExplainRequestPayload,
@@ -6,12 +7,26 @@ import {
   isExplainModeEnabled,
 } from '../utils/explain.js';
 
+/**
+ * Provides api client base behavior for the Jellyfin client and command runtime.
+ */
 export class ApiClientBase {
   protected baseUrl: string;
   protected apiKey?: string;
   protected userId?: string;
   protected timeout: number;
 
+  private readonly clientAuthorization = [
+    'MediaBrowser Client="jellyfin-cli"',
+    'Device="CLI"',
+    'DeviceId="jellyfin-cli"',
+    `Version="${packageJson.version}"`,
+  ].join(', ');
+
+  /**
+   * Creates an instance with the collaborators required by its runtime behavior.
+   * @param config - The resolved Jellyfin client configuration.
+   */
   constructor(config: JellyfinConfig) {
     this.baseUrl = config.serverUrl.replace(/\/$/, '');
     this.apiKey = config.apiKey;
@@ -19,14 +34,26 @@ export class ApiClientBase {
     this.timeout = config.timeout ?? 30000;
   }
 
+  /**
+   * Performs the set user id operation through the typed Jellyfin API boundary.
+   * @param userId - The stable Jellyfin user identifier.
+   */
   setUserId(userId: string): void {
     this.userId = userId;
   }
 
+  /**
+   * Retrieves or derives user id without mutating Jellyfin state.
+   * @returns - The normalized string representation.
+   */
   getUserId(): string | undefined {
     return this.userId;
   }
 
+  /**
+   * Retrieves or derives backend url without mutating Jellyfin state.
+   * @returns - The normalized string representation.
+   */
   getBackendUrl(): string {
     return this.baseUrl;
   }
@@ -53,6 +80,7 @@ export class ApiClientBase {
     
     const headers: Record<string, string> = {
       'Content-Type': 'application/json',
+      Authorization: this.clientAuthorization,
     };
     
     if (this.apiKey) {

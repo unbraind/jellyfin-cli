@@ -166,6 +166,11 @@ const DEFINITIONS = {
   },
 };
 
+/**
+ * Retrieves or derives schema without mutating Jellyfin state.
+ * @param type - The type value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function getSchema(type?: string): Record<string, unknown> {
   if (type) {
     const schema = OUTPUT_SCHEMAS[type];
@@ -175,6 +180,10 @@ export function getSchema(type?: string): Record<string, unknown> {
   return { $schema: 'http://json-schema.org/draft-07/schema#', type: 'object', oneOf: Object.values(OUTPUT_SCHEMAS), definitions: DEFINITIONS, available_types: Object.keys(OUTPUT_SCHEMAS) };
 }
 
+/**
+ * Retrieves or derives available types without mutating Jellyfin state.
+ * @returns - The normalized string representation.
+ */
 export function getAvailableTypes(): string[] {
   return Object.keys(OUTPUT_SCHEMAS);
 }

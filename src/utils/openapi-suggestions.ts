@@ -2,6 +2,9 @@ import type { OpenApiOperationEntry } from './openapi.js';
 
 type SuggestionIntent = 'list' | 'get' | 'search' | 'latest' | 'info' | 'status' | 'create' | 'update' | 'delete';
 
+/**
+ * Represents the open api command suggestion values accepted by the typed Jellyfin interface.
+ */
 export type OpenApiCommandSuggestion = {
   suggestedCommand: string;
   intent: SuggestionIntent;
@@ -89,6 +92,11 @@ function pickTarget(tokens: string[], domain: string): string | undefined {
   return candidates.at(-1);
 }
 
+/**
+ * Implements suggest command from operation for the typed Jellyfin CLI runtime.
+ * @param operation - The operation value required by this operation.
+ * @returns - The typed suggest command from operation result.
+ */
 export function suggestCommandFromOperation(operation: OpenApiOperationEntry): OpenApiCommandSuggestion {
   const tokens = pathTokens(operation.path);
   const domain = pickDomain(tokens);

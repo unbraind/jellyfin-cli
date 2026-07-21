@@ -1,27 +1,24 @@
 import type { JellyfinConfig } from '../types/index.js';
 import { LOW_SIGNAL_TOKENS, isReadOnlyIntent } from './openapi-intent.js';
 import { tokenizeIntentValue, tokenizePathValue } from './openapi-tokenize.js';
+import {
+  fetchOpenApiDocument,
+  type OpenApiDocument,
+} from './openapi-source.js';
+
+export {
+  fetchOpenApiDocument,
+  fetchOpenApiDocumentWithOptions,
+  type OpenApiDocument,
+  type OpenApiFetchOptions,
+  type OpenApiProbeResult,
+} from './openapi-source.js';
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
-const OPENAPI_CANDIDATES = ['/api-docs/openapi.json', '/openapi.json', '/swagger/v1/swagger.json'] as const;
 
-type OpenApiOperation = {
-  tags?: string[] | undefined;
-  summary?: string | undefined;
-  operationId?: string | undefined;
-  deprecated?: boolean | undefined;
-};
-
-type OpenApiPathItem = Partial<Record<string, OpenApiOperation>>;
-
-type OpenApiDocument = {
-  info?: {
-    version?: string | undefined;
-    title?: string | undefined;
-  } | undefined;
-  paths?: Record<string, OpenApiPathItem> | undefined;
-};
-
+/**
+ * Represents the open api stats values accepted by the typed Jellyfin interface.
+ */
 export type OpenApiStats = {
   available: boolean;
   sourcePath?: string | undefined;
@@ -29,18 +26,14 @@ export type OpenApiStats = {
   operationCount?: number | undefined;
   topTags?: Array<{ tag: string; operations: number }> | undefined;
   serverVersion?: string | undefined;
+  sourceKind?: 'server' | 'official' | 'cache' | undefined;
+  cachePath?: string | undefined;
   error?: string | undefined;
 };
 
-export type OpenApiProbeResult = {
-  sourcePath: string;
-  document: OpenApiDocument;
-};
-
-export type OpenApiFetchOptions = {
-  endpointPath?: string | undefined;
-};
-
+/**
+ * Represents the open api operation entry values accepted by the typed Jellyfin interface.
+ */
 export type OpenApiOperationEntry = {
   method: string;
   path: string;
@@ -51,6 +44,9 @@ export type OpenApiOperationEntry = {
   readOnlySafe: boolean;
 };
 
+/**
+ * Represents the open api operation filter values accepted by the typed Jellyfin interface.
+ */
 export type OpenApiOperationFilter = {
   method?: string | undefined;
   pathPrefix?: string | undefined;
@@ -59,78 +55,20 @@ export type OpenApiOperationFilter = {
   readOnlySafe?: boolean | undefined;
 };
 
+/**
+ * Represents the command operation match values accepted by the typed Jellyfin interface.
+ */
 export type CommandOperationMatch = OpenApiOperationEntry & {
   score: number;
   matchedOn: string[];
 };
 
-function getTimeout(config: JellyfinConfig): number {
-  return Math.max(5000, Math.min(60000, config.timeout ?? 30000));
-}
 
-function authHeader(config: JellyfinConfig): Record<string, string> | undefined {
-  return config.apiKey ? { 'X-Emby-Token': config.apiKey } : undefined;
-}
-
-function buildCandidatePaths(endpointPath: string | undefined): string[] {
-  const custom = endpointPath?.trim();
-  const normalizedCustom = custom ? (custom.startsWith('/') ? custom : `/${custom}`) : undefined;
-  const candidates = [normalizedCustom, ...OPENAPI_CANDIDATES];
-  const unique: string[] = [];
-  const seen = new Set<string>();
-  for (const candidate of candidates) {
-    if (!candidate || seen.has(candidate)) {
-      continue;
-    }
-    unique.push(candidate);
-    seen.add(candidate);
-  }
-  return unique;
-}
-
-export async function fetchOpenApiDocument(
-  config: JellyfinConfig,
-  options: OpenApiFetchOptions = {},
-): Promise<OpenApiProbeResult> {
-  if (!config.serverUrl) {
-    throw new Error('Missing server URL');
-  }
-
-  const probeFailures: string[] = [];
-  const candidates = buildCandidatePaths(options.endpointPath);
-  for (const path of candidates) {
-    try {
-      const response = await fetch(`${config.serverUrl}${path}`, {
-        headers: authHeader(config),
-        signal: AbortSignal.timeout(getTimeout(config)),
-      });
-      if (!response.ok) {
-        probeFailures.push(`${path} => HTTP ${response.status}`);
-        continue;
-      }
-
-      const document = (await response.json()) as OpenApiDocument;
-      if (!document || typeof document !== 'object' || !document.paths || typeof document.paths !== 'object') {
-        probeFailures.push(`${path} => Invalid OpenAPI payload`);
-        continue;
-      }
-
-      return {
-        sourcePath: path,
-        document,
-      };
-    } catch (err) {
-      const message = err instanceof Error ? err.message : 'Unknown OpenAPI probe error';
-      probeFailures.push(`${path} => ${message}`);
-    }
-  }
-
-  const reason = probeFailures.join('; ');
-  throw new Error(`OpenAPI schema not reachable. Tried ${candidates.length} path(s): ${reason}`);
-}
-
-export const fetchOpenApiDocumentWithOptions = fetchOpenApiDocument;
-
+/**
+ * Retrieves or derives summarize open api without mutating Jellyfin state.
+ * @param document - The validated OpenAPI document to inspect.
+ * @returns - The typed summarize open api result.
+ */
 export function summarizeOpenApi(document: OpenApiDocument): Omit<OpenApiStats, 'available'> {
   const paths = document.paths ?? {};
   const tagCounts = new Map<string, number>();
@@ -168,6 +106,11 @@ function isReadOnlyMethod(method: string): boolean {
   return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
 }
 
+/**
+ * Retrieves or derives extract open api operations without mutating Jellyfin state.
+ * @param document - The validated OpenAPI document to inspect.
+ * @returns - The typed extract open api operations result.
+ */
 export function extractOpenApiOperations(document: OpenApiDocument): OpenApiOperationEntry[] {
   const paths = document.paths ?? {};
   const operations: OpenApiOperationEntry[] = [];
@@ -199,6 +142,12 @@ export function extractOpenApiOperations(document: OpenApiDocument): OpenApiOper
   });
 }
 
+/**
+ * Retrieves or derives filter open api operations without mutating Jellyfin state.
+ * @param operations - The operations value required by this operation.
+ * @param filters - The filters value required by this operation.
+ * @returns - The typed filter open api operations result.
+ */
 export function filterOpenApiOperations(
   operations: OpenApiOperationEntry[],
   filters: OpenApiOperationFilter,
@@ -237,6 +186,12 @@ export function filterOpenApiOperations(
   });
 }
 
+/**
+ * Retrieves or derives match operations for command intent without mutating Jellyfin state.
+ * @param operations - The operations value required by this operation.
+ * @param commandPath - The command path value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function matchOperationsForCommandIntent(
   operations: OpenApiOperationEntry[],
   commandPath: string,
@@ -316,12 +271,19 @@ export function matchOperationsForCommandIntent(
   });
 }
 
+/**
+ * Retrieves or derives open api stats without mutating Jellyfin state.
+ * @param config - The resolved Jellyfin client configuration.
+ * @returns - The typed get open api stats result.
+ */
 export async function getOpenApiStats(config: JellyfinConfig): Promise<OpenApiStats> {
   try {
     const result = await fetchOpenApiDocument(config);
     return {
       available: true,
       sourcePath: result.sourcePath,
+      sourceKind: result.sourceKind,
+      cachePath: result.cachePath,
       ...summarizeOpenApi(result.document),
     };
   } catch (err) {

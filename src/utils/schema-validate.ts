@@ -143,6 +143,12 @@ function validateNode(
   return errors;
 }
 
+/**
+ * Produces the validated validate json schema result used by CLI automation.
+ * @param instance - The instance value required by this operation.
+ * @param schema - The schema value required by this operation.
+ * @returns - The typed validate json schema result.
+ */
 export function validateJsonSchema(instance: unknown, schema: JsonSchema): ValidationResult {
   const schemaNode = schema as SchemaNode;
   const errors = validateNode(instance, schemaNode, schemaNode, '$');

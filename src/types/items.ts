@@ -1,3 +1,6 @@
+/**
+ * Defines the base item dto contract used across typed Jellyfin boundaries.
+ */
 export interface BaseItemDto {
   Name?: string | null;
   ServerId?: string | null;
@@ -74,6 +77,9 @@ export interface BaseItemDto {
   RemoteTrailers?: { Url?: string }[] | null;
 }
 
+/**
+ * Defines the user item data contract used across typed Jellyfin boundaries.
+ */
 export interface UserItemData {
   PlaybackPositionTicks?: number | null;
   PlayCount?: number | null;
@@ -84,6 +90,9 @@ export interface UserItemData {
   UnplayedItemCount?: number | null;
 }
 
+/**
+ * Defines the image blur hashes contract used across typed Jellyfin boundaries.
+ */
 export interface ImageBlurHashes {
   Primary?: Record<string, string>;
   Art?: Record<string, string>;
@@ -100,14 +109,26 @@ export interface ImageBlurHashes {
   Profile?: Record<string, string>;
 }
 
+/**
+ * Represents the location type values accepted by the typed Jellyfin interface.
+ */
 export type LocationType = 'FileSystem' | 'Remote' | 'Virtual' | 'Offline';
+/**
+ * Represents the play access values accepted by the typed Jellyfin interface.
+ */
 export type PlayAccess = 'Full' | 'None' | 'Restricted';
 
+/**
+ * Defines the external url contract used across typed Jellyfin boundaries.
+ */
 export interface ExternalUrl {
   Name?: string | null;
   Url?: string | null;
 }
 
+/**
+ * Defines the media source info contract used across typed Jellyfin boundaries.
+ */
 export interface MediaSourceInfo {
   Id?: string | null;
   Name?: string | null;
@@ -133,6 +154,9 @@ export interface MediaSourceInfo {
   ReadAtNativeFramerate?: boolean;
 }
 
+/**
+ * Defines the media stream contract used across typed Jellyfin boundaries.
+ */
 export interface MediaStream {
   Codec?: string | null;
   CodecTag?: string | null;
@@ -164,20 +188,38 @@ export interface MediaStream {
   SupportsExternalStream?: boolean;
 }
 
+/**
+ * Represents the media stream protocol values accepted by the typed Jellyfin interface.
+ */
 export type MediaStreamProtocol = 'Http' | 'Hls' | 'Dash' | 'Rtmp' | 'Rtsp';
+/**
+ * Represents the media source type values accepted by the typed Jellyfin interface.
+ */
 export type MediaSourceType = 'Default' | 'Grouping' | 'Placeholder';
+/**
+ * Represents the media stream type values accepted by the typed Jellyfin interface.
+ */
 export type MediaStreamType = 'Video' | 'Audio' | 'Subtitle' | 'EmbeddedImage' | 'Data' | 'Lyric';
 
+/**
+ * Defines the genre dto contract used across typed Jellyfin boundaries.
+ */
 export interface GenreDto {
   Name?: string | null;
   Id?: string | null;
 }
 
+/**
+ * Defines the studio dto contract used across typed Jellyfin boundaries.
+ */
 export interface StudioDto {
   Name?: string | null;
   Id?: string | null;
 }
 
+/**
+ * Defines the person info contract used across typed Jellyfin boundaries.
+ */
 export interface PersonInfo {
   Name?: string | null;
   Id?: string | null;
@@ -186,6 +228,9 @@ export interface PersonInfo {
   PrimaryImageTag?: string | null;
 }
 
+/**
+ * Defines the name id pair contract used across typed Jellyfin boundaries.
+ */
 export interface NameIdPair {
   Name?: string | null;
   Id?: string | null;

@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Builds the livetv admin command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createLivetvAdminCommand(): Command {
   const cmd = new Command('livetv-admin');
   cmd.description('Live TV administrative commands (tuners, providers, timers)');

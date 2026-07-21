@@ -22,6 +22,14 @@ interface ClientResult {
   config: ReturnType<typeof getConfig>;
 }
 
+/**
+ * Performs the create api client operation through the typed Jellyfin API boundary.
+ * @param options - Optional settings that refine the operation.
+ * @param options.format - The requested machine-readable or human-readable output format.
+ * @param options.server - The server value required by this operation.
+ * @param options.explain - The explain value required by this operation.
+ * @returns - The typed create api client result.
+ */
 export async function createApiClient(options: {
   format?: string;
   server?: string;
@@ -78,6 +86,11 @@ export async function createApiClient(options: {
   return { client, format, config };
 }
 
+/**
+ * Implements handle error for the typed Jellyfin CLI runtime.
+ * @param err - The err value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ */
 export function handleError(err: unknown, format: OutputFormat): never {
   if (err instanceof JellyfinApiError) {
     console.error(formatError(err.message, format, err.statusCode, err.details));
@@ -98,10 +111,22 @@ function formatError(error: string, format: OutputFormat, code?: number, details
   return `type: error\ndata:\n  error: ${error}${code ? `\n  code: ${code}` : ''}${details ? `\n  details: ${JSON.stringify(details)}` : ''}\n  success: false`;
 }
 
+/**
+ * Implements output for the typed Jellyfin CLI runtime.
+ * @param data - The typed payload to format or submit.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @param typeHint - The type hint value required by this operation.
+ */
 export function output(data: unknown, format: OutputFormat, typeHint?: string): void {
   console.log(formatOutput(data, format, typeHint));
 }
 
+/**
+ * Produces the validated format users result used by CLI automation.
+ * @param users - The users value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatUsers(users: UserDto[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatUsers(users);
@@ -109,6 +134,12 @@ export function formatUsers(users: UserDto[], format: OutputFormat): string {
   return formatOutput(users, format, 'users');
 }
 
+/**
+ * Produces the validated format user result used by CLI automation.
+ * @param user - The user value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatUser(user: UserDto, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatUser(user);
@@ -116,6 +147,12 @@ export function formatUser(user: UserDto, format: OutputFormat): string {
   return formatOutput(user, format, 'user');
 }
 
+/**
+ * Produces the validated format items result used by CLI automation.
+ * @param items - The items value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatItems(items: BaseItemDto[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatItems(items);
@@ -123,6 +160,12 @@ export function formatItems(items: BaseItemDto[], format: OutputFormat): string 
   return formatOutput(items, format, 'items');
 }
 
+/**
+ * Produces the validated format item result used by CLI automation.
+ * @param item - The item value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatItem(item: BaseItemDto, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatItem(item);
@@ -130,6 +173,12 @@ export function formatItem(item: BaseItemDto, format: OutputFormat): string {
   return formatOutput(item, format, 'item');
 }
 
+/**
+ * Produces the validated format sessions result used by CLI automation.
+ * @param sessions - The sessions value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatSessions(sessions: SessionInfo[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSessions(sessions);
@@ -137,6 +186,12 @@ export function formatSessions(sessions: SessionInfo[], format: OutputFormat): s
   return formatOutput(sessions.map(withPlaybackIndicator), format, 'sessions');
 }
 
+/**
+ * Produces the validated format session result used by CLI automation.
+ * @param session - The session value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatSession(session: SessionInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSession(session);
@@ -151,6 +206,12 @@ function withPlaybackIndicator(session: SessionInfo): SessionInfo & { isPlaying:
   };
 }
 
+/**
+ * Produces the validated format libraries result used by CLI automation.
+ * @param libraries - The libraries value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatLibraries(libraries: LibraryVirtualFolder[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatLibraries(libraries);
@@ -158,6 +219,12 @@ export function formatLibraries(libraries: LibraryVirtualFolder[], format: Outpu
   return formatOutput(libraries, format, 'libraries');
 }
 
+/**
+ * Produces the validated format tasks result used by CLI automation.
+ * @param tasks - The tasks value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatTasks(tasks: ScheduledTaskInfo[], format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatTasks(tasks);
@@ -165,6 +232,12 @@ export function formatTasks(tasks: ScheduledTaskInfo[], format: OutputFormat): s
   return formatOutput(tasks, format, 'tasks');
 }
 
+/**
+ * Produces the validated format task result used by CLI automation.
+ * @param task - The task value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatTask(task: ScheduledTaskInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatTask(task);
@@ -172,6 +245,12 @@ export function formatTask(task: ScheduledTaskInfo, format: OutputFormat): strin
   return formatOutput(task, format, 'task');
 }
 
+/**
+ * Produces the validated format system info result used by CLI automation.
+ * @param info - The info value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatSystemInfo(info: SystemInfo, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSystemInfo(info);
@@ -179,6 +258,12 @@ export function formatSystemInfo(info: SystemInfo, format: OutputFormat): string
   return formatOutput(info, format, 'system_info');
 }
 
+/**
+ * Produces the validated format config result used by CLI automation.
+ * @param config - The resolved Jellyfin client configuration.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatConfig(config: JellyfinConfig, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatConfig(config);
@@ -186,6 +271,12 @@ export function formatConfig(config: JellyfinConfig, format: OutputFormat): stri
   return formatOutput(config, format, 'config');
 }
 
+/**
+ * Produces the validated format servers result used by CLI automation.
+ * @param servers - The servers value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The typed format servers result.
+ */
 export function formatServers(
   servers: { name: string; config: JellyfinConfig; isDefault: boolean }[],
   format: OutputFormat,
@@ -196,6 +287,12 @@ export function formatServers(
   return formatOutput(servers, format, 'servers');
 }
 
+/**
+ * Produces the validated format search result result used by CLI automation.
+ * @param result - The result value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatSearchResult(result: SearchResult, format: OutputFormat): string {
   if (format === 'toon') {
     return toon.formatSearchResult(result);
@@ -203,6 +300,13 @@ export function formatSearchResult(result: SearchResult, format: OutputFormat): 
   return formatOutput(result, format, 'search_result');
 }
 
+/**
+ * Produces the validated format message result used by CLI automation.
+ * @param message - The message value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @param success - The success value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatMessage(message: string, format: OutputFormat, success = true): string {
   if (format === 'toon') {
     return toon.formatMessage(message, success);
@@ -216,6 +320,13 @@ export function formatMessage(message: string, format: OutputFormat, success = t
   return formatOutput({ message, success }, format, success ? 'message' : 'error');
 }
 
+/**
+ * Produces the validated format toon result used by CLI automation.
+ * @param data - The typed payload to format or submit.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @param typeHint - The type hint value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatToon(data: unknown, format: OutputFormat, typeHint?: string): string {
   if (format === 'toon') {
     return toon.formatToon(data, typeHint);

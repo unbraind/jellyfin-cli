@@ -36,14 +36,45 @@ describe('JellyfinApiClient - Full Coverage Tests', () => {
 
   describe('Authentication', () => {
     it('should authenticate with username and password', async () => {
-      const mockUser = { Id: 'user-1', Name: 'testuser', AccessToken: 'token123' };
-      mockFetch.mockResolvedValueOnce(createMockResponse(mockUser));
+      const mockUser = { Id: 'user-1', Name: 'testuser' };
+      mockFetch.mockResolvedValueOnce(createMockResponse({
+        User: mockUser,
+        AccessToken: 'token123',
+        ServerId: 'server-1',
+      }));
       
       const c = new JellyfinApiClient({ serverUrl: 'http://localhost:8096' });
       const result = await c.authenticate('testuser', 'password123');
       
       expect(result.Name).toBe('testuser');
       expect(result.Id).toBe('user-1');
+      expect(mockFetch).toHaveBeenCalledWith(
+        'http://localhost:8096/Users/AuthenticateByName',
+        expect.objectContaining({
+          method: 'POST',
+          headers: expect.objectContaining({
+            Authorization: expect.stringContaining('MediaBrowser Client="jellyfin-cli"'),
+          }),
+          body: JSON.stringify({ Username: 'testuser', Pw: 'password123' }),
+        }),
+      );
+
+      mockFetch.mockResolvedValueOnce(createMockResponse([]));
+      await c.getUsers();
+      expect(mockFetch).toHaveBeenLastCalledWith(
+        'http://localhost:8096/Users',
+        expect.objectContaining({
+          headers: expect.objectContaining({ 'X-Emby-Token': 'token123' }),
+        }),
+      );
+    });
+
+    it('should reject an incomplete authentication response', async () => {
+      mockFetch.mockResolvedValueOnce(createMockResponse({ User: { Id: 'user-1' } }));
+      const c = new JellyfinApiClient({ serverUrl: 'http://localhost:8096' });
+      await expect(c.authenticate('testuser', 'password123')).rejects.toThrow(
+        'Authentication response did not include a user and access token',
+      );
     });
 
     it('should handle authentication failure', async () => {

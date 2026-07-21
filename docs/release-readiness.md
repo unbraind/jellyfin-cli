@@ -22,7 +22,8 @@ Store credentials only in env vars or in `~/.jellyfin-cli/settings.json`:
 jf setup --server http://your-jellyfin-host:8096 --api-key "$JELLYFIN_API_KEY"
 ```
 
-The CLI writes `settings.json` with owner-only permissions (`0600`) on supported platforms.
+The CLI hardens `~/.jellyfin-cli/` to owner-only permissions (`0700`) and writes
+`settings.json` with owner-only permissions (`0600`) on supported platforms.
 
 You can inspect exported values without revealing secrets:
 
@@ -62,6 +63,11 @@ This runs:
 - `bunx` execution smoke from local package tarball (`bun run smoke:bunx`)
 - Generated pm changelog check (`bun run changelog:pm:check`)
 - Release automation unit checks (`bun run test:release`)
+
+The repository's mandatory `100/100/100/100` statement/branch/function/line coverage gate is tracked
+separately and is not yet satisfied. Until that gate is implemented and green, this checklist must
+not be interpreted as permission to publish. Current measurements and runtime limitations are
+recorded in [Jellyfin API Research](api-research.md).
 
 ## 4) Run live read-only CLI E2E checks
 

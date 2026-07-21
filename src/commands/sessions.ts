@@ -3,6 +3,10 @@ import { createApiClient, formatSession, formatSessions, handleError } from './u
 import { toon } from '../formatters/index.js';
 import { addReportingCommands } from './sessions-reporting.js';
 
+/**
+ * Builds the sessions command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createSessionsCommand(): Command {
   const cmd = new Command('sessions');
 

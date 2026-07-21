@@ -5,6 +5,10 @@ function parseMainMenuFilter(value: string): boolean {
   return value.trim().toLowerCase() === 'true';
 }
 
+/**
+ * Builds the dashboard command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createDashboardCommand(): Command {
   const cmd = new Command('dashboard');
 

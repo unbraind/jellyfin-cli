@@ -16,6 +16,10 @@ import { attachSchemaResearchSubcommand } from './schema-research.js';
 import { attachSchemaCoverageSubcommand } from './schema-coverage-command.js';
 import { attachSchemaSuggestSubcommand } from './schema-suggest.js';
 
+/**
+ * Builds the schema command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createSchemaCommand(): Command {
   const cmd = new Command('schema');
 

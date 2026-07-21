@@ -5,6 +5,10 @@ import { toon } from '../formatters/index.js';
 // Plugin-specific commands for optional Jellyfin plugins.
 // Commands silently fail if the plugin is not installed (404/500 from server).
 
+/**
+ * Builds the plugins ext command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createPluginsExtCommand(): Command {
   const cmd = new Command('plugins-ext');
   cmd.description('Commands for optional Jellyfin plugins (Meilisearch, TMDb, InfuseSync, Telegram)');

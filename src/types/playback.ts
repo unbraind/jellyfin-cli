@@ -1,3 +1,6 @@
+/**
+ * Defines the playback progress info contract used across typed Jellyfin boundaries.
+ */
 export interface PlaybackProgressInfo {
   ItemId?: string | null;
   MediaSourceId?: string | null;
@@ -16,8 +19,14 @@ export interface PlaybackProgressInfo {
   BufferAheadMs?: number | null;
 }
 
+/**
+ * Represents the play method values accepted by the typed Jellyfin interface.
+ */
 export type PlayMethod = 'Transcode' | 'DirectStream' | 'DirectPlay';
 
+/**
+ * Defines the playback stop info contract used across typed Jellyfin boundaries.
+ */
 export interface PlaybackStopInfo {
   ItemId?: string | null;
   MediaSourceId?: string | null;

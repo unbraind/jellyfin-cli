@@ -1,3 +1,6 @@
+/**
+ * Defines the system info contract used across typed Jellyfin boundaries.
+ */
 export interface SystemInfo {
   ServerName?: string | null;
   Version?: string | null;
@@ -16,6 +19,9 @@ export interface SystemInfo {
   HasUpdateAvailable?: boolean;
 }
 
+/**
+ * Defines the installation info contract used across typed Jellyfin boundaries.
+ */
 export interface InstallationInfo {
   Id?: string | null;
   Name?: string | null;
@@ -26,8 +32,14 @@ export interface InstallationInfo {
   Status?: InstallationStatus;
 }
 
+/**
+ * Represents the installation status values accepted by the typed Jellyfin interface.
+ */
 export type InstallationStatus = 'Queued' | 'Installing' | 'Completed' | 'Failed' | 'Cancelled';
 
+/**
+ * Defines the activity log entry contract used across typed Jellyfin boundaries.
+ */
 export interface ActivityLogEntry {
   Id?: number | null;
   Name?: string | null;
@@ -41,8 +53,14 @@ export interface ActivityLogEntry {
   ItemName?: string | null;
 }
 
+/**
+ * Represents the log level values accepted by the typed Jellyfin interface.
+ */
 export type LogLevel = 'Trace' | 'Debug' | 'Information' | 'Warning' | 'Error' | 'Critical' | 'None';
 
+/**
+ * Defines the activity log query result contract used across typed Jellyfin boundaries.
+ */
 export interface ActivityLogQueryResult {
   Items?: ActivityLogEntry[] | null;
   TotalRecordCount?: number | null;

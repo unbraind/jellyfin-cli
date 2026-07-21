@@ -1,12 +1,18 @@
 import { readFileSync, readdirSync, statSync } from 'node:fs';
 import { extname, join, relative } from 'node:path';
 
+/**
+ * Defines the file line violation contract used across typed Jellyfin boundaries.
+ */
 export interface FileLineViolation {
   filePath: string;
   codeLines: number;
   maxLines: number;
 }
 
+/**
+ * Defines the secret finding contract used across typed Jellyfin boundaries.
+ */
 export interface SecretFinding {
   filePath: string;
   line: number;
@@ -44,6 +50,11 @@ const SECRET_PATTERNS: { regex: RegExp; reason: string }[] = [
   },
 ];
 
+/**
+ * Implements count code lines for the typed Jellyfin CLI runtime.
+ * @param content - The content value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function countCodeLines(content: string): number {
   let inBlockComment = false;
   let lines = 0;
@@ -91,6 +102,11 @@ export function countCodeLines(content: string): number {
   return lines;
 }
 
+/**
+ * Implements collect type script files for the typed Jellyfin CLI runtime.
+ * @param rootDir - The root dir value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function collectTypeScriptFiles(rootDir: string): string[] {
   const files: string[] = [];
 
@@ -114,6 +130,12 @@ export function collectTypeScriptFiles(rootDir: string): string[] {
   return files;
 }
 
+/**
+ * Retrieves or derives line violations without mutating Jellyfin state.
+ * @param filePaths - The file paths value required by this operation.
+ * @param maxLines - The max lines value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function findLineViolations(filePaths: string[], maxLines = 300): FileLineViolation[] {
   return filePaths
     .map((filePath) => {
@@ -161,6 +183,12 @@ function isLikelyTextFile(filePath: string): boolean {
   return !blockedExtensions.has(extname(filePath));
 }
 
+/**
+ * Retrieves or derives secret findings without mutating Jellyfin state.
+ * @param filePaths - The file paths value required by this operation.
+ * @param rootDir - The root dir value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function findSecretFindings(filePaths: string[], rootDir = process.cwd()): SecretFinding[] {
   const findings: SecretFinding[] = [];
 

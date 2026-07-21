@@ -1,6 +1,11 @@
 import type { SessionInfo, ScheduledTaskInfo } from '../types/index.js';
 import { formatToon } from './base.js';
 
+/**
+ * Produces the validated format sessions result used by CLI automation.
+ * @param sessions - The sessions value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatSessions(sessions: SessionInfo[]): string {
   return formatToon(sessions.map(s => ({
     id: s.Id,
@@ -32,6 +37,11 @@ export function formatSessions(sessions: SessionInfo[]): string {
   })), 'sessions');
 }
 
+/**
+ * Produces the validated format session result used by CLI automation.
+ * @param session - The session value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatSession(session: SessionInfo): string {
   return formatToon({
     id: session.Id,
@@ -63,6 +73,11 @@ export function formatSession(session: SessionInfo): string {
   }, 'session');
 }
 
+/**
+ * Produces the validated format tasks result used by CLI automation.
+ * @param tasks - The tasks value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatTasks(tasks: ScheduledTaskInfo[]): string {
   return formatToon(tasks.map(t => ({
     id: t.Id,
@@ -84,6 +99,11 @@ export function formatTasks(tasks: ScheduledTaskInfo[]): string {
   })), 'tasks');
 }
 
+/**
+ * Produces the validated format task result used by CLI automation.
+ * @param task - The task value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatTask(task: ScheduledTaskInfo): string {
   return formatToon({
     id: task.Id,
@@ -100,6 +120,11 @@ export function formatTask(task: ScheduledTaskInfo): string {
   }, 'task');
 }
 
+/**
+ * Produces the validated format task triggers result used by CLI automation.
+ * @param triggers - The triggers value required by this operation.
+ * @returns - The typed format task triggers result.
+ */
 export function formatTaskTriggers(triggers: { Id?: string; Type?: string; IntervalTicks?: number; TimeOfDayTicks?: number; DayOfWeek?: string[] }[]): string {
   return formatToon(triggers.map(t => ({
     id: t.Id,

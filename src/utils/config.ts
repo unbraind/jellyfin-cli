@@ -4,7 +4,11 @@ import { join } from 'node:path';
 import type { JellyfinConfig } from '../types/index.js';
 import { parseOutputFormat } from './output-format.js';
 
-function getConfigDir(): string {
+/**
+ * Retrieves or derives config dir without mutating Jellyfin state.
+ * @returns - The normalized string representation.
+ */
+export function getConfigDir(): string {
   return process.env.JELLYFIN_CONFIG_DIR || join(homedir(), '.jellyfin-cli');
 }
 
@@ -43,7 +47,12 @@ interface SettingsFile {
 function ensureConfigDir(): void {
   const dir = getConfigDir();
   if (!existsSync(dir)) {
-    mkdirSync(dir, { recursive: true });
+    mkdirSync(dir, { recursive: true, mode: 0o700 });
+  }
+  try {
+    chmodSync(dir, 0o700);
+  } catch {
+    // Best-effort hardening for filesystems that do not implement POSIX modes.
   }
 }
 
@@ -61,6 +70,10 @@ function readSettingsFile(): SettingsFile {
   return {};
 }
 
+/**
+ * Implements write settings file for the typed Jellyfin CLI runtime.
+ * @param settings - The settings value required by this operation.
+ */
 function writeSettingsFile(settings: SettingsFile): void {
   ensureConfigDir();
   const settingsPath = getSettingsFile();
@@ -137,6 +150,11 @@ function getFileConfig(serverName?: string): Partial<JellyfinConfig> {
   return settings.defaultServer ?? {};
 }
 
+/**
+ * Retrieves or derives config without mutating Jellyfin state.
+ * @param serverName - The optional named Jellyfin server profile.
+ * @returns - The normalized string representation.
+ */
 export function getConfig(serverName?: string): JellyfinConfig {
   const envConfig = getEnvConfig();
   const fileConfig = getFileConfig(serverName);
@@ -154,6 +172,12 @@ export function getConfig(serverName?: string): JellyfinConfig {
   return merged;
 }
 
+/**
+ * Implements save config for the typed Jellyfin CLI runtime.
+ * @param config - The resolved Jellyfin client configuration.
+ * @param serverName - The optional named Jellyfin server profile.
+ * @param setAsDefault - The set as default value required by this operation.
+ */
 export function saveConfig(config: JellyfinConfig, serverName?: string, setAsDefault = false): void {
   const settings = readSettingsFile();
   
@@ -170,6 +194,10 @@ export function saveConfig(config: JellyfinConfig, serverName?: string, setAsDef
   writeSettingsFile(settings);
 }
 
+/**
+ * Retrieves or derives servers without mutating Jellyfin state.
+ * @returns - The typed list servers result.
+ */
 export function listServers(): { name: string; config: JellyfinConfig; isDefault: boolean }[] {
   const settings = readSettingsFile();
   const servers: { name: string; config: JellyfinConfig; isDefault: boolean }[] = [];
@@ -187,6 +215,11 @@ export function listServers(): { name: string; config: JellyfinConfig; isDefault
   return servers;
 }
 
+/**
+ * Performs the delete server operation through the typed Jellyfin API boundary.
+ * @param name - The name value required by this operation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function deleteServer(name: string): boolean {
   const settings = readSettingsFile();
   
@@ -208,6 +241,11 @@ export function deleteServer(name: string): boolean {
   return false;
 }
 
+/**
+ * Performs the set current server operation through the typed Jellyfin API boundary.
+ * @param name - The name value required by this operation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function setCurrentServer(name: string): boolean {
   const settings = readSettingsFile();
   
@@ -226,24 +264,42 @@ export function setCurrentServer(name: string): boolean {
   return false;
 }
 
+/**
+ * Retrieves or derives settings path without mutating Jellyfin state.
+ * @returns - The normalized string representation.
+ */
 export function getSettingsPath(): string {
   return getSettingsFile();
 }
 
+/**
+ * Produces the validated is github starred result used by CLI automation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function isGithubStarred(): boolean {
   return readSettingsFile().githubStarred === true;
 }
 
+/**
+ * Implements mark github starred for the typed Jellyfin CLI runtime.
+ */
 export function markGithubStarred(): void {
   const settings = readSettingsFile();
   settings.githubStarred = true;
   writeSettingsFile(settings);
 }
 
+/**
+ * Produces the validated is github star prompted result used by CLI automation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function isGithubStarPrompted(): boolean {
   return readSettingsFile().githubStarPrompted === true;
 }
 
+/**
+ * Implements mark github star prompted for the typed Jellyfin CLI runtime.
+ */
 export function markGithubStarPrompted(): void {
   const settings = readSettingsFile();
   settings.githubStarPrompted = true;

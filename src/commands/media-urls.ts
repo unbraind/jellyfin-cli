@@ -9,6 +9,10 @@ function parseOptionalInt(value: string | undefined): number | undefined {
   return parseInt(value, 10);
 }
 
+/**
+ * Implements attach media url commands for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachMediaUrlCommands(cmd: Command): void {
   cmd.command('video-stream-url <itemId>').description('Get direct video stream URL (optionally by container)')
     .option('-f, --format <format>', 'Output format')

@@ -32,6 +32,7 @@
     "version:next": "node scripts/release-version.mjs next",
     "check:version": "node scripts/release-version.mjs check",
     "check:file-length": "bun run scripts/check-file-length.ts",
+    "check:duplicates": "jscpd src tests scripts --threshold 0 --exit-code 1",
     "check:secrets": "bun run scripts/check-secrets.ts",
     "check:secrets:history": "bun run scripts/check-secrets-history.ts",
     "smoke:dist": "node dist/cli.js --help && node dist/cli.js --version",
@@ -78,11 +79,20 @@
     "@types/node": "^22.20.1",
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.7.0",
+    "eslint-plugin-jsdoc": "63.2.0",
     "globals": "^17.7.0",
+    "jscpd": "5.0.12",
     "tsx": "^4.23.1",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.64.0",
+    "typescript-eslint": "^8.65.0",
     "vitest": "^4.1.10"
+  },
+  "overrides": {
+    "esbuild": "0.28.1",
+    "flatted": "3.4.2",
+    "picomatch": "4.0.5",
+    "postcss": "8.5.21",
+    "vite": "8.1.5"
   },
   "files": [
     "dist",

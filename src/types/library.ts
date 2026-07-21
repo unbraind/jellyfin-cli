@@ -1,3 +1,6 @@
+/**
+ * Defines the library virtual folder contract used across typed Jellyfin boundaries.
+ */
 export interface LibraryVirtualFolder {
   Name?: string | null;
   Locations?: string[] | null;
@@ -8,6 +11,9 @@ export interface LibraryVirtualFolder {
   RefreshStatus?: string | null;
 }
 
+/**
+ * Defines the library options contract used across typed Jellyfin boundaries.
+ */
 export interface LibraryOptions {
   Enabled?: boolean;
   EnablePhotos?: boolean;
@@ -53,13 +59,22 @@ export interface LibraryOptions {
   TypeOptions?: TypeOptions[] | null;
 }
 
+/**
+ * Represents the allow embedded subtitles values accepted by the typed Jellyfin interface.
+ */
 export type AllowEmbeddedSubtitles = 'AllowAll' | 'AllowText' | 'AllowNone' | 'AllowImage';
 
+/**
+ * Defines the media path info contract used across typed Jellyfin boundaries.
+ */
 export interface MediaPathInfo {
   Path?: string | null;
   NetworkPath?: string | null;
 }
 
+/**
+ * Defines the type options contract used across typed Jellyfin boundaries.
+ */
 export interface TypeOptions {
   Type?: string | null;
   MetadataFetchers?: string[] | null;
@@ -71,10 +86,16 @@ export interface TypeOptions {
   EnableInternetProviders?: boolean;
 }
 
+/**
+ * Defines the image option contract used across typed Jellyfin boundaries.
+ */
 export interface ImageOption {
   Type?: ImageType | null;
   Limit?: number | null;
   MinWidth?: number | null;
 }
 
+/**
+ * Represents the image type values accepted by the typed Jellyfin interface.
+ */
 export type ImageType = 'Primary' | 'Art' | 'Backdrop' | 'Banner' | 'Logo' | 'Thumb' | 'Disc' | 'Box' | 'Screenshot' | 'Menu' | 'Chapter' | 'BoxRear' | 'Profile';

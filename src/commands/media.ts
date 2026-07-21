@@ -3,6 +3,10 @@ import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 import { attachMediaUrlCommands } from './media-urls.js';
 
+/**
+ * Builds the media command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createMediaCommand(): Command {
   const cmd = new Command('media');
 

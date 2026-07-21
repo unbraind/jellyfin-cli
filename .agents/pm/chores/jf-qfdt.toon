@@ -6,9 +6,10 @@ status: closed
 priority: 2
 tags[3]: changed,release-history,versioning
 created_at: "2026-07-21T17:14:49.992Z"
-updated_at: "2026-07-21T17:38:18.615Z"
+updated_at: "2026-07-21T19:50:04.490Z"
 closed_at: "2026-07-21T17:14:50.544Z"
 author: codex
+parent: jf-vpw0
 release: 2026.3.4
 resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
 expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.

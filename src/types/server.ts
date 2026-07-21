@@ -1,9 +1,15 @@
+/**
+ * Defines the branding options contract used across typed Jellyfin boundaries.
+ */
 export interface BrandingOptions {
   LoginDisclaimer?: string | null;
   CustomCss?: string | null;
   SplashscreenEnabled?: boolean;
 }
 
+/**
+ * Defines the server configuration contract used across typed Jellyfin boundaries.
+ */
 export interface ServerConfiguration {
   EnableUPnP?: boolean;
   PublicPort?: number | null;
@@ -56,16 +62,25 @@ export interface ServerConfiguration {
   DisablePluginImages?: boolean;
 }
 
+/**
+ * Defines the path substitution contract used across typed Jellyfin boundaries.
+ */
 export interface PathSubstitution {
   From?: string | null;
   To?: string | null;
 }
 
+/**
+ * Defines the server endpoints contract used across typed Jellyfin boundaries.
+ */
 export interface ServerEndpoints {
   IsLocal?: boolean;
   IsInNetwork?: boolean;
 }
 
+/**
+ * Defines the item counts contract used across typed Jellyfin boundaries.
+ */
 export interface ItemCounts {
   MovieCount?: number | null;
   SeriesCount?: number | null;

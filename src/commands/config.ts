@@ -43,6 +43,10 @@ function printConfigPayload(data: Record<string, unknown>, format: OutputFormat,
   console.log(formatOutput(data, format, typeHint));
 }
 
+/**
+ * Builds the config command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createConfigCommand(): Command {
   const cmd = new Command('config');
 
