@@ -1,6 +1,6 @@
 # Release Process
 
-Use this process for every release after the current published baseline.
+Normal releases are automatic. The complete maintained procedure is in [Automated Releases](RELEASING.md).
 
 ## 1) Preconditions
 
@@ -12,18 +12,15 @@ Use this process for every release after the current published baseline.
 
 ```bash
 bun install
-bun run version:sync
+bun run changelog:pm:check
 bun run validate:release
 ```
 
-## 3) Prepare release candidate in GitHub Actions
+## 3) Let Auto Release prepare the candidate
 
-Run `.github/workflows/release-prepare.yml` with target ref (`main` or release commit SHA).
+`.github/workflows/auto-release.yml` runs daily and skips cleanly unless release-relevant changes exist after the latest tag. A manual dispatch defaults to a non-pushing gate run.
 
-Expected artifacts:
-- `release-notes.md`
-- `jellyfin-cli-<version>-dist.tar.gz`
-- `SHA256SUMS.txt`
+It computes the next calendar version, regenerates the complete changelog from pm, validates, and atomically pushes the release commit and tag.
 
 ## 4) Final checks before publish
 
@@ -38,27 +35,13 @@ bun run smoke:npx
 bun run smoke:bunx
 ```
 
-## 5) Publish (manual, guarded)
+## 5) Publish and verify (tag-driven)
 
-Run `.github/workflows/release-publish.yml`:
+The pushed tag starts `.github/workflows/release.yml`. It publishes once to the npm registry with provenance, then proves the exact package through `npx` and `bunx --bun`. Bun consumes npm packages; there is no separate Bun registry copy.
 
-- Use `dry_run: true` first.
-- For real publish, set `dry_run: false` and `confirm_publish: YES_PUBLISH`.
-- Preferred auth: npm Trusted Publishing (GitHub OIDC, no long-lived token).
-- Fallback auth: set `NPM_TOKEN` GitHub secret if Trusted Publishing is not configured yet.
+## 6) Create the GitHub Release
 
-The workflow publishes to npm with provenance enabled.
-It also verifies the published package can execute via both `npx` and `bunx`.
-
-## 6) Create tag + GitHub release (manual)
-
-Run `.github/workflows/release-github.yml`:
-
-- `ref`: published release commit (usually `main`)
-- optional `tag`: leave empty to use `v<package.version>`
-- `confirm_release`: `YES_RELEASE`
-
-This workflow creates an annotated tag and a GitHub release with generated notes.
+The same tag workflow creates the GitHub Release from the pm-generated version section. Rerunning it for an existing tag is safe: an already-published npm version is verified rather than republished.
 
 ## 7) Post-publish verification
 
@@ -75,4 +58,4 @@ jellyfin-cli --help
 jf-cli --help
 ```
 
-Keep `Unreleased` open in `CHANGELOG.md` for the next cycle.
+Do not hand-edit `CHANGELOG.md`; close and classify pm items, then run `bun run changelog:pm` after the last tracker mutation.

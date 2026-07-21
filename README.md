@@ -207,12 +207,10 @@ jf system info --format raw
 ## Release Validation
 
 ```bash
-bun run version:sync
 bun run validate:release
 ```
 
-This syncs/enforces the version policy and runs typecheck, lint, tests, build, dist smoke checks, TypeScript code-length enforcement (<=300 lines excluding comments), tracked-file secret scan, and git-history secret scan.
-It also validates npm packaging (`npm pack --dry-run`) plus local `npx` and `bunx` smoke runs from the packed tarball.
+This enforces the version and generated-changelog policies, then runs typecheck, lint, tests, build, dist smoke checks, TypeScript code-length enforcement (<=300 lines excluding comments), tracked-file and history secret scans, npm packaging, and exact local `npx`/Bun smoke runs.
 
 ## CI/CD and Release Operations
 
@@ -222,10 +220,10 @@ GitHub Actions workflows are configured for professional release management:
 - `CodeQL` (`.github/workflows/codeql.yml`): static security analysis
 - `Secret Scan` (`.github/workflows/secret-scan.yml`): tracked-file + git-history + Gitleaks checks
 - `Commit Quality` (`.github/workflows/commit-quality.yml`): PR title + commit subject professionalism checks
-- `Release Prepare` (`.github/workflows/release-prepare.yml`): manual release candidate validation + artifact packaging
-- `Release Publish (Manual)` (`.github/workflows/release-publish.yml`): guarded npm publish workflow (manual only, optional dry-run)
-  - Uses npm Trusted Publishing when configured; falls back to `NPM_TOKEN` secret
-- `GitHub Release (Manual)` (`.github/workflows/release-github.yml`): creates annotated tag + GitHub release from `package.json` version
+- `Auto Release` (`.github/workflows/auto-release.yml`): scheduled/manual change detection, pm-generated changelog, release gates, and atomic release commit/tag
+- `Release` (`.github/workflows/release.yml`): tag-driven npm provenance publish, exact npm/npx/Bun verification, artifacts, and GitHub Release
+
+See [Automated Releases](docs/RELEASING.md) for setup, changelog ownership, secrets, dry runs, registry semantics, and recovery.
 
 Contributor and governance standards:
 
@@ -241,7 +239,7 @@ Contributor and governance standards:
 - Date uses UTC day
 - `N` is the release index for that UTC day
 - `-1` is not allowed (use `YYYY.M.D` without suffix)
-- Use `bun run version:sync` before preparing a release
+- Auto Release selects the next registry-safe version; use `bun run version:next` to preview it
 
 ## Read-Only Mode
 

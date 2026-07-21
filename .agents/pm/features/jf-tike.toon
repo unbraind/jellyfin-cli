@@ -1,0 +1,53 @@
+id: jf-tike
+title: Automate change-aware daily releases with npm and Bun verification
+description: "Port the proven pm-cli daily auto-release model to jellyfin-cli: detect release-relevant commits after the latest tag, compute calendar versions, regenerate CHANGELOG.md exclusively from closed pm items with pm-changelog, pass the full release gate, push a release commit and tag, publish to npm with provenance, and prove consumption through both npx and bunx."
+type: Feature
+status: closed
+priority: 0
+tags[7]: added,automation,bun,changelog,github-actions,npm,release
+created_at: "2026-07-21T17:21:11.087Z"
+updated_at: "2026-07-21T17:42:05.641Z"
+closed_at: "2026-07-21T17:35:03.058Z"
+author: codex-auto-release
+acceptance_criteria: "Every pre-existing CHANGELOG.md bullet is represented by a closed pm item and survives package-generated replacement.; Scheduled and manual auto-release skip when no release-relevant commits exist after the latest tag and never cut more than one release per UTC day by default.; The release pipeline computes YYYY.M.D or YYYY.M.D-N, regenerates CHANGELOG.md with pm-changelog, runs release validation, and atomically pushes the release commit and tag.; Tag-driven publishing uses npm provenance, is safely retryable, creates a GitHub release, and verifies the exact published version through npm, npx, and bunx/Bun.; Maintainer setup, secrets, architecture, recovery, local parity, and Bun registry semantics are documented in detail and linked from the pm item."
+goal: jf-mqpo
+value: "Make releases routine, auditable, and impossible to silently omit when real product changes land."
+impact: Reduces manual release risk while preserving historical release notes and validating both Node/npm and Bun consumers.
+outcome: A pm-cli-parity daily release pipeline with deterministic pm-generated changelogs and verified public package delivery.
+why_now: "The repository has manual release workflows and a hand-maintained changelog, but no change-aware scheduled driver or package-owned changelog guarantee."
+parent: jf-mqpo
+risk: high
+confidence: high
+resolution: "Ported and adapted the pm-cli auto-release architecture to jellyfin-cli, consolidated obsolete manual workflows into Auto Release plus tag-driven Release, and made pm-changelog the single changelog owner."
+expected_result: "Release-relevant changes are automatically versioned, documented, validated, published once to npm, and verified for both Node/npm and Bun consumers without losing historical changelog data."
+actual_result: "The complete local gate, actionlint v1.7.7, lossless 19-of-19 changelog comparison, local npx/bunx packed-package proofs, and exact public 2026.3.6 npm/npx/bunx verification all passed."
+notes[4]{created_at,author,text}:
+  "2026-07-21T17:34:20.574Z",codex-auto-release,"Legacy changelog preservation proof: git HEAD contained 19 bullets; pm-changelog 2026.7.18 generated 26 bullets with missingLegacyEntries=[] and seven additional closed pm records that the hand-maintained file had omitted."
+  "2026-07-21T17:34:21.599Z",codex-auto-release,"Full local release gate passed on 2026-07-21: 893 tests passed, 177 credential-dependent E2E tests skipped, zero failures; typecheck, lint, build, dist smoke, file-length, tracked/history secret scans, npm pack, npx tarball smoke, bunx --bun tarball smoke, and pm changelog check all passed."
+  "2026-07-21T17:38:47.744Z",codex-auto-release,"Final governance validation after historical backfill: 27 closed items checked with zero missing resolution fields; 29 item histories checked with zero drift, missing streams, unreadable streams, hash mismatches, or chain mismatches."
+  "2026-07-21T17:42:05.641Z",codex-auto-release,"Dry-run verification exposed and fixed a no-op managed-extension timestamp rewrite: fresh checks now install missing pm-changelog files but restore the registry byte-for-byte when the managed entry is unchanged."
+learnings[1]{created_at,author,text}:
+  "2026-07-21T17:34:22.588Z",codex-auto-release,"Bun does not use a separate public package registry for this CLI: bunx resolves packages from registry.npmjs.org. Correct dual-consumer delivery is one npm provenance publish followed by exact-version npx and bunx --bun verification, not a duplicate bun publish."
+files[9]{path,scope,note}:
+  .github/workflows/auto-release.yml,project,null
+  .github/workflows/release.yml,project,null
+  CHANGELOG.md,project,null
+  docs/RELEASING.md,project,null
+  package.json,project,null
+  scripts/release-version.mjs,project,null
+  scripts/release/ensure-pm-changelog.mjs,project,null
+  scripts/release/run-release-pipeline.mjs,project,null
+  scripts/release/verify-published-release.mjs,project,null
+tests[5]{command,scope}:
+  "bun run changelog:pm:check",project
+  "bun run release:pipeline:dry-run -- --json",project
+  "bun run test:release",project
+  "bun run validate:release",project
+  node scripts/release/verify-published-release.mjs --version 2026.3.6,project
+docs[4]{path,scope,note}:
+  docs/release-process.md,project,Contributor release flow
+  docs/release-readiness.md,project,Release gate checklist
+  docs/RELEASING.md,project,"Canonical auto-release architecture,setup,changelog ownership,npm and Bun semantics,and recovery"
+  README.md,project,Public release workflow overview
+close_reason: "Implemented pm-cli-parity change-aware daily release preparation, lossless pm-changelog ownership, atomic release commit/tag creation, idempotent npm provenance publishing, exact npm/npx/Bun verification, scheduled blocker reporting, focused automation tests, and detailed maintainer documentation. Preservation proof retained all 19 legacy bullets and added seven previously omitted closed pm records; full release validation passed with 893 tests and zero failures."
+body: ""

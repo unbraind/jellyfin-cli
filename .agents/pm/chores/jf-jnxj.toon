@@ -1,0 +1,17 @@
+id: jf-jnxj
+title: Release documentation and contributor guidance hardened for production use.
+description: Expanded release-process and contributor docs for a production-ready posture.
+type: Chore
+status: closed
+priority: 2
+tags[3]: changed,docs,release-history
+created_at: "2026-07-21T17:14:51.012Z"
+updated_at: "2026-07-21T17:38:13.037Z"
+closed_at: "2026-07-21T17:14:51.434Z"
+author: codex
+release: 2026.3.4
+resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
+expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.
+actual_result: Release documentation and contributor guidance hardened for production use. is represented by this closed pm item and reproduced by pm-changelog.
+close_reason: Backfilled into the pm tracker to preserve published CHANGELOG history for pm-generated changelog parity.
+body: ""

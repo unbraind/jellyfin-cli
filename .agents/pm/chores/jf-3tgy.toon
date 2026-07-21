@@ -1,0 +1,17 @@
+id: jf-3tgy
+title: "Runtime and development dependencies, ESLint flat configuration, and GitHub Actions were upgraded to maintained releases."
+description: "Upgraded runtime/dev dependencies, adopted ESLint flat config, and modernized GitHub Actions."
+type: Chore
+status: closed
+priority: 2
+tags[3]: changed,ci,dependencies
+created_at: "2026-07-21T17:18:08.860Z"
+updated_at: "2026-07-21T17:37:59.274Z"
+closed_at: "2026-07-21T17:18:09.503Z"
+author: codex
+parent: jf-zifk
+resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
+expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.
+actual_result: "Runtime and development dependencies, ESLint flat configuration, and GitHub Actions were upgraded to maintained releases. is represented by this closed pm item and reproduced by pm-changelog."
+close_reason: Backfilled into the pm tracker to preserve the Unreleased CHANGELOG entries for pm-generated changelog parity.
+body: ""

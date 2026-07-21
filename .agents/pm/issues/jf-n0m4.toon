@@ -1,12 +1,12 @@
 id: jf-n0m4
-title: Prevent shell injection through manual release workflow inputs
+title: Prevented manual release inputs from being interpolated directly into privileged workflow shell scripts.
 description: "Manual release workflows interpolate workflow_dispatch inputs directly into run-script source. A ref, tag, or confirmation value containing quotes or shell metacharacters can change the generated shell program. Pass all GitHub expression values through step-level environment variables, quote shell expansions, and add workflow lint/static validation."
 type: Issue
 status: closed
 priority: 0
 tags[4]: github-actions,release,security,workflow-injection
 created_at: "2026-07-16T16:51:57.099Z"
-updated_at: "2026-07-16T17:00:22.677Z"
+updated_at: "2026-07-21T17:22:58.562Z"
 closed_at: "2026-07-16T17:00:22.676Z"
 author: codex
 acceptance_criteria: "No workflow_dispatch input is interpolated directly inside a run script.; Release confirmation, tag, ref, and metadata behavior remains unchanged for valid inputs."

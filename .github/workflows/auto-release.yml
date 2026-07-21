@@ -1,0 +1,121 @@
+name: Auto Release
+
+on:
+  schedule:
+    - cron: '35 2 * * *'
+  workflow_dispatch:
+    inputs:
+      push:
+        description: 'Push the checked release commit and tag'
+        type: boolean
+        required: false
+        default: false
+      dry_run:
+        description: 'Run all release gates without changing git history'
+        type: boolean
+        required: false
+        default: false
+
+permissions:
+  actions: read
+  contents: write
+  issues: write
+
+concurrency:
+  group: auto-release-${{ github.workflow }}
+  cancel-in-progress: false
+
+jobs:
+  auto-release:
+    name: Detect, validate, and release changes
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    environment: release
+
+    steps:
+      - name: Checkout full release history
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.11'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Run change-aware release pipeline
+        id: release
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          INPUT_PUSH: ${{ github.event_name == 'workflow_dispatch' && (inputs.push && 'true' || 'false') || 'true' }}
+          INPUT_DRY_RUN: ${{ github.event_name == 'workflow_dispatch' && (inputs.dry_run && 'true' || 'false') || 'false' }}
+          RELEASE_PAT_CONFIGURED: ${{ secrets.RELEASE_PAT != '' }}
+          RELEASE_PUSH_TOKEN: ${{ secrets.RELEASE_PAT || github.token }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [[ "${INPUT_DRY_RUN}" == 'true' && "${INPUT_PUSH}" == 'true' ]]; then
+            echo 'dry_run=true cannot be combined with push=true'
+            exit 2
+          fi
+          if [[ "${INPUT_PUSH}" == 'true' && "${INPUT_DRY_RUN}" != 'true' && "${RELEASE_PAT_CONFIGURED}" != 'true' ]]; then
+            echo 'RELEASE_PAT is required to push the release commit and tag through protected main.'
+            exit 1
+          fi
+
+          args=(--json --author 'github-actions[bot]')
+          [[ "${INPUT_DRY_RUN}" == 'true' ]] && args+=(--dry-run)
+          [[ "${INPUT_PUSH}" == 'true' ]] && args+=(--push)
+          previous_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+          node scripts/release/run-release-pipeline.mjs "${args[@]}"
+          new_tag="$(git describe --tags --abbrev=0 2>/dev/null || true)"
+
+          if [[ "${INPUT_PUSH}" != 'true' || "${INPUT_DRY_RUN}" == 'true' || -z "${new_tag}" || "${new_tag}" == "${previous_tag}" ]]; then
+            echo 'No new pushed release tag detected; downstream publishing was correctly skipped.'
+            exit 0
+          fi
+
+          echo "published_tag=${new_tag}" >> "${GITHUB_OUTPUT}"
+          echo "published_sha=$(git rev-list -n 1 "${new_tag}")" >> "${GITHUB_OUTPUT}"
+          release_run=''
+          for _attempt in $(seq 1 30); do
+            release_run="$(gh run list --workflow release.yml --event push --branch "${new_tag}" --limit 20 --json databaseId,status,headBranch --jq ".[] | select(.headBranch == \"${new_tag}\" and (.status == \"queued\" or .status == \"in_progress\" or .status == \"waiting\")) | .databaseId" | head -1)"
+            [[ -n "${release_run}" ]] && break
+            sleep 10
+          done
+          [[ -n "${release_run}" ]] || { echo "Release workflow for ${new_tag} did not appear."; exit 1; }
+          gh run watch "${release_run}" --compact --exit-status --interval 30
+
+      - name: Close stale scheduled-release blocker after publish
+        if: success() && github.event_name == 'schedule' && steps.release.outputs.published_tag
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ steps.release.outputs.published_tag }}
+        run: |
+          set -euo pipefail
+          issue="$(gh issue list --state open --search '"Auto Release blocked: scheduled run failed" in:title' --json number --jq '.[0].number // empty')"
+          [[ -z "${issue}" ]] || gh issue close "${issue}" --reason completed --comment "Scheduled Auto Release recovered and published ${RELEASE_TAG}."
+
+      - name: Report a blocked scheduled release
+        if: failure() && github.event_name == 'schedule'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RUN_URL: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+          RELEASE_SHA: ${{ github.sha }}
+          RELEASE_PAT_CONFIGURED: ${{ secrets.RELEASE_PAT != '' }}
+        run: |
+          set -euo pipefail
+          title='Auto Release blocked: scheduled run failed'
+          body="The scheduled release failed before a verified publish.\n\nRun: ${RUN_URL}\nCommit: ${RELEASE_SHA}\nRELEASE_PAT configured: ${RELEASE_PAT_CONFIGURED}\n\nResolve the failing gate or release secret, then rerun Auto Release manually."
+          issue="$(gh issue list --state open --search "\"${title}\" in:title" --json number --jq '.[0].number // empty')"
+          if [[ -n "${issue}" ]]; then gh issue comment "${issue}" --body "${body}"; else gh issue create --title "${title}" --body "${body}"; fi

@@ -35,6 +35,12 @@ test-results/
 .backup-*/
 *.tgz
 
+# Installed (vendored) pm extensions are npm artifacts restored at runtime by
+# `pm install npm:pm-changelog --project` (auto-release + changelog:pm:check reinstall
+# on every run). Track only the managed registry so restores are deterministic.
+.agents/pm/extensions/*
+!.agents/pm/extensions/.managed-extensions.json
+
 # pm-cli:runtime-cache:start
 .agents/pm/runtime/
 .agents/pm/search/
