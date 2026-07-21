@@ -187,7 +187,9 @@ export function runPipeline(argv = process.argv.slice(2)) {
     return result;
   }
 
-  runCommand(commandFor('bun'), ['run', 'validate:release']);
+  runCommand(commandFor('bun'), ['run', 'validate:release'], {
+    env: { PM_CHANGELOG_RELEASE_VERSION: dryRun ? '' : targetVersion },
+  });
   const notesPath = path.join(tmpdir(), `jellyfin-cli-${targetVersion}-release-notes.md`);
   if (!dryRun) runCommand(process.execPath, ['scripts/release/generate-release-notes.mjs', '--version', targetVersion, '--output', notesPath]);
   const tagName = `v${targetVersion}`;

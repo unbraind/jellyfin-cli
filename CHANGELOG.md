@@ -18,6 +18,7 @@
 
 ### Fixed
 
+- Make release changelog validation target-version aware ([jf-ss2e](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-ss2e.toon))
 - Existing dead assignments surfaced by the updated lint toolchain. ([jf-1m42](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-1m42.toon))
 - Stale release documentation that still described the project as unreleased. ([jf-43cu](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-43cu.toon))
 - Fix sessions list output format and active playback fields ([jf-ddd7](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-ddd7.toon))
