@@ -6,7 +6,7 @@ status: closed
 priority: 0
 tags[5]: automation,bun,npm,release,verification
 created_at: "2026-07-21T18:21:18.133Z"
-updated_at: "2026-07-21T18:27:58.570Z"
+updated_at: "2026-07-21T18:33:59.286Z"
 closed_at: "2026-07-21T18:27:57.847Z"
 author: codex-release-agent
 estimated_minutes: 20
@@ -21,7 +21,7 @@ reviewer: maintainer
 risk: high
 confidence: high
 sprint: release-hardening
-release: 2026.7.21
+release: 2026.7.21-2
 severity: high
 environment: GitHub Actions tag release job
 repro_steps: "From a jellyfin-cli checkout whose package version equals the requested registry version, run npx with --package jellyfin-cli@that-version and invoke jf."
@@ -33,8 +33,9 @@ fixed_version: 2026.7.21
 component: release-automation
 regression: true
 customer_impact: "The package was available, but the release workflow and GitHub Release remained incomplete."
-notes[1]{created_at,author,text}:
+notes[2]{created_at,author,text}:
   "2026-07-21T18:26:56.403Z",codex-release-agent,"Root-cause proof: inside the same-name, same-version release checkout, npm metadata and Bun succeeded while npx selected the checkout and could not find a self-installed jf binary. After moving all consumer checks to an empty temporary working directory and clearing publish authentication, exact 2026.7.21 verification passed npm, npx, and Bun on attempt one."
+  "2026-07-21T18:33:59.283Z",codex-release-agent,"Release lineage correction: the verifier isolation fix landed after v2026.7.21 was created, so its changelog entry belongs to the subsequent 2026.7.21-2 patch rather than the immutable original tag."
 files[2]{path,scope,note}:
   .github/workflows/release.yml,project,null
   scripts/release/verify-published-release.mjs,project,null

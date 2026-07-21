@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Isolate public package verification from release checkout and authentication ([jf-jsqh](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-jsqh.toon))
+
 ## 2026.7.21 - 2026-07-21
 
 ### Added
@@ -18,7 +24,6 @@
 
 ### Fixed
 
-- Isolate public package verification from release checkout and authentication ([jf-jsqh](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-jsqh.toon))
 - Make release changelog validation target-version aware ([jf-ss2e](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-ss2e.toon))
 - Existing dead assignments surfaced by the updated lint toolchain. ([jf-1m42](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-1m42.toon))
 - Stale release documentation that still described the project as unreleased. ([jf-43cu](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-43cu.toon))
