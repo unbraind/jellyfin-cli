@@ -21,6 +21,8 @@ The release path is deliberately split:
 4. The pipeline updates `package.json` and `package-lock.json`, runs `bun run validate:release`, generates release notes from the target changelog section, creates one release commit and tag, and pushes both atomically.
 5. `.github/workflows/release.yml` runs for the pushed tag, verifies tag/package identity, repeats the complete release gate, publishes with npm provenance, verifies the exact registry version through npm metadata, `npx`, and `bunx --bun`, then creates the GitHub Release.
 
+During release preparation, the pipeline sets `PM_CHANGELOG_RELEASE_VERSION` only for the validation subprocess. This makes `changelog:pm:check` compare the prepared versioned section with the same target used to generate it. Normal branch validation leaves the variable unset and continues to require the pending `Unreleased` form.
+
 The tag push must use a maintainer token rather than the workflow `GITHUB_TOKEN`: GitHub does not recursively start another workflow from a tag created with the default token, and protected `main` may also require bypass rights. The release token is passed only to the atomic git push and is not persisted by checkout.
 
 ## npm and Bun publication semantics

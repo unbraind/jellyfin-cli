@@ -1,5 +1,6 @@
 import assert from 'node:assert/strict';
 import test from 'node:test';
+import { changelogCheckArgs } from './check-changelog.mjs';
 import { extractReleaseSection } from './generate-release-notes.mjs';
 import { isReleaseRelevantPath } from './release-relevance.mjs';
 import { isTagForDate, releaseDecision } from './run-release-pipeline.mjs';
@@ -42,6 +43,13 @@ test('published version parsing lets transient invalid JSON be retried', () => {
   assert.equal(parsePublishedVersion('"2026.7.21"'), '2026.7.21');
   assert.equal(parsePublishedVersion('temporarily unavailable'), null);
   assert.equal(parsePublishedVersion('{"version":"2026.7.21"}'), null);
+});
+
+test('changelog checks distinguish pending and prepared release contexts', () => {
+  assert.equal(changelogCheckArgs().includes('--release-version'), false);
+  const releaseArgs = changelogCheckArgs('2026.7.21');
+  assert.deepEqual(releaseArgs.slice(releaseArgs.indexOf('--release-version'), -1), ['--release-version', '2026.7.21']);
+  assert.throws(() => changelogCheckArgs('not-a-version'), /Invalid PM_CHANGELOG_RELEASE_VERSION/);
 });
 
 test('process start failures retain their operating-system error', () => {

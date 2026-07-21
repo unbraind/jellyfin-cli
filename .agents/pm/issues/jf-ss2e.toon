@@ -1,0 +1,51 @@
+id: jf-ss2e
+title: Make release changelog validation target-version aware
+description: "The first production Auto Release run generated a versioned changelog, then the generic changelog check regenerated the pending Unreleased form and rejected the otherwise valid release workspace."
+type: Issue
+status: closed
+priority: 0
+tags[4]: automation,changelog,regression,release
+created_at: "2026-07-21T18:06:26.555Z"
+updated_at: "2026-07-21T18:09:25.442Z"
+closed_at: "2026-07-21T18:08:06.719Z"
+author: codex-release-agent
+estimated_minutes: 30
+acceptance_criteria: "Normal main-branch changelog checks continue to validate the Unreleased form.; Release preparation validates the generated target-version form without drift.; The real Auto Release run publishes and verifies the exact package through npm, npx, and Bun."
+goal: jf-mqpo
+value: Remove the final production-only release blocker.
+impact: Allows deterministic automated publishing after all quality gates pass.
+outcome: One changelog check supports both pending and release-preparation contexts explicitly.
+why_now: The production exercise exposed a context mismatch that local pending-state validation could not reproduce.
+parent: jf-tike
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: release-hardening
+release: 2026.7.21
+severity: high
+environment: GitHub Actions release workspace
+repro_steps: "Generate the changelog with a target release version, then run the generic pending-state changelog check."
+resolution: Added a target-aware changelog check helper and passed the target version only into release-preparation validation while retaining pending-state validation by default.
+expected_result: The release gate validates the exact target-version changelog.
+actual_result: Node and Bun regression tests plus an isolated clean-clone dual-context changelog check passed; the production rerun remains the final publication proof.
+affected_version: 2026.7.16
+fixed_version: 2026.7.21
+component: release-automation
+regression: true
+customer_impact: No package was published; automated releases were blocked safely.
+notes[2]{created_at,author,text}:
+  "2026-07-21T18:08:05.650Z",codex-release-agent,"Isolated clean-clone proof passed both modes: an unset target validated the pending Unreleased changelog, while PM_CHANGELOG_RELEASE_VERSION=2026.7.21 validated the prepared versioned changelog generated from the same closed pm items."
+  "2026-07-21T18:09:25.441Z",codex-release-agent,"Final local gate passed after closure and changelog regeneration: 28 closed items have complete resolution metadata; 30 history streams have zero drift; 895 tests passed with 177 credential-dependent skips and zero failures; build, pack, npm/npx, Bun, changelog, and secret scans all passed. Preservation comparison found all 27 prior generated bullets present plus the new fix entry."
+files[4]{path,scope,note}:
+  package.json,project,null
+  scripts/release/check-changelog.mjs,project,null
+  scripts/release/release.test.mjs,project,null
+  scripts/release/run-release-pipeline.mjs,project,null
+tests[3]{command,scope}:
+  "bun run changelog:pm:check",project
+  "bun run test:release",project
+  "bun run validate:release",project
+docs[1]{path,scope,note}:
+  docs/RELEASING.md,project,Pending and prepared-release changelog validation contexts
+close_reason: "Fixed the production-only changelog validation context mismatch with explicit, validated target-version propagation and clean-clone regression proof."
+body: ""
