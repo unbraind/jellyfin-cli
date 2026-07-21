@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Publish same-day calendar patches with an explicit npm dist-tag ([jf-wmc1](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-wmc1.toon))
+
 ## 2026.7.21-2 - 2026-07-21
 
 ### Fixed
