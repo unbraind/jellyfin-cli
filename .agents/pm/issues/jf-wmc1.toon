@@ -1,0 +1,44 @@
+id: jf-wmc1
+title: Publish same-day calendar patches with an explicit npm dist-tag
+description: The first same-day ordinal tag was safely rejected before publication because npm treats YYYY.M.D-N as a SemVer prerelease and requires an explicit dist-tag.
+type: Issue
+status: closed
+priority: 0
+tags[5]: automation,bin,npm,regression,release
+created_at: "2026-07-21T18:38:40.657Z"
+updated_at: "2026-07-21T18:39:57.365Z"
+closed_at: "2026-07-21T18:39:56.909Z"
+author: codex-release-agent
+estimated_minutes: 20
+acceptance_criteria: "Same-day ordinal versions publish explicitly to the latest dist-tag with provenance.; The package retains its CLI bin mappings after npm normalization.; The corrected exact version runs through npm metadata, npx, and Bun and has a GitHub Release."
+goal: jf-mqpo
+value: Complete a valid npm and Bun patch release.
+impact: Prevents npm from rejecting ordinal releases or stripping executable bins.
+outcome: Calendar patch releases are publishable and executable across Node and Bun.
+why_now: The real provenance publish surfaced npm 11 constraints not exercised by dry-run packing.
+parent: jf-tike
+reviewer: maintainer
+risk: critical
+confidence: high
+sprint: release-hardening
+release: 2026.7.21-3
+severity: critical
+environment: npm 11 provenance publish in GitHub Actions
+repro_steps: Publish a YYYY.M.D-N version without --tag.
+resolution: Added an explicit latest dist-tag to provenance publishing for same-day ordinal SemVer releases and documented npm's calendar-version semantics.
+expected_result: npm publishes the exact version with all CLI bins and provenance.
+actual_result: npm publish dry-run accepted 2026.7.21-2 with tag latest; the published stable manifest confirms all three canonical bin mappings remain present. The corrected 2026.7.21-3 production run is the final proof.
+affected_version: 2026.7.21-2
+fixed_version: 2026.7.21-3
+component: release-automation
+regression: true
+customer_impact: No broken package was published; the patch release remained incomplete.
+files[1]{path,scope,note}:
+  .github/workflows/release.yml,project,null
+tests[2]{command,scope}:
+  "bun run validate:release",project
+  npm publish --dry-run --tag latest,project
+docs[1]{path,scope,note}:
+  docs/RELEASING.md,project,Same-day ordinal npm dist-tag semantics
+close_reason: "Added explicit latest dist-tag publishing for same-day ordinal versions; dry-run publish, bin-manifest verification, release regression tests, and secret scans passed."
+body: ""

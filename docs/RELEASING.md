@@ -8,6 +8,7 @@
 - The scheduled driver runs daily at `02:35 UTC` and releases only when at least one non-tracker file changed after the latest reachable release tag.
 - Commits that only change `.agents/pm/**` are retained as project evidence but do not publish a new CLI package.
 - By default, only one release is created per UTC day. A maintainer may explicitly use `--allow-same-day-release` when a second same-day release is required.
+- Same-day ordinal versions such as `YYYY.M.D-2` are SemVer prereleases, so publishing explicitly assigns them to npm's `latest` dist-tag.
 - `CHANGELOG.md` is generated from closed pm items by the project-managed `pm-changelog` package using the explicitly pinned pm CLI version. Do not edit it manually.
 - Publishing is idempotent: rerunning the tag workflow skips `npm publish` when the exact version already exists, then repeats public verification and GitHub Release creation.
 

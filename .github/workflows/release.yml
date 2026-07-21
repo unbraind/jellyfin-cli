@@ -80,7 +80,7 @@ jobs:
           if npm view "jellyfin-cli@${version}" version --json >/dev/null 2>&1; then
             echo "jellyfin-cli@${version} is already published; continuing with verification."
           else
-            npm publish --access public --provenance
+            npm publish --access public --provenance --tag latest
           fi
 
       - name: Verify the exact package through npm, npx, and Bun
