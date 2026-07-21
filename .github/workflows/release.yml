@@ -85,7 +85,13 @@ jobs:
 
       - name: Verify the exact package through npm, npx, and Bun
         timeout-minutes: 8
-        run: node scripts/release/verify-published-release.mjs --tag "${RELEASE_TAG}"
+        env:
+          NPM_CONFIG_USERCONFIG: ${{ runner.temp }}/npm-public-verification.npmrc
+        run: |
+          # Do not let setup-node's publish authentication affect the public-consumer proof.
+          : > "${NPM_CONFIG_USERCONFIG}"
+          unset NODE_AUTH_TOKEN
+          node scripts/release/verify-published-release.mjs --tag "${RELEASE_TAG}"
 
       - name: Create GitHub release
         uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1

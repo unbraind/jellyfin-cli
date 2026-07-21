@@ -1,0 +1,47 @@
+id: jf-jsqh
+title: Isolate public package verification from release checkout and authentication
+description: "The tag workflow published successfully, but public verification ran inside the same-name, same-version release checkout. npm treated that checkout as the requested package even though its own bin was not self-installed; publish-oriented client state also remained in scope."
+type: Issue
+status: closed
+priority: 0
+tags[5]: automation,bun,npm,release,verification
+created_at: "2026-07-21T18:21:18.133Z"
+updated_at: "2026-07-21T18:27:58.570Z"
+closed_at: "2026-07-21T18:27:57.847Z"
+author: codex-release-agent
+estimated_minutes: 20
+acceptance_criteria: "Publishing continues to use the protected npm token and provenance.; Post-publish npm, npx, and Bun checks run with a clean public registry configuration.; An idempotent existing-tag dispatch completes exact-version verification and creates the GitHub Release."
+goal: jf-mqpo
+value: Complete trustworthy public-consumer release proof.
+impact: Prevents publish credentials from affecting anonymous package verification.
+outcome: Authentication is scoped to publishing; verification proves public usability.
+why_now: The first successful package publish exposed the Actions-only client configuration leak.
+parent: jf-tike
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: release-hardening
+release: 2026.7.21
+severity: high
+environment: GitHub Actions tag release job
+repro_steps: "From a jellyfin-cli checkout whose package version equals the requested registry version, run npx with --package jellyfin-cli@that-version and invoke jf."
+resolution: "Separated publishing from public verification, cleared publish client state, and ran registry consumers from an empty temporary directory so npm cannot select the same-version release checkout."
+expected_result: "The exact public version resolves through npm metadata, npx, and Bun."
+actual_result: "Exact public 2026.7.21 verification passed npm metadata, npx, and Bun on the first attempt; the complete local release gate passed with 895 tests, 177 credential-dependent skips, and zero failures."
+affected_version: 2026.7.21
+fixed_version: 2026.7.21
+component: release-automation
+regression: true
+customer_impact: "The package was available, but the release workflow and GitHub Release remained incomplete."
+notes[1]{created_at,author,text}:
+  "2026-07-21T18:26:56.403Z",codex-release-agent,"Root-cause proof: inside the same-name, same-version release checkout, npm metadata and Bun succeeded while npx selected the checkout and could not find a self-installed jf binary. After moving all consumer checks to an empty temporary working directory and clearing publish authentication, exact 2026.7.21 verification passed npm, npx, and Bun on attempt one."
+files[2]{path,scope,note}:
+  .github/workflows/release.yml,project,null
+  scripts/release/verify-published-release.mjs,project,null
+tests[2]{command,scope}:
+  "bun run release:verify-published -- --version 2026.7.21",project
+  "bun run validate:release",project
+docs[1]{path,scope,note}:
+  docs/RELEASING.md,project,Public registry and isolated working-directory verification boundary
+close_reason: Fixed public verification by isolating both registry configuration and working directory from the authenticated same-version release checkout; exact npm/npx/Bun and full release gates passed.
+body: ""

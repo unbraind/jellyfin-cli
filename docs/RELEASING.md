@@ -23,6 +23,8 @@ The release path is deliberately split:
 
 During release preparation, the pipeline sets `PM_CHANGELOG_RELEASE_VERSION` only for the validation subprocess. This makes `changelog:pm:check` compare the prepared versioned section with the same target used to generate it. Normal branch validation leaves the variable unset and continues to require the pending `Unreleased` form.
 
+The npm token is scoped to the publish step. Before public verification, the workflow replaces setup-node's authenticated npm user configuration with an empty temporary config and clears `NODE_AUTH_TOKEN` from the verification process. The verifier also runs npm metadata, `npx`, and `bunx --bun` from an empty temporary working directory so npm cannot mistake the tagged checkout for an already-installed copy of the requested package. Together these checks prove that the exact package is anonymously consumable from the public registry.
+
 The tag push must use a maintainer token rather than the workflow `GITHUB_TOKEN`: GitHub does not recursively start another workflow from a tag created with the default token, and protected `main` may also require bypass rights. The release token is passed only to the atomic git push and is not persisted by checkout.
 
 ## npm and Bun publication semantics

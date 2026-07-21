@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 
-import { readFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { tmpdir } from 'node:os';
 import path from 'node:path';
 import { commandFor, flagString, parseFlags, repoRoot, runCommand } from './utils.mjs';
 
@@ -19,14 +20,20 @@ export function parsePublishedVersion(raw) {
 
 export async function verifyPublishedVersion({ version, attempts = 30, delayMs = 10_000 }) {
   const pkg = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
-  for (let attempt = 1; attempt <= attempts; attempt += 1) {
-    const npmView = runCommand(commandFor('npm'), ['view', `${pkg.name}@${version}`, 'version', '--json'], { allowFailure: true, capture: true });
-    const npx = runCommand(commandFor('npx'), ['--yes', '--package', `${pkg.name}@${version}`, 'jf', '--version'], { allowFailure: true, capture: true });
-    const bunx = runCommand(commandFor('bunx'), ['--bun', '--package', `${pkg.name}@${version}`, 'jf', '--version'], { allowFailure: true, capture: true });
-    if (npmView.status === 0 && parsePublishedVersion(npmView.stdout) === version && npx.status === 0 && npx.stdout.includes(version) && bunx.status === 0 && bunx.stdout.includes(version)) {
-      return { ok: true, package: pkg.name, version, npm: true, npx: true, bunx: true, attempts: attempt };
+  const verificationDirectory = mkdtempSync(path.join(tmpdir(), 'jellyfin-cli-public-verify-'));
+  try {
+    for (let attempt = 1; attempt <= attempts; attempt += 1) {
+      const options = { allowFailure: true, capture: true, cwd: verificationDirectory };
+      const npmView = runCommand(commandFor('npm'), ['view', `${pkg.name}@${version}`, 'version', '--json'], options);
+      const npx = runCommand(commandFor('npx'), ['--yes', '--package', `${pkg.name}@${version}`, 'jf', '--version'], options);
+      const bunx = runCommand(commandFor('bunx'), ['--bun', '--package', `${pkg.name}@${version}`, 'jf', '--version'], options);
+      if (npmView.status === 0 && parsePublishedVersion(npmView.stdout) === version && npx.status === 0 && npx.stdout.includes(version) && bunx.status === 0 && bunx.stdout.includes(version)) {
+        return { ok: true, package: pkg.name, version, npm: true, npx: true, bunx: true, attempts: attempt };
+      }
+      if (attempt < attempts) await sleep(delayMs);
     }
-    if (attempt < attempts) await sleep(delayMs);
+  } finally {
+    rmSync(verificationDirectory, { recursive: true, force: true });
   }
   throw new Error(`Published package ${pkg.name}@${version} did not become usable through npm, npx, and bunx`);
 }
