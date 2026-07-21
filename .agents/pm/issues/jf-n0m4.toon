@@ -6,7 +6,7 @@ status: closed
 priority: 0
 tags[4]: github-actions,release,security,workflow-injection
 created_at: "2026-07-16T16:51:57.099Z"
-updated_at: "2026-07-21T17:22:58.562Z"
+updated_at: "2026-07-21T17:58:21.330Z"
 closed_at: "2026-07-16T17:00:22.676Z"
 author: codex
 acceptance_criteria: "No workflow_dispatch input is interpolated directly inside a run script.; Release confirmation, tag, ref, and metadata behavior remains unchanged for valid inputs."
@@ -19,11 +19,8 @@ resolution: "Moved confirmation, tag, and ref values into step environment varia
 expected_result: Dispatch inputs are data rather than generated shell source.
 actual_result: No workflow run block directly interpolates workflow_dispatch input expressions.
 customer_impact: An authorized workflow dispatcher can unintentionally or maliciously execute altered commands with release workflow permissions.
-notes[1]{created_at,author,text}:
+notes[2]{created_at,author,text}:
   "2026-07-16T17:00:05.312Z",codex,All workflow_dispatch values used by shell scripts now enter through step env variables; no direct input expressions remain inside run-script source.
-files[3]{path,scope,note}:
-  .github/workflows/release-github.yml,project,tag and confirmation input boundary
-  .github/workflows/release-publish.yml,project,publish confirmation boundary
-  .github/workflows/release-prepare.yml,project,release metadata ref boundary
+  "2026-07-21T17:58:21.330Z",codex-release-agent,The three manual release workflows were intentionally superseded by the consolidated change-aware auto-release and tag-driven release workflows tracked under jf-tike; stale file links were removed so pm validation reflects the current public repository.
 close_reason: Manual release input shell boundaries are hardened.
 body: ""

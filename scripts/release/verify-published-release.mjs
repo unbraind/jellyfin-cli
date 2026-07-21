@@ -8,13 +8,22 @@ function sleep(milliseconds) {
   return new Promise((resolve) => setTimeout(resolve, milliseconds));
 }
 
+export function parsePublishedVersion(raw) {
+  try {
+    const value = JSON.parse(raw);
+    return typeof value === 'string' ? value : null;
+  } catch {
+    return null;
+  }
+}
+
 export async function verifyPublishedVersion({ version, attempts = 30, delayMs = 10_000 }) {
   const pkg = JSON.parse(readFileSync(path.join(repoRoot, 'package.json'), 'utf8'));
   for (let attempt = 1; attempt <= attempts; attempt += 1) {
     const npmView = runCommand(commandFor('npm'), ['view', `${pkg.name}@${version}`, 'version', '--json'], { allowFailure: true, capture: true });
     const npx = runCommand(commandFor('npx'), ['--yes', '--package', `${pkg.name}@${version}`, 'jf', '--version'], { allowFailure: true, capture: true });
     const bunx = runCommand(commandFor('bunx'), ['--bun', '--package', `${pkg.name}@${version}`, 'jf', '--version'], { allowFailure: true, capture: true });
-    if (npmView.status === 0 && JSON.parse(npmView.stdout) === version && npx.status === 0 && npx.stdout.includes(version) && bunx.status === 0 && bunx.stdout.includes(version)) {
+    if (npmView.status === 0 && parsePublishedVersion(npmView.stdout) === version && npx.status === 0 && npx.stdout.includes(version) && bunx.status === 0 && bunx.stdout.includes(version)) {
       return { ok: true, package: pkg.name, version, npm: true, npx: true, bunx: true, attempts: attempt };
     }
     if (attempt < attempts) await sleep(delayMs);

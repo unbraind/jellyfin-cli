@@ -8,7 +8,7 @@
 - The scheduled driver runs daily at `02:35 UTC` and releases only when at least one non-tracker file changed after the latest reachable release tag.
 - Commits that only change `.agents/pm/**` are retained as project evidence but do not publish a new CLI package.
 - By default, only one release is created per UTC day. A maintainer may explicitly use `--allow-same-day-release` when a second same-day release is required.
-- `CHANGELOG.md` is generated from closed pm items by the latest published `pm-changelog` package. Do not edit it manually.
+- `CHANGELOG.md` is generated from closed pm items by the project-managed `pm-changelog` package using the explicitly pinned pm CLI version. Do not edit it manually.
 - Publishing is idempotent: rerunning the tag workflow skips `npm publish` when the exact version already exists, then repeats public verification and GitHub Release creation.
 
 ## Architecture
@@ -16,7 +16,7 @@
 The release path is deliberately split:
 
 1. `.github/workflows/auto-release.yml` checks out full history, installs with both Node and Bun available, and calls `scripts/release/run-release-pipeline.mjs`.
-2. The pipeline compares `HEAD` with the latest tag, ignores tracker-only changes, enforces the one-release-per-day guard, asks the npm registry for the next available calendar version, and installs `pm-changelog` through the published pm CLI.
+2. The pipeline compares `HEAD` with the latest tag, ignores tracker-only changes, enforces the one-release-per-day guard, asks the npm registry for the next available calendar version, and installs `pm-changelog` through the pinned published pm CLI.
 3. `pm changelog generate --mode replace --all-release-tags` rebuilds the entire changelog. Historical items use explicit `release` metadata, so the `2026.3.4` and `2026.3.6` sections remain stable while newly closed items enter the pending release.
 4. The pipeline updates `package.json` and `package-lock.json`, runs `bun run validate:release`, generates release notes from the target changelog section, creates one release commit and tag, and pushes both atomically.
 5. `.github/workflows/release.yml` runs for the pushed tag, verifies tag/package identity, repeats the complete release gate, publishes with npm provenance, verifies the exact registry version through npm metadata, `npx`, and `bunx --bun`, then creates the GitHub Release.

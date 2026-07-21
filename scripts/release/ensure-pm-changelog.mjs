@@ -2,13 +2,13 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { commandFor, repoRoot, runCommand } from './utils.mjs';
+import { commandFor, pmCliPackage, repoRoot, runCommand } from './utils.mjs';
 
 const registryPath = path.join(repoRoot, '.agents', 'pm', 'extensions', '.managed-extensions.json');
 
 function pmCommand(args, options = {}) {
   return runCommand(commandFor('npm'), [
-    'exec', '--yes', '--package', '@unbrained/pm-cli@latest', '--', 'pm', ...args,
+    'exec', '--yes', '--package', pmCliPackage, '--', 'pm', ...args,
   ], options);
 }
 

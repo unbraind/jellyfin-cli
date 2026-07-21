@@ -3,6 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
+export const pmCliPackage = '@unbrained/pm-cli@2026.7.21';
 
 export function commandFor(binary) {
   return process.platform === 'win32' && !binary.endsWith('.cmd') ? `${binary}.cmd` : binary;
@@ -21,6 +22,9 @@ export function runCommand(command, args, options = {}) {
     encoding: 'utf8',
     stdio: capture ? ['ignore', 'pipe', 'pipe'] : 'inherit',
   });
+  if (result.error && !allowFailure) {
+    throw new Error(`Command failed to start: ${command} ${args.join(' ')}\n${result.error.message}`);
+  }
   const status = result.status ?? 1;
   if (status !== 0 && !allowFailure) {
     const detail = [result.stderr, result.stdout].filter(Boolean).join('\n').trim();
@@ -30,6 +34,7 @@ export function runCommand(command, args, options = {}) {
     status,
     stdout: capture ? result.stdout ?? '' : '',
     stderr: capture ? result.stderr ?? '' : '',
+    error: result.error ?? null,
   };
 }
 

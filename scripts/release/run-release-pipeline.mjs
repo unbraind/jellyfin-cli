@@ -13,6 +13,7 @@ import {
   flagBool,
   flagString,
   parseFlags,
+  pmCliPackage,
   repoRoot,
   runCommand,
   utcDateKey,
@@ -40,8 +41,16 @@ export function getChangedFilesSince(lastTag) {
   return result.stdout.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
 }
 
+export function isTagForDate(tag, dateKey) {
+  const escapedDate = dateKey.replaceAll(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  return new RegExp(`^v${escapedDate}(?:-\\d+)?$`).test(tag);
+}
+
 export function listTodayTags(dateKey) {
-  return git(['tag', '--list', `v${dateKey}*`]).stdout.split(/\r?\n/).map((entry) => entry.trim()).filter(Boolean);
+  return git(['tag', '--list', `v${dateKey}*`]).stdout
+    .split(/\r?\n/)
+    .map((entry) => entry.trim())
+    .filter((entry) => isTagForDate(entry, dateKey));
 }
 
 export function releaseDecision({ commitsSinceLastTag, lastTag, changedFiles, tagsToday, allowSameDayRelease = false }) {
@@ -70,7 +79,7 @@ function readPackageVersion() {
 }
 
 function runPm(args) {
-  return runCommand(commandFor('npm'), ['exec', '--yes', '--package', '@unbrained/pm-cli@latest', '--', 'pm', ...args]);
+  return runCommand(commandFor('npm'), ['exec', '--yes', '--package', pmCliPackage, '--', 'pm', ...args]);
 }
 
 function prepareReleaseChangelog(targetVersion) {
