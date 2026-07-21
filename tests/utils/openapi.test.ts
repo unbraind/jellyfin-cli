@@ -1,4 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { join } from 'node:path';
 import {
   extractOpenApiOperations,
   fetchOpenApiDocument,
@@ -17,10 +20,18 @@ const CONFIG = {
 
 describe('openapi utils', () => {
   const originalFetch = globalThis.fetch;
+  const originalConfigDir = process.env.JELLYFIN_CONFIG_DIR;
+  let fallbackConfigDir: string | undefined;
 
   afterEach(() => {
     vi.restoreAllMocks();
     globalThis.fetch = originalFetch;
+    if (fallbackConfigDir) {
+      rmSync(fallbackConfigDir, { recursive: true, force: true });
+      fallbackConfigDir = undefined;
+    }
+    if (originalConfigDir === undefined) delete process.env.JELLYFIN_CONFIG_DIR;
+    else process.env.JELLYFIN_CONFIG_DIR = originalConfigDir;
   });
 
   it('summarizes paths, operations, and tags', () => {
@@ -180,7 +191,7 @@ describe('openapi utils', () => {
       .mockResolvedValueOnce(new Response('Not Found', { status: 404 }));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
 
-    await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow(
+    await expect(fetchOpenApiDocument(CONFIG, { officialFallback: false })).rejects.toThrow(
       /OpenAPI schema not reachable\. Tried 3 path\(s\):.*\/swagger\/v1\/swagger\.json => HTTP 404/,
     );
   });
@@ -204,6 +215,70 @@ describe('openapi utils', () => {
     expect(Object.keys(result.document.paths ?? {})).toContain('/Custom/OpenApi');
     expect(fetchMock).toHaveBeenCalledTimes(1);
     expect(fetchMock.mock.calls[0]?.[0]).toBe('http://127.0.0.1:8096/custom/openapi.json');
+  });
+
+  it('uses and privately caches the exact official schema without forwarding auth', async () => {
+    fallbackConfigDir = mkdtempSync(join(tmpdir(), 'jf-openapi-fallback-'));
+    process.env.JELLYFIN_CONFIG_DIR = fallbackConfigDir;
+    const officialDocument = {
+      info: { version: '10.11.11' },
+      paths: { '/System/Ping': { get: { tags: ['System'] } } },
+    };
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }))
+      .mockResolvedValueOnce(Response.json(officialDocument));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const result = await fetchOpenApiDocument(CONFIG);
+
+    expect(result.sourceKind).toBe('official');
+    expect(result.sourcePath).toBe(
+      'https://repo.jellyfin.org/files/openapi/stable/jellyfin-openapi-10.11.11.json',
+    );
+    expect(result.cachePath).toContain('jellyfin-openapi-10.11.11.json');
+    expect(JSON.parse(readFileSync(result.cachePath!, 'utf-8'))).toEqual(officialDocument);
+    expect(statSync(result.cachePath!).mode & 0o777).toBe(0o600);
+    expect(fetchMock.mock.calls[0]?.[1]?.headers).toEqual({ 'X-Emby-Token': 'test-key' });
+    expect(fetchMock.mock.calls[3]?.[1]?.headers).toBeUndefined();
+    expect(fetchMock.mock.calls[4]?.[1]?.headers).toBeUndefined();
+
+    fetchMock.mockReset()
+      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }));
+    const cachedResult = await fetchOpenApiDocument(CONFIG);
+    expect(cachedResult.sourceKind).toBe('cache');
+    expect(cachedResult.document).toEqual(officialDocument);
+    expect(fetchMock).toHaveBeenCalledTimes(4);
+  });
+
+  it('rejects official and cached schemas whose declared version differs from the server', async () => {
+    fallbackConfigDir = mkdtempSync(join(tmpdir(), 'jf-openapi-version-'));
+    process.env.JELLYFIN_CONFIG_DIR = fallbackConfigDir;
+    const cacheDir = join(fallbackConfigDir, 'cache', 'openapi');
+    mkdirSync(cacheDir, { recursive: true });
+    writeFileSync(
+      join(cacheDir, 'jellyfin-openapi-10.11.11.json'),
+      JSON.stringify({ info: { version: '10.10.0' }, paths: { '/Cached': { get: {} } } }),
+    );
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }))
+      .mockResolvedValueOnce(Response.json({
+        info: { version: '10.10.0' },
+        paths: { '/Official': { get: {} } },
+      }));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow(
+      'Invalid or version-mismatched OpenAPI payload',
+    );
   });
 
   it('returns empty list when intent has no meaningful tokens', () => {

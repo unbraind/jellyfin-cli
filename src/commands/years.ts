@@ -27,6 +27,10 @@ function normalizeYears(
   }));
 }
 
+/**
+ * Builds the years command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createYearsCommand(): Command {
   const cmd = new Command('years');
 

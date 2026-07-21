@@ -8,6 +8,10 @@ type SetupStatusOptions = FormatOptions & {
   name?: string | undefined;
 };
 
+/**
+ * Implements attach setup status subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSetupStatusSubcommand(cmd: Command): void {
   cmd
     .command('status')

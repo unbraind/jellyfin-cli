@@ -1,3 +1,6 @@
+/**
+ * Defines the search hint contract used across typed Jellyfin boundaries.
+ */
 export interface SearchHint {
   Id?: string | null;
   Name?: string | null;
@@ -22,17 +25,26 @@ export interface SearchHint {
   AlbumArtist?: string | null;
 }
 
+/**
+ * Defines the search result contract used across typed Jellyfin boundaries.
+ */
 export interface SearchResult {
   SearchHints?: SearchHint[] | null;
   TotalRecordCount?: number | null;
 }
 
+/**
+ * Defines the query result contract used across typed Jellyfin boundaries.
+ */
 export interface QueryResult<T> {
   Items?: T[] | null;
   TotalRecordCount?: number | null;
   StartIndex?: number | null;
 }
 
+/**
+ * Defines the items query params contract used across typed Jellyfin boundaries.
+ */
 export interface ItemsQueryParams {
   ids?: string[];
   excludeItemIds?: string[];
@@ -67,6 +79,9 @@ export interface ItemsQueryParams {
   fields?: string[];
 }
 
+/**
+ * Defines the api error contract used across typed Jellyfin boundaries.
+ */
 export interface ApiError {
   message: string;
   statusCode?: number;

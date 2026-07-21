@@ -76,6 +76,10 @@ function parseValidationInput(value: string, sourceFormat: string): unknown {
   }
 }
 
+/**
+ * Builds the schema validate command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createSchemaValidateCommand(): Command {
   return new Command('validate')
     .description('Validate Toon/JSON/YAML payloads against CLI output schemas')

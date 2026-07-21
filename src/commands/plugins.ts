@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Builds the plugins command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createPluginsCommand(): Command {
   const cmd = new Command('plugins');
 

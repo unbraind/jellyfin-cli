@@ -3,6 +3,10 @@ import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 import { attachLivetvExtendedCommands } from './livetv-extended.js';
 
+/**
+ * Builds the livetv command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createLivetvCommand(): Command {
   const cmd = new Command('livetv');
 

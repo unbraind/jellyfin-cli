@@ -7,6 +7,11 @@ function sanitizeUrl(url: string | null | undefined): string | undefined {
   return url.replace(/^(https?:\/\/)+/, (_, p: string) => p);
 }
 
+/**
+ * Produces the validated format system info result used by CLI automation.
+ * @param info - The info value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatSystemInfo(info: SystemInfo): string {
   return formatToon({
     name: info.ServerName,
@@ -19,6 +24,11 @@ export function formatSystemInfo(info: SystemInfo): string {
   }, 'sys');
 }
 
+/**
+ * Produces the validated format users result used by CLI automation.
+ * @param users - The users value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatUsers(users: UserDto[]): string {
   return formatToon(users.map(u => ({
     id: u.Id,
@@ -31,6 +41,11 @@ export function formatUsers(users: UserDto[]): string {
   })), 'users');
 }
 
+/**
+ * Produces the validated format user result used by CLI automation.
+ * @param user - The user value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatUser(user: UserDto): string {
   return formatToon({
     id: user.Id,
@@ -57,6 +72,11 @@ export function formatUser(user: UserDto): string {
   }, 'user');
 }
 
+/**
+ * Produces the validated format config result used by CLI automation.
+ * @param config - The resolved Jellyfin client configuration.
+ * @returns - The normalized string representation.
+ */
 export function formatConfig(config: JellyfinConfig): string {
   return formatToon({
     url: config.serverUrl,
@@ -67,6 +87,11 @@ export function formatConfig(config: JellyfinConfig): string {
   }, 'config');
 }
 
+/**
+ * Produces the validated format servers result used by CLI automation.
+ * @param servers - The servers value required by this operation.
+ * @returns - The typed format servers result.
+ */
 export function formatServers(servers: { name: string; config: JellyfinConfig; isDefault: boolean }[]): string {
   return formatToon(servers.map(s => ({
     name: s.name,

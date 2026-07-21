@@ -1,3 +1,6 @@
+/**
+ * Defines the device info contract used across typed Jellyfin boundaries.
+ */
 export interface DeviceInfo {
   Name?: string | null;
   CustomName?: string | null;
@@ -12,6 +15,9 @@ export interface DeviceInfo {
   IconUrl?: string | null;
 }
 
+/**
+ * Defines the device capabilities contract used across typed Jellyfin boundaries.
+ */
 export interface DeviceCapabilities {
   PlayableMediaTypes?: string[] | null;
   SupportedCommands?: string[] | null;
@@ -23,6 +29,9 @@ export interface DeviceCapabilities {
   DeviceProfile?: DeviceProfile;
 }
 
+/**
+ * Defines the device profile contract used across typed Jellyfin boundaries.
+ */
 export interface DeviceProfile {
   MaxStreamingBitrate?: number | null;
   MaxStaticBitrate?: number | null;
@@ -34,6 +43,9 @@ export interface DeviceProfile {
   SubtitleProfiles?: SubtitleProfile[] | null;
 }
 
+/**
+ * Defines the direct play profile contract used across typed Jellyfin boundaries.
+ */
 export interface DirectPlayProfile {
   Container?: string | null;
   AudioCodec?: string | null;
@@ -41,6 +53,9 @@ export interface DirectPlayProfile {
   Type?: string | null;
 }
 
+/**
+ * Defines the transcoding profile contract used across typed Jellyfin boundaries.
+ */
 export interface TranscodingProfile {
   Container?: string | null;
   Type?: string | null;
@@ -49,22 +64,34 @@ export interface TranscodingProfile {
   Protocol?: string | null;
 }
 
+/**
+ * Defines the container profile contract used across typed Jellyfin boundaries.
+ */
 export interface ContainerProfile {
   Type?: string | null;
   Container?: string | null;
 }
 
+/**
+ * Defines the codec profile contract used across typed Jellyfin boundaries.
+ */
 export interface CodecProfile {
   Type?: string | null;
   Codec?: string | null;
   Container?: string | null;
 }
 
+/**
+ * Defines the subtitle profile contract used across typed Jellyfin boundaries.
+ */
 export interface SubtitleProfile {
   Format?: string | null;
   Method?: string | null;
 }
 
+/**
+ * Defines the device options contract used across typed Jellyfin boundaries.
+ */
 export interface DeviceOptions {
   CustomName?: string | null;
 }

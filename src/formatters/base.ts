@@ -1,10 +1,19 @@
 import YAML from 'yaml';
 
+/**
+ * Defines the toon output contract used across typed Jellyfin boundaries.
+ */
 export interface ToonOutput {
   type: string;
   data: unknown;
 }
 
+/**
+ * Performs the create toon output operation through the typed Jellyfin API boundary.
+ * @param type - The type value required by this operation.
+ * @param data - The typed payload to format or submit.
+ * @returns - The normalized string representation.
+ */
 export function createToonOutput(type: string, data: unknown): ToonOutput {
   return { type, data: compact(data) };
 }
@@ -28,6 +37,12 @@ function compact(obj: unknown): unknown {
   return obj;
 }
 
+/**
+ * Produces the validated format toon result used by CLI automation.
+ * @param output - The output value required by this operation.
+ * @param typeHint - The type hint value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatToon(output: unknown, typeHint?: string): string {
   const type = typeHint ?? detectType(output);
   const toonOutput = createToonOutput(type, output);
@@ -42,6 +57,11 @@ export function formatToon(output: unknown, typeHint?: string): string {
   }).trim();
 }
 
+/**
+ * Produces the validated detect type result used by CLI automation.
+ * @param output - The output value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function detectType(output: unknown): string {
   if (output === null || output === undefined) return 'empty';
   if (typeof output === 'string') return 'msg';
@@ -71,6 +91,12 @@ export function detectType(output: unknown): string {
   return 'unknown';
 }
 
+/**
+ * Produces the validated format message result used by CLI automation.
+ * @param message - The message value required by this operation.
+ * @param success - The success value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatMessage(message: string, success = true): string {
   if (success) {
     return formatToon({ msg: message }, 'ok');
@@ -78,6 +104,13 @@ export function formatMessage(message: string, success = true): string {
   return formatToon({ err: message }, 'err');
 }
 
+/**
+ * Produces the validated format error result used by CLI automation.
+ * @param error - The error value to normalize for structured output.
+ * @param code - The code value required by this operation.
+ * @param details - Optional structured diagnostic details.
+ * @returns - The normalized string representation.
+ */
 export function formatError(error: string, code?: number, details?: unknown): string {
   const data: Record<string, unknown> = { err: error };
   if (code) data.code = code;

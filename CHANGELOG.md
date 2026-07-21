@@ -1,5 +1,20 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Honor output formats and survive Playback Reporting user-list failures ([jf-59hr](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-59hr.toon))
+
+### Security
+
+- Fix live username/password authentication contract ([jf-cqqy](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-cqqy.toon))
+- Fallback to the exact official Jellyfin OpenAPI document ([jf-rjox](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-rjox.toon))
+
+### Other
+
+- Verify and document the complete read-only jf-cli interface ([jf-sylm](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-sylm.toon))
+
 ## 2026.7.21-3 - 2026-07-21
 
 ### Fixed

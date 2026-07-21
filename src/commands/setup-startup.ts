@@ -76,6 +76,10 @@ async function runStartupDiagnostics(thisCommand: Command, options: SetupStartup
   }
 }
 
+/**
+ * Implements attach setup startup subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSetupStartupSubcommand(cmd: Command): void {
   cmd
     .command('startup')

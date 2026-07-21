@@ -1,0 +1,48 @@
+id: jf-rjox
+title: Fallback to the exact official Jellyfin OpenAPI document
+description: "A transient HTTP 500 from the local Jellyfin 10.11.11 OpenAPI route exposed a resilience gap. Prefer the local document, but resolve and validate an exact official stable document without forwarding credentials when every local candidate is unavailable; cache only below the private CLI data directory and report provenance."
+type: Issue
+status: closed
+priority: 0
+tags[4]: api,openapi,resilience,security
+created_at: "2026-07-21T19:00:05.640Z"
+updated_at: "2026-07-21T20:03:26.376Z"
+closed_at: "2026-07-21T20:03:25.501Z"
+author: codex-jellyfin
+estimated_minutes: 120
+acceptance_criteria: "Local candidates remain preferred; Fallback resolves an exact safe semantic server version from /System/Info/Public; No authentication header is sent to repo.jellyfin.org; Cache is private, versioned, validated, and reusable offline; Doctor, setup validate, schema research, and schema coverage pass against the local 10.11.11 instance"
+goal: jf-mqpo
+value: Restore live API research and readiness diagnostics on current Jellyfin.
+impact: Agents can inspect the actual server contract even when server-hosted Swagger generation fails.
+outcome: Exact-version official fallback with explicit source and cache provenance.
+why_now: Live readiness currently fails solely because the server OpenAPI route returns HTTP 500.
+parent: jf-gn5j
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+severity: high
+environment: Jellyfin 10.11.11 at a private local URL; jf-cli 2026.7.21-3
+repro_steps: "Temporarily make all local OpenAPI candidates unavailable, then run schema or doctor diagnostics; the resolver must fall back safely. Repeated current probes of /api-docs/openapi.json return 356 paths and 429 operations."
+resolution: Local-first discovery now falls back only to a version-matched official or private cached document and exposes its source.
+expected_result: Schema diagnostics remain available safely when local OpenAPI endpoints fail.
+actual_result: "Twenty-four resolver tests pass, including local preference, credential isolation, 0600 cache files, cache reuse, and version-mismatch rejection; current live local discovery returns 429 operations."
+component: schema-research
+customer_impact: "Schema discovery, coverage analysis, and setup readiness gates fail for agents despite an otherwise healthy server."
+dependencies[2]{id,kind,created_at,author,source_kind}:
+  jf-cqqy,related_to,"2026-07-21T19:50:14.652Z",codex-jellyfin,null
+  jf-fdh1,related_to,"2026-07-21T19:50:14.652Z",codex-jellyfin,null
+comments[1]{created_at,author,text}:
+  "2026-07-21T19:52:46.898Z",codex-jellyfin,"The local 10.11.11 server currently serves 429 operations from /api-docs/openapi.json. The implementation remains intentionally resilient: it prefers the authenticated local specification, validates version-matched official stable fallback sources, never forwards credentials off-host, caches only under the private user data directory, and exposes source provenance."
+notes[1]{created_at,author,text}:
+  "2026-07-21T19:00:05.640Z",codex-jellyfin,"Official source selected: https://repo.jellyfin.org/files/openapi/stable/jellyfin-openapi-<version>.json; only strictly validated numeric dotted versions may enter the URL."
+files[3]{path,scope,note}:
+  src/utils/config.ts,project,Owner-only CLI data-directory enforcement
+  src/utils/openapi-source.ts,project,Exact-version local official and private-cache resolver
+  src/utils/openapi.ts,project,OpenAPI diagnostics provenance integration
+tests[1]{command,path,scope,timeout_seconds}:
+  bun test tests/utils/openapi.test.ts,tests/utils/openapi.test.ts,project,120
+docs[1]{path,scope,note}:
+  docs/api-research.md,project,Authoritative research provenance and fallback design
+close_reason: Implemented and verified resilient exact-version OpenAPI discovery with credential isolation and private cache provenance.
+body: ""

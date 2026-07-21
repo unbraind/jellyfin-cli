@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { formatOutput } from '../formatters/index.js';
 
+/**
+ * Builds the trickplay command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createTrickplayCommand(): Command {
   const cmd = new Command('trickplay');
 

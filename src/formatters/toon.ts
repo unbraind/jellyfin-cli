@@ -3,6 +3,9 @@ import { formatSystemInfo, formatUsers, formatUser, formatConfig, formatServers 
 import { formatItems, formatItem, formatQueryResult, formatSearchResult, formatLibraries, formatActivityLog, formatLiveTvInfo } from './items.js';
 import { formatSessions, formatSession, formatTasks, formatTask, formatTaskTriggers } from './sessions.js';
 
+/**
+ * Defines the toon output contract used across typed Jellyfin boundaries.
+ */
 export interface ToonOutput {
   type: string;
   data: unknown;

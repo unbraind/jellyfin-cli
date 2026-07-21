@@ -2,6 +2,10 @@ import type { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Performs the add admin commands operation through the typed Jellyfin API boundary.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function addAdminCommands(cmd: Command): void {
   cmd.command('policy <userId>').description('Get user policy')
     .option('-f, --format <format>', 'Output format')

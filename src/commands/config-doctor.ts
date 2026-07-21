@@ -154,6 +154,10 @@ function buildRequirementStatus(
   return hasRequirements ? status : undefined;
 }
 
+/**
+ * Performs the add config doctor command operation through the typed Jellyfin API boundary.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function addConfigDoctorCommand(cmd: Command): void {
   cmd
     .command('doctor')

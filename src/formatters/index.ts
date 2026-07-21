@@ -4,6 +4,13 @@ import { stringify } from 'yaml';
 
 export { toon };
 
+/**
+ * Produces the validated format output result used by CLI automation.
+ * @param data - The typed payload to format or submit.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @param typeHint - The type hint value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function formatOutput(data: unknown, format: OutputFormat, typeHint?: string): string {
   switch (format) {
     case 'json':
@@ -134,6 +141,12 @@ function formatValue(value: unknown): string {
   return String(value);
 }
 
+/**
+ * Produces the validated format success result used by CLI automation.
+ * @param message - The message value required by this operation.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - The normalized string representation.
+ */
 export function formatSuccess(message: string, format: OutputFormat): string {
   if (format === 'json') {
     return JSON.stringify({ success: true, message });
@@ -144,6 +157,14 @@ export function formatSuccess(message: string, format: OutputFormat): string {
   return toon.formatMessage(message, true);
 }
 
+/**
+ * Produces the validated format error result used by CLI automation.
+ * @param error - The error value to normalize for structured output.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @param code - The code value required by this operation.
+ * @param details - Optional structured diagnostic details.
+ * @returns - The normalized string representation.
+ */
 export function formatError(error: string, format: OutputFormat, code?: number, details?: unknown): string {
   if (format === 'json') {
     return JSON.stringify({ success: false, error, code, details });

@@ -1,0 +1,38 @@
+id: jf-gn5j
+title: Refresh Jellyfin 10.11.11 API and agent interface
+description: "Research the authoritative Jellyfin 10.11.11 API and the configured local instance, harden schema discovery when the server-hosted document is unavailable, verify intuitive help and structured output contracts, and ship read-only production evidence without exposing private configuration."
+type: Epic
+status: open
+priority: 0
+tags[6]: agents,api,openapi,read-only,setup,toon
+created_at: "2026-07-21T19:00:04.847Z"
+updated_at: "2026-07-21T19:53:14.902Z"
+author: codex-jellyfin
+estimated_minutes: 360
+acceptance_criteria: "Live API-key and username/password authentication are proven without media/library mutation; Schema research uses the exact server-version OpenAPI contract even when the local Swagger endpoint fails; All CLI help, output formats, schemas, setup flows, and read-only E2E checks pass; No credential or instance-derived private data is tracked by Git"
+goal: jf-mqpo
+value: Give humans and agents a reliable complete command surface for current Jellyfin servers.
+impact: Makes API discovery and programmatic workflows resilient to server Swagger failures while preserving privacy and read-only safety.
+outcome: "A release-ready CLI with current-version schema evidence, validated command mappings, and fully documented local setup."
+why_now: "The configured Jellyfin 10.11.11 instance returns HTTP 500 for its local OpenAPI endpoint, making current readiness and research commands fail despite valid auth."
+parent: jf-mqpo
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+comments[3]:
+  - created_at: "2026-07-21T19:00:04.847Z"
+    author: codex-jellyfin
+    text: "Started with all-status tracker inventory, current GitHub inventory, setup wizard validation, and read-only live auth checks."
+  - created_at: "2026-07-21T19:00:20.001Z"
+    author: codex-jellyfin
+    text: Authoritative research confirms Jellyfin documents Swagger under /api-docs/swagger/index.html and publishes exact stable OpenAPI files through repo.jellyfin.org. The first local probe returned a transient HTTP 500; repeated validation now serves all 429 operations on 10.11.11. The implementation therefore prefers local OpenAPI and retains an exact-version official fallback without forwarding credentials.
+    edited_at: "2026-07-21T19:53:14.901Z"
+  - created_at: "2026-07-21T19:52:52.024Z"
+    author: codex-jellyfin
+    text: "Current program state: live authentication, usage-statistics resilience, OpenAPI source fallback, format validation, global help deduplication, and compiled read-only acceptance are implemented. Honest blockers remain genuine four-dimensional 100% coverage and the complete strict release-gate matrix."
+notes[1]{created_at,author,text}:
+  "2026-07-21T19:00:04.847Z",codex-jellyfin,Private credentials remain only under ~/.jellyfin-cli at restrictive permissions; repository research artifacts must be sanitized and reproducible.
+learnings[1]{created_at,author,text}:
+  "2026-07-21T19:00:04.847Z",codex-jellyfin,"Jellyfin publishes exact stable OpenAPI documents at repo.jellyfin.org/files/openapi/stable/, including 10.11.11; remote fetches must never receive the local API key."
+body: ""

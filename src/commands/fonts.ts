@@ -3,6 +3,10 @@ import { writeFile } from 'node:fs/promises';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Builds the fonts command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createFontsCommand(): Command {
   const cmd = new Command('fonts');
   cmd.description('Manage fallback subtitle fonts');

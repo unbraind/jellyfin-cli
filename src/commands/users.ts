@@ -3,6 +3,10 @@ import { createApiClient, handleError } from './utils.js';
 import { formatMessage, formatToon, formatUser, formatUsers } from './utils.js';
 import { addAdminCommands } from './users-admin.js';
 
+/**
+ * Builds the users command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createUsersCommand(): Command {
   const cmd = new Command('users');
 

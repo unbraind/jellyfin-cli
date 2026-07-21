@@ -1,7 +1,30 @@
 {
   "version": 1,
-  "updated_at": "2026-07-21T18:41:54.665Z",
+  "updated_at": "2026-07-21T19:48:03.716Z",
   "entries": [
+    {
+      "name": "builtin-governance-audit",
+      "directory": "builtin-governance-audit",
+      "scope": "project",
+      "manifest_version": "0.1.0",
+      "manifest_entry": "./index.ts",
+      "capabilities": [
+        "commands",
+        "hooks",
+        "parser",
+        "schema",
+        "services"
+      ],
+      "installed_at": "2026-07-21T19:48:03.687Z",
+      "updated_at": "2026-07-21T19:48:03.687Z",
+      "source": {
+        "kind": "builtin",
+        "input": "governance-audit",
+        "location": "governance-audit",
+        "name": "governance-audit",
+        "package": "@unbrained/pm-governance-audit"
+      }
+    },
     {
       "name": "pm-changelog",
       "directory": "pm-changelog",

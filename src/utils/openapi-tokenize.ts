@@ -63,6 +63,11 @@ function expandTokenAliases(token: string): string[] {
   }
 }
 
+/**
+ * Produces the validated tokenize intent value result used by CLI automation.
+ * @param value - The value value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function tokenizeIntentValue(value: string): string[] {
   const tokens = value
     .split(/[^A-Za-z0-9]+/g)
@@ -75,6 +80,11 @@ export function tokenizeIntentValue(value: string): string[] {
   return Array.from(new Set(tokens));
 }
 
+/**
+ * Produces the validated tokenize path value result used by CLI automation.
+ * @param path - The API, command, or filesystem path to process.
+ * @returns - The normalized string representation.
+ */
 export function tokenizePathValue(path: string): Set<string> {
   return new Set(tokenizeIntentValue(path));
 }

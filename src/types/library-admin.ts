@@ -1,3 +1,6 @@
+/**
+ * Defines the add virtual folder params contract used across typed Jellyfin boundaries.
+ */
 export interface AddVirtualFolderParams {
   name: string;
   collectionType?: string;
@@ -5,6 +8,9 @@ export interface AddVirtualFolderParams {
   refreshLibrary?: boolean;
 }
 
+/**
+ * Defines the add media path params contract used across typed Jellyfin boundaries.
+ */
 export interface AddMediaPathParams {
   name: string;
   path: string;
@@ -12,6 +18,9 @@ export interface AddMediaPathParams {
   refreshLibrary?: boolean;
 }
 
+/**
+ * Defines the update media path params contract used across typed Jellyfin boundaries.
+ */
 export interface UpdateMediaPathParams {
   name: string;
   pathInfo: {

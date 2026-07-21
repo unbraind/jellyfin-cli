@@ -1,0 +1,45 @@
+id: jf-59hr
+title: Honor output formats and survive Playback Reporting user-list failures
+description: "All usage-stats subcommands hard-coded Toon despite advertised global/local formats, and the installed Playback Reporting plugin returns HTTP 500 for user_usage_stats/user_list. Route every report through the shared formatter and fall back read-only to core Jellyfin users with explicit per-record provenance when only the optional plugin user-list endpoint fails."
+type: Issue
+status: closed
+priority: 0
+tags[4]: formatting,plugin,resilience,usage-stats
+created_at: "2026-07-21T19:13:37.700Z"
+updated_at: "2026-07-21T20:03:29.873Z"
+closed_at: "2026-07-21T20:03:29.044Z"
+author: codex-jellyfin
+estimated_minutes: 90
+acceptance_criteria: "All usage-stats commands honor Toon, JSON, YAML, Markdown, Table, and Raw format selection; A plugin user-list HTTP 500 falls back to GET /Users and marks unknown plugin membership explicitly; Other plugin errors remain structured failures; Unit and compiled-binary live E2E tests pass without mutations"
+goal: jf-mqpo
+value: Keep optional plugin diagnostics useful and machine-readable on imperfect installations.
+impact: Removes a live E2E failure and a cross-format contract violation.
+outcome: Consistent structured usage reports with a transparent safe fallback.
+why_now: The mandatory live suite produced 176 passes and one failure at the plugin user-list endpoint.
+parent: jf-gn5j
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+severity: high
+environment: Jellyfin 10.11.11 with Playback Reporting plugin; jf-cli compiled binary
+repro_steps: Run JELLYFIN_READ_ONLY=1 jf-cli usage-stats users; observe plugin HTTP 500. Run with --format json and observe hard-coded Toon before the fix.
+resolution: Every usage-stats command uses the shared formatter; only plugin user-list HTTP 500 falls back to core users with explicit provenance and unknown membership.
+expected_result: All advertised formats remain parseable and optional plugin failure does not break safe user reporting.
+actual_result: "Focused tests pass and the compiled read-only Jellyfin acceptance suite passes all 177 cases, including usage-stats users and movies."
+component: usage-stats
+customer_impact: Agent pipelines fail or receive the wrong serialization format.
+dependencies[2]{id,kind,created_at,author,source_kind}:
+  jf-ddd7,related_to,"2026-07-21T19:50:10.697Z",codex-jellyfin,null
+  jf-mkzh,related_to,"2026-07-21T19:50:10.697Z",codex-jellyfin,null
+comments[1]{created_at,author,text}:
+  "2026-07-21T19:52:46.042Z",codex-jellyfin,"Live read-only acceptance is complete against Jellyfin 10.11.11: the compiled global jf-cli exercised usage statistics and the full E2E command matrix without changing server data. The dedicated run passed 177 tests in 112.81 seconds; fallback provenance and all shared output formats were separately verified."
+files[1]{path,scope,note}:
+  src/commands/usage-stats.ts,project,Shared formatting and plugin user-list fallback
+tests[2]{command,path,scope,timeout_seconds}:
+  bun test tests/commands/usage-stats.test.ts,tests/commands/usage-stats.test.ts,project,120
+  JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts,tests/e2e/cli.test.ts,project,300
+docs[1]{path,scope,note}:
+  docs/api-research.md,project,Live plugin and format acceptance evidence
+close_reason: Implemented and verified shared formatting plus transparent Playback Reporting user-list fallback.
+body: ""

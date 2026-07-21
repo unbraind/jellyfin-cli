@@ -43,6 +43,10 @@ function hasExplicitFormatOption(command: Command): boolean {
   return false;
 }
 
+/**
+ * Implements attach setup env subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSetupEnvSubcommand(cmd: Command): void {
   cmd
     .command('env')

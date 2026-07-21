@@ -8,6 +8,9 @@ type JsonSchema = {
   additionalProperties: false;
 };
 
+/**
+ * Represents the cli tool schema values accepted by the typed Jellyfin interface.
+ */
 export type CliToolSchema = {
   name: string;
   command: string;
@@ -95,6 +98,12 @@ function safeSchemaKey(name: string, taken: Set<string>): string {
   return key;
 }
 
+/**
+ * Implements generate cli tool schemas for the typed Jellyfin CLI runtime.
+ * @param root - The root Commander command used for command-tree discovery.
+ * @param prefix - The prefix value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function generateCliToolSchemas(root: Command, prefix?: string): CliToolSchema[] {
   const normalizedPrefix = prefix?.trim().toLowerCase();
   const leaves = collectLeafCommands(root);

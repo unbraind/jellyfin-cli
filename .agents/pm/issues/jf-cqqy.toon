@@ -1,0 +1,69 @@
+id: jf-cqqy
+title: Fix live username/password authentication contract
+description: "The client sends AuthenticateByName without Jellyfin client-identification metadata, models the AuthenticationResult response as UserDto, and never installs AccessToken for subsequent requests. Live Jellyfin 10.11.11 returns HTTP 400 before the current mocked unit test can detect the contract error."
+type: Issue
+status: closed
+priority: 0
+tags[6]: api,auth,e2e,openapi,regression,security
+created_at: "2026-07-21T19:38:09.589Z"
+updated_at: "2026-07-21T20:03:28.118Z"
+closed_at: "2026-07-21T20:03:27.264Z"
+author: codex-jellyfin
+estimated_minutes: 120
+acceptance_criteria: AuthenticateByName sends the Jellyfin MediaBrowser client header required by the server; The exact 10.11.11 AuthenticationResult wrapper is fully typed without any; Successful authentication stores AccessToken and User.Id for subsequent requests and modules; Username/password ENV auth succeeds through the compiled jf-cli under read-only mode; Unit tests assert request headers response unwrapping token propagation and structured failures
+goal: jf-mqpo
+value: Make the documented username/password setup path actually usable.
+impact: Restores setup wizard and ENV authentication for users who do not provide an API key.
+outcome: Correct typed authentication followed by authenticated read-only CLI calls.
+why_now: The requested live credential proof failed with HTTP 400 and exposed a mocked-test blind spot.
+parent: jf-gn5j
+reviewer: maintainer
+risk: critical
+confidence: high
+sprint: jellyfin-10.11.11
+reporter: codex-jellyfin
+severity: critical
+environment: Jellyfin 10.11.11 compiled jf-cli with JELLYFIN_USERNAME and JELLYFIN_PASSWORD
+repro_steps: Use a clean JELLYFIN_CONFIG_DIR set server URL username and password via ENV and run jf-cli --format json users me; observe Authentication failed API request failed 400 Bad Request.
+resolution: "AuthenticateByName now sends MediaBrowser client identity, validates and installs AccessToken, records User.Id, and synchronizes every API facade module."
+expected_result: Username/password-only automation authenticates and performs subsequent read-only calls.
+actual_result: Contract tests pass and a clean environment-only compiled jf-cli session authenticated successfully against the local server without persisting credentials.
+affected_version: 2026.7.21-3
+component: api-auth
+regression: true
+customer_impact: All username/password-only setup and runtime flows fail against the live server.
+dependencies[4]{id,kind,created_at,author,source_kind}:
+  jf-rjox,related_to,"2026-07-21T19:38:09.589Z",codex-jellyfin,null
+  jf-gqxo,related_to,"2026-07-21T19:50:16.114Z",codex-jellyfin,null
+  jf-lpki,related_to,"2026-07-21T19:50:16.114Z",codex-jellyfin,null
+  jf-mkzh,related_to,"2026-07-21T19:50:16.114Z",codex-jellyfin,null
+comments[2]{created_at,author,text}:
+  "2026-07-21T19:38:09.589Z",codex-jellyfin,Discovered during required live read-only ENV authentication after API-key setup validation and 177 compiled E2E checks passed.
+  "2026-07-21T19:40:42.667Z",codex-jellyfin,"Live repair proof passed: a clean config directory with only server URL username and password in ENV authenticated through the rebuilt global jf-cli and returned a current-user record under JELLYFIN_READ_ONLY=1."
+notes[1]{created_at,author,text}:
+  "2026-07-21T19:38:09.589Z",codex-jellyfin,"Authoritative source: local 10.11.11 OpenAPI /Users/AuthenticateByName returns components.schemas.AuthenticationResult with User SessionInfo AccessToken and ServerId."
+learnings[2]{created_at,author,text}:
+  "2026-07-21T19:38:09.589Z",codex-jellyfin,Mocking the endpoint as a UserDto allowed both the missing client header and wrong response envelope to pass; contract fixtures must come from the exact OpenAPI schema.
+  "2026-07-21T19:40:43.552Z",codex-jellyfin,Jellyfin requires a MediaBrowser client-identification Authorization header even before an access token exists; API-key-only tests masked this prerequisite. AuthenticationResult.User and AccessToken must both be validated before updating client state.
+files[5]{path,scope,note}:
+  src/api/base.ts,project,Client identification and token state
+  src/api/client.ts,project,Facade state synchronization
+  src/api/core-api.ts,project,Authentication request and response contract
+  src/types/index.ts,project,Public authentication type export
+  src/types/user.ts,project,Typed AuthenticationResult contract
+tests[3]:
+  - command: JELLYFIN_READ_ONLY=1 jf-cli --format json users me
+    scope: project
+    timeout_seconds: 120
+  - command: bun test tests/api/client-full.test.ts
+    path: tests/api/client-full.test.ts
+    scope: project
+    timeout_seconds: 120
+  - command: bun test tests/api/client.test.ts tests/api/client-full.test.ts
+    path: tests/api/client-full.test.ts
+    scope: project
+    timeout_seconds: 120
+docs[1]{path,scope,note}:
+  docs/api.md,project,Username password authentication contract
+close_reason: Implemented and live-verified the Jellyfin 10.11.11 username/password AuthenticationResult contract.
+body: ""

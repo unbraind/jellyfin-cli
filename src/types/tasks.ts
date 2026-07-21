@@ -1,3 +1,6 @@
+/**
+ * Defines the scheduled task info contract used across typed Jellyfin boundaries.
+ */
 export interface ScheduledTaskInfo {
   Name?: string | null;
   State?: TaskState;
@@ -12,8 +15,14 @@ export interface ScheduledTaskInfo {
   CurrentProgressPercentage?: number | null;
 }
 
+/**
+ * Represents the task state values accepted by the typed Jellyfin interface.
+ */
 export type TaskState = 'Idle' | 'Cancelling' | 'Running';
 
+/**
+ * Defines the task result contract used across typed Jellyfin boundaries.
+ */
 export interface TaskResult {
   StartTimeUtc?: string | null;
   EndTimeUtc?: string | null;
@@ -25,8 +34,14 @@ export interface TaskResult {
   LongErrorMessage?: string | null;
 }
 
+/**
+ * Represents the task completion status values accepted by the typed Jellyfin interface.
+ */
 export type TaskCompletionStatus = 'Completed' | 'Failed' | 'Cancelled' | 'Aborted';
 
+/**
+ * Defines the task trigger info contract used across typed Jellyfin boundaries.
+ */
 export interface TaskTriggerInfo {
   Type?: string | null;
   TimeOfDayTicks?: number | null;
@@ -34,4 +49,7 @@ export interface TaskTriggerInfo {
   DayOfWeek?: DayOfWeek | null;
 }
 
+/**
+ * Represents the day of week values accepted by the typed Jellyfin interface.
+ */
 export type DayOfWeek = 'Sunday' | 'Monday' | 'Tuesday' | 'Wednesday' | 'Thursday' | 'Friday' | 'Saturday';

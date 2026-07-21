@@ -40,7 +40,7 @@ Installed executable names: `jf`, `jellyfin-cli`, and `jf-cli`.
 jf setup --server http://your-server:8096 --api-key YOUR_API_KEY
 
 # Or use username/password authentication
-jf setup --server http://your-server:8096 --username your-user --password your-password
+JELLYFIN_USERNAME=your-user JELLYFIN_PASSWORD='your-password' jf users me
 
 # Test connection
 jf config test
@@ -64,7 +64,8 @@ jf sessions play SESSION_ID ITEM_ID
 
 ## Features
 
-- **Full Jellyfin API Coverage**: All major API endpoints supported
+- **Broad Jellyfin API Coverage**: Major endpoint families are implemented; use `jf schema research`
+  and the operation-ID coverage roadmap for exact-version gap analysis
 - **Agent-Optimized**: Designed for LLM/AI agent integration with structured output
 - **Toon Format**: Default YAML output format for easy parsing
 - **Multiple Output Formats**: Toon, JSON, table, raw, YAML, and Markdown

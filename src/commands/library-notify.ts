@@ -5,6 +5,10 @@ import { toon } from '../formatters/index.js';
 // Webhook-style notification commands — tell Jellyfin a file has changed so it rescans.
 // Useful in CI/CD pipelines after moving/encoding media files.
 
+/**
+ * Builds the library notify command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createLibraryNotifyCommand(): Command {
   const cmd = new Command('library-notify');
   cmd.description('Notify Jellyfin of file-system changes (triggers targeted rescans)');

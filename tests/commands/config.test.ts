@@ -16,6 +16,7 @@ const isolatedJellyfinEnv: Record<string, string> = {
   JELLYFIN_OUTPUT_FORMAT: '',
   JELLYFIN_READ_ONLY: '',
   JELLYFIN_EXPLAIN: '',
+  JELLYFIN_OPENAPI_OFFICIAL_FALLBACK: '0',
 };
 
 async function runCli(

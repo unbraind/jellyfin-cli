@@ -65,9 +65,11 @@ describe('help output global options (all top-level commands)', () => {
       expect(result.code).toBe(0);
       expect(result.stdout).toContain('Global Options:');
       expect(result.stdout).toContain('--format <format>');
-      expect(result.stdout).toContain('--server <name>');
+      expect(result.stdout).toMatch(/--server <(?:name|url)>/);
       expect(result.stdout).toContain('--explain');
       expect(result.stdout).toContain('--read-only');
+      expect(result.stdout.match(/--format <format>/g)).toHaveLength(1);
+      expect(result.stdout.match(/--server <(?:name|url)>/g)).toHaveLength(1);
     }
   }, 60000);
 });

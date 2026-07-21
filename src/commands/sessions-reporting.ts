@@ -2,6 +2,10 @@ import type { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Performs the add reporting commands operation through the typed Jellyfin API boundary.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function addReportingCommands(cmd: Command): void {
   cmd.command('report-capabilities').description('Report session capabilities to the server')
     .option('-f, --format <format>', 'Output format')

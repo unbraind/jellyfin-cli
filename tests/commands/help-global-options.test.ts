@@ -38,6 +38,7 @@ describe('help output global options', () => {
     expect(result.stdout).toContain('--server <name>');
     expect(result.stdout).toContain('--explain');
     expect(result.stdout).toContain('--read-only');
+    expect(result.stdout.match(/--format <format>/g)).toHaveLength(1);
   });
 
   it('shows global options for nested subcommand help', async () => {
@@ -46,5 +47,6 @@ describe('help output global options', () => {
     expect(result.stdout).toContain('Global Options:');
     expect(result.stdout).toContain('--format <format>');
     expect(result.stdout).toContain('--server <name>');
+    expect(result.stdout.match(/--format <format>/g)).toHaveLength(1);
   });
 });

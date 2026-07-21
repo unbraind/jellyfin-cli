@@ -6,6 +6,9 @@ const MAX_ARRAY_ITEMS = 20;
 
 export const EXPLAIN_ENV_KEY = 'JELLYFIN_EXPLAIN';
 
+/**
+ * Represents the explain request payload values accepted by the typed Jellyfin interface.
+ */
 export type ExplainRequestPayload = {
   type: 'request_explain';
   data: {
@@ -18,6 +21,12 @@ export type ExplainRequestPayload = {
   };
 };
 
+/**
+ * Produces the validated is explain mode enabled result used by CLI automation.
+ * @param explainOption - The explain option value required by this operation.
+ * @param explainEnvValue - The explain env value value required by this operation.
+ * @returns - Whether the inspected value satisfies the documented condition.
+ */
 export function isExplainModeEnabled(
   explainOption: unknown,
   explainEnvValue = process.env[EXPLAIN_ENV_KEY],
@@ -79,6 +88,16 @@ function isReadOnlyMethod(method: string): boolean {
   return upper === 'GET' || upper === 'HEAD' || upper === 'OPTIONS';
 }
 
+/**
+ * Produces the validated build explain request payload result used by CLI automation.
+ * @param input - The input value required by this operation.
+ * @param input.method - The method value required by this operation.
+ * @param input.path - The API, command, or filesystem path to process.
+ * @param input.params - Optional request parameters forwarded to the Jellyfin endpoint.
+ * @param input.body - The body value required by this operation.
+ * @param input.timeoutMs - The timeout ms value required by this operation.
+ * @returns - The typed build explain request payload result.
+ */
 export function buildExplainRequestPayload(input: {
   method: string;
   path: string;
@@ -99,6 +118,10 @@ export function buildExplainRequestPayload(input: {
   };
 }
 
+/**
+ * Implements emit explain request for the typed Jellyfin CLI runtime.
+ * @param payload - The payload value required by this operation.
+ */
 export function emitExplainRequest(payload: ExplainRequestPayload): void {
   process.stderr.write(`${JSON.stringify(payload)}\n`);
 }

@@ -26,6 +26,10 @@ type SuggestActionOptions = FormatOptions &
     tag?: string | undefined;
   };
 
+/**
+ * Implements attach schema suggest subcommand for the typed Jellyfin CLI runtime.
+ * @param cmd - The Commander command that receives the configured subcommands.
+ */
 export function attachSchemaSuggestSubcommand(cmd: Command): void {
   cmd
     .command('suggest')

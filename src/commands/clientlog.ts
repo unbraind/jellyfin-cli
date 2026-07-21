@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Builds the clientlog command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createClientlogCommand(): Command {
   const cmd = new Command('clientlog');
   cmd.description('Send client-side log entries to the Jellyfin server');

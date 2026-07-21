@@ -114,7 +114,10 @@ describe('JellyfinApiClient', () => {
       const stderrSpy = vi.spyOn(process.stderr, 'write').mockImplementation(() => true);
       process.env.JELLYFIN_EXPLAIN = '1';
       try {
-        mockFetch.mockResolvedValueOnce(createMockResponse({ test: 'data' }));
+        mockFetch.mockResolvedValueOnce(createMockResponse({
+          User: { Id: 'user-1', Name: 'steve' },
+          AccessToken: 'issued-token',
+        }));
 
         await client.authenticate('steve', 'secret-password');
 

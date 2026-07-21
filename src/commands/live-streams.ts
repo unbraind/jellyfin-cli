@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { toon } from '../formatters/index.js';
 
+/**
+ * Builds the live streams command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createLiveStreamsCommand(): Command {
   const cmd = new Command('live-streams');
   cmd.description('Manage live media streams (open/close direct media sources)');

@@ -2,6 +2,10 @@ import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { formatSuccess, toon } from '../formatters/index.js';
 
+/**
+ * Builds the branding command tree with validated options and actions.
+ * @returns - The configured Commander command tree.
+ */
 export function createBrandingCommand(): Command {
   const cmd = new Command('branding');
 

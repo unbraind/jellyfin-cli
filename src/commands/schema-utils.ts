@@ -3,6 +3,9 @@ import { formatOutput } from '../formatters/index.js';
 import { isOutputFormat, parseOutputFormat } from '../utils/output-format.js';
 import type { OutputFormat } from '../types/index.js';
 
+/**
+ * Represents the format options values accepted by the typed Jellyfin interface.
+ */
 export type FormatOptions = {
   format?: string | undefined;
 };
@@ -30,6 +33,12 @@ function resolveFormatCandidate(command: Command, options: FormatOptions): strin
   return 'toon';
 }
 
+/**
+ * Retrieves or derives output format without mutating Jellyfin state.
+ * @param command - The Commander command whose path or behavior is inspected.
+ * @param options - Optional settings that refine the operation.
+ * @returns - The typed resolve output format result.
+ */
 export function resolveOutputFormat(command: Command, options: FormatOptions): OutputFormat {
   const candidate = resolveFormatCandidate(command, options);
   if (!isOutputFormat(candidate)) {
@@ -39,6 +48,13 @@ export function resolveOutputFormat(command: Command, options: FormatOptions): O
   return parseOutputFormat(candidate, 'toon');
 }
 
+/**
+ * Produces the validated parse positive integer result used by CLI automation.
+ * @param value - The value value required by this operation.
+ * @param label - The label value required by this operation.
+ * @param outputFormat - The output format value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function parsePositiveInteger(value: string, label: string, outputFormat: OutputFormat): number {
   const parsed = parseInt(value, 10);
   if (!Number.isFinite(parsed) || parsed <= 0) {
@@ -48,6 +64,12 @@ export function parsePositiveInteger(value: string, label: string, outputFormat:
   return parsed;
 }
 
+/**
+ * Produces the validated parse coverage percent result used by CLI automation.
+ * @param value - The value value required by this operation.
+ * @param outputFormat - The output format value required by this operation.
+ * @returns - The normalized string representation.
+ */
 export function parseCoveragePercent(value: string, outputFormat: OutputFormat): number {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed < 0 || parsed > 100) {

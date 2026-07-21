@@ -6,9 +6,10 @@ status: closed
 priority: 2
 tags[2]: added,release-history
 created_at: "2026-07-21T17:14:46.122Z"
-updated_at: "2026-07-21T17:38:21.432Z"
+updated_at: "2026-07-21T19:50:01.902Z"
 closed_at: "2026-07-21T17:14:46.906Z"
 author: codex
+parent: jf-mqpo
 release: 2026.3.4
 resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
 expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.

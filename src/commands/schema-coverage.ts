@@ -1,6 +1,9 @@
 import { matchOperationsForCommandIntent, type OpenApiOperationEntry } from '../utils/openapi.js';
 import type { CliToolSchema } from '../utils/tool-schema.js';
 
+/**
+ * Represents the unmatched tag summary values accepted by the typed Jellyfin interface.
+ */
 export type UnmatchedTagSummary = {
   tag: string;
   operations: number;
@@ -12,12 +15,18 @@ type TagBucket = {
   samplePaths: Set<string>;
 };
 
+/**
+ * Represents the unmatched tool summary values accepted by the typed Jellyfin interface.
+ */
 export type UnmatchedToolSummary = {
   command: string;
   read_only_safe: boolean;
   reason: 'no_openapi_match_above_min_score' | 'local_only_command';
 };
 
+/**
+ * Represents the coverage mapping result values accepted by the typed Jellyfin interface.
+ */
 export type CoverageMappingResult = {
   mappedOperationKeys: Set<string>;
   mappedToolCount: number;
@@ -51,6 +60,13 @@ function isLocalOnlyCommand(command: string): boolean {
   return LOCAL_ONLY_COMMANDS.has(command);
 }
 
+/**
+ * Implements map open api coverage to tools for the typed Jellyfin CLI runtime.
+ * @param operations - The operations value required by this operation.
+ * @param tools - The tools value required by this operation.
+ * @param minScore - The min score value required by this operation.
+ * @returns - The typed map open api coverage to tools result.
+ */
 export function mapOpenApiCoverageToTools(
   operations: OpenApiOperationEntry[],
   tools: CliToolSchema[],
@@ -111,6 +127,13 @@ export function mapOpenApiCoverageToTools(
   };
 }
 
+/**
+ * Retrieves or derives summarize operations by tag without mutating Jellyfin state.
+ * @param operations - The operations value required by this operation.
+ * @param rowLimit - The row limit value required by this operation.
+ * @param samplePathsPerTag - The sample paths per tag value required by this operation.
+ * @returns - The typed summarize operations by tag result.
+ */
 export function summarizeOperationsByTag(
   operations: OpenApiOperationEntry[],
   rowLimit = 10,
