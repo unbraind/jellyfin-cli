@@ -1,0 +1,17 @@
+id: jf-vuu5
+title: "Repository-local `pm` project governance with detailed goals, epics, issues, tasks, evidence, and append-only history."
+description: "Introduced repository-local pm tracking with goals/epics/issues/tasks, evidence, and append-only history."
+type: Feature
+status: closed
+priority: 2
+tags[2]: added,governance
+created_at: "2026-07-21T17:18:04.931Z"
+updated_at: "2026-07-21T17:38:22.928Z"
+closed_at: "2026-07-21T17:18:05.287Z"
+author: codex
+parent: jf-zifk
+resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
+expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.
+actual_result: "Repository-local `pm` project governance with detailed goals, epics, issues, tasks, evidence, and append-only history. is represented by this closed pm item and reproduced by pm-changelog."
+close_reason: Backfilled into the pm tracker to preserve the Unreleased CHANGELOG entries for pm-generated changelog parity.
+body: ""

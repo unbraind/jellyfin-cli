@@ -12,13 +12,7 @@ Configure branch protection on `main` to require these checks before merge:
 - `Commit Quality / Semantic PR Title`
 - `Commit Quality / Commit Subject Style`
 
-Use manual release workflows for controlled releases:
-
-- `.github/workflows/release-prepare.yml` (validate + build artifacts only)
-- `.github/workflows/release-publish.yml` (manual publish, supports dry run)
-- `.github/workflows/release-github.yml` (manual tag + GitHub release creation)
-
-For npm auth, prefer Trusted Publishing (GitHub OIDC). Keep `NPM_TOKEN` only as fallback.
+Use `.github/workflows/auto-release.yml` for change-aware scheduled/manual preparation and `.github/workflows/release.yml` for tag-driven provenance publishing. Configure `RELEASE_PAT` and `NPM_TOKEN` in the `release` environment as described in [Automated Releases](RELEASING.md).
 
 ## 1) Configure auth outside the repository
 
@@ -37,10 +31,10 @@ jf setup env --shell
 jf setup env --format json
 ```
 
-## 2) Sync date+release version
+## 2) Preview the next release version
 
 ```bash
-bun run version:sync
+bun run version:next
 ```
 
 Version format is required: `YYYY.M.D` or `YYYY.M.D-<N>` (example: `2026.3.4` or `2026.3.4-2`).
@@ -66,6 +60,8 @@ This runs:
 - npm packaging dry-run (`bun run pack:dry-run`)
 - `npx` execution smoke from local package tarball (`bun run smoke:npx`)
 - `bunx` execution smoke from local package tarball (`bun run smoke:bunx`)
+- Generated pm changelog check (`bun run changelog:pm:check`)
+- Release automation unit checks (`bun run test:release`)
 
 ## 4) Run live read-only CLI E2E checks
 
@@ -166,5 +162,4 @@ If you set temporary env vars in your shell, clear them before release (`unset J
 
 ## 8) Changelog state
 
-Keep an `Unreleased` section in [../CHANGELOG.md](../CHANGELOG.md), document user-visible and
-security-relevant changes there, and move those entries under the dated version when publishing.
+Never edit [../CHANGELOG.md](../CHANGELOG.md) manually. Ensure every user-visible or security-relevant change is represented by a closed, classified pm item, then run `bun run changelog:pm` after the final tracker mutation. Historical releases are preserved by each pm item's explicit release metadata.

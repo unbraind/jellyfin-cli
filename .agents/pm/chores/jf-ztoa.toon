@@ -1,0 +1,17 @@
+id: jf-ztoa
+title: Refactored CLI bootstrap wiring into a reusable program builder for improved maintainability and testability.
+description: Extracted the CLI bootstrap into a reusable program-builder for maintainability and isolated testing.
+type: Chore
+status: closed
+priority: 2
+tags[3]: changed,refactor,release-history
+created_at: "2026-07-21T17:14:53.914Z"
+updated_at: "2026-07-21T17:38:26.064Z"
+closed_at: "2026-07-21T17:14:54.602Z"
+author: codex
+release: 2026.3.6
+resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
+expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.
+actual_result: Refactored CLI bootstrap wiring into a reusable program builder for improved maintainability and testability. is represented by this closed pm item and reproduced by pm-changelog.
+close_reason: Backfilled into the pm tracker to preserve published CHANGELOG history for pm-generated changelog parity.
+body: ""

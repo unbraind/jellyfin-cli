@@ -1,0 +1,94 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Existing release tag to publish, for example v2026.7.21'
+        type: string
+        required: true
+
+permissions:
+  contents: write
+  id-token: write
+
+concurrency:
+  group: release-${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  release:
+    name: Validate, publish, and verify
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: release
+    env:
+      RELEASE_TAG: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref_name }}
+
+    steps:
+      - name: Checkout exact tag
+        uses: actions/checkout@9c091bb21b7c1c1d1991bb908d89e4e9dddfe3e0 # v7.0.0
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+          ref: ${{ github.event_name == 'workflow_dispatch' && inputs.tag || github.ref }}
+
+      - name: Setup Node.js for npm provenance
+        uses: actions/setup-node@48b55a011bda9f5d6aeb4c2d9c7362e8dae4041e # v6
+        with:
+          node-version: 24
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Setup Bun
+        uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2
+        with:
+          bun-version: '1.3.11'
+
+      - name: Install dependencies
+        run: bun install --frozen-lockfile
+
+      - name: Enforce tag and package version identity
+        run: |
+          case "${RELEASE_TAG}" in v*.*.*) ;; *) echo "Invalid release tag: ${RELEASE_TAG}"; exit 2 ;; esac
+          node scripts/release-version.mjs check --tag "${RELEASE_TAG}"
+
+      - name: Run the complete release gate
+        run: bun run validate:release
+
+      - name: Generate pm-backed release notes
+        run: node scripts/release/generate-release-notes.mjs --version "${RELEASE_TAG#v}" --output "${RUNNER_TEMP}/release-notes.md"
+
+      - name: Upload release artifacts
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7
+        with:
+          name: jellyfin-cli-${{ env.RELEASE_TAG }}
+          path: |
+            dist/
+            ${{ runner.temp }}/release-notes.md
+          if-no-files-found: error
+
+      - name: Publish exact version to the npm registry with provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="${RELEASE_TAG#v}"
+          if npm view "jellyfin-cli@${version}" version --json >/dev/null 2>&1; then
+            echo "jellyfin-cli@${version} is already published; continuing with verification."
+          else
+            npm publish --access public --provenance
+          fi
+
+      - name: Verify the exact package through npm, npx, and Bun
+        timeout-minutes: 8
+        run: node scripts/release/verify-published-release.mjs --tag "${RELEASE_TAG}"
+
+      - name: Create GitHub release
+        uses: softprops/action-gh-release@718ea10b132b3b2eba29c1007bb80653f286566b # v3.0.1
+        with:
+          tag_name: ${{ env.RELEASE_TAG }}
+          body_path: ${{ runner.temp }}/release-notes.md

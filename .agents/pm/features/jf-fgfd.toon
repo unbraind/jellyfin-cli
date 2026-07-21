@@ -1,0 +1,17 @@
+id: jf-fgfd
+title: Command-level hook coverage tests for CLI post-action behavior.
+description: Added tests exercising Commander post-action hook behavior at the command level.
+type: Feature
+status: closed
+priority: 2
+tags[3]: added,release-history,testing
+created_at: "2026-07-21T17:14:52.945Z"
+updated_at: "2026-07-21T17:38:08.102Z"
+closed_at: "2026-07-21T17:14:53.461Z"
+author: codex
+release: 2026.3.6
+resolution: Completed historical change reconstructed from the preserved legacy CHANGELOG.md entry.
+expected_result: The historical release note remains losslessly represented by durable pm lineage and package-generated changelog output.
+actual_result: Command-level hook coverage tests for CLI post-action behavior. is represented by this closed pm item and reproduced by pm-changelog.
+close_reason: Backfilled into the pm tracker to preserve published CHANGELOG history for pm-generated changelog parity.
+body: ""

@@ -16,7 +16,8 @@ jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin me
 | [API Research](api-research.md) | Live API discovery notes and agent-focused roadmap |
 | [Release Readiness](release-readiness.md) | Pre-release validation, secret safety, and E2E checklist |
 | [Release Process](release-process.md) | First-release and recurring release workflow |
-| [Changelog](../CHANGELOG.md) | Release notes (currently reset pre-1.0) |
+| [Automated Releases](RELEASING.md) | Daily release architecture, setup, pm changelog ownership, npm/Bun verification, and recovery |
+| [Changelog](../CHANGELOG.md) | pm-generated release history |
 
 ## Installation
 
