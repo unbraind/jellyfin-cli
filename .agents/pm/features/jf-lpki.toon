@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[4]: code-quality,docs,security,static-analysis
 created_at: "2026-07-21T19:13:36.782Z"
-updated_at: "2026-07-21T20:10:30.387Z"
+updated_at: "2026-07-22T04:56:39.172Z"
 assignee: codex-jellyfin
 author: codex-jellyfin
 estimated_minutes: 720
@@ -28,21 +28,28 @@ dependencies[5]{id,kind,created_at,author,source_kind}:
   jf-gqxo,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
   jf-sylm,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
   jf-wemh,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
-comments[3]{created_at,author,text}:
+comments[4]{created_at,author,text}:
   "2026-07-21T19:52:47.903Z",codex-jellyfin,"Current quality evidence: typecheck and strict ESLint pass; every source file is at or below 300 code lines excluding comments; tracked-tree and repository-history secret scans pass. jscpd reports a 5.78% duplicated-line baseline, so zero-duplication and the complete mandatory gate bundle remain open work."
   "2026-07-21T20:04:31.266Z",codex-jellyfin,"Strict TypeScript and JSDoc lint, source LOC, and both secret scans pass. The zero-duplication command is now explicit as check:duplicates, but remains red at the measured 5.78% baseline and is intentionally not represented as a completed release gate."
   "2026-07-21T20:09:41.945Z",codex-jellyfin,"Dependency remediation completed for the current lane: compatible overrides pin vite 8.1.5, flatted 3.4.2, postcss 8.5.21, esbuild 0.28.1, and picomatch 4.0.5; both bun audit and npm audit now report zero vulnerabilities. Typecheck, lint, and all 903 non-live tests still pass."
+  "2026-07-22T04:41:09.931Z",codex-jellyfin,Continuing paired static-analysis/docstring gate implementation because it shares the release verification surface with jf-mkzh; external package types will be read from node_modules and source files remain <=300 LOC.
 notes[1]{created_at,author,text}:
   "2026-07-21T19:13:36.782Z",codex-jellyfin,"Applicability must be explicit: ShellCheck/PSScriptAnalyzer gates fail on violations when matching scripts exist and report a deterministic no-files result otherwise."
 learnings[1]{created_at,author,text}:
   "2026-07-21T19:16:03.605Z",codex-jellyfin,"Current policy scan found two inline type imports and one parameter-property class; no explicit any types or dynamic imports were found in src. Existing ESLint treats no-explicit-any and unused declarations as warnings and disables the any rule in tests, so it is not yet a mandatory gate."
-files[4]{path,scope,note}:
+files[6]{path,scope,note}:
   bun.lock,project,Resolved vulnerability-free Bun dependency graph
   eslint.config.js,project,Mandatory type-safety erasable-syntax and JSDoc rules
   package-lock.json,project,Reproducible audited npm compatibility dependency graph
   package.json,project,Strict lint plugins duplication command and audited transitive overrides
-tests[3]{command,path,scope,timeout_seconds}:
-  bun audit,bun.lock,project,120
-  bun run typecheck && bun run lint,eslint.config.js,project,300
-  npm audit --omit=dev,package.json,project,120
+  tests/setup/node-bun-compat.ts,project,null
+  vitest.config.ts,project,null
+tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
+  bun audit,bun.lock,project,120,tracker
+  bun run lint,package.json,project,300,tracker
+  bun run typecheck,package.json,project,300,tracker
+  npm audit --omit=dev,package.json,project,120,tracker
+docs[2]{path,scope,note}:
+  docs/api-research.md,project,null
+  docs/release-readiness.md,project,null
 body: ""

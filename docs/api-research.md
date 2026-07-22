@@ -67,7 +67,7 @@ read-only-safe coverage patterns:
 JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts
 ```
 
-Latest compiled-binary run result: `177` passing, `0` failing in `112.81s`.
+Latest compiled-binary run result (2026-07-22): `177` passing, `0` failing in `105.07s`.
 
 ## Full Test + Coverage Validation
 
@@ -75,15 +75,19 @@ Command:
 
 ```bash
 bun run test:coverage
+bun run test:coverage:four
 ```
 
-Observed after the authentication repair:
+Observed on 2026-07-22:
 
-- `901` passing, `177` credential-dependent skips, `0` failing
-- Bun coverage baseline before the current ratchet: `58.83%` lines and `44.93%` functions
-- Bun's current reporter does not provide the four independent statement/branch/function/line totals
-  required by the repository policy. Vitest provides those dimensions under Node, but fourteen
-  integration suites currently depend on Bun-only `Bun.spawn`/`Bun.serve` APIs.
+- Bun: `903` passing, `177` credential-dependent skips, `0` failing; `58.63%` lines and
+  `44.37%` functions.
+- Vitest: `894` passing, `0` failing; `38.19%` statements, `37.40%` branches, `49.92%`
+  functions, and `37.87%` lines.
+- `tests/setup/node-bun-compat.ts` provides typed Node adapters for the test harness's
+  `Bun.spawn` and `Bun.serve` boundaries. The live E2E suite remains a separate Bun gate because
+  subprocess execution is intentionally black-box and does not contribute attributable parent-process
+  coverage.
 
 The repository-wide `100/100/100/100` requirement is not yet met. It remains a release-blocking,
 priority-zero tracked feature; no lower baseline should be described as complete coverage.

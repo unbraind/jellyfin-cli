@@ -13,6 +13,7 @@
 
 ### Other
 
+- Make four-metric coverage portable across Bun and Node ([jf-8oz6](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-8oz6.toon))
 - Verify and document the complete read-only jf-cli interface ([jf-sylm](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-sylm.toon))
 
 ## 2026.7.21-3 - 2026-07-21
