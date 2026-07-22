@@ -1,0 +1,49 @@
+id: jf-8oz6
+title: Make four-metric coverage portable across Bun and Node
+description: "Add a typed Node test-runtime adapter for the Bun.spawn and Bun.serve harness boundaries, keep live read-only E2E separate, expose deterministic Vitest execution and four-dimensional coverage diagnostics, and make portable execution part of release validation."
+type: Task
+status: closed
+priority: 0
+tags[7]: agents,bun,coverage,node,release-gate,testing,vitest
+created_at: "2026-07-22T04:51:32.380Z"
+updated_at: "2026-07-22T04:58:08.822Z"
+closed_at: "2026-07-22T04:58:07.635Z"
+author: codex-jellyfin
+estimated_minutes: 120
+acceptance_criteria: All deterministic non-live tests pass under Vitest without changing production runtime behavior; Vitest reports statements branches functions and lines across every source file including src/cli.ts; The compiled jf-cli live read-only suite remains a separate passing gate; Release validation includes the cross-runtime suite and documentation records honest non-100 coverage
+definition_of_ready: Exact Bun-only failure surface measured; no matching all-status pm child exists; live instance configuration remains private and read-only.
+goal: jf-mqpo
+value: Creates the trustworthy measurement boundary required to finish the governed 100 percent coverage goal.
+impact: Removes 254 Node-runtime harness failures and prevents Bun-only tests from hiding missing branch and statement coverage.
+outcome: One deterministic four-metric diagnostic plus independent Bun and live E2E proof.
+why_now: The 100 percent release blocker cannot be addressed honestly until all four dimensions are measurable.
+parent: jf-mkzh
+reviewer: github-bots
+risk: medium
+confidence: high
+resolution: "Added a typed Node compatibility adapter for Bun test harness APIs, separated live E2E from attributable coverage, added portable/four-metric scripts, and required the portable suite in release validation."
+expected_result: "All deterministic tests run under Vitest, four dimensions are measurable, live E2E remains independent, and release validation stays green."
+actual_result: "894/894 Vitest tests, 177/177 live compiled CLI E2E tests, and the complete release gate pass; exact four-metric baseline is documented without claiming 100 percent."
+dependencies[2]{id,kind,created_at,author,source_kind}:
+  jf-gn5j,related,"2026-07-22T04:51:32.380Z",codex-jellyfin,epic
+  jf-lpki,related,"2026-07-22T04:51:32.380Z",codex-jellyfin,implementation
+comments[2]{created_at,author,text}:
+  "2026-07-22T04:51:32.380Z",codex-jellyfin,Implementation completed after reproducing 254 Vitest failures caused only by missing Bun.spawn and Bun.serve globals; focused and full portable suites now pass.
+  "2026-07-22T04:58:06.379Z",codex-jellyfin,"Direct linked commands all pass, but pm test --run is blocked before command execution by upstream core bug https://github.com/unbraind/pm-cli/issues/642. Verified results are retained from direct runs; this completed jellyfin-cli task is not blocked by the tracker-runner defect."
+notes[1]{created_at,author,text}:
+  "2026-07-22T04:51:32.380Z",codex-jellyfin,Coverage is intentionally documented as 38.19/37.40/49.92/37.87 rather than represented as complete.
+learnings[1]{created_at,author,text}:
+  "2026-07-22T04:51:32.380Z",codex-jellyfin,Black-box child-process E2E and attributable in-process coverage are complementary gates; neither should be substituted for the other.
+files[3]{path,scope,note}:
+  tests/setup/node-bun-compat.ts,project,Typed Node adapters for Bun test harness APIs
+  vitest.config.ts,project,Portable suite and complete source coverage scope
+  package.json,project,Portable and four-metric scripts plus release gate
+tests[3]{command,path,scope,timeout_seconds,pm_context_mode}:
+  "bun run test:coverage:four",package.json,project,300,tracker
+  "bun run test:portable",package.json,project,300,tracker
+  "bun run validate:release",package.json,project,1200,tracker
+docs[2]{path,scope,note}:
+  docs/api-research.md,project,Measured live and four-metric evidence
+  docs/release-readiness.md,project,Release gate documentation
+close_reason: Portable four-metric coverage foundation completed with direct full release validation and read-only live evidence; pm linked-runner defect filed upstream as pm-cli#642.
+body: ""

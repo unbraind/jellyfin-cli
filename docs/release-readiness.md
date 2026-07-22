@@ -52,6 +52,7 @@ This runs:
 - TypeScript checks (`bun run typecheck`)
 - Lint (`bun run lint`)
 - Full tests (`bun run test`)
+- Cross-runtime unit/integration tests (`bun run test:portable`)
 - Build (`bun run build`)
 - Dist smoke check (`bun run smoke:dist`)
 - Version policy check (`bun run check:version`)
@@ -68,6 +69,8 @@ The repository's mandatory `100/100/100/100` statement/branch/function/line cove
 separately and is not yet satisfied. Until that gate is implemented and green, this checklist must
 not be interpreted as permission to publish. Current measurements and runtime limitations are
 recorded in [Jellyfin API Research](api-research.md).
+
+Run `bun run test:coverage:four` to produce the authoritative four-dimension diagnostic report.
 
 ## 4) Run live read-only CLI E2E checks
 
