@@ -106,6 +106,9 @@ jf-cli system --help
 jf-cli system info --help
 jf-cli --format json years list --limit 5
 jf-cli --format toon items list --limit 1 | jf-cli schema validate items --from toon
+# Direct official TOON decoder check
+jf-cli --format toon system info \
+  | bun -e "import { decode } from '@toon-format/toon'; const s=await new Response(Bun.stdin.stream()).text(); const d=decode(s); if (d?.type !== 'system_info') process.exit(1)"
 # JSON parse check
 jf-cli --format json config doctor | jq '.checks.connection_ok and .checks.auth_ok and .checks.openapi_available'
 
@@ -172,3 +175,17 @@ If you set temporary env vars in your shell, clear them before release (`unset J
 ## 8) Changelog state
 
 Never edit [../CHANGELOG.md](../CHANGELOG.md) manually. Ensure every user-visible or security-relevant change is represented by a closed, classified pm item, then run `bun run changelog:pm` after the final tracker mutation. Historical releases are preserved by each pm item's explicit release metadata.
+
+## 9) GitHub review inventory
+
+After each PR push, use one blocking checks watcher and then capture the exact-head review inventory:
+
+```bash
+gh pr checks <number> --watch
+bun run reviews:inventory -- --pr <number> --repo unbraind/jellyfin-cli
+```
+
+The inventory includes top-level comments, submitted reviews, inline threads, resolution state,
+reactions, and the reviewed head SHA. Use `reply-inline`, `react`, and `resolve-thread` from
+`scripts/reviews/pr-review-loop.mjs` so inline findings are acknowledged and resolved on their
+actual review surface.

@@ -3196,7 +3196,7 @@ Available types: `message`, `error`, `system_info`, `users`, `user`, `items`, `i
 
 ### schema validate [type]
 
-Validate a Toon/JSON/YAML payload against one schema type (or auto-detect from payload `type`).
+Validate a TOON/JSON/YAML payload against one schema type (or auto-detect from payload `type`).
 
 ```bash
 jf schema validate [type] [--from <sourceFormat>] [--input <payload>] [--format <format>]

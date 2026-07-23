@@ -94,7 +94,7 @@ describe('schema openapi command', () => {
     expect(result.stdout).toContain('type: openapi_summary');
     expect(result.stdout).toContain('path_count: 2');
     expect(result.stdout).toContain('operation_count: 3');
-    expect(result.stdout).toContain('operations:');
+    expect(result.stdout).toContain('operations[2]:');
     expect(result.stdout).toContain('read_only_safe: true');
   });
 
@@ -152,8 +152,8 @@ describe('schema openapi command', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('filtered_operation_count: 1');
     expect(result.stdout).toContain('command_intent: users list');
-    expect(result.stdout).toContain('command_matches:');
-    expect(result.stdout).toContain('matched_on:');
+    expect(result.stdout).toContain('command_matches[1]:');
+    expect(result.stdout).toContain('matched_on[1]:');
   });
 
   it('supports read-only-only operation filtering', async () => {
@@ -255,7 +255,7 @@ describe('schema openapi command', () => {
       '5',
     ]);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('command_matches:');
+    expect(result.stdout).toContain('command_matches[1]:');
     expect(result.stdout).toContain('/Items/{itemId}/ExternalIdInfos');
     expect(result.stdout).not.toContain('/Library/Media/Updated');
   });
@@ -332,11 +332,11 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('operation_scope_count: 3');
     expect(result.stdout).toContain('mapped_operation_count: 1');
     expect(result.stdout).toContain('unmapped_operation_count: 2');
-    expect(result.stdout).toContain('unmatched_operations:');
+    expect(result.stdout).toContain('unmatched_operations[2]:');
     expect(result.stdout).toContain('unmatched_tools_total: 0');
     expect(result.stdout).toContain('unmapped_tool_count: 0');
     expect(result.stdout).toContain('local_only_tools_total: 0');
-    expect(result.stdout).toContain('unmatched_by_tag:');
+    expect(result.stdout).toContain('unmatched_by_tag[2]:');
     expect(result.stdout).toContain('summary:');
     expect(result.stdout).toContain('coverage_percent:');
     expect(result.stdout).toContain('tag: Custom');
@@ -388,8 +388,8 @@ describe('schema coverage command', () => {
       '5',
     ]);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('unmatched_tools:');
-    expect(result.stdout).toContain('reason: no_openapi_match_above_min_score');
+    expect(result.stdout).toContain('unmatched_tools[5]{command,read_only_safe,reason}:');
+    expect(result.stdout).toContain('jf users by-name,true,no_openapi_match_above_min_score');
     expect(result.stdout).toContain('unmapped_tool_count:');
     expect(result.stdout).toContain('local_only_tools_total: 0');
   });
@@ -432,7 +432,7 @@ describe('schema coverage command', () => {
     expect(result.code).toBe(0);
     expect(result.stdout).toContain('unmatched_tools_total: 0');
     expect(result.stdout).toContain('local_only_tools_total:');
-    expect(result.stdout).toContain('reason: local_only_command');
+    expect(result.stdout).toContain('jf config doctor,true,local_only_command');
   });
 
   it('returns error for invalid --min-score', async () => {
@@ -477,7 +477,7 @@ describe('schema coverage command', () => {
 
     const result = await runCli(['schema', 'coverage', '--suggest-commands', '--limit', '5']);
     expect(result.code).toBe(0);
-    expect(result.stdout).toContain('suggested_commands:');
+    expect(result.stdout).toContain('suggested_commands[1]:');
     expect(result.stdout).toContain('path: /Xyzzy/Entropy');
     expect(result.stdout).toContain('suggested_command: xyzzy list');
   });
@@ -662,7 +662,7 @@ describe('schema tools command', () => {
     expect(result.stdout).toContain('type: tool_schemas');
     expect(result.stdout).toContain('command: jf system activity');
     expect(result.stdout).toContain('read_only_safe: true');
-    expect(result.stdout).toContain('tools:');
+    expect(result.stdout).toContain('tools[5]:');
   });
 
   it('marks mutating commands as not read-only-safe', async () => {
@@ -732,7 +732,7 @@ describe('schema tools command', () => {
     expect(result.stdout).toContain('type: tool_schemas');
     expect(result.stdout).toContain('openapi_matching:');
     expect(result.stdout).toContain('enabled: true');
-    expect(result.stdout).toContain('openapi_matches:');
+    expect(result.stdout).toContain('openapi_matches[2]:');
     expect(result.stdout).toContain('method: GET');
     expect(result.stdout).toContain('path: /System/Info');
   });
@@ -777,12 +777,12 @@ describe('schema validate command', () => {
   it('auto-detects payload type when type argument is omitted', async () => {
     const payload = [
       'type: sessions',
-      'data:',
-      ' - id: s1',
+      'data[1]{id,is_playing}:',
+      '  s1,false',
       'meta:',
-      ' timestamp: 2026-03-03T00:00:00.000Z',
-      ' format: toon',
-      ' version: 1.0.0',
+      '  timestamp: 2026-03-03T00:00:00.000Z',
+      '  format: toon',
+      '  version: 1.0.0',
     ].join('\n');
 
     const result = await runCli(['schema', 'validate', '--from', 'toon', '--input', payload]);

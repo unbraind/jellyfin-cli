@@ -1,11 +1,11 @@
-# Jellyfin API Research (Validated July 21, 2026)
+# Jellyfin API Research (Validated July 23, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
 ## Verification Scope
 
-- Verification date: **July 21, 2026**
+- Verification date: **July 23, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -58,6 +58,25 @@ Observed:
 - Username/password authentication passed from an isolated environment-only profile after validating
   Jellyfin's `AuthenticationResult` envelope and required `MediaBrowser` client header.
 
+## Official TOON Contract Validation
+
+The default `toon` format now uses `@toon-format/toon` 4.0.0, the official TypeScript
+implementation of Token-Oriented Object Notation. It is no longer a YAML-like custom serializer.
+The CLI preserves semantic empty arrays, null values, false values, and zero values during
+serialization.
+
+Canonical live formatter families were validated by piping compiled CLI output through both the
+official decoder and `jf-cli schema validate`:
+
+```bash
+JELLYFIN_READ_ONLY=1 jf-cli --format toon system info \
+  | jf-cli schema validate system_info --from toon --format json
+```
+
+The same read-only validation passed for `system_info`, `users`, `items`, `sessions`, `libraries`,
+and `tasks`. Unit-level contract coverage also decodes and validates representative output for
+`query_result`, `search_result`, `config`, `activity_log`, `message`, and `error`.
+
 ## End-to-End CLI Validation
 
 The full live E2E suite (`tests/e2e/cli.test.ts`) was executed against the local instance with
@@ -67,7 +86,7 @@ read-only-safe coverage patterns:
 JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts
 ```
 
-Latest compiled-binary run result (2026-07-22): `177` passing, `0` failing in `105.07s`.
+Latest compiled-binary run result (2026-07-23): `177` passing, `0` failing in `144.36s`.
 
 ## Full Test + Coverage Validation
 
@@ -78,12 +97,11 @@ bun run test:coverage
 bun run test:coverage:four
 ```
 
-Observed on 2026-07-22:
+Observed on 2026-07-23:
 
-- Bun: `903` passing, `177` credential-dependent skips, `0` failing; `58.63%` lines and
-  `44.37%` functions.
-- Vitest: `894` passing, `0` failing; `38.19%` statements, `37.40%` branches, `49.92%`
-  functions, and `37.87%` lines.
+- Bun: `915` passing, `177` credential-dependent skips, `0` failing.
+- Vitest: `906` passing, `0` failing; `38.24%` statements, `37.38%` branches, `50.00%`
+  functions, and `37.90%` lines.
 - `tests/setup/node-bun-compat.ts` provides typed Node adapters for the test harness's
   `Bun.spawn` and `Bun.serve` boundaries. The live E2E suite remains a separate Bun gate because
   subprocess execution is intentionally black-box and does not contribute attributable parent-process
@@ -210,5 +228,7 @@ export JELLYFIN_READ_ONLY=1
 - [Jellyfin server repository and hosted Swagger path](https://github.com/jellyfin/jellyfin#accessing-the-hosted-web-client)
 - [Jellyfin 10.11.11 release](https://github.com/jellyfin/jellyfin/releases/tag/v10.11.11)
 - [Jellyfin stable OpenAPI artifacts](https://repo.jellyfin.org/files/openapi/stable/)
+- [Official TOON TypeScript implementation](https://github.com/toon-format/toon)
+- [TOON specification](https://github.com/toon-format/spec)
 - [Bun coverage documentation](https://bun.sh/docs/test/code-coverage)
 - [Vitest coverage provider guidance](https://vitest.dev/guide/coverage.html)

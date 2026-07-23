@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { decode } from '@toon-format/toon';
 import {
   formatToon,
   formatSystemInfo,
@@ -24,6 +25,7 @@ describe('toon formatters', () => {
     it('should format empty output', () => {
       const result = formatToon(null);
       expect(result).toContain('type: empty');
+      expect(decode(result)).toEqual({ type: 'empty', data: null });
     });
 
     it('should format string output', () => {
@@ -41,11 +43,14 @@ describe('toon formatters', () => {
     it('should format array output', () => {
       const result = formatToon([1, 2, 3]);
       expect(result).toContain('type: list');
+      expect(result).toContain('data[3]: 1,2,3');
+      expect(decode(result)).toEqual({ type: 'list', data: [1, 2, 3] });
     });
 
     it('should use type hint', () => {
       const result = formatToon({ test: 'data' }, 'custom_type');
       expect(result).toContain('type: custom_type');
+      expect(decode(result)).toEqual({ type: 'custom_type', data: { test: 'data' } });
     });
   });
 
@@ -62,7 +67,7 @@ describe('toon formatters', () => {
         WebSocketPortNumber: 8096,
       };
       const result = formatSystemInfo(info);
-      expect(result).toContain('type: sys');
+      expect(result).toContain('type: system_info');
       expect(result).toContain('Test Server');
       expect(result).toContain('10.8.0');
     });
@@ -76,8 +81,16 @@ describe('toon formatters', () => {
       ];
       const result = formatUsers(users);
       expect(result).toContain('type: users');
+      expect(result).toContain('data[2]{id,name,is_admin}');
       expect(result).toContain('User1');
       expect(result).toContain('User2');
+      expect(decode(result)).toMatchObject({
+        type: 'users',
+        data: [
+          { id: 'user-1', name: 'User1', is_admin: true },
+          { id: 'user-2', name: 'User2', is_admin: false },
+        ],
+      });
     });
   });
 
@@ -163,8 +176,8 @@ describe('toon formatters', () => {
         StartIndex: 0,
       };
       const formatted = formatQueryResult(result);
-      expect(formatted).toContain('type: items');
-      expect(formatted).toContain('total: 1');
+      expect(formatted).toContain('type: query_result');
+      expect(formatted).toContain('total_count: 1');
     });
   });
 
@@ -175,7 +188,7 @@ describe('toon formatters', () => {
         TotalRecordCount: 1,
       };
       const formatted = formatSearchResult(result);
-      expect(formatted).toContain('type: search');
+      expect(formatted).toContain('type: search_result');
       expect(formatted).toContain('Test Result');
     });
   });
@@ -187,7 +200,7 @@ describe('toon formatters', () => {
         { Name: 'Shows', ItemId: 'lib-2', CollectionType: 'tvshows' },
       ];
       const result = formatLibraries(libraries);
-      expect(result).toContain('type: libs');
+      expect(result).toContain('type: libraries');
       expect(result).toContain('Movies');
       expect(result).toContain('Shows');
     });
@@ -211,7 +224,7 @@ describe('toon formatters', () => {
         { Id: 1, Name: 'User Login', Type: 'UserLoggedIn', Date: '2024-01-01T00:00:00Z' },
       ];
       const result = formatActivityLog(entries);
-      expect(result).toContain('type: activity');
+      expect(result).toContain('type: activity_log');
       expect(result).toContain('User Login');
     });
   });
@@ -219,8 +232,8 @@ describe('toon formatters', () => {
   describe('formatMessage', () => {
     it('should format success message', () => {
       const result = formatMessage('Operation successful');
-      expect(result).toContain('type: ok');
-      expect(result).toContain('msg:');
+      expect(result).toContain('type: message');
+      expect(result).toContain('message:');
       expect(result).toContain('Operation successful');
     });
   });
@@ -228,8 +241,8 @@ describe('toon formatters', () => {
   describe('formatError', () => {
     it('should format error message', () => {
       const result = formatError('Something went wrong', 500);
-      expect(result).toContain('type: err');
-      expect(result).toContain('err:');
+      expect(result).toContain('type: error');
+      expect(result).toContain('error:');
       expect(result).toContain('Something went wrong');
       expect(result).toContain('code: 500');
     });

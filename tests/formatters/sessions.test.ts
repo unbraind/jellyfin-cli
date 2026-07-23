@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest';
+import { decode } from '@toon-format/toon';
 import { formatSessions, formatSession, formatTasks, formatTask } from '../../src/formatters/sessions.js';
 
 describe('formatSessions', () => {
@@ -25,7 +26,9 @@ describe('formatSessions', () => {
     expect(result).toContain('session-1');
     expect(result).toContain('TestUser');
     expect(result).toContain('Test Movie');
-    expect(result).toContain('is_playing: true');
+    expect(decode(result)).toMatchObject({
+      data: [{ id: 'session-1', is_playing: true }],
+    });
   });
 
   it('should format sessions without now playing', () => {
@@ -44,7 +47,9 @@ describe('formatSessions', () => {
     const result = formatSessions(sessions);
     expect(result).toContain('session-2');
     expect(result).toContain('AnotherUser');
-    expect(result).toContain('is_playing: false');
+    expect(decode(result)).toMatchObject({
+      data: [{ id: 'session-2', is_playing: false }],
+    });
   });
 });
 

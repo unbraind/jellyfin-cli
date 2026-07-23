@@ -12,7 +12,7 @@ describe('base formatters type detection', () => {
   });
 
   it('should detect lib list', () => {
-    expect(formatToon([{ ItemId: '123', CollectionType: 'movies' }])).toContain('type: libs');
+    expect(formatToon([{ ItemId: '123', CollectionType: 'movies' }])).toContain('type: libraries');
   });
 
   it('should detect object fallback', () => {
@@ -21,11 +21,11 @@ describe('base formatters type detection', () => {
   });
 
   it('should detect success msg', () => {
-    expect(formatToon({ message: 'msg', success: true })).toContain('type: ok');
+    expect(formatToon({ message: 'msg', success: true })).toContain('type: message');
   });
 
   it('should detect error msg in obj', () => {
-    expect(formatToon({ message: 'msg', success: false })).toContain('type: err');
-    expect(formatToon({ error: 'err' })).toContain('type: err');
+    expect(formatToon({ message: 'msg', success: false })).toContain('type: error');
+    expect(formatToon({ error: 'err' })).toContain('type: error');
   });
 });

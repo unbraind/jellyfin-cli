@@ -2,12 +2,11 @@ id: jf-mkzh
 title: Enforce 100 percent repository-wide test coverage
 description: "Replace the legacy 59 percent command-layer ratchet with a mandatory, non-bypassable 100 percent threshold for statements, branches, functions, and lines across every source file. Coverage must come from meaningful unit, integration, functional, acceptance, smoke, dogfood, performance, white-box, black-box, and read-only live E2E tests; exclusions and artificial execution-only tests are not acceptable."
 type: Feature
-status: in_progress
+status: open
 priority: 0
 tags[5]: active-ratchet,coverage,quality,roadmap,testing
 created_at: "2026-07-16T17:00:03.971Z"
-updated_at: "2026-07-22T04:56:38.197Z"
-assignee: codex-jellyfin
+updated_at: "2026-07-23T05:14:21.420Z"
 author: codex
 estimated_minutes: 1440
 acceptance_criteria: "Statements, branches, functions, and lines each measure exactly 100 percent across all source code; Coverage thresholds are enforced globally and per-file in every release and pull-request gate; Tests assert observable behavior and failure paths without coverage-only no-op execution or duplicated cases; Read-only live E2E, packaged-binary smoke, acceptance, performance, and dogfood suites are mandatory documented gates; Coverage cannot be reduced through ignore directives, source exclusions, or threshold changes without explicit governance failure"
@@ -25,12 +24,14 @@ dependencies[4]{id,kind,created_at,author,source_kind}:
   jf-7jxa,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
   jf-fgfd,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
   jf-sylm,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
-comments[5]{created_at,author,text}:
+comments[7]{created_at,author,text}:
   "2026-07-21T19:16:04.867Z",codex-jellyfin,Highest-priority requirement accepted. Current Bun coverage reports only functions and lines; evaluating LCOV/four-dimension enforcement and coverage capture for command subprocesses before selecting the non-cheatable gate.
   "2026-07-21T19:52:49.060Z",codex-jellyfin,Coverage remains the principal release blocker. Bun coverage reports 58.83% lines and 44.93% functions; Vitest can express all four 100% thresholds but its Node runtime currently fails 254 tests across 14 Bun-specific suites using Bun.spawn or Bun.serve. No artificial exclusions or mocked coverage inflation will be accepted.
   "2026-07-21T20:04:29.442Z",codex-jellyfin,"Latest post-change coverage run: 901 pass, 177 live-only skips, 0 fail; 58.64% lines and 44.56% functions. Command callbacks execute primarily in subprocess acceptance tests and are not attributed to the parent Bun coverage profile, which is the dominant instrumentation gap."
   "2026-07-22T04:41:08.659Z",codex-jellyfin,"Continuing implementation on 2026-07-22 after full all-status inventory; will measure current exact coverage first, close meaningful gaps, and verify read-only installed-binary E2E against the private configured instance."
   "2026-07-22T04:50:16.913Z",codex-jellyfin,"Portability foundation completed: typed Node adapters make 894 deterministic tests pass under Vitest; authoritative four-metric baseline is 38.19 statements, 37.40 branches, 49.92 functions, 37.87 lines. Live compiled CLI read-only suite passed 177/177. Item remains in progress because genuine 100/100/100/100 is not met."
+  "2026-07-23T04:51:19.423Z",codex-jellyfin,"2026-07-23 continuation: full all-status PM lineage, live GitHub state, official Jellyfin sources, and private-profile boundaries reviewed. Measuring exact current four-metric gaps before adding behavior-focused tests; no exclusions or threshold weakening."
+  "2026-07-23T05:14:21.420Z",codex-jellyfin,"2026-07-23 diagnostic after official TOON work: portable Vitest gate passes 906/906 with 38.24% statements, 37.38% branches, 50.00% functions, and 37.90% lines. The 100/100/100/100 acceptance requirement remains open and is not claimed complete."
 notes[4]{created_at,author,text}:
   "2026-07-16T17:00:03.971Z",codex,"Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
   "2026-07-21T19:13:34.272Z",codex-jellyfin,"Baseline measured with bun test --coverage on 2026-07-21: 898 pass, 177 skipped, 0 fail; 44.93% functions and 58.83% lines. Bun's text reporter exposes only functions/lines, so the mandatory gate must use a four-dimension instrumenter and per-file thresholds while preserving Bun compatibility."

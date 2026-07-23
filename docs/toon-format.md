@@ -1,824 +1,281 @@
-# Toon Output Format
+# TOON Output Format
 
-The Toon format is the default output format for jellyfin-cli, designed for optimal parsing by LLMs and AI agents.
+TOON (Token-Oriented Object Notation) is the default `jellyfin-cli` output format. The CLI uses the
+official [`@toon-format/toon`](https://github.com/toon-format/toon) encoder and decoder, rather than
+treating YAML as TOON.
 
-## Overview
+TOON represents the JSON data model with indentation for nested objects, explicit array lengths, and
+tabular rows for uniform arrays. It is compact for LLM context while remaining deterministic and
+losslessly decodable.
 
-Toon is a YAML-based structured output format that provides:
+## Output Envelope
 
-- **Type Information**: Every output includes a `type` field
-- **Consistent Structure**: Predictable data organization
-- **Compact Envelope**: Stable `type` and `data` fields without synthetic metadata
-- **Human Readable**: YAML format is easy to read and debug
-- **Machine Parseable**: Easy to parse with any YAML library
+Every TOON response has a stable `type` and `data` envelope:
 
-## Structure
-
-```yaml
-type: <output_type>
+```toon
+type: user
 data:
-  <structured_data>
+  id: user-1
+  name: steve
+  admin: true
 ```
 
-## Getting Schemas
+The `type` identifies the semantic payload. `data` is the command result after the command-specific
+normalization and secret-redaction rules have run. Undefined object properties are omitted; explicit
+`null`, empty strings, empty objects, and empty arrays are preserved.
 
-Use the `jf schema` command to get JSON schemas for all output types:
+An empty list remains distinguishable from missing data:
+
+```toon
+type: items
+data: []
+```
+
+## Uniform Arrays
+
+The official encoder collapses uniform object arrays into a counted table. Field names appear once:
+
+```toon
+type: users
+data[2]{id,name,admin,disabled}:
+  user-1,steve,true,false
+  user-2,viewer,false,false
+```
+
+The `[2]` declares the row count and `{id,name,admin,disabled}` declares the row schema. Strict
+decoding rejects a mismatched count or row shape.
+
+Nested fields can participate in a table header:
+
+```toon
+type: sessions
+data[1]{id,user,client,is_playing,now{id,name,type},state{paused,muted}}:
+  session-1,steve,Jellyfin Web,true,item-1,Example Movie,Movie,false,false
+```
+
+Non-uniform or deeply nested arrays use TOON's list representation instead:
+
+```toon
+type: operations
+data[2]:
+  - method: GET
+    path: /System/Info
+  - method: GET
+    path: /Users
+    tags[1]: User
+```
+
+## Scalar Rules
+
+TOON scalars use the same value model as JSON:
+
+- strings
+- finite numbers
+- booleans
+- `null`
+- arrays
+- objects
+
+Strings are quoted when required to preserve their value. URLs, timestamps, numeric-looking strings,
+empty strings, and strings containing structural punctuation may therefore be quoted:
+
+```toon
+type: config
+data:
+  url: "http://server.example:8096"
+  user: steve
+  timeout: 30000
+```
+
+Consumers must decode TOON rather than parsing lines or removing quotes manually.
+
+## Selecting a Format
+
+TOON is the default:
 
 ```bash
-# Get all schemas
-jf schema
-
-# Get schema for specific type
-jf schema user
-jf schema items
-jf schema sessions
-
-# List all available types
-jf schema list
-
-# Output as JSON
-jf schema --format json
+jf users list
+jf users list --format toon
+jf --format toon users list
 ```
 
-## Output Types Reference
+Other output formats remain independent:
 
-### Core Types
+```bash
+jf users list --format json
+jf users list --format yaml
+jf users list --format table
+jf users list --format raw
+jf users list --format markdown
+```
 
-#### message
+`yaml` is a separate format. It is not an alias for `toon`.
 
-Success/error messages for operations.
+## Decoding and Round-Trip Validation
 
-```yaml
+Use the official TypeScript package for programmatic decoding:
+
+```typescript
+import { decode } from '@toon-format/toon';
+import { execFileSync } from 'node:child_process';
+
+const serialized = execFileSync('jf', ['users', 'list', '--format', 'toon'], {
+  encoding: 'utf8',
+});
+const payload = decode(serialized);
+```
+
+The decoder returns the JSON data model represented by the TOON document. In strict mode (the
+default), it validates declared array lengths and tabular row counts.
+
+The CLI also exposes a schema-aware validation command:
+
+```bash
+jf users list --format toon |
+  jf schema validate users --from toon --format json
+```
+
+Example result:
+
+```json
+{
+  "valid": true,
+  "expected_type": "users",
+  "detected_type": "users",
+  "error_count": 0,
+  "errors": []
+}
+```
+
+`--from auto` attempts JSON, then strict TOON, then YAML. Prefer an explicit input format in CI so a
+document cannot be accepted under the wrong serialization contract.
+
+## Schemas and Agent Discovery
+
+Inspect the available output schemas and command tool definitions before building a consumer:
+
+```bash
+jf schema list --format json
+jf schema user --format json
+jf schema items --format json
+jf schema tools --format json
+```
+
+Schemas describe the decoded envelope, not the textual layout. Decode TOON first, then validate the
+resulting JSON data model.
+
+The schema and live OpenAPI discovery commands are read-only:
+
+```bash
+jf schema openapi --format toon
+jf schema research --include-unmatched --format toon
+jf schema coverage --format toon
+```
+
+## Common Payloads
+
+Success:
+
+```toon
 type: message
 data:
-  message: "Operation completed successfully"
+  message: Operation completed
   success: true
 ```
 
-#### error
+Error:
 
-Error responses with details.
-
-```yaml
+```toon
 type: error
 data:
-  error: "Item not found"
-  code: 404
-  details:
-    itemId: "abc123"
+  error: Item not found
   success: false
+  code: 404
 ```
 
-### System Types
+Items:
 
-#### system_info
-
-Server system information.
-
-```yaml
-type: system_info
-data:
-  name: "My Jellyfin Server"
-  version: "10.8.13"
-  id: "abc123..."
-  local_address: "http://192.168.1.100:8096"
-  operating_system: "Linux"
-  has_pending_restart: false
-  can_self_restart: true
-  web_socket_port: 8096
+```toon
+type: items
+data[2]{id,name,type,year,rating}:
+  item-1,Example Movie,Movie,2026,8.1
+  item-2,Example Series,Series,2025,7.9
 ```
 
-#### config
+Query result:
 
-Configuration display (credentials masked).
-
-```yaml
-type: config
-data:
-  server_url: "http://192.168.1.100:8096"
-  username: "admin"
-  user_id: "user-1"
-  timeout: 30000
-  output_format: "toon"
-```
-
-#### activity_log
-
-Server activity log entries.
-
-```yaml
-type: activity_log
-data:
-  - id: 1
-    name: "UserLoggedIn"
-    type: "AuthenticationSucceeded"
-    date: "2024-01-01T00:00:00.000Z"
-    user_id: "user-1"
-    severity: "Info"
-```
-
-### User Types
-
-#### users
-
-List of users.
-
-```yaml
-type: users
-data:
-  - id: "user-1"
-    name: "admin"
-    is_admin: true
-    is_disabled: false
-    is_hidden: false
-    last_login: "2024-01-01T00:00:00.000Z"
-    has_password: true
-  - id: "user-2"
-    name: "viewer"
-    is_admin: false
-    is_disabled: false
-    is_hidden: false
-    last_login: null
-    has_password: false
-```
-
-#### user
-
-Single user details.
-
-```yaml
-type: user
-data:
-  id: "user-1"
-  name: "admin"
-  is_admin: true
-  is_disabled: false
-  is_hidden: false
-  last_login: "2024-01-01T00:00:00.000Z"
-  last_activity: "2024-01-01T00:00:00.000Z"
-  has_password: true
-  configuration:
-    subtitle_language: "en"
-    subtitle_mode: "Default"
-    play_default_audio: true
-    hide_played: false
-    auto_play_next: true
-  policy:
-    enable_all_folders: true
-    enable_remote_access: true
-    enable_live_tv: true
-    enable_playback: true
-    enable_transcoding: true
-```
-
-#### user_policy
-
-User permissions and policy.
-
-```yaml
-type: user_policy
-data:
-  is_administrator: true
-  is_hidden: false
-  is_disabled: false
-  enable_remote_access: true
-  enable_live_tv_access: true
-  enable_live_tv_management: true
-  enable_media_playback: true
-  enable_video_playback_transcoding: true
-  enable_content_deletion: false
-  enable_all_folders: true
-```
-
-#### user_config
-
-User preferences.
-
-```yaml
-type: user_config
-data:
-  subtitle_language_preference: "en"
-  subtitle_mode: "Default"
-  play_default_audio_track: true
-  hide_played_in_latest: false
-  enable_next_episode_auto_play: true
-```
-
-### Item Types
-
-#### items
-
-List of media items.
-
-```yaml
+```toon
 type: items
 data:
-  - id: "item-1"
-    name: "The Matrix"
-    type: "Movie"
-    year: 1999
-    rating: 8.7
-    runtime_ticks: 82800000000
-    genres:
-      - "Action"
-      - "Sci-Fi"
-    overview: "A computer hacker learns..."
-    played: true
-    favorite: false
-    play_count: 3
-    unplayed_count: null
-  - id: "item-2"
-    name: "Breaking Bad"
-    type: "Series"
-    year: 2008
-    rating: 9.5
-    runtime_ticks: null
-    genres:
-      - "Crime"
-      - "Drama"
-    overview: "A high school chemistry teacher..."
-    played: false
-    favorite: true
-    play_count: 0
-    unplayed_count: 62
+  total: 2
+  offset: 0
+  items[2]{Id,Name,Type}:
+    item-1,Example Movie,Movie
+    item-2,Example Series,Series
 ```
 
-#### item
+System information:
 
-Single item details with full metadata.
-
-```yaml
-type: item
+```toon
+type: system_info
 data:
-  id: "item-1"
-  name: "The Matrix"
-  type: "Movie"
-  path: "/media/movies/The Matrix (1999)/The Matrix.mkv"
-  year: 1999
-  official_rating: "R"
-  community_rating: 8.7
-  critic_rating: 7.8
-  runtime_ticks: 82800000000
-  status: null
-  premiere_date: "1999-03-31T00:00:00.000Z"
-  end_date: null
-  genres:
-    - "Action"
-    - "Sci-Fi"
-    - "Thriller"
-  studios:
-    - "Warner Bros."
-    - "Village Roadshow Pictures"
-  people:
-    - name: "Keanu Reeves"
-      role: "Neo"
-      type: "Actor"
-    - name: "Laurence Fishburne"
-      role: "Morpheus"
-      type: "Actor"
-    - name: "Lana Wachowski"
-      role: null
-      type: "Director"
-  overview: "A computer hacker learns from mysterious rebels..."
-  taglines:
-    - "The Matrix has you..."
-  media_sources:
-    - id: "source-1"
-      name: "The Matrix"
-      container: "mkv"
-      path: "/media/movies/The Matrix (1999)/The Matrix.mkv"
-      bitrate: 15000000
-      size: 15000000000
-  media_streams:
-    - index: 0
-      type: "Video"
-      codec: "h264"
-      language: null
-      title: null
-      is_default: true
-      is_forced: false
-      width: 1920
-      height: 1080
-      channels: null
-    - index: 1
-      type: "Audio"
-      codec: "ac3"
-      language: "eng"
-      title: "English 5.1"
-      is_default: true
-      is_forced: false
-      width: null
-      height: null
-      channels: 6
-    - index: 2
-      type: "Subtitle"
-      codec: "srt"
-      language: "eng"
-      title: "English"
-      is_default: false
-      is_forced: false
-      width: null
-      height: null
-      channels: null
-  user_data:
-    played: true
-    favorite: false
-    play_count: 3
-    last_played: "2024-01-01T00:00:00.000Z"
-    position_ticks: 0
-  child_count: null
-  recursive_item_count: null
+  name: Jellyfin
+  version: 10.11.11
+  id: server-id
+  local_address: "http://server.example:8096"
+  operating_system: Linux
+  has_pending_restart: false
 ```
 
-#### search_result
-
-Search results with hints.
-
-```yaml
-type: search_result
-data:
-  total_count: 5
-  hints:
-    - id: "item-1"
-      name: "The Matrix"
-      type: "Movie"
-      year: 1999
-      runtime_ticks: 82800000000
-      media_type: "Video"
-      series: null
-      album: null
-      artists: null
-      index: null
-      parent_index: null
-    - id: "item-2"
-      name: "The Matrix Reloaded"
-      type: "Movie"
-      year: 2003
-      runtime_ticks: 83400000000
-      media_type: "Video"
-      series: null
-      album: null
-      artists: null
-      index: null
-      parent_index: null
-```
-
-#### chapters
-
-Chapter list for an item.
-
-```yaml
-type: chapters
-data:
-  - index: 0
-    name: "Chapter 1"
-    start_position_ticks: 0
-    has_image: true
-  - index: 1
-    name: "Chapter 2"
-    start_position_ticks: 36000000000
-    has_image: true
-```
-
-#### filters
-
-Available query filters.
-
-```yaml
-type: filters
-data:
-  genres:
-    - "Action"
-    - "Comedy"
-    - "Drama"
-  studios:
-    - "Warner Bros."
-    - "Universal"
-  tags:
-    - "favorite"
-    - "4k"
-  years:
-    - 2023
-    - 2022
-    - 2021
-  official_ratings:
-    - "G"
-    - "PG"
-    - "R"
-  persons:
-    - name: "Tom Hanks"
-      id: "person-1"
-```
-
-### Session Types
-
-#### sessions
-
-List of active sessions.
-
-```yaml
-type: sessions
-data:
-  - id: "session-1"
-    uid: "user-1"
-    user: "admin"
-    client: "Jellyfin Web"
-    device: "Chrome"
-    rc: true
-    active: true
-    is_playing: true
-    now:
-      id: "item-1"
-      name: "The Matrix"
-      type: "Movie"
-    rt: 81600000000
-    state:
-      paused: false
-      muted: false
-    pos: 36000000000
-    vol: 80
-    method: DirectPlay
-    repeat: RepeatNone
-```
-
-#### session
-
-Single session details.
-
-```yaml
-type: session
-data:
-  id: "session-1"
-  uid: "user-1"
-  user: "admin"
-  client: "Jellyfin Web"
-  device: "Chrome"
-  ver: "10.8.13"
-  active: "2024-01-01T00:00:00.000Z"
-  rc: true
-  is_playing: true
-  now:
-    id: "item-1"
-    name: "The Matrix"
-    type: "Movie"
-  rt: 82800000000
-  state:
-    paused: false
-    muted: false
-  pos: 36000000000
-  vol: 80
-  method: DirectPlay
-  repeat: RepeatNone
-```
-
-### Library Types
-
-#### libraries
-
-List of media libraries.
-
-```yaml
-type: libraries
-data:
-  - name: "Movies"
-    id: "lib-1"
-    collection_type: "movies"
-    locations:
-      - "/media/movies"
-    refresh_status: "Idle"
-  - name: "TV Shows"
-    id: "lib-2"
-    collection_type: "tvshows"
-    locations:
-      - "/media/tvshows"
-    refresh_status: "Idle"
-```
-
-### Task Types
-
-#### tasks
-
-List of scheduled tasks.
-
-```yaml
-type: tasks
-data:
-  - id: "task-1"
-    name: "Scan Media Library"
-    key: "RefreshLibrary"
-    state: "Idle"
-    category: "Library"
-    description: "Scans your media library for new files"
-    is_hidden: false
-    last_execution:
-      start_time: "2024-01-01T00:00:00.000Z"
-      end_time: "2024-01-01T00:05:00.000Z"
-      status: "Completed"
-      error: null
-    triggers:
-      - type: "IntervalTrigger"
-        interval_ticks: 864000000000
-        time_of_day_ticks: null
-        day_of_week: null
-```
-
-#### task
-
-Single task details.
-
-```yaml
-type: task
-data:
-  id: "task-1"
-  name: "Scan Media Library"
-  key: "RefreshLibrary"
-  state: "Running"
-  category: "Library"
-  description: "Scans your media library for new files"
-  current_progress: 45
-  is_hidden: false
-```
-
-#### task_triggers
-
-Task schedule triggers.
-
-```yaml
-type: task_triggers
-data:
-  - id: "trigger-1"
-    type: "IntervalTrigger"
-    interval_ticks: 864000000000
-    max_runs: null
-  - id: "trigger-2"
-    type: "DailyTrigger"
-    time_of_day_ticks: 216000000000
-    max_runs: null
-```
-
-### Plugin Types
-
-#### plugins
-
-List of installed plugins.
-
-```yaml
-type: plugins
-data:
-  - id: "plugin-1"
-    name: "LDAP Authentication"
-    version: "1.0.0"
-    status: "Active"
-    description: "LDAP authentication provider"
-  - id: "plugin-2"
-    name: "Playback Reporting"
-    version: "2.0.0"
-    status: "Active"
-    description: "Track playback activity"
-```
-
-### Media Types
-
-#### playback_info
-
-Playback information for an item.
-
-```yaml
-type: playback_info
-data:
-  play_session_id: "session-abc123"
-  media_sources:
-    - id: "source-1"
-      name: "The Matrix"
-      container: "mkv"
-      supports_direct_play: true
-      supports_direct_stream: true
-      supports_transcoding: true
-```
-
-#### stream_url
-
-Video stream URL.
-
-```yaml
-type: stream_url
-data:
-  url: "http://server:8096/videos/item-1/stream?..."
-  item_id: "item-1"
-```
-
-#### audio_url
-
-Audio stream URL.
-
-```yaml
-type: audio_url
-data:
-  url: "http://server:8096/audio/item-1/stream?..."
-  item_id: "item-1"
-```
-
-#### subtitle_url
-
-Subtitle URL.
-
-```yaml
-type: subtitle_url
-data:
-  url: "http://server:8096/videos/item-1/subtitles/2?..."
-  item_id: "item-1"
-  stream_index: 2
-```
-
-#### image_url
-
-Image URL.
-
-```yaml
-type: image_url
-data:
-  url: "http://server:8096/Items/item-1/Images/Primary?..."
-  item_id: "item-1"
-```
-
-### Other Types
-
-#### recommendations
-
-Content recommendations.
-
-```yaml
-type: recommendations
-data:
-  - baseline_item: "item-1"
-    category_id: "cat-1"
-    type: "SimilarTo"
-    items:
-      - id: "item-2"
-        name: "The Matrix Reloaded"
-      - id: "item-3"
-        name: "The Matrix Revolutions"
-```
-
-#### item_counts
-
-Library statistics.
-
-```yaml
-type: item_counts
-data:
-  movies: 500
-  series: 75
-  episodes: 2500
-  albums: 200
-  songs: 3000
-```
-
-#### live_tv_info
-
-Live TV information.
-
-```yaml
-type: live_tv_info
-data:
-  is_enabled: true
-  services:
-    - name: "HDHomeRun"
-      type: "TunerHost"
-  guide_info:
-    last_update: "2024-01-01T00:00:00.000Z"
-    status: "Ok"
-```
-
-## Parsing Examples
-
-### Python
-
-```python
-import yaml
-import subprocess
-
-def get_items(search_term):
-    result = subprocess.run(
-        ['jf', 'items', 'search', search_term, '--format', 'toon'],
-        capture_output=True,
-        text=True
-    )
-    
-    data = yaml.safe_load(result.stdout)
-    
-    if data['type'] == 'error':
-        raise Exception(data['data']['error'])
-    
-    if data['type'] == 'search_result':
-        return data['data']['hints']
-    
-    return []
-
-# Usage
-try:
-    items = get_items('matrix')
-    for item in items:
-        print(f"{item['name']} ({item['type']}, {item.get('year', 'N/A')})")
-except Exception as e:
-    print(f"Error: {e}")
-```
-
-### JavaScript/Node.js
-
-```javascript
-import yaml from 'yaml';
-import { execSync } from 'child_process';
-
-function getItems(searchTerm) {
-  const result = execSync(
-    `jf items search "${searchTerm}" --format toon`,
-    { encoding: 'utf-8' }
-  );
-  
-  const data = yaml.parse(result);
-  
-  if (data.type === 'error') {
-    throw new Error(data.data.error);
-  }
-  
-  if (data.type === 'search_result') {
-    return data.data.hints;
-  }
-  
-  return [];
-}
-
-// Usage
-try {
-  const items = getItems('matrix');
-  items.forEach(item => {
-    console.log(`${item.name} (${item.type}, ${item.year ?? 'N/A'})`);
-  });
-} catch (e) {
-  console.error(`Error: ${e.message}`);
-}
-```
-
-### TypeScript with Types
-
-```typescript
-import yaml from 'yaml';
-import { execSync } from 'child_process';
-
-interface ToonOutput<T> {
-  type: string;
-  data: T;
-}
-
-interface SearchHint {
-  id: string;
-  name: string;
-  type: string;
-  year?: number;
-  runtime_ticks?: number;
-}
-
-interface SearchResult {
-  total_count: number;
-  hints: SearchHint[];
-}
-
-function searchItems(term: string): SearchHint[] {
-  const result = execSync(
-    `jf items search "${term}" --format toon`,
-    { encoding: 'utf-8' }
-  );
-  
-  const output: ToonOutput<SearchResult | { error: string }> = yaml.parse(result);
-  
-  if (output.type === 'error') {
-    throw new Error((output.data as { error: string }).error);
-  }
-  
-  return (output.data as SearchResult).hints;
-}
-```
+Actual fields vary by command and server response. Use `jf schema`, command help, and
+[`api.md`](api.md) as the authoritative command contract.
 
 ## Error Handling
 
-All errors follow a consistent format:
+Errors written in TOON remain typed envelopes. Check `type` after decoding:
 
-```yaml
-type: error
-data:
-  error: "Description of the error"
-  code: 404
-  details: {}
-  success: false
+```typescript
+import { decode, type JsonValue } from '@toon-format/toon';
+
+function getErrorMessage(payload: JsonValue): string | undefined {
+  if (typeof payload !== 'object' || payload === null || Array.isArray(payload)) {
+    return undefined;
+  }
+  if (payload.type !== 'error' || typeof payload.data !== 'object' || payload.data === null) {
+    return undefined;
+  }
+  const data = payload.data;
+  return !Array.isArray(data) && typeof data.error === 'string' ? data.error : undefined;
+}
 ```
 
-Always check the `type` field to determine how to process the output.
+The process exit code remains authoritative for success or failure. Structured output supplements
+the exit code; it does not replace it.
 
-## Best Practices
+## Security and Privacy
 
-1. **Always check the type field**: Before processing data, verify the output type
-2. **Handle errors explicitly**: Check for `type: error` and handle appropriately
-3. **Use null-safe access**: Fields may be null/undefined - use safe access patterns
-4. **Parse timestamps as ISO 8601**: All timestamps are in ISO 8601 format
-5. **Use schema command**: Run `jf schema <type>` to understand data structure
+- Credentials are never intentionally included in formatted configuration output.
+- Settings and OpenAPI caches stay below `~/.jellyfin-cli/` with owner-local permissions.
+- Use `--read-only` or `JELLYFIN_READ_ONLY=1` for non-mutating automation.
+- Do not log raw command output when it may contain library, user, device, or session data.
+- Prefer `jf config doctor --format json` for redacted diagnostics.
+
+## Best Practices for Agents
+
+1. Decode TOON with the official decoder; do not use a YAML parser.
+2. Check the process exit code and decoded `type` before reading `data`.
+3. Respect declared array lengths and field headers.
+4. Use JSON when another program lacks a TOON decoder.
+5. Use `jf schema tools --format json` for function-calling metadata.
+6. Enable read-only mode before live discovery or acceptance tests.
+7. Keep credentials in environment variables or `~/.jellyfin-cli/settings.json`, never prompts,
+   tracked fixtures, snapshots, or logs.
+
+## References
+
+- [Official TOON implementation](https://github.com/toon-format/toon)
+- [TOON specification](https://github.com/toon-format/spec)
+- [TOON TypeScript API](https://toonformat.dev/reference/api)
+- [Agent integration](agent-integration.md)
+- [CLI API reference](api.md)
+- [Security](security.md)

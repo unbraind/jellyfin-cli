@@ -3,7 +3,7 @@ import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 export const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..', '..');
-export const pmCliPackage = '@unbrained/pm-cli@2026.7.21';
+export const pmCliPackage = '@unbrained/pm-cli@2026.7.22';
 
 export function commandFor(binary) {
   return process.platform === 'win32' && !binary.endsWith('.cmd') ? `${binary}.cmd` : binary;

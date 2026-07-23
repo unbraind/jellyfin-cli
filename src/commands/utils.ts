@@ -108,7 +108,10 @@ function formatError(error: string, format: OutputFormat, code?: number, details
   if (format === 'raw') {
     return `Error: ${error}`;
   }
-  return `type: error\ndata:\n  error: ${error}${code ? `\n  code: ${code}` : ''}${details ? `\n  details: ${JSON.stringify(details)}` : ''}\n  success: false`;
+  if (format === 'toon') {
+    return toon.formatError(error, code, details);
+  }
+  return formatOutput({ success: false, error, code, details }, format);
 }
 
 /**

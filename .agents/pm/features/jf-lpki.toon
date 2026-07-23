@@ -2,12 +2,11 @@ id: jf-lpki
 title: Enforce docstring and static analysis quality gates
 description: "Require complete high-quality source API documentation and strict non-bypassable checks for TypeScript safety, docstrings, duplication, pm metadata, dependencies, containers/filesystems, shell scripts, PowerShell, CodeQL/Greptile, and coverage reporting."
 type: Feature
-status: in_progress
+status: open
 priority: 0
 tags[4]: code-quality,docs,security,static-analysis
 created_at: "2026-07-21T19:13:36.782Z"
-updated_at: "2026-07-22T04:56:39.172Z"
-assignee: codex-jellyfin
+updated_at: "2026-07-23T05:14:21.403Z"
 author: codex-jellyfin
 estimated_minutes: 720
 acceptance_criteria: "Every exported and internal source declaration has accurate actionable API documentation and docstring coverage is 100 percent; No any, inline/dynamic imports, non-erasable TypeScript syntax, or untyped external APIs remain; ESLint, jscpd, pm validation/lint, Trivy, ShellCheck, PSScriptAnalyzer where applicable, CodeQL, Greptile, and Codecov are mandatory documented gates; All tools are pinned, free to run in GitHub, and cannot be silently skipped when applicable files exist"
@@ -28,11 +27,13 @@ dependencies[5]{id,kind,created_at,author,source_kind}:
   jf-gqxo,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
   jf-sylm,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
   jf-wemh,related_to,"2026-07-21T19:50:11.875Z",codex-jellyfin,null
-comments[4]{created_at,author,text}:
+comments[6]{created_at,author,text}:
   "2026-07-21T19:52:47.903Z",codex-jellyfin,"Current quality evidence: typecheck and strict ESLint pass; every source file is at or below 300 code lines excluding comments; tracked-tree and repository-history secret scans pass. jscpd reports a 5.78% duplicated-line baseline, so zero-duplication and the complete mandatory gate bundle remain open work."
   "2026-07-21T20:04:31.266Z",codex-jellyfin,"Strict TypeScript and JSDoc lint, source LOC, and both secret scans pass. The zero-duplication command is now explicit as check:duplicates, but remains red at the measured 5.78% baseline and is intentionally not represented as a completed release gate."
   "2026-07-21T20:09:41.945Z",codex-jellyfin,"Dependency remediation completed for the current lane: compatible overrides pin vite 8.1.5, flatted 3.4.2, postcss 8.5.21, esbuild 0.28.1, and picomatch 4.0.5; both bun audit and npm audit now report zero vulnerabilities. Typecheck, lint, and all 903 non-live tests still pass."
   "2026-07-22T04:41:09.931Z",codex-jellyfin,Continuing paired static-analysis/docstring gate implementation because it shares the release verification surface with jf-mkzh; external package types will be read from node_modules and source files remain <=300 LOC.
+  "2026-07-23T04:51:20.465Z",codex-jellyfin,"2026-07-23 continuation: paired quality-gate work is active because it shares the same source/test/release surface. Verifying effective code-line limits, JSDoc coverage, zero duplication, strict TypeScript rules, security scanners, and CI enforcement before implementation."
+  "2026-07-23T05:14:21.403Z",codex-jellyfin,"2026-07-23 diagnostic after official TOON work: strict jscpd threshold remains red with 216 clones and 9.11% duplicated lines overall. The zero-duplication acceptance requirement remains open and is not claimed complete."
 notes[1]{created_at,author,text}:
   "2026-07-21T19:13:36.782Z",codex-jellyfin,"Applicability must be explicit: ShellCheck/PSScriptAnalyzer gates fail on violations when matching scripts exist and report a deterministic no-files result otherwise."
 learnings[1]{created_at,author,text}:

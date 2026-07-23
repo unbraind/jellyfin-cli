@@ -9,14 +9,14 @@ import { formatToon } from './base.js';
 export function formatSessions(sessions: SessionInfo[]): string {
   return formatToon(sessions.map(s => ({
     id: s.Id,
-    uid: s.UserId,
-    user: s.UserName,
+    user_id: s.UserId,
+    user_name: s.UserName,
     client: s.Client,
-    device: s.DeviceName,
-    rc: s.SupportsRemoteControl,
+    device_name: s.DeviceName,
+    supports_remote_control: s.SupportsRemoteControl,
     active: s.IsActive,
     is_playing: s.NowPlayingItem !== undefined && s.NowPlayingItem !== null,
-    now: s.NowPlayingItem ? {
+    now_playing: s.NowPlayingItem ? {
       id: s.NowPlayingItem.Id,
       name: s.NowPlayingItem.Name,
       type: s.NowPlayingItem.Type,
@@ -24,15 +24,15 @@ export function formatSessions(sessions: SessionInfo[]): string {
       season: s.NowPlayingItem.ParentIndexNumber,
       episode: s.NowPlayingItem.IndexNumber,
     } : undefined,
-    rt: s.NowPlayingItem?.RunTimeTicks,
-    state: s.PlayState ? {
+    runtime_ticks: s.NowPlayingItem?.RunTimeTicks,
+    play_state: s.PlayState ? {
       paused: s.PlayState.IsPaused,
       muted: s.PlayState.IsMuted,
     } : undefined,
-    pos: s.PlayState?.PositionTicks,
-    vol: s.PlayState?.VolumeLevel,
-    method: s.PlayState?.PlayMethod,
-    repeat: s.PlayState?.RepeatMode,
+    position_ticks: s.PlayState?.PositionTicks,
+    volume_level: s.PlayState?.VolumeLevel,
+    play_method: s.PlayState?.PlayMethod,
+    repeat_mode: s.PlayState?.RepeatMode,
     shuffle: s.PlayState?.PlaybackOrder === 'Shuffle' ? true : undefined,
   })), 'sessions');
 }
@@ -45,15 +45,15 @@ export function formatSessions(sessions: SessionInfo[]): string {
 export function formatSession(session: SessionInfo): string {
   return formatToon({
     id: session.Id,
-    uid: session.UserId,
-    user: session.UserName,
+    user_id: session.UserId,
+    user_name: session.UserName,
     client: session.Client,
-    device: session.DeviceName,
-    ver: session.ApplicationVersion,
-    active: session.LastActivityDate,
-    rc: session.SupportsRemoteControl,
+    device_name: session.DeviceName,
+    application_version: session.ApplicationVersion,
+    last_activity: session.LastActivityDate,
+    supports_remote_control: session.SupportsRemoteControl,
     is_playing: session.NowPlayingItem !== undefined && session.NowPlayingItem !== null,
-    now: session.NowPlayingItem ? {
+    now_playing: session.NowPlayingItem ? {
       id: session.NowPlayingItem.Id,
       name: session.NowPlayingItem.Name,
       type: session.NowPlayingItem.Type,
@@ -61,15 +61,15 @@ export function formatSession(session: SessionInfo): string {
       season: session.NowPlayingItem.ParentIndexNumber,
       episode: session.NowPlayingItem.IndexNumber,
     } : undefined,
-    rt: session.NowPlayingItem?.RunTimeTicks,
-    state: session.PlayState ? {
+    runtime_ticks: session.NowPlayingItem?.RunTimeTicks,
+    play_state: session.PlayState ? {
       paused: session.PlayState.IsPaused,
       muted: session.PlayState.IsMuted,
     } : undefined,
-    pos: session.PlayState?.PositionTicks,
-    vol: session.PlayState?.VolumeLevel,
-    method: session.PlayState?.PlayMethod,
-    repeat: session.PlayState?.RepeatMode,
+    position_ticks: session.PlayState?.PositionTicks,
+    volume_level: session.PlayState?.VolumeLevel,
+    play_method: session.PlayState?.PlayMethod,
+    repeat_mode: session.PlayState?.RepeatMode,
   }, 'session');
 }
 
@@ -84,10 +84,10 @@ export function formatTasks(tasks: ScheduledTaskInfo[]): string {
     name: t.Name,
     key: t.Key,
     state: t.State,
-    cat: t.Category,
-    last: t.LastExecutionResult ? {
-      start: t.LastExecutionResult.StartTimeUtc,
-      end: t.LastExecutionResult.EndTimeUtc,
+    category: t.Category,
+    last_execution: t.LastExecutionResult ? {
+      start_time_utc: t.LastExecutionResult.StartTimeUtc,
+      end_time_utc: t.LastExecutionResult.EndTimeUtc,
       status: t.LastExecutionResult.Status,
     } : undefined,
     triggers: t.Triggers?.length ? t.Triggers.map(tr => ({
@@ -110,11 +110,11 @@ export function formatTask(task: ScheduledTaskInfo): string {
     name: task.Name,
     key: task.Key,
     state: task.State,
-    cat: task.Category,
-    pct: task.Progress,
-    last: task.LastExecutionResult ? {
-      start: task.LastExecutionResult.StartTimeUtc,
-      end: task.LastExecutionResult.EndTimeUtc,
+    category: task.Category,
+    progress: task.Progress,
+    last_execution: task.LastExecutionResult ? {
+      start_time_utc: task.LastExecutionResult.StartTimeUtc,
+      end_time_utc: task.LastExecutionResult.EndTimeUtc,
       status: task.LastExecutionResult.Status,
     } : undefined,
   }, 'task');

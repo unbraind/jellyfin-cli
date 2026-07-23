@@ -42,13 +42,14 @@
     "smoke:npx": "sh -c 'PKG=\"$(npm pack --silent)\" && npm exec --yes --package \"./$PKG\" jf -- --version && rm -f \"$PKG\"'",
     "smoke:bunx": "sh -c 'PKG=\"$(npm pack --silent)\" && ABS=\"$(pwd)/$PKG\" && bunx --bun --package \"file://$ABS\" jellyfin-cli --version && rm -f \"$PKG\"'",
     "changelog:pm:install": "node scripts/release/ensure-pm-changelog.mjs",
-    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.7.21 -- pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
+    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.7.22 -- pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
     "changelog:pm:check": "node scripts/release/check-changelog.mjs",
     "test:release": "node --test scripts/release/release.test.mjs",
     "release:notes": "node scripts/release/generate-release-notes.mjs",
     "release:pipeline": "node scripts/release/run-release-pipeline.mjs",
     "release:pipeline:dry-run": "node scripts/release/run-release-pipeline.mjs --dry-run",
     "release:verify-published": "node scripts/release/verify-published-release.mjs",
+    "reviews:inventory": "node scripts/reviews/pr-review-loop.mjs inventory",
     "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run test:portable && bun run test:release && bun run build && bun run smoke:dist && bun run check:file-length && bun run check:secrets && bun run check:secrets:history && bun run pack:dry-run && bun run smoke:npx && bun run smoke:bunx && bun run changelog:pm:check",
     "release:check": "bun run validate:release",
     "clean": "rm -rf dist",
@@ -72,6 +73,7 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
+    "@toon-format/toon": "4.0.0",
     "chalk": "^5.6.2",
     "commander": "^15.0.0",
     "yaml": "^2.9.0"

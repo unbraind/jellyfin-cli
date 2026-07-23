@@ -13,12 +13,12 @@ export function formatItems(items: BaseItemDto[]): string {
     type: i.Type,
     year: i.ProductionYear,
     rating: i.CommunityRating,
-    rt: i.RunTimeTicks,
+    runtime_ticks: i.RunTimeTicks,
     genres: i.Genres?.length ? i.Genres : undefined,
     played: i.UserData?.Played,
-    fav: i.UserData?.IsFavorite,
-    plays: i.UserData?.PlayCount,
-    unplayed: i.UserData?.UnplayedItemCount,
+    favorite: i.UserData?.IsFavorite,
+    play_count: i.UserData?.PlayCount,
+    unplayed_count: i.UserData?.UnplayedItemCount,
   })), 'items');
 }
 
@@ -34,10 +34,10 @@ export function formatItem(item: BaseItemDto): string {
     type: item.Type,
     path: item.Path,
     year: item.ProductionYear,
-    rated: item.OfficialRating,
+    official_rating: item.OfficialRating,
     rating: item.CommunityRating,
-    critics: item.CriticRating,
-    rt: item.RunTimeTicks,
+    critic_rating: item.CriticRating,
+    runtime_ticks: item.RunTimeTicks,
     status: item.Status,
     premiered: item.PremiereDate,
     ended: item.EndDate,
@@ -50,7 +50,7 @@ export function formatItem(item: BaseItemDto): string {
     })),
     overview: item.Overview,
     taglines: item.Taglines?.length ? item.Taglines : undefined,
-    sources: item.MediaSources?.map(s => ({
+    media_sources: item.MediaSources?.map(s => ({
       id: s.Id,
       name: s.Name,
       container: s.Container,
@@ -58,27 +58,27 @@ export function formatItem(item: BaseItemDto): string {
       bitrate: s.Bitrate,
       size: s.Size,
     })),
-    streams: item.MediaStreams?.map(s => ({
-      idx: s.Index,
+    media_streams: item.MediaStreams?.map(s => ({
+      index: s.Index,
       type: s.Type,
       codec: s.Codec,
-      lang: s.Language,
+      language: s.Language,
       title: s.Title,
-      w: s.Width,
-      h: s.Height,
-      ch: s.Channels,
-      def: s.IsDefault,
+      width: s.Width,
+      height: s.Height,
+      channels: s.Channels,
+      default: s.IsDefault,
       forced: s.IsForced,
     })),
-    user: item.UserData ? {
+    user_data: item.UserData ? {
       played: item.UserData.Played,
-      fav: item.UserData.IsFavorite,
-      plays: item.UserData.PlayCount,
-      last: item.UserData.LastPlayedDate,
-      pos: item.UserData.PlaybackPositionTicks,
+      favorite: item.UserData.IsFavorite,
+      play_count: item.UserData.PlayCount,
+      last_played: item.UserData.LastPlayedDate,
+      playback_position_ticks: item.UserData.PlaybackPositionTicks,
     } : undefined,
     children: item.ChildCount,
-    total: item.RecursiveItemCount,
+    recursive_item_count: item.RecursiveItemCount,
   }, 'item');
 }
 
@@ -90,12 +90,12 @@ export function formatItem(item: BaseItemDto): string {
  */
 export function formatQueryResult<T>(result: QueryResult<T>, itemFormatter?: (item: T) => unknown): string {
   return formatToon({
-    total: result.TotalRecordCount,
+    total_count: result.TotalRecordCount,
     offset: result.StartIndex,
     items: itemFormatter && result.Items?.length 
       ? result.Items.map(itemFormatter).filter(Boolean)
       : result.Items,
-  }, 'items');
+  }, 'query_result');
 }
 
 /**
@@ -105,20 +105,20 @@ export function formatQueryResult<T>(result: QueryResult<T>, itemFormatter?: (it
  */
 export function formatSearchResult(result: SearchResult): string {
   return formatToon({
-    total: result.TotalRecordCount,
+    total_count: result.TotalRecordCount,
     hints: result.SearchHints?.map(h => ({
       id: h.Id,
       name: h.Name,
       type: h.Type,
       year: h.ProductionYear,
-      rt: h.RunTimeTicks,
-      media: h.MediaType,
+      runtime_ticks: h.RunTimeTicks,
+      media_type: h.MediaType,
       series: h.Series,
       album: h.Album,
-      ep: h.IndexNumber,
-      s: h.ParentIndexNumber,
+      episode: h.IndexNumber,
+      season: h.ParentIndexNumber,
     })),
-  }, 'search');
+  }, 'search_result');
 }
 
 /**
@@ -130,10 +130,10 @@ export function formatLibraries(libraries: LibraryVirtualFolder[]): string {
   return formatToon(libraries.map(l => ({
     name: l.Name,
     id: l.ItemId,
-    type: l.CollectionType,
+    collection_type: l.CollectionType,
     paths: l.Locations?.length ? l.Locations : undefined,
     status: l.RefreshStatus,
-  })), 'libs');
+  })), 'libraries');
 }
 
 /**
@@ -143,13 +143,14 @@ export function formatLibraries(libraries: LibraryVirtualFolder[]): string {
  */
 export function formatActivityLog(log: ActivityLogEntry[]): string {
   return formatToon(log.map(e => ({
+    id: e.Id,
     type: e.Type,
     name: e.Name,
-    user: e.UserId,
-    when: e.Date,
-    item: e.ItemId,
-    lvl: e.Severity,
-  })), 'activity');
+    user_id: e.UserId,
+    date: e.Date,
+    item_id: e.ItemId,
+    severity: e.Severity,
+  })), 'activity_log');
 }
 
 /**

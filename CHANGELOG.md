@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Replace YAML-like output with official TOON serialization ([jf-644n](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-644n.toon))
+
 ## 2026.7.22 - 2026-07-22
 
 ### Fixed
