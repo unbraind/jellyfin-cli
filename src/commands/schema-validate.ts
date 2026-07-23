@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { text } from 'node:stream/consumers';
+import { decode as decodeToon } from '@toon-format/toon';
 import YAML from 'yaml';
 import { formatOutput } from '../formatters/index.js';
 import { getSchema } from './schema-defs.js';
@@ -62,8 +63,11 @@ function parseValidationInput(value: string, sourceFormat: string): unknown {
   if (sourceFormat === 'json') {
     return JSON.parse(trimmed);
   }
-  if (sourceFormat === 'yaml' || sourceFormat === 'toon') {
+  if (sourceFormat === 'yaml') {
     return YAML.parse(trimmed);
+  }
+  if (sourceFormat === 'toon') {
+    return decodeToon(trimmed);
   }
   if (sourceFormat !== 'auto') {
     throw new Error(`Invalid input format: ${sourceFormat}. Use one of: auto, json, yaml, toon.`);
@@ -72,7 +76,11 @@ function parseValidationInput(value: string, sourceFormat: string): unknown {
   try {
     return JSON.parse(trimmed);
   } catch {
-    return YAML.parse(trimmed);
+    try {
+      return decodeToon(trimmed);
+    } catch {
+      return YAML.parse(trimmed);
+    }
   }
 }
 
@@ -82,7 +90,7 @@ function parseValidationInput(value: string, sourceFormat: string): unknown {
  */
 export function createSchemaValidateCommand(): Command {
   return new Command('validate')
-    .description('Validate Toon/JSON/YAML payloads against CLI output schemas')
+    .description('Validate TOON/JSON/YAML payloads against CLI output schemas')
     .argument('[type]', 'Output type to validate against (optional, auto-detected from payload type)')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--input <value>', 'Payload to validate as inline string (otherwise read from stdin)')

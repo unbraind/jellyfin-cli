@@ -1,4 +1,5 @@
 import type { Command } from 'commander';
+import { formatToon } from '../formatters/base.js';
 import { MUTATING_VERBS, READ_ONLY_ALLOWED } from './read-only-policy.js';
 
 function normalizedPath(command: Command): string {
@@ -79,12 +80,10 @@ export function isCommandBlockedInReadOnly(path: string): boolean {
  * @returns - The normalized string representation.
  */
 export function buildReadOnlyError(path: string): string {
-  return [
-    'type: error',
-    'data:',
-    '  error: Command blocked by read-only mode',
-    `  command: ${path}`,
-    '  hint: Disable --read-only or set JELLYFIN_READ_ONLY=0 to allow mutating operations.',
-    '  success: false',
-  ].join('\n');
+  return formatToon({
+    error: 'Command blocked by read-only mode',
+    command: path,
+    hint: 'Disable --read-only or set JELLYFIN_READ_ONLY=0 to allow mutating operations.',
+    success: false,
+  }, 'error');
 }

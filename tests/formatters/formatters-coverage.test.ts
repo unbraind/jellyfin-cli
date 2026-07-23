@@ -124,7 +124,7 @@ describe('formatQueryResult', () => {
   it('should handle query result with null items', () => {
     const result = { TotalRecordCount: 0 };
     const output = formatQueryResult(result as never);
-    expect(output).toContain('type: items');
+    expect(output).toContain('type: query_result');
   });
 });
 
@@ -146,7 +146,7 @@ describe('formatSearchResult', () => {
       ],
     };
     const output = formatSearchResult(result);
-    expect(output).toContain('type: search');
+    expect(output).toContain('type: search_result');
     expect(output).toContain('Movie A');
     expect(output).toContain('Episode B');
     expect(output).toContain('Great Show');
@@ -156,7 +156,7 @@ describe('formatSearchResult', () => {
   it('should format empty search result', () => {
     const result = { TotalRecordCount: 0, SearchHints: [] };
     const output = formatSearchResult(result);
-    expect(output).toContain('type: search');
+    expect(output).toContain('type: search_result');
     expect(output).toContain('0');
   });
 });
@@ -168,7 +168,7 @@ describe('formatLibraries', () => {
       Locations: ['/data/movies'], RefreshStatus: 'Idle',
     }];
     const output = formatLibraries(libs);
-    expect(output).toContain('type: libs');
+    expect(output).toContain('type: libraries');
     expect(output).toContain('Movies');
     expect(output).toContain('/data/movies');
   });
@@ -192,7 +192,7 @@ describe('formatActivityLog', () => {
       Severity: 'Info',
     }];
     const output = formatActivityLog(entries);
-    expect(output).toContain('type: activity');
+    expect(output).toContain('type: activity_log');
     expect(output).toContain('AuthenticationSucceeded');
     expect(output).toContain('user-1');
   });
@@ -319,7 +319,7 @@ describe('formatSystemInfo - URL sanitization', () => {
       LocalAddress: null, HasPendingRestart: false, CanSelfRestart: true,
     };
     const result = formatSystemInfo(info as never);
-    expect(result).toContain('type: sys');
+    expect(result).toContain('type: system_info');
   });
 
   it('should handle valid URL without modification', () => {
@@ -417,7 +417,7 @@ describe('formatConfig', () => {
     expect(result).toContain('60000');
   });
 
-  it('should format minimal config (default format/timeout omitted)', () => {
+  it('should format minimal config with explicit defaults for schema validation', () => {
     const config = {
       serverUrl: 'http://localhost:8096',
       outputFormat: 'toon' as const,
@@ -425,10 +425,8 @@ describe('formatConfig', () => {
     };
     const result = formatConfig(config);
     expect(result).toContain('type: config');
-    // toon is default, should not show
-    expect(result).not.toContain('fmt:');
-    // 30000 is default, should not show
-    expect(result).not.toContain('30000');
+    expect(result).toContain('output_format: toon');
+    expect(result).toContain('timeout: 30000');
   });
 });
 

@@ -99,8 +99,10 @@ describe('schema research command', () => {
     expect(result.stdout).toContain('operation_scope_count: 2');
     expect(result.stdout).toContain('unmatched_tools_total:');
     expect(result.stdout).toContain('local_only_tools_total:');
-    expect(result.stdout).toContain('unmatched_tools:');
-    expect(result.stdout).toContain('local_only_tools:');
+    expect(result.stdout).toContain('unmatched_tools[5]{command,read_only_safe,reason}:');
+    expect(result.stdout).toContain(
+      'local_only_tools[5]{command,read_only_safe,reason}:',
+    );
     expect(result.stdout).toContain('include_unmatched: true');
   });
 

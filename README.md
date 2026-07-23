@@ -67,7 +67,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Broad Jellyfin API Coverage**: Major endpoint families are implemented; use `jf schema research`
   and the operation-ID coverage roadmap for exact-version gap analysis
 - **Agent-Optimized**: Designed for LLM/AI agent integration with structured output
-- **Toon Format**: Default YAML output format for easy parsing
+- **Official TOON Format**: Default output uses `@toon-format/toon` for compact, lossless agent data
 - **Multiple Output Formats**: Toon, JSON, table, raw, YAML, and Markdown
 - **Secure**: Credentials stored in user config directory, never committed
 - **Type-Safe**: Full TypeScript implementation
@@ -136,21 +136,18 @@ The CLI supports multiple output formats optimized for different use cases:
 
 ### Toon (Default)
 
-The default format is optimized for LLM/agent consumption using YAML:
+The default format is encoded by the official
+[`@toon-format/toon`](https://github.com/toon-format/toon) implementation:
 
-```yaml
+```toon
 type: items
-data:
-  - id: abc123
-    name: The Matrix
-    type: Movie
-    year: 1999
-    rating: 8.7
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
+data[2]{id,name,type,year,rating}:
+  abc123,The Matrix,Movie,1999,8.7
+  def456,The Matrix Reloaded,Movie,2003,7.2
 ```
+
+TOON and YAML are separate output formats. TOON uses explicit array lengths and tabular field
+headers and should be decoded with the official TOON decoder.
 
 ### JSON
 
@@ -583,7 +580,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 This CLI is designed to be easily used by AI agents and LLMs:
 
-1. **Structured Output**: The default `toon` format provides consistent, parseable YAML output
+1. **Structured Output**: The default `toon` format provides compact, lossless official TOON output
 2. **Type Information**: Every output includes a `type` field indicating the data structure
 3. **Stable Envelope**: Output always includes a top-level `type` and structured `data`
 4. **Error Handling**: Errors are returned in a consistent format
@@ -592,9 +589,11 @@ This CLI is designed to be easily used by AI agents and LLMs:
 ### Example Agent Integration
 
 ```javascript
+import { decode } from '@toon-format/toon';
+
 // Execute command and parse output
 const result = await exec('jf items search "matrix" --format toon');
-const data = yaml.parse(result);
+const data = decode(result);
 
 if (data.type === 'search_result') {
   for (const hint of data.data.hints) {
@@ -606,25 +605,20 @@ if (data.type === 'search_result') {
 ### Python Example
 
 ```python
-import yaml
+import json
 import subprocess
 
 def get_items(search_term):
     result = subprocess.run(
-        ['jf', 'items', 'search', search_term, '--format', 'toon'],
+        ['jf', 'items', 'search', search_term, '--format', 'json'],
         capture_output=True,
-        text=True
+        check=True,
+        text=True,
     )
     
-    data = yaml.safe_load(result.stdout)
+    data = json.loads(result.stdout)
     
-    if data['type'] == 'error':
-        raise Exception(data['data']['error'])
-    
-    if data['type'] == 'search_result':
-        return data['data']['hints']
-    
-    return []
+    return data.get('SearchHints', [])
 ```
 
 ## Development

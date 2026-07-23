@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { decode as decodeToon } from '@toon-format/toon';
 import { parse as parseYaml } from 'yaml';
 import { JellyfinApiClient } from '../api/client.js';
 import { formatOutput } from '../formatters/index.js';
@@ -73,7 +74,7 @@ function validateRenderedOutput(format: OutputFormat, rendered: string): void {
   }
 
   if (format === 'toon') {
-    const parsed = parseYaml(rendered);
+    const parsed = decodeToon(rendered);
     if (typeof parsed !== 'object' || parsed === null || !('type' in parsed)) {
       throw new Error('missing_toon_type_field');
     }

@@ -1,4 +1,4 @@
-import YAML from 'yaml';
+import { encode } from '@toon-format/toon';
 
 /**
  * Defines the toon output contract used across typed Jellyfin boundaries.
@@ -19,20 +19,20 @@ export function createToonOutput(type: string, data: unknown): ToonOutput {
 }
 
 function compact(obj: unknown): unknown {
-  if (obj === null || obj === undefined) return undefined;
+  if (obj === undefined) return undefined;
+  if (obj === null) return null;
   if (Array.isArray(obj)) {
-    const arr = obj.map(compact).filter(v => v !== undefined);
-    return arr.length > 0 ? arr : undefined;
+    return obj.map(compact).filter((value) => value !== undefined);
   }
   if (typeof obj === 'object') {
     const out: Record<string, unknown> = {};
     for (const [k, v] of Object.entries(obj as Record<string, unknown>)) {
       const cleaned = compact(v);
-      if (cleaned !== undefined && cleaned !== '' && !(Array.isArray(cleaned) && cleaned.length === 0)) {
+      if (cleaned !== undefined) {
         out[k] = cleaned;
       }
     }
-    return Object.keys(out).length > 0 ? out : undefined;
+    return out;
   }
   return obj;
 }
@@ -46,15 +46,7 @@ function compact(obj: unknown): unknown {
 export function formatToon(output: unknown, typeHint?: string): string {
   const type = typeHint ?? detectType(output);
   const toonOutput = createToonOutput(type, output);
-  return YAML.stringify(toonOutput, { 
-    indent: 1,
-    indentSeq: false,
-    lineWidth: -1,
-    minContentWidth: 0,
-    defaultStringType: 'PLAIN',
-    defaultKeyType: 'PLAIN',
-    singleQuote: false,
-  }).trim();
+  return encode(toonOutput);
 }
 
 /**
@@ -72,19 +64,19 @@ export function detectType(output: unknown): string {
     if (first && typeof first === 'object') {
       if ('SessionId' in first || 'PlayState' in first) return 'sessions';
       if ('IsAdministrator' in first) return 'users';
-      if ('ItemId' in first && 'CollectionType' in first) return 'libs';
+      if ('ItemId' in first && 'CollectionType' in first) return 'libraries';
       if ('Id' in first || 'id' in first) return 'items';
     }
     return 'list';
   }
   if (typeof output === 'object') {
     const obj = output as Record<string, unknown>;
-    if ('ServerName' in obj || 'Version' in obj) return 'sys';
+    if ('ServerName' in obj || 'Version' in obj) return 'system_info';
     if ('Items' in obj) return 'items';
     if ('SearchHints' in obj) return 'search';
     if ('PlayState' in obj) return 'session';
-    if ('message' in obj && 'success' in obj) return obj.success ? 'ok' : 'err';
-    if ('error' in obj) return 'err';
+    if ('message' in obj && 'success' in obj) return obj.success ? 'message' : 'error';
+    if ('error' in obj) return 'error';
     if ('Id' in obj || 'id' in obj) return 'item';
     return 'obj';
   }
@@ -99,9 +91,9 @@ export function detectType(output: unknown): string {
  */
 export function formatMessage(message: string, success = true): string {
   if (success) {
-    return formatToon({ msg: message }, 'ok');
+    return formatToon({ message, success: true }, 'message');
   }
-  return formatToon({ err: message }, 'err');
+  return formatToon({ error: message, success: false }, 'error');
 }
 
 /**
@@ -112,8 +104,8 @@ export function formatMessage(message: string, success = true): string {
  * @returns - The normalized string representation.
  */
 export function formatError(error: string, code?: number, details?: unknown): string {
-  const data: Record<string, unknown> = { err: error };
+  const data: Record<string, unknown> = { error, success: false };
   if (code) data.code = code;
-  if (details !== undefined) data.ctx = details;
-  return formatToon(data, 'err');
+  if (details !== undefined) data.details = details;
+  return formatToon(data, 'error');
 }

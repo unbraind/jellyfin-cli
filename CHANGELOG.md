@@ -4,6 +4,7 @@
 
 ### Fixed
 
+- Replace YAML-like output with official TOON serialization ([jf-644n](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-644n.toon))
 - Honor output formats and survive Playback Reporting user-list failures ([jf-59hr](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-59hr.toon))
 
 ### Security

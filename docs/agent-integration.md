@@ -1,569 +1,292 @@
 # Agent Integration Guide
 
-This guide explains how to integrate jellyfin-cli with AI agents, LLMs, and automation tools.
+`jellyfin-cli` is designed for non-interactive agents, LLM tool runners, and deterministic
+automation. It combines:
 
-## Why Agent-Optimized?
+- official TOON output by default;
+- JSON, YAML, table, raw, and Markdown alternatives;
+- semantic output types;
+- JSON schemas and function-calling tool schemas;
+- a global read-only guard;
+- redacted request explanations;
+- live OpenAPI discovery and coverage diagnostics.
 
-Traditional CLIs are designed for human interaction with:
-- Interactive prompts
-- Human-readable tables
-- Colored output
-- Inconsistent error messages
+## Safe Session Defaults
 
-jellyfin-cli is designed for **machine consumption** with:
-- Structured YAML output (Toon format)
-- Consistent type information
-- Machine-parseable error messages
-- No interactive prompts
-- JSON schema support
-
-## Quick Start for Agents
-
-### Basic Pattern
+For discovery, planning, and tests against a real server, enable read-only mode before executing any
+API command:
 
 ```bash
-# 1. Execute command with toon format (default)
-jf items search "matrix"
-
-# 2. Parse the YAML output
-# 3. Check the 'type' field to determine data structure
-# 4. Handle errors if type === 'error'
+export JELLYFIN_READ_ONLY=1
+export JELLYFIN_TIMEOUT=120000
 ```
 
-### Output Structure
+Credentials belong in environment variables or `~/.jellyfin-cli/settings.json`. Do not place API
+keys, passwords, server responses, media IDs, usernames, device inventories, or signed URLs in
+prompts, tracked fixtures, snapshots, PM items, or CI logs.
 
-Every command outputs:
-
-```yaml
-type: <output_type>
-data:
-  <structured_data>
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
-```
-
-### Understanding Types
-
-Use the schema command to understand output types:
+Verify the profile without printing secrets:
 
 ```bash
-# List all available types
-jf schema list
-
-# Get schema for a specific type
-jf schema user
-jf schema items
-jf schema sessions
-
-# Get all schemas at once
-jf schema
+jf config doctor \
+  --validate-formats \
+  --require-connected \
+  --require-auth \
+  --require-openapi \
+  --require-valid-formats \
+  --format json
 ```
 
-### OpenAPI-Aware Command Discovery
+## Output Contract
 
-Use live server metadata to keep agent plans aligned with actual Jellyfin capabilities:
+The default format is official Token-Oriented Object Notation (TOON):
+
+```toon
+type: users
+data[2]{id,name,admin,disabled}:
+  user-1,steve,true,false
+  user-2,viewer,false,false
+```
+
+Every formatted TOON response has:
+
+- `type`: the semantic output kind;
+- `data`: the normalized command result.
+
+Uniform arrays declare their length and fields once. Decode this format with an official TOON
+decoder; a YAML parser is not a TOON decoder.
+
+Use JSON when an automation runtime does not have a TOON decoder:
 
 ```bash
-# Summarize/filter live OpenAPI operations
-jf schema openapi --read-only-ops --for-command "items list" --limit 20
-
-# Export machine-usable CLI tool schemas
-jf schema tools --openapi-match --openapi-match-limit 3 --limit 20
-
-# Suggest command patterns from intent
-jf schema suggest --for-command "users list" --limit 10
-
-# Suggest command candidates for uncovered endpoints
-jf schema suggest --read-only-ops --limit 20
+jf users list --format json
 ```
 
-## Integration Patterns
+See [`toon-format.md`](toon-format.md) for syntax, decoding, strict validation, and examples.
 
-### Pattern 1: Direct Execution
+## TypeScript Integration
 
-Execute commands directly and parse output:
+Use argument arrays rather than shell interpolation:
 
-```python
-import yaml
-import subprocess
+```typescript
+import { decode, type JsonValue } from '@toon-format/toon';
+import { execFile } from 'node:child_process';
+import { promisify } from 'node:util';
 
-def run_jf_command(args):
-    """Run a jellyfin-cli command and return parsed output."""
-    result = subprocess.run(
-        ['jf'] + args + ['--format', 'toon'],
-        capture_output=True,
-        text=True
-    )
-    
-    if result.returncode != 0 and not result.stdout:
-        raise Exception(f"Command failed: {result.stderr}")
-    
-    data = yaml.safe_load(result.stdout)
-    
-    if data.get('type') == 'error':
-        raise Exception(data['data']['error'])
-    
-    return data
+const execFileAsync = promisify(execFile);
+
+async function runJellyfin(args: string[]): Promise<JsonValue> {
+  const { stdout, stderr } = await execFileAsync('jf', [...args, '--format', 'toon'], {
+    env: {
+      ...process.env,
+      JELLYFIN_READ_ONLY: '1',
+    },
+    maxBuffer: 10 * 1024 * 1024,
+  });
+
+  if (stderr.trim()) {
+    process.stderr.write(stderr);
+  }
+  return decode(stdout);
+}
+
+const result = await runJellyfin(['items', 'search', 'matrix']);
 ```
 
-### Pattern 2: Streaming URLs
+Do not construct a shell command from user input. `execFile` preserves argument boundaries and
+avoids shell expansion.
 
-Get direct streaming URLs for media playback:
+## Process and Error Handling
 
-```python
-def play_movie(item_id, session_id):
-    """Play a movie on a specific session."""
-    # Get stream URL
-    stream = run_jf_command(['items', 'stream-url', item_id])
-    url = stream['data']['url']
-    
-    # Send play command
-    run_jf_command(['sessions', 'play', session_id, item_id])
-    
-    return url
-```
+The process exit code is authoritative. Failed commands also emit a structured error when the
+selected output format supports it.
 
-### Pattern 3: User Management
+An agent runner should:
 
-Automate user management tasks:
+1. capture `stdout`, `stderr`, and the exit code separately;
+2. decode `stdout` on success;
+3. decode structured `stderr` when possible on failure;
+4. never retry a mutating operation automatically;
+5. redact identifiers and response fragments before logging.
 
-```python
-def create_user_with_policy(username, password, is_admin=False):
-    """Create a user and set their policy."""
-    # Create user
-    result = run_jf_command(['users', 'create', username, '--password', password])
-    user_id = result['data']['id']
-    
-    # Set admin policy if needed
-    if is_admin:
-        run_jf_command([
-            'users', 'update-policy', user_id,
-            '--admin', 'true',
-            '--remote-access', 'true'
-        ])
-    
-    return user_id
-```
-
-### Pattern 4: Library Maintenance
-
-Automate library maintenance:
-
-```python
-def refresh_library_and_wait():
-    """Refresh library and monitor progress."""
-    # Start refresh
-    run_jf_command(['library', 'refresh'])
-    
-    # Monitor task progress
-    while True:
-        tasks = run_jf_command(['tasks', 'list'])
-        scan_task = next(
-            (t for t in tasks['data'] if t['key'] == 'RefreshLibrary'),
-            None
-        )
-        
-        if scan_task and scan_task['state'] == 'Idle':
-            break
-        
-        time.sleep(5)
-    
-    return True
-```
-
-## Common Workflows
-
-### Workflow 1: Search and Play
-
-```python
-def search_and_play(query, session_id):
-    """Search for content and play it."""
-    # Search
-    results = run_jf_command(['items', 'search', query, '--limit', '10'])
-    
-    if not results['data']['hints']:
-        return "No results found"
-    
-    # Get first result
-    item = results['data']['hints'][0]
-    
-    # Play it
-    run_jf_command(['sessions', 'play', session_id, item['id']])
-    
-    return f"Now playing: {item['name']}"
-```
-
-### Workflow 2: Get Recommendations
-
-```python
-def get_recommendations_for_user(user_id):
-    """Get personalized recommendations."""
-    # Get user's favorites
-    favorites = run_jf_command(['favorites', 'list', '--user', user_id])
-    
-    if not favorites['data']:
-        # Fall back to general recommendations
-        recs = run_jf_command(['discover', 'recommendations'])
-        return recs['data']
-    
-    # Get similar items based on favorites
-    recommendations = []
-    for fav in favorites['data'][:5]:
-        similar = run_jf_command(['items', 'similar', fav['id'], '--limit', '5'])
-        recommendations.extend(similar['data'])
-    
-    return recommendations
-```
-
-### Workflow 3: Session Monitoring
-
-```python
-def monitor_active_sessions():
-    """Monitor all active sessions and their playback."""
-    sessions = run_jf_command(['sessions', 'list'])
-    
-    for session in sessions['data']:
-        user = session['user_name']
-        device = session['device_name']
-        
-        if session.get('now_playing'):
-            item = session['now_playing']['name']
-            position = session['play_state']['position_ticks']
-            total = session['now_playing'].get('run_time_ticks', 0)
-            
-            if total > 0:
-                progress = (position / total) * 100
-                print(f"{user} on {device}: {item} ({progress:.1f}%)")
-        else:
-            print(f"{user} on {device}: Idle")
-```
-
-### Workflow 4: Bulk Metadata Update
-
-```python
-def update_movie_genres(movie_ids, new_genres):
-    """Update genres for multiple movies."""
-    genres_str = ','.join(new_genres)
-    
-    for movie_id in movie_ids:
-        try:
-            run_jf_command([
-                'items', 'update', movie_id,
-                '--genres', genres_str
-            ])
-            print(f"Updated {movie_id}")
-        except Exception as e:
-            print(f"Failed to update {movie_id}: {e}")
-```
-
-## Error Handling
-
-### Error Output Format
-
-```yaml
-type: error
-data:
-  error: "Item not found"
-  code: 404
-  details:
-    itemId: "invalid-id"
-  success: false
-meta:
-  timestamp: "2024-01-01T00:00:00.000Z"
-  format: toon
-  version: "1.0.0"
-```
-
-### Error Handling Pattern
-
-```python
-class JellyfinError(Exception):
-    def __init__(self, message, code=None, details=None):
-        super().__init__(message)
-        self.code = code
-        self.details = details
-
-def safe_jf_command(args):
-    """Run command with proper error handling."""
-    result = subprocess.run(
-        ['jf'] + args + ['--format', 'toon'],
-        capture_output=True,
-        text=True
-    )
-    
-    data = yaml.safe_load(result.stdout) if result.stdout else None
-    
-    if data and data.get('type') == 'error':
-        error_data = data['data']
-        raise JellyfinError(
-            error_data.get('error', 'Unknown error'),
-            code=error_data.get('code'),
-            details=error_data.get('details')
-        )
-    
-    if result.returncode != 0:
-        raise JellyfinError(f"Command failed with code {result.returncode}")
-    
-    return data
-```
-
-## Schema Integration
-
-### Using Schemas for Validation
-
-```python
-import json
-import subprocess
-from jsonschema import validate, ValidationError
-
-def get_schema(output_type):
-    """Get JSON schema for an output type."""
-    result = subprocess.run(
-        ['jf', 'schema', output_type, '--format', 'json'],
-        capture_output=True,
-        text=True
-    )
-    return json.loads(result.stdout)
-
-def validate_output(data, expected_type):
-    """Validate output against its schema."""
-    schema = get_schema(expected_type)
-    try:
-        validate(instance=data, schema=schema)
-        return True
-    except ValidationError as e:
-        print(f"Validation error: {e.message}")
-        return False
-```
-
-### Dynamic Type Handling
-
-```python
-def process_output(data):
-    """Process output based on its type."""
-    output_type = data.get('type')
-    
-    handlers = {
-        'items': handle_items,
-        'users': handle_users,
-        'sessions': handle_sessions,
-        'error': handle_error,
-        'search_result': handle_search,
-        # Add more handlers as needed
-    }
-    
-    handler = handlers.get(output_type, handle_unknown)
-    return handler(data['data'])
-```
-
-## LLM Prompt Engineering
-
-### System Prompt Template
-
-```
-You are an assistant that interacts with a Jellyfin media server using the jellyfin-cli tool.
-
-The CLI outputs structured YAML in the "Toon" format:
-- Every output has a 'type' field indicating the data structure
-- Every output has a 'data' field with the actual data
-- Errors have type 'error' with details in the data field
-
-Available commands:
-- jf items search <term> - Search for media
-- jf items get <id> - Get item details
-- jf sessions list - List active sessions
-- jf sessions play <sessionId> <itemId> - Play media
-- jf users list - List users
-- jf library list - List libraries
-- jf schema list - List all output types
-
-Always check the 'type' field to understand the output structure.
-Handle 'type: error' outputs gracefully.
-```
-
-### Example Conversation
-
-```
-User: What movies do we have with "matrix" in the title?
-
-Assistant: [executes: jf items search "matrix" --types Movie]
-
-The search found 3 movies:
-1. The Matrix (1999) - Action, Sci-Fi
-2. The Matrix Reloaded (2003) - Action, Sci-Fi
-3. The Matrix Revolutions (2003) - Action, Sci-Fi
-
-Would you like me to play one of these?
-```
-
-## Best Practices
-
-### 1. Always Specify Format
+Read-only mode blocks known mutating command paths before request execution:
 
 ```bash
-# Good - explicit format
-jf items search "matrix" --format toon
-
-# Also works (toon is default) but explicit is clearer
-jf items search "matrix"
+JELLYFIN_READ_ONLY=1 jf sessions play SESSION_ID ITEM_ID
 ```
 
-### 2. Handle Pagination
-
-```python
-def get_all_items(parent_id):
-    """Get all items with pagination."""
-    all_items = []
-    offset = 0
-    limit = 100
-    
-    while True:
-        result = run_jf_command([
-            'items', 'list',
-            '--parent', parent_id,
-            '--limit', str(limit),
-            '--offset', str(offset)
-        ])
-        
-        items = result['data']
-        all_items.extend(items)
-        
-        if len(items) < limit:
-            break
-        
-        offset += limit
-    
-    return all_items
-```
-
-### 3. Use Specific Types
+Use `--explain` for redacted request metadata:
 
 ```bash
-# Good - filter by type
-jf items list --types Movie,Series
-
-# Less efficient - gets all items
-jf items list
+JELLYFIN_READ_ONLY=1 jf --explain system info --format json
 ```
 
-### 4. Cache Schema Information
+Explanation data is written to `stderr`, leaving the machine-readable payload on `stdout`.
 
-```python
-# Cache schemas at startup
-SCHEMAS = {}
+## Tool Schema Discovery
 
-def init_schemas():
-    types = run_jf_command(['schema', 'list'])
-    for t in types['data']['types']:
-        SCHEMAS[t] = get_schema(t)
+Export function-calling metadata instead of scraping help:
+
+```bash
+jf schema tools --format json
+jf schema tools --command items --limit 50 --format json
+jf schema tools --command "system info" --openapi-match --format json
 ```
 
-### 5. Rate Limiting
+Each tool record includes:
 
-```python
-import time
+- a stable tool name;
+- the full `jf` command path;
+- description;
+- argument and option schema;
+- read-only safety classification;
+- optional likely OpenAPI operation matches.
 
-class RateLimitedClient:
-    def __init__(self, requests_per_second=10):
-        self.min_interval = 1.0 / requests_per_second
-        self.last_request = 0
-    
-    def run(self, args):
-        now = time.time()
-        elapsed = now - self.last_request
-        if elapsed < self.min_interval:
-            time.sleep(self.min_interval - elapsed)
-        
-        self.last_request = time.time()
-        return run_jf_command(args)
+Tool schemas describe invocation inputs. Output schemas are available separately:
+
+```bash
+jf schema list --format json
+jf schema items --format json
+jf schema user --format json
 ```
 
-## Complete Example: Media Browser Agent
+## Validating Output
 
-```python
-#!/usr/bin/env python3
-"""
-A simple media browser agent using jellyfin-cli.
-"""
+Validate the decoded envelope against the built-in schema registry:
 
-import yaml
-import subprocess
-from typing import Optional, List, Dict, Any
-
-class JellyfinAgent:
-    def __init__(self):
-        self.output_format = 'toon'
-    
-    def _run(self, *args) -> Dict[str, Any]:
-        """Execute a jellyfin-cli command."""
-        cmd = ['jf'] + list(args) + ['--format', self.output_format]
-        result = subprocess.run(cmd, capture_output=True, text=True)
-        
-        data = yaml.safe_load(result.stdout) if result.stdout else None
-        
-        if data and data.get('type') == 'error':
-            raise Exception(data['data']['error'])
-        
-        return data
-    
-    def search(self, query: str, item_type: Optional[str] = None) -> List[Dict]:
-        """Search for media."""
-        args = ['items', 'search', query]
-        if item_type:
-            args.extend(['--types', item_type])
-        
-        result = self._run(*args)
-        return result['data']['hints']
-    
-    def get_libraries(self) -> List[Dict]:
-        """Get all libraries."""
-        result = self._run('library', 'list')
-        return result['data']
-    
-    def get_items(self, library_id: str, limit: int = 50) -> List[Dict]:
-        """Get items from a library."""
-        result = self._run('items', 'list', '--parent', library_id, '--limit', str(limit))
-        return result['data']
-    
-    def get_item(self, item_id: str) -> Dict:
-        """Get item details."""
-        result = self._run('items', 'get', item_id)
-        return result['data']
-    
-    def get_sessions(self) -> List[Dict]:
-        """Get active sessions."""
-        result = self._run('sessions', 'list')
-        return result['data']
-    
-    def play(self, session_id: str, item_id: str) -> bool:
-        """Play an item on a session."""
-        self._run('sessions', 'play', session_id, item_id)
-        return True
-    
-    def control(self, session_id: str, action: str) -> bool:
-        """Control playback (pause, unpause, stop, next, previous)."""
-        self._run('sessions', action, session_id)
-        return True
-
-# Usage
-if __name__ == '__main__':
-    agent = JellyfinAgent()
-    
-    # Search for movies
-    movies = agent.search('matrix', 'Movie')
-    for movie in movies[:5]:
-        print(f"- {movie['name']} ({movie.get('year', 'N/A')})")
-    
-    # List libraries
-    print("\nLibraries:")
-    for lib in agent.get_libraries():
-        print(f"- {lib['name']} ({lib['collection_type']})")
+```bash
+jf items list --limit 1 --format toon |
+  jf schema validate items --from toon --format json
 ```
 
-## Related Documentation
+Use explicit `--from toon`, `--from json`, or `--from yaml` in CI. `--from auto` is useful
+interactively but should not replace a declared serialization contract.
 
-- [API Reference](api.md) - Complete command documentation
-- [Toon Format](toon-format.md) - Output format specification
-- [Troubleshooting](troubleshooting.md) - Common issues
+The TOON path uses the official strict decoder, including array-length and tabular-row validation.
+
+## Live API Research
+
+The local server is the primary contract source:
+
+```bash
+jf schema openapi --include-paths --limit 50 --format json
+jf schema research --include-unmatched --limit 100 --format json
+jf schema coverage --read-only-ops --include-unmatched --limit 100 --format json
+```
+
+Useful focused queries:
+
+```bash
+jf schema openapi --method GET --tag Users --read-only-ops --format json
+jf schema suggest --for-command "users list" --limit 10 --format json
+jf schema tools --command users --openapi-match --format json
+```
+
+Intent coverage is a naming/mapping diagnostic. It does not prove that every operation has an
+executable, semantically complete command. For implementation decisions, inspect operation IDs,
+request/response schemas, command behavior, tests, and read-only live evidence together.
+
+## Help Discovery
+
+Every command exposes local help and inherited global options:
+
+```bash
+jf --help
+jf items --help
+jf items search --help
+```
+
+Global options:
+
+- `--format <toon|json|table|raw|yaml|markdown>`
+- `--server <name>`
+- `--explain`
+- `--read-only`
+- `--help`
+- `--version`
+
+Prefer tool schemas for automated invocation and help text for human inspection.
+
+## Pagination
+
+List/search commands generally expose `--limit` and an offset/start option when supported by the
+Jellyfin endpoint. Agents should:
+
+1. request a bounded page;
+2. inspect the returned total/count fields;
+3. advance the offset deterministically;
+4. stop when the page is empty or the total is reached;
+5. enforce their own maximum result and byte budgets.
+
+Never fetch an unbounded media library solely to answer a narrow question.
+
+## Server Selection
+
+Named profiles keep credentials and preferences outside the repository:
+
+```bash
+jf config list --format json
+jf --server home system info
+```
+
+Environment values override the active profile for ephemeral automation:
+
+```bash
+JELLYFIN_SERVER_URL=http://server.example:8096 \
+JELLYFIN_API_KEY=redacted \
+JELLYFIN_READ_ONLY=1 \
+jf system info --format json
+```
+
+Never echo or trace those variables. Use CI secret masking and disable shell tracing around
+credential setup.
+
+## Setup Automation
+
+The interactive wizard is intended for humans:
+
+```bash
+jf setup
+```
+
+Agents should use explicit configuration and readiness commands:
+
+```bash
+jf setup status --format json
+jf setup env --format json
+jf setup validate --require-all --validate-formats --format json
+```
+
+Writing a local environment file is an explicit local mutation. Review the target and permissions
+before using `jf setup env --write-file`.
+
+## Performance and Context Efficiency
+
+- Prefer TOON for large uniform lists consumed by an LLM.
+- Prefer JSON for `jq`, typed pipelines, and runtimes without a TOON decoder.
+- Use `--limit` and command filters before execution.
+- Use schema/tool discovery once and cache only non-sensitive results.
+- Avoid repeating full OpenAPI or library inventories in prompts.
+- Treat signed media/image URLs as secrets until they expire.
+
+## Production Checklist
+
+- Read-only mode is enabled for discovery and tests.
+- Credentials are resolved only from environment variables or the owner-local settings file.
+- Command arguments are passed without a shell.
+- Exit code, `stdout`, and `stderr` are handled separately.
+- TOON is decoded by an official decoder.
+- The decoded envelope is schema-validated where contracts cross trust boundaries.
+- Pagination and output-byte limits are bounded.
+- Logs redact server, user, device, media, session, and URL identifiers.
+- `jf config doctor` and `jf setup validate` pass required checks.
+- The actual packaged `jf-cli` binary has passed read-only live tests.
+
+## References
+
+- [TOON output contract](toon-format.md)
+- [CLI API reference](api.md)
+- [Live API research](api-research.md)
+- [Security](security.md)
+- [Release readiness](release-readiness.md)
+- [Troubleshooting](troubleshooting.md)

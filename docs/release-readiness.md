@@ -106,6 +106,9 @@ jf-cli system --help
 jf-cli system info --help
 jf-cli --format json years list --limit 5
 jf-cli --format toon items list --limit 1 | jf-cli schema validate items --from toon
+# Direct official TOON decoder check
+jf-cli --format toon system info \
+  | bun -e "import { decode } from '@toon-format/toon'; const s=await new Response(Bun.stdin.stream()).text(); const d=decode(s); if (d?.type !== 'system_info') process.exit(1)"
 # JSON parse check
 jf-cli --format json config doctor | jq '.checks.connection_ok and .checks.auth_ok and .checks.openapi_available'
 

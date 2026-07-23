@@ -12,6 +12,7 @@
  */
 
 import { describe, it, expect } from 'vitest';
+import { decode } from '@toon-format/toon';
 import { existsSync, readFileSync } from 'node:fs';
 import { homedir } from 'node:os';
 import { join } from 'node:path';
@@ -26,6 +27,14 @@ interface StoredSettings {
   defaultServer?: StoredConfig;
   servers?: Record<string, StoredConfig>;
   currentServer?: string;
+}
+
+function decodeEnvelope(output: string): Record<string, unknown> {
+  const value = decode(output);
+  if (typeof value !== 'object' || value === null || Array.isArray(value)) {
+    throw new Error('Expected decoded TOON output to be an object envelope.');
+  }
+  return value as Record<string, unknown>;
 }
 
 function readSettingsAuth(): StoredConfig {
@@ -147,9 +156,12 @@ const T = 60_000;
 describe.skipIf(skip)('E2E system', () => {
   it('system info contains name and version', async () => {
     const out = await jf('system', 'info');
-    expect(out).toMatch(/^type: sys/m);
-    expect(out).toMatch(/name:/);
-    expect(out).toMatch(/ver:/);
+    const envelope = decodeEnvelope(out);
+    expect(envelope.type).toBe('system_info');
+    expect(envelope.data).toMatchObject({
+      name: expect.any(String),
+      version: expect.any(String),
+    });
   }, T);
 
   it('system health returns Healthy', async () => {
@@ -180,7 +192,7 @@ describe.skipIf(skip)('E2E system', () => {
 
   it('system activity returns entries', async () => {
     const out = await jf('system', 'activity', '--limit', '3');
-    expect(out).toMatch(/^type: activity/m);
+    expect(out).toMatch(/^type: activity_log/m);
   }, T);
 });
 
@@ -191,17 +203,21 @@ describe.skipIf(skip)('E2E system', () => {
 describe.skipIf(skip)('E2E library', () => {
   it('library list returns libs', async () => {
     const out = await jf('library', 'list');
-    expect(out).toMatch(/^type: libs/m);
+    expect(out).toMatch(/^type: libraries/m);
   }, T);
 
   it('library genres returns Genre items', async () => {
     const out = await jf('library', 'genres', '--limit', '3');
-    expect(out).toMatch(/type: Genre/);
+    const data = decodeEnvelope(out).data;
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'Genre' })]));
   }, T);
 
   it('library persons returns Person items', async () => {
     const out = await jf('library', 'persons', '--limit', '3');
-    expect(out).toMatch(/type: Person/);
+    const data = decodeEnvelope(out).data;
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'Person' })]));
   }, T);
 
   it('library studios returns items', async () => {
@@ -245,7 +261,9 @@ describe.skipIf(skip)('E2E items', () => {
 
   it('items list --types Movie --recursive returns movies', async () => {
     const out = await jf('items', 'list', '--types', 'Movie', '--recursive', '--limit', '3');
-    expect(out).toMatch(/type: Movie/);
+    const data = decodeEnvelope(out).data;
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'Movie' })]));
   }, T);
 
   it('items latest returns items', async () => {
@@ -260,7 +278,7 @@ describe.skipIf(skip)('E2E items', () => {
 
   it('items search matrix returns results', async () => {
     const out = await jf('items', 'search', 'matrix', '--limit', '3');
-    expect(out).toMatch(/^type: search/m);
+    expect(out).toMatch(/^type: search_result/m);
   }, T);
 
   it('items filters returns filter options', async () => {
@@ -582,12 +600,14 @@ describe.skipIf(skip)('E2E library structure', () => {
 describe.skipIf(skip)('E2E items extended', () => {
   it('items list --types Series returns series items', async () => {
     const out = await jf('items', 'list', '--types', 'Series', '--recursive', '--limit', '3');
-    expect(out).toMatch(/type: Series/);
+    const data = decodeEnvelope(out).data;
+    expect(Array.isArray(data)).toBe(true);
+    expect(data).toEqual(expect.arrayContaining([expect.objectContaining({ type: 'Series' })]));
   }, T);
 
   it('items search inception returns results', async () => {
     const out = await jf('items', 'search', 'inception');
-    expect(out).toMatch(/^type: search/m);
+    expect(out).toMatch(/^type: search_result/m);
   }, T);
 });
 
@@ -1247,7 +1267,7 @@ describe.skipIf(skip)('E2E config', () => {
 
   it('config test connects to server', async () => {
     const out = await jf('config', 'test');
-    expect(out).toMatch(/^type: sys/m);
+    expect(out).toMatch(/^type: system_info/m);
   }, T);
 
   it('config doctor validate-formats returns all_ok=true in json mode', async () => {
@@ -1302,14 +1322,16 @@ describe.skipIf(skip)('E2E images', () => {
 
   it('images person-url returns person_image_url type', async () => {
     const out = await jf('images', 'person-url', 'Tom Hanks', 'Primary', '--index', '0');
-    expect(out).toMatch(/^type: person_image_url/m);
-    expect(out).toMatch(/url: http/);
+    const envelope = decodeEnvelope(out);
+    expect(envelope.type).toBe('person_image_url');
+    expect(envelope.data).toMatchObject({ url: expect.stringMatching(/^https?:\/\//) });
   }, T);
 
   it('images genre-url returns genre_image_url type', async () => {
     const out = await jf('images', 'genre-url', 'Action', 'Primary', '--index', '0');
-    expect(out).toMatch(/^type: genre_image_url/m);
-    expect(out).toMatch(/url: http/);
+    const envelope = decodeEnvelope(out);
+    expect(envelope.type).toBe('genre_image_url');
+    expect(envelope.data).toMatchObject({ url: expect.stringMatching(/^https?:\/\//) });
   }, T);
 });
 
@@ -1608,7 +1630,7 @@ describe.skipIf(skip)('E2E explain mode', () => {
   it('prints request metadata to stderr without changing stdout payload', async () => {
     const result = await runJfWithCode(['--explain', 'system', 'info']);
     expect(result.code).toBe(0);
-    expect(result.stdout).toMatch(/^type: sys/m);
+    expect(result.stdout).toMatch(/^type: system_info/m);
     expect(result.stderr).toMatch(/"type":"request_explain"/);
     expect(result.stderr).toMatch(/"path":"\/System\/Info"/);
     expect(result.stderr).toMatch(/"method":"GET"/);

@@ -2,7 +2,9 @@
 
 ## Overview
 
-jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin media server API. It outputs structured data in the Toon format (YAML-based) by default, making it easy for LLMs to parse.
+jellyfin-cli is an agent-optimized CLI tool for interacting with the Jellyfin media server API. It
+uses the official Token-Oriented Object Notation (TOON) implementation by default, with JSON, YAML,
+table, raw, and Markdown available as distinct alternatives.
 
 ## Documentation Index
 
@@ -183,7 +185,7 @@ The CLI supports multiple output formats:
 
 | Format | Description | Best For |
 |--------|-------------|----------|
-| `toon` | YAML-based format (default) | LLM/AI agents, scripts |
+| `toon` | Official compact TOON format (default) | LLM/AI agents, scripts |
 | `json` | Standard JSON output | Programmatic processing |
 | `table` | Human-readable table | Interactive use |
 | `raw` | Raw API response | Debugging |
@@ -248,7 +250,7 @@ Notes:
 | `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
 | `jf schema suggest` | Generate candidate CLI command names from intent-matched or uncovered OpenAPI operations |
-| `jf schema validate` | Validate Toon/JSON/YAML payloads against CLI schemas for CI and agent safety |
+| `jf schema validate` | Validate TOON/JSON/YAML payloads against CLI schemas for CI and agent safety |
 
 ### System Administration
 
@@ -522,9 +524,9 @@ Notes:
 
 This CLI is designed for AI agent integration:
 
-1. **Structured Output**: Default `toon` format provides consistent YAML output
+1. **Structured Output**: Default `toon` format provides official lossless TOON output
 2. **Type Information**: Every output includes a `type` field
-3. **Metadata**: Includes timestamp, format version
+3. **Stable Envelope**: Every formatted response has a semantic `type` and structured `data`
 4. **Error Handling**: Errors in consistent format
 5. **No Interactive Prompts**: All inputs via command-line arguments
 6. **JSON Schemas**: Available via `jf schema` command

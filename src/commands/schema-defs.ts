@@ -21,7 +21,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'system_info' },
-      data: { type: 'object', properties: { name: { type: 'string' }, version: { type: 'string' }, id: { type: 'string' }, local_address: { type: 'string' } }, required: ['name', 'version'] },
+      data: { type: 'object', properties: { name: { type: 'string' }, version: { type: 'string' }, id: { type: 'string' }, local_address: { type: 'string' }, operating_system: { type: 'string' }, has_pending_restart: { type: 'boolean' }, can_self_restart: { type: 'boolean' } }, required: ['name', 'version'] },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
@@ -30,7 +30,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'users' },
-      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, is_admin: { type: 'boolean' } }, required: ['id', 'name'] } },
+      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, is_admin: { type: 'boolean' }, is_disabled: { type: 'boolean' }, is_hidden: { type: 'boolean' }, has_password: { type: 'boolean' }, last_login: { type: 'string' } }, required: ['id', 'name'] } },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
@@ -39,7 +39,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'user' },
-      data: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, is_admin: { type: 'boolean' }, configuration: { type: 'object' }, policy: { type: 'object' } }, required: ['id', 'name'] },
+      data: { type: 'object', properties: { id: { type: 'string' }, name: { type: 'string' }, server_id: { type: 'string' }, is_admin: { type: 'boolean' }, is_disabled: { type: 'boolean' }, is_hidden: { type: 'boolean' }, has_password: { type: 'boolean' }, last_login: { type: 'string' }, last_activity: { type: 'string' }, configuration: { type: 'object' }, policy: { type: 'object' } }, required: ['id', 'name'] },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
@@ -62,11 +62,20 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
+  query_result: {
+    type: 'object',
+    properties: {
+      type: { const: 'query_result' },
+      data: { type: 'object', properties: { total_count: { type: 'number' }, offset: { type: 'number' }, items: { type: 'array' } }, required: ['total_count'] },
+      meta: { $ref: '#/definitions/meta' },
+    },
+    required: ['type', 'data'],
+  },
   sessions: {
     type: 'object',
     properties: {
       type: { const: 'sessions' },
-      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, user_name: { type: 'string' }, client: { type: 'string' }, device_name: { type: 'string' }, now_playing: { type: 'object' }, play_state: { type: 'object' } }, required: ['id'] } },
+      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'string' }, user_id: { type: 'string' }, user_name: { type: 'string' }, client: { type: 'string' }, device_name: { type: 'string' }, supports_remote_control: { type: 'boolean' }, is_playing: { type: 'boolean' }, now_playing: { type: 'object' }, runtime_ticks: { type: 'number' }, play_state: { type: 'object' }, position_ticks: { type: 'number' }, volume_level: { type: 'number' }, play_method: { type: 'string' }, repeat_mode: { type: 'string' }, shuffle: { type: 'boolean' } }, required: ['id', 'is_playing'] } },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
@@ -111,7 +120,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'config' },
-      data: { type: 'object', properties: { server_url: { type: 'string' }, username: { type: 'string' }, output_format: { type: 'string' }, user_id: { type: ['string', 'null'] }, timeout: { type: 'number' } }, required: ['server_url', 'output_format'] },
+      data: { type: 'object', properties: { server_url: { type: ['string', 'null'] }, username: { type: ['string', 'null'] }, output_format: { type: 'string' }, user_id: { type: ['string', 'null'] }, timeout: { type: 'number' } }, required: ['server_url', 'output_format', 'timeout'] },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],
@@ -138,7 +147,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     type: 'object',
     properties: {
       type: { const: 'activity_log' },
-      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'number' }, name: { type: 'string' }, type: { type: 'string' }, date: { type: 'string' }, user_id: { type: 'string' } } } },
+      data: { type: 'array', items: { type: 'object', properties: { id: { type: 'number' }, name: { type: 'string' }, type: { type: 'string' }, date: { type: 'string' }, user_id: { type: 'string' }, item_id: { type: 'string' }, severity: { type: 'string' } } } },
       meta: { $ref: '#/definitions/meta' },
     },
     required: ['type', 'data'],

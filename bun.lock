@@ -5,6 +5,7 @@
     "": {
       "name": "jellyfin-cli",
       "dependencies": {
+        "@toon-format/toon": "4.0.0",
         "chalk": "^5.6.2",
         "commander": "^15.0.0",
         "yaml": "^2.9.0",
@@ -175,6 +176,8 @@
     "@sindresorhus/base62": ["@sindresorhus/base62@1.0.0", "", {}, "sha512-TeheYy0ILzBEI/CO55CP6zJCSdSWeRtGnHy8U8dWSUH4I68iqTsy7HkMktR4xakThc9jotkPQUXT4ITdbV7cHA=="],
 
     "@standard-schema/spec": ["@standard-schema/spec@1.1.0", "", {}, "sha512-l2aFy5jALhniG5HgqrD6jXLi/rUWrKvqN/qJx6yoJsgKhblVd+iqqU4RCXavm/jPityDo5TCvKMnpjKnOriy0w=="],
+
+    "@toon-format/toon": ["@toon-format/toon@4.0.0", "", {}, "sha512-0mCchUNCqYX2jZapNhcX3t+Dkl+ARp6EUF41MgXOv9p0iddh9uZfdkpzgALsrxv4jiWMlBNoiwbGl5yrfYuT7g=="],
 
     "@tybys/wasm-util": ["@tybys/wasm-util@0.10.3", "", { "dependencies": { "tslib": "^2.4.0" } }, "sha512-F3fo1MYrRJYL3zER0OUOmkutjr1Vp23m7OsSgp7nq4SP6OqX6C/56XFIPAl5bt3zaBRjmW7SGz3u/6LwFpYcOg=="],
 
