@@ -49,6 +49,7 @@
     "release:pipeline": "node scripts/release/run-release-pipeline.mjs",
     "release:pipeline:dry-run": "node scripts/release/run-release-pipeline.mjs --dry-run",
     "release:verify-published": "node scripts/release/verify-published-release.mjs",
+    "reviews:inventory": "node scripts/reviews/pr-review-loop.mjs inventory",
     "validate:release": "bun run check:version && bun run typecheck && bun run lint && bun run test && bun run test:portable && bun run test:release && bun run build && bun run smoke:dist && bun run check:file-length && bun run check:secrets && bun run check:secrets:history && bun run pack:dry-run && bun run smoke:npx && bun run smoke:bunx && bun run changelog:pm:check",
     "release:check": "bun run validate:release",
     "clean": "rm -rf dist",

@@ -6,7 +6,7 @@ status: closed
 priority: 0
 tags[5]: agents,format,output,serialization,toon
 created_at: "2026-07-23T04:53:59.365Z"
-updated_at: "2026-07-23T05:23:15.225Z"
+updated_at: "2026-07-23T05:28:34.072Z"
 closed_at: "2026-07-23T05:22:11.979Z"
 author: codex-jellyfin
 estimated_minutes: 360
@@ -38,22 +38,24 @@ dependencies[5]{id,kind,created_at,author,source_kind}:
   jf-mkzh,related_to,"2026-07-23T04:53:59.365Z",codex-jellyfin,null
   jf-sylm,related_to,"2026-07-23T04:53:59.365Z",codex-jellyfin,null
   jf-w5ow,related_to,"2026-07-23T04:53:59.365Z",codex-jellyfin,null
-comments[4]{created_at,author,text}:
+comments[5]{created_at,author,text}:
   "2026-07-23T04:53:59.365Z",codex-jellyfin,"Official sources reviewed on 2026-07-23: toon-format/toon is the reference TypeScript implementation and @toon-format/toon 4.0.0 is the current npm release; the published spec describes lossless JSON-model encoding with explicit array lengths and tabular headers."
   "2026-07-23T05:08:43.852Z",codex-jellyfin,"Implemented official @toon-format/toon 4.0.0 encoding/decoding, normalized canonical formatter type names and descriptive fields to the JSON Schema registry, fixed error/read-only bypass output, added direct decode-to-schema contract coverage, refreshed agent/TOON docs, and advanced the release tooling pin to pm CLI 2026.7.22. Unit suite: 915 pass, 177 live skips, 0 fail; typecheck/lint/file-length pass."
   "2026-07-23T05:21:56.046Z",codex-jellyfin,"Acceptance evidence: PM-linked suite 10/10 passes; 915 Bun tests pass with 177 expected non-live skips; portable Vitest 906/906 passes; full compiled read-only Jellyfin E2E 177/177 passes; real system/users/items/sessions/libraries/tasks TOON output decodes and validates against canonical schemas; connection/auth/OpenAPI/all-format diagnostics pass; tracked and history secret scans pass."
   "2026-07-23T05:23:15.216Z",codex-jellyfin,"Release tooling verification: npm registry latest pm-changelog is 2026.7.22; project-managed extension upgraded from 2026.7.18 to 2026.7.22 and activated successfully through pm CLI 2026.7.22."
+  "2026-07-23T05:28:34.072Z",codex-jellyfin,"Added the requested reusable GitHub review helper for exact-head inventory, reactions, inline replies, and thread resolution; documented the blocking watcher plus inventory workflow for future sessions."
 notes[2]{created_at,author,text}:
   "2026-07-23T04:53:59.365Z",codex-jellyfin,Do not replace TOON with YAML aliases or a home-grown encoder. Use top-level imports from the installed official package and inspect its bundled type declarations before implementation.
   "2026-07-23T05:08:44.744Z",codex-jellyfin,"Design decision: TOON is now a distinct standards-backed wire format. YAML remains separately supported; schema auto-detection tries JSON, strict TOON, then YAML. Empty arrays, nulls, and false values are preserved because removing them changes output semantics and breaks schema contracts."
 learnings[1]{created_at,author,text}:
   "2026-07-23T05:21:55.205Z",codex-jellyfin,Text-pattern tests are not sufficient for a structured wire format. Decode output with the official implementation and assert the semantic envelope so quoting and tabular compaction changes do not create false failures.
-files[20]{path,scope,note}:
+files[21]{path,scope,note}:
   .agents/pm/extensions/.managed-extensions.json,project,Project-managed pm-changelog upgraded to latest 2026.7.22
   bun.lock,project,null
   package-lock.json,project,null
   package.json,project,Official encoder dependency and release gates
   scripts/release/utils.mjs,project,null
+  scripts/reviews/pr-review-loop.mjs,project,Exact-head GitHub review inventory and inline acknowledgement helper
   src/commands/config-doctor.ts,project,null
   src/commands/schema-defs.ts,project,null
   src/commands/schema-validate.ts,project,null
@@ -69,7 +71,7 @@ files[20]{path,scope,note}:
   tests/e2e/cli.test.ts,project,null
   tests/formatters/schema-contract.test.ts,project,null
   tests/formatters/toon.test.ts,project,null
-tests[10]:
+tests[11]:
   - command: "bun run check:file-length"
     scope: project
   - command: "bun run check:secrets"
@@ -96,6 +98,10 @@ tests[10]:
     scope: project
     timeout_seconds: 120
     pm_context_mode: tracker
+  - command: node --check scripts/reviews/pr-review-loop.mjs
+    path: scripts/reviews/pr-review-loop.mjs
+    scope: project
+    timeout_seconds: 120
 docs[7]{path,scope,note}:
   docs/agent-integration.md,project,Agent parser guidance
   docs/api-research.md,project,null
