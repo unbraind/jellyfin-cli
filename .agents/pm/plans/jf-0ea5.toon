@@ -2,12 +2,12 @@ id: jf-0ea5
 title: Ship OpenAPI-validated Jellyfin API execution
 description: "Add a secure agent-first execution surface that resolves exact Jellyfin OpenAPI operations, validates methods paths parameters and bodies, defaults to read-only behavior, preserves all structured output formats, and strengthens executable API coverage evidence without replacing intuitive typed commands."
 type: Plan
-status: in_progress
+status: closed
 priority: 0
 tags[7]: agents,api,contracts,openapi,read-only,release,tool-schema
 created_at: "2026-07-24T20:59:42.537Z"
-updated_at: "2026-07-24T21:54:07.407Z"
-assignee: codex-jellyfin-api
+updated_at: "2026-07-24T22:04:28.630Z"
+closed_at: "2026-07-24T22:03:25.700Z"
 author: codex-jellyfin-api
 estimated_minutes: 600
 acceptance_criteria: Exact operation IDs and METHOD/path pairs resolve deterministically against the configured server OpenAPI document; GET HEAD and OPTIONS execution is permitted by default while mutating methods require explicit opt-in and remain blocked by global read-only mode; Query path and JSON body inputs are parsed and validated without forwarding credentials outside the configured origin; TOON JSON YAML Markdown table and raw output remain valid and agent tool schemas fully describe the new interface; Help docs setup validation unit integration package and live compiled read-only acceptance are green with no private data committed
@@ -22,6 +22,9 @@ risk: high
 confidence: high
 sprint: jellyfin-10.11.11
 release: next-manual-release
+resolution: "Delivered exact OpenAPI operation inspection and safe execution with contract validation, bounded responses, agent schemas, complete docs, mock-only mutation tests, 179-command compiled live read-only acceptance, deterministic package consumers, and terminal exact-head PR checks/reviewer inventory."
+expected_result: Every configured Jellyfin OpenAPI operation resolves by exact operation ID and can be inspected or executed through safe structured CLI contracts without exposing private credentials or mutating the live server during acceptance.
+actual_result: "The CLI now exposes exact inspect/get/mutate contracts for all 429 live operation IDs; full release validation and 179 compiled read-only live tests pass, with mutations verified only on an isolated loopback server."
 dependencies[8]{id,kind,created_at,author,source_kind}:
   jf-59hr,related,"2026-07-24T20:59:42.537Z",null,null
   jf-644n,related,"2026-07-24T20:59:42.537Z",null,null
@@ -69,7 +72,8 @@ docs[6]{path,scope,note}:
   docs/README.md,project,Documentation index
   docs/release-readiness.md,project,Read-only exact-operation acceptance
   README.md,project,Exact operation user guidance
-plan_mode: executing
+close_reason: "Implementation, documentation, private live read-only acceptance, package/security gates, PM graph evidence, and PR #38 terminal review processing are complete; merge follows the generated closeout head."
+plan_mode: completed
 plan_scope: "OpenAPI operation resolution, safe generic API execution, agent tool contracts, setup/docs/help integration, behavior tests, live read-only acceptance, and release-ready PR closeout."
 plan_harness: codex
 plan_resume_context: "Jellyfin 10.11.11 exposes 429 operations across 356 paths; 397 leaf commands map fuzzily at score 3, but executable completeness needs exact operation validation. Implement jf api with read-only default and explicit mutation safeguards, then prove formats/help/live/package/quality and finish PR review."
@@ -82,51 +86,11 @@ plan_decisions[2]{ts,author,decision,rationale,evidence}:
   "2026-07-24T21:40:16.456Z",codex-jellyfin-api,Buffer generic operation responses incrementally and cancel the response stream at the configured byte ceiling.,A post-arrayBuffer size check labels responses as bounded but cannot prevent excessive memory use; incremental enforcement makes the agent safety contract real.,Focused binary and overflow integration tests pass after streaming implementation.
 plan_discoveries[1]{ts,author,text}:
   "2026-07-24T21:00:01.322Z",codex-jellyfin-api,"Configured Jellyfin 10.11.11 serves its OpenAPI document directly: 356 paths, 429 operations, 257 read-only operations, and 397 CLI leaf tools. At min_score=3 every operation has a semantic tool candidate, but one tool remains unmatched and fuzzy mapping is not executable coverage proof."
-plan_steps[6]:
-  - id: plan-step-001
-    order: 1
-    title: Record official and live Jellyfin 10.11.11 operation evidence
-    status: completed
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:11:03.786Z"
-    evidence: "Official jellyfin/jellyfin v10.11.11 and live owner-only research confirmed 356 paths, 429 uniquely identified operations, 257 read-only operations, 76 JSON body operations, 2 text bodies, and 4 image bodies; sanitized counts recorded in docs/api-research.md."
-    completed_at: "2026-07-24T21:11:03.786Z"
-  - id: plan-step-002
-    order: 2
-    title: Implement exact OpenAPI operation resolution and safe API execution
-    status: completed
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:37:54.508Z"
-    evidence: "Implemented exact case-insensitive operationId resolution, path/query/body contract validation, same-origin bounded response execution, JSON/text/file request bodies, strict content-type checks, read-only method routing, explicit mutation confirmation, and global read-only enforcement."
-    completed_at: "2026-07-24T21:37:54.508Z"
-  - id: plan-step-003
-    order: 3
-    title: Integrate help tool schemas output formats and documentation
-    status: completed
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:37:55.647Z"
-    evidence: "Registered api inspect/get/mutate with detailed nested help; added structured schemas and exact API tool filtering; documented README, docs index, API reference, agent integration, research, and release acceptance across TOON JSON YAML Markdown table and raw formats."
-    completed_at: "2026-07-24T21:37:55.647Z"
-  - id: plan-step-004
-    order: 4
-    title: Add behavior-focused unit integration and live read-only acceptance tests
-    status: completed
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:37:56.742Z"
-    evidence: "Behavior tests cover exact resolution, duplicate/unknown rejection, parameter/body/content-type validation, bounded JSON/text/base64 responses, all formatters, tool safety, and mock-only mutation. Final compiled live acceptance passed 179/179 read-only tests including exact inspect/get; no live mutation executed."
-    completed_at: "2026-07-24T21:37:56.742Z"
-  - id: plan-step-005
-    order: 5
-    title: Run strict release quality security coverage duplication and PM gates
-    status: completed
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:54:07.406Z"
-    evidence: "validate:release passed in full; 929 Bun tests pass with 179 live-only skips in portable mode, 920/920 Vitest portable tests pass, npm and isolated Bun tarball consumer smokes pass, file length/secrets/history/changelog gates pass, bun/npm audits and Trivy report zero findings. Honest repository baselines remain 38.65/38.31/50.27/38.32 four-metric coverage and 8.63% duplication, already canonically tracked by related jf-mkzh and jf-lpki; no threshold was weakened."
-    completed_at: "2026-07-24T21:37:58.238Z"
-  - id: plan-step-006
-    order: 6
-    title: Publish PR process every bot finding merge and close PM lineage
-    status: in_progress
-    created_at: "2026-07-24T20:59:42.698Z"
-    updated_at: "2026-07-24T21:37:59.596Z"
+plan_steps[6]{id,order,title,status,created_at,updated_at,evidence,completed_at}:
+  plan-step-001,1,Record official and live Jellyfin 10.11.11 operation evidence,completed,"2026-07-24T20:59:42.698Z","2026-07-24T21:11:03.786Z","Official jellyfin/jellyfin v10.11.11 and live owner-only research confirmed 356 paths, 429 uniquely identified operations, 257 read-only operations, 76 JSON body operations, 2 text bodies, and 4 image bodies; sanitized counts recorded in docs/api-research.md.","2026-07-24T21:11:03.786Z"
+  plan-step-002,2,Implement exact OpenAPI operation resolution and safe API execution,completed,"2026-07-24T20:59:42.698Z","2026-07-24T21:37:54.508Z","Implemented exact case-insensitive operationId resolution, path/query/body contract validation, same-origin bounded response execution, JSON/text/file request bodies, strict content-type checks, read-only method routing, explicit mutation confirmation, and global read-only enforcement.","2026-07-24T21:37:54.508Z"
+  plan-step-003,3,Integrate help tool schemas output formats and documentation,completed,"2026-07-24T20:59:42.698Z","2026-07-24T21:37:55.647Z","Registered api inspect/get/mutate with detailed nested help; added structured schemas and exact API tool filtering; documented README, docs index, API reference, agent integration, research, and release acceptance across TOON JSON YAML Markdown table and raw formats.","2026-07-24T21:37:55.647Z"
+  plan-step-004,4,Add behavior-focused unit integration and live read-only acceptance tests,completed,"2026-07-24T20:59:42.698Z","2026-07-24T21:37:56.742Z","Behavior tests cover exact resolution, duplicate/unknown rejection, parameter/body/content-type validation, bounded JSON/text/base64 responses, all formatters, tool safety, and mock-only mutation. Final compiled live acceptance passed 179/179 read-only tests including exact inspect/get; no live mutation executed.","2026-07-24T21:37:56.742Z"
+  plan-step-005,5,Run strict release quality security coverage duplication and PM gates,completed,"2026-07-24T20:59:42.698Z","2026-07-24T21:54:07.406Z","validate:release passed in full; 929 Bun tests pass with 179 live-only skips in portable mode, 920/920 Vitest portable tests pass, npm and isolated Bun tarball consumer smokes pass, file length/secrets/history/changelog gates pass, bun/npm audits and Trivy report zero findings. Honest repository baselines remain 38.65/38.31/50.27/38.32 four-metric coverage and 8.63% duplication, already canonically tracked by related jf-mkzh and jf-lpki; no threshold was weakened.","2026-07-24T21:37:58.238Z"
+  plan-step-006,6,Publish PR process every bot finding merge and close PM lineage,completed,"2026-07-24T20:59:42.698Z","2026-07-24T22:03:23.484Z","PR #38 was rebased onto release head 5035805. Exact head 8e48399 passed Quality Gates, npm Compatibility, Secret Scanning, CodeQL actions and JavaScript analysis, semantic title, and commit-style checks. Complete thread-aware inventory found zero review threads or code findings; CodeRabbit and Sourcery were quota-limited, Gemini was sunset, Cubic was neutral, and Greptile produced no installed check or response after two exact-head requests. Every bot status comment/review was acknowledged and voted.","2026-07-24T22:03:23.484Z"
 body: ""
