@@ -161,6 +161,69 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
+  api_operation: {
+    type: 'object',
+    properties: {
+      type: { const: 'api_operation' },
+      data: {
+        type: 'object',
+        properties: {
+          operation_id: { type: 'string' },
+          method: { type: 'string' },
+          path_template: { type: 'string' },
+          read_only_safe: { type: 'boolean' },
+          deprecated: { type: 'boolean' },
+          parameters: { type: 'array' },
+          request_body_allowed: { type: 'boolean' },
+          request_body_required: { type: 'boolean' },
+          request_body_content_types: { type: 'array' },
+          openapi_source: { type: 'string' },
+        },
+        required: [
+          'operation_id',
+          'method',
+          'path_template',
+          'read_only_safe',
+          'deprecated',
+          'parameters',
+          'request_body_allowed',
+          'request_body_required',
+          'request_body_content_types',
+          'openapi_source',
+        ],
+      },
+    },
+    required: ['type', 'data'],
+  },
+  api_operation_response: {
+    type: 'object',
+    properties: {
+      type: { const: 'api_operation_response' },
+      data: {
+        type: 'object',
+        properties: {
+          operation_id: { type: 'string' },
+          method: { type: 'string' },
+          path: { type: 'string' },
+          openapi_source: { type: 'string' },
+          status: { type: 'number' },
+          content_type: { type: ['string', 'null'] },
+          encoding: { enum: ['json', 'text', 'base64', 'empty'] },
+        },
+        required: [
+          'operation_id',
+          'method',
+          'path',
+          'openapi_source',
+          'status',
+          'content_type',
+          'encoding',
+          'data',
+        ],
+      },
+    },
+    required: ['type', 'data'],
+  },
 };
 
 const DEFINITIONS = {

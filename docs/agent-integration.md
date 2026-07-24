@@ -186,6 +186,33 @@ Intent coverage is a naming/mapping diagnostic. It does not prove that every ope
 executable, semantically complete command. For implementation decisions, inspect operation IDs,
 request/response schemas, command behavior, tests, and read-only live evidence together.
 
+## Exact Operation Execution
+
+Use typed commands first. When an endpoint has no ergonomic typed surface—or an agent needs a
+forward-compatible exact contract—resolve and invoke its OpenAPI operation ID:
+
+```bash
+jf api inspect GetUserById --format json
+jf api get GetUserById --path-param userId=USER_ID --format toon
+```
+
+The CLI rejects unknown operation IDs, undeclared query/path parameters, missing required inputs,
+unsupported request content types, and oversized responses. Binary responses are base64-encoded
+inside the normal structured envelope.
+
+Mutations are intentionally separate:
+
+```bash
+jf api mutate UpdateDeviceOptions \
+  --path-param deviceId=DEVICE_ID \
+  --body-json '{"CustomName":"Living room"}' \
+  --confirm
+```
+
+`api mutate` is classified as unsafe in exported tool schemas and is blocked before execution by
+`JELLYFIN_READ_ONLY=1` / `--read-only`. `--explain` reports only body content type and byte length
+for generic calls; it never writes body contents to diagnostics.
+
 ## Help Discovery
 
 Every command exposes local help and inherited global options:

@@ -672,6 +672,14 @@ describe('schema tools command', () => {
     expect(result.stdout).toContain('read_only_safe: false');
   });
 
+  it('matches command prefixes on complete path segments', async () => {
+    const result = await runCli(['schema', 'tools', '--command', 'api', '--limit', '10']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('command: jf api get');
+    expect(result.stdout).toContain('command: jf api mutate');
+    expect(result.stdout).not.toContain('command: jf apikeys');
+  });
+
   it('returns error for invalid --limit', async () => {
     const result = await runCli(['schema', 'tools', '--limit', '0']);
     expect(result.code).toBe(1);

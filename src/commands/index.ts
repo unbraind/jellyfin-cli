@@ -50,3 +50,4 @@ export { createClientlogCommand } from './clientlog.js';
 export { createTrailersCommand } from './trailers.js';
 export { createPluginsExtCommand } from './plugins-ext.js';
 export { createLibraryNotifyCommand } from './library-notify.js';
+export { createApiCommand } from './api.js';

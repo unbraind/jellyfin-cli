@@ -114,7 +114,11 @@ export function generateCliToolSchemas(root: Command, prefix?: string): CliToolS
     if (!commandPath) {
       continue;
     }
-    if (normalizedPrefix && !commandPath.startsWith(normalizedPrefix)) {
+    if (
+      normalizedPrefix &&
+      commandPath !== normalizedPrefix &&
+      !commandPath.startsWith(`${normalizedPrefix} `)
+    ) {
       continue;
     }
 

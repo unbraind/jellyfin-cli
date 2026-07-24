@@ -133,6 +133,8 @@ jf schema research --include-unmatched --require-coverage 100 --limit 20
 jf schema tools --command system --limit 10
 jf schema coverage --method GET --command-prefix system --min-score 3 --require-coverage 100 --limit 20
 jf schema suggest --for-command "users list" --limit 10
+jf api inspect GetPublicSystemInfo
+jf api get GetPublicSystemInfo --format json
 ```
 
 All commands above are read-only and provide machine-parseable discovery output for agent workflows.

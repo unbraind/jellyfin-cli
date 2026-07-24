@@ -197,6 +197,39 @@ describe.skipIf(skip)('E2E system', () => {
 });
 
 // -------------------------------------------------------------------------
+// OpenAPI operation commands
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E api operations', () => {
+  it('inspects an exact read-only operation contract', async () => {
+    const out = await jf('api', 'inspect', 'GetPublicSystemInfo');
+    const envelope = decodeEnvelope(out);
+    expect(envelope.type).toBe('api_operation');
+    expect(envelope.data).toMatchObject({
+      operation_id: 'GetPublicSystemInfo',
+      method: 'GET',
+      read_only_safe: true,
+    });
+  }, T);
+
+  it('executes an exact read-only operation against the compiled CLI', async () => {
+    const result = await runJfWithCode(
+      ['api', 'get', 'GetPublicSystemInfo'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const envelope = decodeEnvelope(result.stdout);
+    expect(envelope.type).toBe('api_operation_response');
+    expect(envelope.data).toMatchObject({
+      operation_id: 'GetPublicSystemInfo',
+      method: 'GET',
+      status: 200,
+      encoding: 'json',
+    });
+  }, T);
+});
+
+// -------------------------------------------------------------------------
 // Library commands
 // -------------------------------------------------------------------------
 
