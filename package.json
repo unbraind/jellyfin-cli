@@ -1,6 +1,6 @@
 {
   "name": "jellyfin-cli",
-  "version": "2026.7.22",
+  "version": "2026.7.24",
   "description": "Agent-optimized CLI tool for interacting with the Jellyfin API",
   "homepage": "https://github.com/unbraind/jellyfin-cli#readme",
   "repository": {
