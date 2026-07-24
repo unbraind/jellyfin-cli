@@ -60,6 +60,7 @@ import {
   createTrailersCommand,
   createPluginsExtCommand,
   createLibraryNotifyCommand,
+  createApiCommand,
 } from './commands/index.js';
 import packageJson from '../package.json' with { type: 'json' };
 
@@ -203,6 +204,7 @@ export function createProgram(deps: CliProgramDeps = {}): Command {
   program.addCommand(createTrailersCommand());
   program.addCommand(createPluginsExtCommand());
   program.addCommand(createLibraryNotifyCommand());
+  program.addCommand(createApiCommand());
 
   enableGlobalHelpOptions(program);
   return program;

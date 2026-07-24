@@ -18,6 +18,7 @@ export const MUTATING_VERBS = new Set([
   'merge',
   'message',
   'move',
+  'mutate',
   'mute',
   'next',
   'pause',

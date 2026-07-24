@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Other
+
+- Ship OpenAPI-validated Jellyfin API execution ([jf-0ea5](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-0ea5.toon))
+
 ## 2026.7.24 - 2026-07-24
 
 ### Fixed

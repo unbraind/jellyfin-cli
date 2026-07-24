@@ -249,6 +249,7 @@ Notes:
 | `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
 | `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
+| `jf api inspect/get/mutate` | Inspect or execute an exact OpenAPI operation with declared-input validation and read-only safeguards |
 | `jf schema suggest` | Generate candidate CLI command names from intent-matched or uncovered OpenAPI operations |
 | `jf schema validate` | Validate TOON/JSON/YAML payloads against CLI schemas for CI and agent safety |
 

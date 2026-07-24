@@ -1,11 +1,11 @@
-# Jellyfin API Research (Validated July 23, 2026)
+# Jellyfin API Research (Validated July 24, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
 ## Verification Scope
 
-- Verification date: **July 23, 2026**
+- Verification date: **July 24, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -33,7 +33,28 @@ Observed:
 
 Do not use the `100%` compatibility-threshold result as the sole claim that every Jellyfin feature
 is implemented. Endpoint-level completeness needs an explicit operation-ID manifest plus executable
-contract tests; that stronger evidence remains part of the tracked API-interface work.
+contract tests.
+
+## Exact Operation Execution
+
+The live 10.11.11 document declares a unique, non-empty `operationId` for all `429` operations.
+`jf api inspect|get|mutate` now resolves those identifiers exactly and validates declared path/query
+parameters, request-body presence, and request content types before execution.
+
+- `257` operations use read-only-safe `GET`, `HEAD`, or `OPTIONS` methods and can run through
+  `jf api get`.
+- Non-read-only operations require `jf api mutate ... --confirm`.
+- Global read-only mode blocks `api mutate` before any request.
+- The schema declares `76` JSON-capable request-body operations, `2` text bodies, and `4` image
+  bodies (media-type declarations overlap for JSON variants).
+- JSON, text, and file-backed binary/text bodies are supported without allowing custom origins or
+  custom authorization headers.
+- Buffered responses have an explicit size limit; binary responses are base64-wrapped so every
+  formatter remains machine-valid.
+
+This exact-operation fallback complements the typed command interface. It proves executable reach
+for current and future schema operations without claiming that a generic call is as ergonomic as a
+dedicated high-level command.
 
 ## Live Readiness Checks
 

@@ -3160,6 +3160,58 @@ jf library remove-path <folderName> <path> [--refresh] [-f format]
 
 Output type: `message`
 
+## api
+
+Exact OpenAPI operation access for forward-compatible agent workflows. Prefer the typed command
+groups elsewhere in this reference for routine use.
+
+### api inspect
+
+Resolve an exact operation ID and report its HTTP method, path template, tags, safety
+classification, declared path/query parameters, request-body requirement, and accepted content
+types. No API operation is executed.
+
+```bash
+jf api inspect <operationId> [--endpoint <path>] [--format <format>]
+```
+
+Output type: `api_operation`
+
+### api get
+
+Execute an exact read-only operation. Only OpenAPI operations using `GET`, `HEAD`, or `OPTIONS` are
+accepted.
+
+```bash
+jf api get <operationId> \
+  [--path-param <key=value...>] \
+  [--query <key=value...>] \
+  [--max-bytes <bytes>] \
+  [--format <format>]
+```
+
+All supplied names must be declared by OpenAPI, required parameters must be present, path values are
+URL-encoded, and repeated query keys are preserved. Output type: `api_operation_response`.
+
+### api mutate
+
+Execute an exact non-read-only operation:
+
+```bash
+jf api mutate <operationId> --confirm \
+  [--path-param <key=value...>] \
+  [--query <key=value...>] \
+  [--body-json <json> | --body-text <text> | --body-file <path>] \
+  [--content-type <type>] \
+  [--max-bytes <bytes>] \
+  [--format <format>]
+```
+
+`--confirm` is mandatory. `JELLYFIN_READ_ONLY=1` or the global `--read-only` flag blocks the command
+before network execution. `--body-file` requires an explicit `--content-type`; every request content
+type must match the operation's OpenAPI declaration. Responses are size-bounded and binary data is
+base64-encoded inside the structured output envelope.
+
 ## schema
 
 JSON Schema commands for LLM/Agent integration.
