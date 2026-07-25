@@ -140,14 +140,10 @@ export async function fetchOfficialOpenApiDocument(
   artifactVersion: string,
   options: OfficialOpenApiFetchOptions = {},
 ): Promise<OpenApiProbeResult> {
-  const version = artifactVersion.trim();
-  if (!ARTIFACT_VERSION_PATTERN.test(version)) {
-    throw new Error(`Invalid official OpenAPI artifact version: ${artifactVersion}`);
-  }
-  if (version.includes('-') && !options.allowPrerelease) {
-    throw new Error('Prerelease OpenAPI artifacts require --allow-prerelease');
-  }
-
+  const version = validateOfficialOpenApiArtifactVersion(
+    artifactVersion,
+    options.allowPrerelease,
+  );
   const expectedVersion = expectedDocumentVersion(version);
   const cachePath = join(getConfigDir(), 'cache', 'openapi', `jellyfin-openapi-${version}.json`);
   const cached = existsSync(cachePath) ? parseDocument(readFileSync(cachePath, 'utf-8')) : undefined;
@@ -166,6 +162,26 @@ export async function fetchOfficialOpenApiDocument(
   }
   writeCache(cachePath, document);
   return { sourcePath: officialUrl, sourceKind: 'official', cachePath, document };
+}
+
+/**
+ * Validates one official artifact identifier before any local or remote schema probe.
+ * @param artifactVersion - Exact stable or prerelease artifact identifier.
+ * @param allowPrerelease - Whether alpha, beta, or release-candidate artifacts are permitted.
+ * @returns The trimmed safe artifact identifier.
+ */
+export function validateOfficialOpenApiArtifactVersion(
+  artifactVersion: string,
+  allowPrerelease = false,
+): string {
+  const version = artifactVersion.trim();
+  if (!ARTIFACT_VERSION_PATTERN.test(version)) {
+    throw new Error(`Invalid official OpenAPI artifact version: ${artifactVersion}`);
+  }
+  if (version.includes('-') && !allowPrerelease) {
+    throw new Error('Prerelease OpenAPI artifacts require --allow-prerelease');
+  }
+  return version;
 }
 
 /**

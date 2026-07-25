@@ -136,9 +136,13 @@ jf schema suggest --for-command "users list" --limit 10
 jf schema compatibility --fail-on-breaking
 jf api inspect GetPublicSystemInfo
 jf api get GetPublicSystemInfo --format json
+jf api batch --file tests/fixtures/live-read-batch.json --dry-run
+jf api batch --file tests/fixtures/live-read-batch.json --format json
 ```
 
 All commands above are read-only and provide machine-parseable discovery output for agent workflows.
+The batch fixture contains only public operation IDs; live response content is never written to the
+repository.
 
 ## 6) Verify executable names
 

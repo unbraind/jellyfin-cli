@@ -222,6 +222,28 @@ The CLI rejects unknown operation IDs, undeclared query/path parameters, missing
 unsupported request content types, and oversized responses. Binary responses are base64-encoded
 inside the normal structured envelope.
 
+For related reads, submit one strict manifest so the CLI can resolve the schema once and preflight
+the entire plan before execution:
+
+```bash
+printf '%s' '{
+  "version": 1,
+  "requests": [
+    {"id": "server", "operation_id": "GetPublicSystemInfo"},
+    {
+      "id": "user",
+      "operation_id": "GetUserById",
+      "path_params": {"userId": "USER_ID"}
+    }
+  ]
+}' | jf api batch --stdin --dry-run --format toon
+```
+
+Remove `--dry-run` after inspecting the resolved plan. Batches accept only read-only HTTP methods,
+preserve input order and caller IDs, reuse one authenticated client, and enforce request-count,
+per-response, and aggregate byte ceilings. One invalid manifest entry prevents every network
+operation. Runtime HTTP failures are returned per request and make the process exit nonzero.
+
 Mutations are intentionally separate:
 
 ```bash

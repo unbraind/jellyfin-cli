@@ -1,0 +1,13 @@
+{
+  "version": 1,
+  "requests": [
+    {
+      "id": "public-system-info",
+      "operation_id": "GetPublicSystemInfo"
+    },
+    {
+      "id": "system-info",
+      "operation_id": "GetSystemInfo"
+    }
+  ]
+}

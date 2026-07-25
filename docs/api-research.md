@@ -56,6 +56,18 @@ This exact-operation fallback complements the typed command interface. It proves
 for current and future schema operations without claiming that a generic call is as ergonomic as a
 dedicated high-level command.
 
+## Read-Only Batch Execution
+
+`jf api batch` composes exact read operations without introducing a generic mutation pipeline. A
+strict version-1 JSON manifest is limited to 25 requests by default and 100 at the hard ceiling.
+Every operation ID, method, path parameter, and query name is validated against one resolved
+OpenAPI document before the first request runs.
+
+Execution is sequential and deterministic, reuses one authenticated client, preserves caller IDs,
+and enforces both per-response and aggregate byte budgets. `--dry-run` emits the fully materialized
+plan without executing API operations. Live acceptance uses only `GetPublicSystemInfo` and
+`GetSystemInfo` under `JELLYFIN_READ_ONLY=1`; raw responses and server identity remain untracked.
+
 ## Version Compatibility Evidence
 
 Official primary sources identify `10.11.11` as the latest stable server release and `12.0 RC3` as

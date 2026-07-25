@@ -17,6 +17,7 @@ interface CompatServer {
 
 interface SpawnOptions {
   env?: Record<string, string | undefined>;
+  stdin?: Blob;
   stdout?: 'pipe';
   stderr?: 'pipe';
 }
@@ -88,9 +89,16 @@ if (typeof globalThis.Bun === 'undefined') {
     spawn(command, options = {}) {
       const child = spawn(command[0] ?? '', command.slice(1), {
         env: options.env as NodeJS.ProcessEnv | undefined,
-        stdio: ['ignore', 'pipe', 'pipe'],
+        stdio: [options.stdin ? 'pipe' : 'ignore', 'pipe', 'pipe'],
       });
       if (!child.stdout || !child.stderr) throw new Error('Failed to create child pipes');
+      if (options.stdin && child.stdin) {
+        void options.stdin.arrayBuffer().then((buffer) => {
+          child.stdin?.end(Buffer.from(buffer));
+        }, (error: unknown) => {
+          child.stdin?.destroy(error instanceof Error ? error : new Error('Stdin read failed'));
+        });
+      }
       return {
         stdout: Readable.toWeb(child.stdout) as ReadableStream<Uint8Array>,
         stderr: Readable.toWeb(child.stderr) as ReadableStream<Uint8Array>,

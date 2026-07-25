@@ -3193,6 +3193,29 @@ jf api get <operationId> \
 All supplied names must be declared by OpenAPI, required parameters must be present, path values are
 URL-encoded, and repeated query keys are preserved. Output type: `api_operation_response`.
 
+### api batch
+
+Preflight and execute a versioned JSON manifest of exact read-only operations:
+
+```bash
+jf api batch (--file <manifest.json> | --stdin) \
+  [--dry-run] \
+  [--max-operations <count>] \
+  [--max-bytes <bytes>] \
+  [--max-total-bytes <bytes>] \
+  [--format <format>]
+```
+
+The manifest must contain `version: 1` and a non-empty `requests` array. Each request requires a
+unique caller `id` and an exact `operation_id`; optional `path_params` and `query` objects use
+OpenAPI-declared names. All requests are resolved and validated before execution, and any
+`POST`/`PUT`/`PATCH`/`DELETE` operation rejects the entire manifest before an API request is made.
+
+`--dry-run` returns output type `api_batch_plan`. Execution returns `api_batch_response` with
+ordered results, per-request status or structured error, byte counts, and aggregate success/failure
+counts. The command returns nonzero when any request fails. Defaults are 25 requests, one MiB per
+response, and ten MiB across responses; the hard request-count ceiling is 100.
+
 ### api mutate
 
 Execute an exact non-read-only operation:
