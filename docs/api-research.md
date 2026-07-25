@@ -67,7 +67,7 @@ an opt-in preview. The official artifacts contain:
 
 The live server additionally exposes plugin-provided contracts, so upgrade analysis uses an
 official-to-official baseline by default. The sanitized `10.11.11` to `12.0-rc3` comparison found
-`39` breaking findings, `94` review findings, and `25` non-breaking findings. These counts are an
+`39` breaking findings, `115` review findings, and `26` non-breaking findings. These counts are an
 RC compatibility signal, not a claim about the eventual Jellyfin 12 stable contract.
 
 ```bash
