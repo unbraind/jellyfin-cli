@@ -4,6 +4,7 @@
 
 ### Added
 
+- Add bounded read-only Jellyfin API batches ([jf-lyq6](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-lyq6.toon))
 - Add version-aware Jellyfin API compatibility manifests ([jf-axko](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-axko.toon))
 
 ### Other
