@@ -1,7 +1,6 @@
 import { spawn } from 'node:child_process';
 import { Readable } from 'node:stream';
 import { createServer, type IncomingMessage, type ServerResponse } from 'node:http';
-import { randomInt } from 'node:crypto';
 
 type RouteValue = Response | ((request: Request) => Response | Promise<Response>);
 
@@ -55,9 +54,7 @@ async function writeResponse(response: Response, target: ServerResponse): Promis
 if (typeof globalThis.Bun === 'undefined') {
   const compat: BunCompat = {
     serve(options) {
-      const serverPort = options.port === 0
-        ? randomInt(20_000, 60_000)
-        : options.port;
+      let serverPort = options.port;
       const server = createServer(async (incoming, outgoing) => {
         try {
           const request = await toRequest(incoming, serverPort);
@@ -76,7 +73,13 @@ if (typeof globalThis.Bun === 'undefined') {
           outgoing.end(error instanceof Error ? error.message : 'Test server failure');
         }
       });
-      server.listen(serverPort, '127.0.0.1');
+      server.listen(serverPort);
+      const address = server.address();
+      if (!address || typeof address === 'string') {
+        server.close();
+        throw new Error('Test server did not expose a TCP address');
+      }
+      serverPort = address.port;
       return {
         port: serverPort,
         stop() { server.close(); },

@@ -3336,6 +3336,34 @@ Notes:
 - Scope summaries include both unmatched operations and unmatched CLI-tool samples (`unmatched_tools_total`, `unmatched_tools`).
 - `--save <path>` persists the same payload to a JSON file and returns `saved_to` in stdout output.
 
+### schema compatibility
+
+Compare exact official Jellyfin API versions or explicitly audit the live server contract:
+
+```bash
+jf schema compatibility \
+  [--name <name>] \
+  [--endpoint <path>] \
+  [--baseline official|live] \
+  [--target-version <version>] \
+  [--allow-prerelease] \
+  [--fail-on-breaking] \
+  [--limit <number>] \
+  [--format <format>]
+```
+
+The default `official` baseline uses the configured live server only to resolve its API version,
+then compares trusted official artifacts without forwarding authentication. `--baseline live`
+includes local plugin and server extensions. Preview artifact names require `--allow-prerelease`.
+`--fail-on-breaking` prints the structured `openapi_compatibility` result before exiting nonzero.
+
+Findings cover operation additions/removals, operation ID changes, parameters, required request
+bodies, request content types, response statuses, and component-schema additions/removals/changes.
+Schema changes whose direction cannot be proven automatically are marked `review`, not silently
+treated as compatible.
+
+Output type: `openapi_compatibility`
+
 ---
 
 ## auth

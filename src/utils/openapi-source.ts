@@ -17,6 +17,7 @@ const LOCAL_OPENAPI_PATHS = [
 ] as const;
 const OFFICIAL_OPENAPI_BASE = 'https://repo.jellyfin.org/files/openapi/stable';
 const VERSION_PATTERN = /^\d+\.\d+\.\d+(?:\.\d+)?$/;
+const ARTIFACT_VERSION_PATTERN = /^\d+\.\d+(?:\.\d+){0,2}(?:-(?:alpha|beta|rc)\d+)?$/i;
 
 type OpenApiOperation = {
   tags?: string[] | undefined;
@@ -32,6 +33,9 @@ export type OpenApiDocument = {
     title?: string | undefined;
   } | undefined;
   paths?: Record<string, Partial<Record<string, OpenApiOperation>>> | undefined;
+  components?: {
+    schemas?: Record<string, unknown> | undefined;
+  } | undefined;
 };
 
 /** Trusted location from which an OpenAPI document was resolved. */
@@ -51,6 +55,11 @@ export type OpenApiFetchOptions = {
   officialFallback?: boolean | undefined;
 };
 
+/** Controls exact official artifact resolution for stable and opted-in preview versions. */
+export type OfficialOpenApiFetchOptions = {
+  allowPrerelease?: boolean | undefined;
+};
+
 function isDocument(value: unknown): value is OpenApiDocument {
   return typeof value === 'object' && value !== null &&
     typeof (value as OpenApiDocument).paths === 'object' &&
@@ -68,6 +77,11 @@ function parseDocument(text: string): OpenApiDocument | undefined {
 
 function matchesVersion(document: OpenApiDocument, version: string): boolean {
   return document.info?.version === version;
+}
+
+function expectedDocumentVersion(artifactVersion: string): string {
+  const stablePart = artifactVersion.replace(/-(?:alpha|beta|rc)\d+$/i, '');
+  return stablePart.split('.').length === 2 ? `${stablePart}.0` : stablePart;
 }
 
 function localPaths(endpointPath: string | undefined): string[] {
@@ -110,6 +124,48 @@ function writeCache(path: string, document: OpenApiDocument): void {
   writeFileSync(temporaryPath, `${JSON.stringify(document)}\n`, { encoding: 'utf-8', mode: 0o600 });
   renameSync(temporaryPath, path);
   chmodSync(path, 0o600);
+}
+
+/**
+ * Resolves one trusted official Jellyfin OpenAPI artifact without forwarding credentials.
+ * Prerelease artifact names require explicit opt-in and are validated against their stable API
+ * version because preview filenames such as 12.0-rc3 report `info.version` as 12.0.0.
+ * @param config - Request timeout configuration; credentials are deliberately ignored.
+ * @param artifactVersion - Exact official artifact version embedded in the trusted URL.
+ * @param options - Stable-by-default prerelease policy.
+ * @returns The validated official or private-cache document and provenance.
+ */
+export async function fetchOfficialOpenApiDocument(
+  config: JellyfinConfig,
+  artifactVersion: string,
+  options: OfficialOpenApiFetchOptions = {},
+): Promise<OpenApiProbeResult> {
+  const version = artifactVersion.trim();
+  if (!ARTIFACT_VERSION_PATTERN.test(version)) {
+    throw new Error(`Invalid official OpenAPI artifact version: ${artifactVersion}`);
+  }
+  if (version.includes('-') && !options.allowPrerelease) {
+    throw new Error('Prerelease OpenAPI artifacts require --allow-prerelease');
+  }
+
+  const expectedVersion = expectedDocumentVersion(version);
+  const cachePath = join(getConfigDir(), 'cache', 'openapi', `jellyfin-openapi-${version}.json`);
+  const cached = existsSync(cachePath) ? parseDocument(readFileSync(cachePath, 'utf-8')) : undefined;
+  if (cached && matchesVersion(cached, expectedVersion)) {
+    return { sourcePath: cachePath, sourceKind: 'cache', cachePath, document: cached };
+  }
+
+  const officialUrl = `${OFFICIAL_OPENAPI_BASE}/jellyfin-openapi-${version}.json`;
+  const response = await fetchText(officialUrl, config, false);
+  if (!response.ok) {
+    throw new Error(`Official OpenAPI artifact unavailable for ${version}: HTTP ${response.status}`);
+  }
+  const document = parseDocument(await response.text());
+  if (!document || !matchesVersion(document, expectedVersion)) {
+    throw new Error(`Official OpenAPI artifact has an invalid API version for ${version}`);
+  }
+  writeCache(cachePath, document);
+  return { sourcePath: officialUrl, sourceKind: 'official', cachePath, document };
 }
 
 /**

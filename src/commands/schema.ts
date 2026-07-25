@@ -15,6 +15,7 @@ import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from '.
 import { attachSchemaResearchSubcommand } from './schema-research.js';
 import { attachSchemaCoverageSubcommand } from './schema-coverage-command.js';
 import { attachSchemaSuggestSubcommand } from './schema-suggest.js';
+import { attachSchemaCompatibilitySubcommand } from './schema-compatibility.js';
 
 /**
  * Builds the schema command tree with validated options and actions.
@@ -43,6 +44,7 @@ export function createSchemaCommand(): Command {
   attachSchemaResearchSubcommand(cmd);
   attachSchemaCoverageSubcommand(cmd);
   attachSchemaSuggestSubcommand(cmd);
+  attachSchemaCompatibilitySubcommand(cmd);
 
   cmd
     .command('list')

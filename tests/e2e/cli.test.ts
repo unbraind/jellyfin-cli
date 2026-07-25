@@ -575,6 +575,21 @@ describe.skipIf(skip)('E2E schema', () => {
     expect(out).toMatch(/properties/);
     expect(out).toMatch(/\$schema/);
   }, T);
+
+  it('schema compatibility validates the exact official stable contract', async () => {
+    const result = await runJfWithCode(
+      ['schema', 'compatibility'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const envelope = decodeEnvelope(result.stdout);
+    expect(envelope.type).toBe('openapi_compatibility');
+    expect(envelope.data).toMatchObject({
+      compatible: true,
+      baseline: { source_kind: 'official' },
+      summary: { breaking: 0 },
+    });
+  }, T);
 });
 
 // -------------------------------------------------------------------------

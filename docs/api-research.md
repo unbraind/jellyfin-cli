@@ -1,11 +1,11 @@
-# Jellyfin API Research (Validated July 24, 2026)
+# Jellyfin API Research (Validated July 25, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
 ## Verification Scope
 
-- Verification date: **July 24, 2026**
+- Verification date: **July 25, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -55,6 +55,37 @@ parameters, request-body presence, and request content types before execution.
 This exact-operation fallback complements the typed command interface. It proves executable reach
 for current and future schema operations without claiming that a generic call is as ergonomic as a
 dedicated high-level command.
+
+## Version Compatibility Evidence
+
+Official primary sources identify `10.11.11` as the latest stable server release and `12.0 RC3` as
+an opt-in preview. The official artifacts contain:
+
+- `10.11.11`: `315` paths, `388` operations, and `357` component schemas.
+- `12.0-rc3` (document API version `12.0.0`): `294` paths, `364` operations, and `357` component
+  schemas.
+
+The live server additionally exposes plugin-provided contracts, so upgrade analysis uses an
+official-to-official baseline by default. The sanitized `10.11.11` to `12.0-rc3` comparison found
+`39` breaking findings, `115` review findings, and `26` non-breaking findings. These counts are an
+RC compatibility signal, not a claim about the eventual Jellyfin 12 stable contract.
+
+```bash
+# Stable exact-version consistency check
+jf schema compatibility
+
+# Explicit preview comparison; nonzero after output when breaking findings exist
+jf schema compatibility \
+  --target-version 12.0-rc3 \
+  --allow-prerelease \
+  --fail-on-breaking
+
+# Separate local extension drift from core version compatibility
+jf schema compatibility --baseline live
+```
+
+Raw official and live documents remain in owner-only `~/.jellyfin-cli` storage. Git and PM contain
+only versions, aggregate counts, classifications, and public source links.
 
 ## Live Readiness Checks
 

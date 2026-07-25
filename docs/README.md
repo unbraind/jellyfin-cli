@@ -82,6 +82,12 @@ jf schema suggest --for-command "users list" --limit 10
 # Suggest command candidates for uncovered OpenAPI operations
 jf schema suggest --read-only-ops --limit 20
 
+# Compare the installed stable API with an explicit preview contract
+jf schema compatibility --target-version 12.0-rc3 --allow-prerelease
+
+# Audit local plugin/server extensions against the matching official contract
+jf schema compatibility --baseline live --fail-on-breaking --format json
+
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info
 
@@ -249,6 +255,7 @@ Notes:
 | `jf schema research` | Build consolidated live OpenAPI + full/read-only coverage snapshot for agent backlog planning |
 | `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
+| `jf schema compatibility` | Compare trusted official versions or explicitly audit live/plugin API drift with CI breaking-change gates |
 | `jf api inspect/get/mutate` | Inspect or execute an exact OpenAPI operation with declared-input validation and read-only safeguards |
 | `jf schema suggest` | Generate candidate CLI command names from intent-matched or uncovered OpenAPI operations |
 | `jf schema validate` | Validate TOON/JSON/YAML payloads against CLI schemas for CI and agent safety |

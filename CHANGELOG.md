@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+### Added
+
+- Add version-aware Jellyfin API compatibility manifests ([jf-axko](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-axko.toon))
+
 ### Other
 
 - Ship OpenAPI-validated Jellyfin API execution ([jf-0ea5](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-0ea5.toon))

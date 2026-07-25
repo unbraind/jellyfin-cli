@@ -6,6 +6,7 @@ import {
   extractOpenApiOperations,
   fetchOpenApiDocument,
   fetchOpenApiDocumentWithOptions,
+  fetchOfficialOpenApiDocument,
   filterOpenApiOperations,
   getOpenApiStats,
   matchOperationsForCommandIntent,
@@ -278,6 +279,47 @@ describe('openapi utils', () => {
 
     await expect(fetchOpenApiDocument(CONFIG)).rejects.toThrow(
       'Invalid or version-mismatched OpenAPI payload',
+    );
+  });
+
+  it('fetches explicitly opted-in preview artifacts without forwarding auth', async () => {
+    fallbackConfigDir = mkdtempSync(join(tmpdir(), 'jf-openapi-preview-'));
+    process.env.JELLYFIN_CONFIG_DIR = fallbackConfigDir;
+    const previewDocument = {
+      info: { version: '12.0.0' },
+      paths: { '/System/Ping': { get: { tags: ['System'] } } },
+    };
+    const fetchMock = vi.fn().mockResolvedValueOnce(Response.json(previewDocument));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    const result = await fetchOfficialOpenApiDocument(CONFIG, '12.0-rc3', {
+      allowPrerelease: true,
+    });
+
+    expect(result.sourceKind).toBe('official');
+    expect(result.document).toEqual(previewDocument);
+    expect(fetchMock.mock.calls[0]?.[0]).toBe(
+      'https://repo.jellyfin.org/files/openapi/stable/jellyfin-openapi-12.0-rc3.json',
+    );
+    expect(fetchMock.mock.calls[0]?.[1]?.headers).toBeUndefined();
+  });
+
+  it('rejects unavailable and version-mismatched official artifacts', async () => {
+    fallbackConfigDir = mkdtempSync(join(tmpdir(), 'jf-openapi-official-errors-'));
+    process.env.JELLYFIN_CONFIG_DIR = fallbackConfigDir;
+    const fetchMock = vi.fn()
+      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+      .mockResolvedValueOnce(Response.json({
+        info: { version: '10.10.0' },
+        paths: { '/Wrong': { get: {} } },
+      }));
+    globalThis.fetch = fetchMock as unknown as typeof fetch;
+
+    await expect(fetchOfficialOpenApiDocument(CONFIG, '10.11.11')).rejects.toThrow(
+      'Official OpenAPI artifact unavailable for 10.11.11: HTTP 404',
+    );
+    await expect(fetchOfficialOpenApiDocument(CONFIG, '10.11.11')).rejects.toThrow(
+      'Official OpenAPI artifact has an invalid API version for 10.11.11',
     );
   });
 
