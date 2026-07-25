@@ -1,0 +1,126 @@
+id: jf-axko
+title: Add version-aware Jellyfin API compatibility manifests
+description: "Add a read-only agent-first compatibility surface that compares the configured live OpenAPI contract with trusted official stable or explicitly opted-in preview schemas, classifies operation and component-schema drift, emits schema-validated structured formats, and supports CI breaking-change gates without exposing private server data."
+type: Plan
+status: in_progress
+priority: 0
+tags[7]: agents,api,compatibility,openapi,read-only,release,schema
+created_at: "2026-07-25T00:14:27.009Z"
+updated_at: "2026-07-25T01:13:22.169Z"
+assignee: codex-jellyfin-compat
+author: codex-jellyfin-compat
+estimated_minutes: 600
+acceptance_criteria: Default comparison uses the configured live document and its exact official stable version without forwarding credentials; Explicit version comparison supports Jellyfin 12 prerelease only with an opt-in flag and validates official source identity; Operation additions removals identifier changes parameter requiredness body and response drift plus component schema drift are deterministically classified; TOON JSON YAML Markdown table and raw formats are schema-valid and documented with detailed nested help; A fail-on-breaking CI mode returns nonzero only after emitting a complete machine-readable report; Unit integration installed-package and private compiled live read-only acceptance pass with no secrets or live mutations
+goal: jf-mqpo
+value: Let agents and maintainers reason about upgrades and server-specific API drift before invoking operations.
+impact: Prevents silent API incompatibility across Jellyfin stable upgrades previews and plugin-extended local servers.
+outcome: A deterministic privacy-safe compatibility manifest and CI gate for current and future Jellyfin API contracts.
+why_now: The exact-operation fallback provides reach but agents still lack evidence about version drift and breaking contract changes; Jellyfin 12 RC3 makes this gap immediate.
+parent: jf-gn5j
+reviewer: github-review-bots
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11-to-12
+release: next-manual-release
+dependencies[8]{id,kind,created_at,author,source_kind}:
+  jf-0ea5,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-644n,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-gn5j,parent,"2026-07-25T00:14:27.009Z",null,null
+  jf-lpki,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-mkzh,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-rjox,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-sylm,related,"2026-07-25T00:14:27.009Z",null,null
+  jf-tike,related,"2026-07-25T00:14:27.009Z",null,null
+comments[8]{created_at,author,text}:
+  "2026-07-25T00:14:27.009Z",codex-jellyfin-compat,Search across all 41 PM items found the related exact-operation and fallback lineage but no version-aware compatibility manifest item. This plan is the sole active in-progress item; the broader coverage and static-quality features remain open and unclaimed.
+  "2026-07-25T00:36:29.159Z",codex-jellyfin-compat,The first full release run passed 939 Bun tests but correctly failed on a Vitest unhandled EADDRINUSE after all 930 assertions. Root cause was random fixed-port selection in the Node Bun.serve compatibility adapter; parallel workers could choose the same port. Replaced it with deterministic per-process allocation and restarted the entire release gate.
+  "2026-07-25T00:39:20.737Z",codex-jellyfin-compat,"The second complete release run confirmed the port-collision fix, then failed because one new test serialized four CLI subprocess format checks and exceeded Vitest's 5-second default under full-suite load. Parallelized the independent checks and assigned a bounded 15-second test timeout; three consecutive focused portable runs passed. Restarting the entire release gate again."
+  "2026-07-25T00:42:10.875Z",codex-jellyfin-compat,"Full release validator passed after deterministic test-server port isolation and bounded parallel formatter checks: 939 Bun tests passed (180 read-only live tests intentionally skipped in offline validator), 930 Vitest tests passed, 9 release tests passed, build/package-installed npm exec/Bun smoke/file-length/secret scans/changelog check all passed. Separate four-metric coverage remains an honest repository baseline of 39.44% statements, 39.52% branches, 50.77% functions, and 39.05% lines; canonical coverage work remains jf-mkzh. Strict zero-duplication gate also remains open at 8.62% lines / 8.49% tokens (219 clones); canonical deduplication work remains jf-lpki. This plan does not weaken, exclude, or misreport either gate."
+  "2026-07-25T00:52:09.376Z",codex-jellyfin-compat,PM-linked acceptance added realistic full-suite load and exposed the first compatibility test still using Vitest's 5-second default while running three actual CLI subprocesses. The same PM run proved focused 34/34 and compiled private live read-only 180/180. Set the behavior-focused test's explicit bound to 15 seconds without changing assertions or production behavior; three consecutive portable focused runs now pass. Re-running all linked PM tests for a clean tracker-native record.
+  "2026-07-25T01:00:00.578Z",codex-jellyfin-compat,"The second PM-linked run correctly categorized a different existing schema-suite failure as an infrastructure collision. Root cause: PID-derived fixed-port ranges were not globally collision-free. The portable Bun.serve adapter now asks the OS for a real ephemeral port and reads the immediately bound wildcard TCP address before returning; this preserves the synchronous Bun.serve test contract and removes guessed ports. Three consecutive complete portable runs pass 930/930. Re-running tracker-native acceptance."
+  "2026-07-25T01:05:57.561Z",codex-jellyfin-compat,"Third tracker-native run passed all 930 portable assertions, build, packaging, security, and smoke stages, then hit the already-reported pm-cli tracker-sandbox changelog identity defect unbraind/pm-cli#682; the same changelog check passes directly with exact 37-item parity. Its subsequent focused run exposed one remaining default 5-second bound under tracker load, so every compatibility test that spawns the actual CLI now has the same explicit 15-second upper bound. Live compiled acceptance again passed 180/180. No duplicate pm-cli issue created because #682 is canonical."
+  "2026-07-25T01:13:22.169Z",codex-jellyfin-compat,"Final semantic review expanded drift detection to inline request content and response schemas plus non-breaking requiredness relaxations, and moved the fully constrained compatibility output contract into a dedicated under-300-LOC schema module. Focused Bun/Vitest pass 9/9, full release passes 940 Bun + 931 Vitest + 9 release tests, and the rebuilt actual CLI re-passed the live exact-stable compatibility acceptance under read-only mode."
+notes[1]{created_at,author,text}:
+  "2026-07-25T00:14:27.009Z",codex-jellyfin-compat,"Privacy boundary: credentials, local URLs, raw live schemas, entity data, and cache paths remain only under owner-only ~/.jellyfin-cli. PM, git, PR, and docs may contain official versions, contract categories, and aggregate counts only."
+learnings[1]{created_at,author,text}:
+  "2026-07-25T00:14:27.009Z",codex-jellyfin-compat,Official Jellyfin 12.0 RC3 is intentionally stored in the stable OpenAPI artifact directory but reports info.version 12.0.0; source artifact identity and document API version must therefore be represented separately.
+files[12]{path,scope,note}:
+  src/commands/schema-compatibility-def.ts,project,Strict compatibility output JSON Schema
+  src/commands/schema-compatibility.ts,project,Agent and CI compatibility command
+  src/commands/schema-defs.ts,project,Compatibility output schema
+  src/commands/schema.ts,project,Schema command registration
+  src/utils/openapi-compatibility.ts,project,Deterministic operation and schema compatibility analysis
+  src/utils/openapi-source.ts,project,Trusted stable and preview artifact acquisition
+  src/utils/openapi.ts,project,Official source API export
+  tests/commands/schema-compatibility.test.ts,project,Command format schema and agent contract tests
+  tests/e2e/cli.test.ts,project,Compiled live read-only acceptance
+  tests/setup/node-bun-compat.ts,project,Collision-free portable server allocation
+  tests/utils/openapi-compatibility.test.ts,project,Compatibility classifier tests
+  tests/utils/openapi.test.ts,project,Trusted official source tests
+tests[3]{command,path,scope,timeout_seconds,pm_context_mode}:
+  "bun run validate:release",package.json,project,1800,tracker
+  bun test tests/utils/openapi.test.ts tests/utils/openapi-compatibility.test.ts tests/commands/schema-compatibility.test.ts,package.json,project,300,tracker
+  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker
+docs[6]{path,scope,note}:
+  docs/agent-integration.md,project,Agent upgrade and drift workflow
+  docs/api-research.md,project,Sanitized stable and preview evidence
+  docs/api.md,project,Complete command reference
+  docs/README.md,project,Command index and examples
+  docs/release-readiness.md,project,Read-only release acceptance
+  README.md,project,User-facing compatibility workflow
+plan_mode: executing
+plan_scope: "Official/live OpenAPI acquisition, normalized compatibility manifests, breaking-risk classification, command help and schemas, documentation, tests, private live stable/preview acceptance, and production PR closeout."
+plan_harness: codex
+plan_resume_context: "Stable Jellyfin is 10.11.11 and the local owner-only server matches it; 12.0 RC3 is prerelease. Exact operation execution shipped in jf-0ea5. Add a non-duplicative schema compatibility command with stable defaults, explicit prerelease opt-in, no auth forwarding to official origins, and honest breaking-risk classification."
+plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "2026-07-25T00:30:06.312Z",codex-jellyfin-compat,Use official current-version baseline by default and require --baseline live for plugin drift.,This prevents installed plugin endpoints from being mislabeled as core removals in a Jellyfin upgrade report while retaining a deliberate server-extension audit.,Sanitized live-to-official 10.11.11 comparison reported 41 operation and 21 schema removals that disappear from the core 10.11.11-to-12.0 RC3 baseline.
+plan_discoveries[1]{ts,author,text}:
+  "2026-07-25T00:30:04.571Z",codex-jellyfin-compat,The live 10.11.11 schema includes 41 operations and 21 component schemas beyond the official core artifact because installed plugins extend the contract. Upgrade analysis must default to official-to-official comparison while live drift remains an explicit mode.
+plan_steps[6]:
+  - id: plan-step-001
+    order: 1
+    title: Record latest official stable preview and sanitized live contract evidence
+    status: completed
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:14:50.353Z"
+    evidence: Official primary sources confirm 10.11.11 as latest stable and 12.0 RC3 as prerelease; owner-only official artifacts contain 315 paths/388 operations for 10.11.11 and 294 paths/364 operations for RC3 (document API version 12.0.0). Private live research was refreshed under ~/.jellyfin-cli with enforced read-only mode; no raw contract or private server detail entered PM or git.
+    completed_at: "2026-07-25T00:14:50.353Z"
+  - id: plan-step-002
+    order: 2
+    title: Implement trusted OpenAPI source loading and deterministic compatibility analysis
+    status: completed
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:30:07.976Z"
+    evidence: Implemented authenticated same-origin live discovery plus credential-free exact official artifact loading with owner-only caching; prerelease artifacts require opt-in and validate filename identity separately from info.version. Added deterministic operation parameter body response and component-schema classification with stable ordering and complete aggregate counts.
+    completed_at: "2026-07-25T00:30:07.976Z"
+  - id: plan-step-003
+    order: 3
+    title: Integrate command help output schemas agent contracts and documentation
+    status: completed
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:30:10.952Z"
+    evidence: Registered jf schema compatibility and diff alias with detailed help stable official baseline explicit live drift preview opt-in output limits and fail-after-output CI gating. Added openapi_compatibility schema read-only agent tool contract and updated README docs index agent guide API reference research and release-readiness guidance.
+    completed_at: "2026-07-25T00:30:10.952Z"
+  - id: plan-step-004
+    order: 4
+    title: Add behavior-focused unit integration format and live read-only acceptance tests
+    status: completed
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:33:14.971Z"
+    evidence: Focused source and command suites pass 34/34 tests covering stable and preview acquisition no-auth forwarding all classifier categories deterministic ordering unsafe version rejection CI exit semantics schema-valid TOON and JSON plus YAML raw Markdown table and agent tool contracts. The rebuilt actual CLI passed the complete private live suite 180/180 under JELLYFIN_READ_ONLY=1 including exact stable compatibility; no live mutation ran.
+    completed_at: "2026-07-25T00:33:14.971Z"
+  - id: plan-step-005
+    order: 5
+    title: Run strict release coverage duplication security and PM gates
+    status: completed
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:46:18.839Z"
+    evidence: "Complete release validator passed after dependency refresh: 939 Bun, 930 portable Vitest, 9 release tests, build, package-installed npm exec, Bun smoke, file-length, secret history, and changelog checks. Bun/npm production audits and Trivy are clean after ESLint 10.8.0, eslint-plugin-jsdoc 63.2.2, and brace-expansion 5.0.8 override; ShellCheck has no shell inputs and PowerShell is absent. PM validate/health/graph/dedupe are clean. Honest unmet repository-wide gates remain 39.44/39.52/50.77/39.05 coverage and 8.62% duplicated lines, tracked by open canonical jf-mkzh and jf-lpki without weakening thresholds."
+    completed_at: "2026-07-25T00:46:18.839Z"
+  - id: plan-step-006
+    order: 6
+    title: Publish PR process every bot finding merge and close PM lineage
+    status: in_progress
+    created_at: "2026-07-25T00:14:27.090Z"
+    updated_at: "2026-07-25T00:46:24.327Z"
+body: ""

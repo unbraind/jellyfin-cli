@@ -201,6 +201,7 @@ jf system info --format raw
 - `jf schema tools` - Export command tool schemas for LLM function-calling, with optional live OpenAPI endpoint matches
 - `jf schema coverage` - Estimate API coverage, list unmatched OpenAPI operations, and suggest command names
 - `jf schema suggest` - Generate candidate CLI command patterns from OpenAPI intent matches or coverage gaps
+- `jf schema compatibility` - Compare exact official API versions or audit live/plugin drift
 - `jf api inspect <operationId>` - Inspect one exact OpenAPI operation and its declared inputs
 - `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
 - `jf api mutate <operationId> --confirm` - Execute a validated mutation (blocked by `--read-only`)
@@ -578,6 +579,13 @@ Mutating operations are blocked with a structured Toon error while read operatio
 - `jf schema tools [--command <prefix> --limit <n> --openapi-match --name <server>]` - Export tool schemas with input schema, read-only metadata, and optional live OpenAPI endpoint matches per command
 - `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--require-coverage 100] [--suggest-commands] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set and optionally generate candidate CLI names for unmapped endpoints
 - `jf schema suggest [--for-command "users list"] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--min-score 3] [--limit 20]` - Generate structured CLI command suggestions from live OpenAPI (intent mode with `--for-command`, or uncovered operation mode without it)
+- `jf schema compatibility [--baseline official|live] [--target-version 12.0-rc3 --allow-prerelease] [--fail-on-breaking] [--limit 50]` - Classify deterministic operation, parameter, body, response, and component-schema drift between trusted API contracts
+
+Official-to-official comparison is the default, using the configured server's API version as the
+baseline and target. This avoids misclassifying plugin endpoints as core Jellyfin removals. Use
+`--baseline live` to audit server/plugin drift explicitly. Alpha, beta, and RC artifacts require
+`--allow-prerelease`; their artifact identity is reported separately from the document API version.
+`--fail-on-breaking` emits the complete structured report before returning a nonzero status.
 
 ### Exact OpenAPI Operations
 

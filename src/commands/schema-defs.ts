@@ -1,3 +1,5 @@
+import { OPENAPI_COMPATIBILITY_SCHEMA } from './schema-compatibility-def.js';
+
 export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   message: {
     type: 'object',
@@ -224,6 +226,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
+  openapi_compatibility: OPENAPI_COMPATIBILITY_SCHEMA,
 };
 
 const DEFINITIONS = {

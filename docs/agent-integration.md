@@ -186,6 +186,28 @@ Intent coverage is a naming/mapping diagnostic. It does not prove that every ope
 executable, semantically complete command. For implementation decisions, inspect operation IDs,
 request/response schemas, command behavior, tests, and read-only live evidence together.
 
+## Version Compatibility
+
+Before an upgrade, compare the configured server's official core version with the candidate:
+
+```bash
+jf schema compatibility \
+  --target-version 12.0-rc3 \
+  --allow-prerelease \
+  --fail-on-breaking \
+  --format toon
+```
+
+The default baseline is the exact official artifact matching the live server's declared API version.
+This keeps plugin-provided operations out of core upgrade findings. Use `--baseline live` only when
+you intentionally want a server/plugin drift audit.
+
+The report separates artifact identity (for example, `12.0-rc3`) from the OpenAPI document version
+(`12.0.0`) and classifies removed operations, operation ID changes, parameter requiredness and
+schema changes, request content types, response statuses, and component schemas. Prerelease
+artifacts require explicit opt-in. Official downloads never receive server credentials, and cached
+documents stay under `~/.jellyfin-cli/cache/openapi`.
+
 ## Exact Operation Execution
 
 Use typed commands first. When an endpoint has no ergonomic typed surface—or an agent needs a

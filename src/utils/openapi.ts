@@ -9,9 +9,11 @@ import {
 export {
   fetchOpenApiDocument,
   fetchOpenApiDocumentWithOptions,
+  fetchOfficialOpenApiDocument,
   type OpenApiDocument,
   type OpenApiFetchOptions,
   type OpenApiProbeResult,
+  type OfficialOpenApiFetchOptions,
 } from './openapi-source.js';
 
 const HTTP_METHODS = new Set(['get', 'post', 'put', 'patch', 'delete', 'head', 'options', 'trace']);
