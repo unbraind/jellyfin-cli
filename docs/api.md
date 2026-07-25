@@ -3208,8 +3208,8 @@ jf api batch (--file <manifest.json> | --stdin) \
 
 The manifest must contain `version: 1` and a non-empty `requests` array. Each request requires a
 unique caller `id` and an exact `operation_id`; optional `path_params` and `query` objects use
-OpenAPI-declared names. All requests are resolved and validated before execution, and any
-`POST`/`PUT`/`PATCH`/`DELETE` operation rejects the entire manifest before an API request is made.
+OpenAPI-declared names. All requests are resolved and validated before execution, and any method
+other than `GET`, `HEAD`, or `OPTIONS` rejects the entire manifest before an API request is made.
 
 `--dry-run` returns output type `api_batch_plan`. Execution returns `api_batch_response` with
 ordered results, per-request status or structured error, byte counts, and aggregate success/failure

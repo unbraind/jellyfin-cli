@@ -23,6 +23,12 @@ export type PreparedApiBatchRequest = {
 
 type JsonObject = Record<string, unknown>;
 
+/**
+ * Narrows a decoded JSON value to a non-array object.
+ * @param value - Candidate decoded JSON value.
+ * @param label - Human-readable location for validation errors.
+ * @returns The validated JSON object.
+ */
 function objectValue(value: unknown, label: string): JsonObject {
   if (typeof value !== 'object' || value === null || Array.isArray(value)) {
     throw new Error(`${label} must be a JSON object`);
@@ -30,6 +36,12 @@ function objectValue(value: unknown, label: string): JsonObject {
   return value as JsonObject;
 }
 
+/**
+ * Rejects fields outside a strict manifest contract.
+ * @param value - Object whose keys are inspected.
+ * @param allowed - Exact supported field names.
+ * @param label - Human-readable location for validation errors.
+ */
 function rejectUnknownKeys(value: JsonObject, allowed: string[], label: string): void {
   const unknown = Object.keys(value).filter((key) => !allowed.includes(key));
   if (unknown.length > 0) {
@@ -37,6 +49,12 @@ function rejectUnknownKeys(value: JsonObject, allowed: string[], label: string):
   }
 }
 
+/**
+ * Validates a JSON object whose values must all be strings.
+ * @param value - Optional decoded map value.
+ * @param label - Human-readable location for validation errors.
+ * @returns A normalized string map.
+ */
 function stringMap(value: unknown, label: string): Record<string, string> {
   if (value === undefined) {
     return {};
@@ -52,6 +70,12 @@ function stringMap(value: unknown, label: string): Record<string, string> {
   return result;
 }
 
+/**
+ * Validates query values as strings or repeated string values.
+ * @param value - Optional decoded query map.
+ * @param label - Human-readable location for validation errors.
+ * @returns A normalized query map.
+ */
 function queryMap(value: unknown, label: string): Record<string, string | string[]> {
   if (value === undefined) {
     return {};

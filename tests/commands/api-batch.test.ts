@@ -78,8 +78,6 @@ afterEach(() => {
 describe('api batch command', () => {
   it('preflights every request without executing operations', async () => {
     const result = await runCli([
-      '--format',
-      'json',
       'api',
       'batch',
       '--file',
@@ -88,13 +86,18 @@ describe('api batch command', () => {
     ]);
     expect(result.code).toBe(0);
     expect(operationRequests).toBe(0);
-    expect(JSON.parse(result.stdout)).toMatchObject({
-      dry_run: true,
-      request_count: 2,
-      requests: [
-        { id: 'user', operation_id: 'GetUserById', method: 'GET' },
-        { id: 'binary', operation_id: 'GetBinary', method: 'GET' },
-      ],
+    const envelope = decode(result.stdout);
+    expect(validateJsonSchema(envelope, getSchema('api_batch_plan')).errors).toEqual([]);
+    expect(envelope).toMatchObject({
+      type: 'api_batch_plan',
+      data: {
+        dry_run: true,
+        request_count: 2,
+        requests: [
+          { id: 'user', operation_id: 'GetUserById', method: 'GET' },
+          { id: 'binary', operation_id: 'GetBinary', method: 'GET' },
+        ],
+      },
     });
   });
 

@@ -6,11 +6,11 @@ status: in_progress
 priority: 0
 tags[8]: agents,api,batch,contracts,openapi,read-only,release,tool-schema
 created_at: "2026-07-25T22:29:31.042Z"
-updated_at: "2026-07-25T23:03:05.543Z"
+updated_at: "2026-07-25T23:25:15.264Z"
 assignee: codex-jellyfin-batch
 author: codex-jellyfin-batch
 estimated_minutes: 720
-acceptance_criteria: JSON manifests from a file or stdin preflight every request before target-operation execution and reject all non-read-only operations; Batch size per-response size and aggregate response size are strictly bounded and deterministic ordered results preserve caller request identifiers; Dry-run emits resolved OpenAPI contracts without executing target operations; schema discovery remains a read-only contract fetch; TOON JSON YAML Markdown table and raw outputs plus function-calling schemas describe and validate the batch interface; Full release validation PM integrity private-data scans packaged consumer proof exact-head CI and terminal review inventory pass without publishing
+acceptance_criteria: JSON manifests from a file or stdin preflight every request before target-operation execution and reject all non-read-only operations; Request count per-response size and aggregate response size are strictly bounded and deterministic ordered results preserve caller request identifiers; Dry-run emits resolved OpenAPI contracts without executing target operations; schema discovery remains a read-only contract fetch; TOON JSON YAML Markdown table and raw outputs plus function-calling schemas describe and validate the batch interface; Full release validation PM integrity private-data scans packaged consumer proof exact-head CI and terminal review inventory pass without publishing
 definition_of_ready: Latest official Jellyfin release and OpenAPI sources verified; all-status PM duplicate search complete; private config permissions verified; existing exact-operation contracts understood.
 goal: jf-mqpo
 value: Let agents gather related Jellyfin facts safely in one deterministic invocation.
@@ -38,10 +38,11 @@ dependencies[14]{id,kind,created_at,author,source_kind}:
   jf-0ea5,implements,"2026-07-25T22:36:35.890Z",codex-jellyfin-batch,null
   jf-axko,blocked_by,"2026-07-25T22:36:37.083Z",codex-jellyfin-batch,null
   jf-sylm,verifies,"2026-07-25T22:36:38.236Z",codex-jellyfin-batch,null
-comments[3]{created_at,author,text}:
+comments[4]{created_at,author,text}:
   "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"All 42 PM items, their statuses and rich recent lineage, project graph, latest official Jellyfin 10.11.11 release, live sanitized 429-operation schema, configured profile permissions, and current GitHub head were reviewed. No duplicate batch-execution item exists."
   "2026-07-25T22:48:55.403Z",codex-jellyfin-batch,"Implementation validation so far: 14 focused Bun tests and 20 focused portable tests pass; compiled live batch returned 2/2 ordered successes; isolated npm-installed jf-cli resolved from an unrelated prefix and passed dry-run plus live batch. Full release validation, audits, and Trivy are green. Honest repository baselines are 39.84 statements, 40.13 branches, 51.10 functions, 39.45 lines and 8.44 percent duplicated lines, so canonical P0 items jf-mkzh and jf-lpki remain open and are not represented as complete."
   "2026-07-25T22:55:33.015Z",codex-jellyfin-batch,"PM linked-test result: focused and live commands passed (14/14 and 181/181). validate:release reached the final changelog check after all tests/build/package/security smokes, then reproduced known core pm-cli issue #682 because the tracker sandbox has 43/43 items but lacks source Git tag identity. Direct source-workspace validation is being rerun; no duplicate upstream issue will be filed."
+  "2026-07-25T23:25:15.264Z",codex-jellyfin-batch,"CodeRabbit exact-head review produced five valid findings. Accepted all: clarify PM request-count bound, document the complete GET/HEAD/OPTIONS allowlist, name input-selection booleans, parse manifests before OpenAPI I/O, and validate dry-run output against api_batch_plan. Added docstrings to all new source helpers while applying the fixes."
 notes[1]{created_at,author,text}:
   "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"Privacy boundary: credentials, server address, entity IDs, raw live responses, and cached OpenAPI documents remain only in environment variables and owner-only ~/.jellyfin-cli. PM, git, CI, PRs, and summaries may contain only public versions, aggregate counts, and synthetic fixtures."
 learnings[2]{created_at,author,text}:

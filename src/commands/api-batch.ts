@@ -25,8 +25,15 @@ type ApiBatchOptions = FormatOptions & {
   maxTotalBytes?: string | undefined;
 };
 
+/**
+ * Reads and decodes exactly one bounded manifest input.
+ * @param options - Batch command options naming a file or standard input.
+ * @returns The decoded JSON value for strict manifest validation.
+ */
 function readManifest(options: ApiBatchOptions): unknown {
-  if ((options.file === undefined) === (options.stdin !== true)) {
+  const fileProvided = options.file !== undefined;
+  const stdinProvided = options.stdin === true;
+  if (fileProvided === stdinProvided) {
     throw new Error('Use exactly one of --file or --stdin');
   }
   if (options.file !== undefined && statSync(options.file).size > MAX_MANIFEST_BYTES) {
@@ -43,6 +50,11 @@ function readManifest(options: ApiBatchOptions): unknown {
   }
 }
 
+/**
+ * Projects a prepared operation into its public dry-run contract.
+ * @param entry - Fully validated batch request.
+ * @returns A serializable preflight entry without credentials.
+ */
 function preflightEntry(entry: PreparedApiBatchRequest): Record<string, unknown> {
   return {
     id: entry.id,
@@ -92,6 +104,7 @@ export function attachApiBatchSubcommand(cmd: Command): void {
           'Maximum total response bytes',
           format,
         );
+        const requests = parseApiBatchManifest(readManifest(options), maxOperations);
         const config = getConfig(options.server);
         if (!config.serverUrl) {
           throw new Error('No server URL configured. Use: jf config set --server <url>');
@@ -99,10 +112,7 @@ export function attachApiBatchSubcommand(cmd: Command): void {
         const source = await fetchOpenApiDocumentWithOptions(config, {
           endpointPath: options.endpoint,
         });
-        const prepared = prepareApiBatch(
-          source.document,
-          parseApiBatchManifest(readManifest(options), maxOperations),
-        );
+        const prepared = prepareApiBatch(source.document, requests);
         const preflight = prepared.map(preflightEntry);
         if (options.dryRun) {
           output({
