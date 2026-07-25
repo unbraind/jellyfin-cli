@@ -121,13 +121,6 @@ export class ApiClientBase {
       true,
     );
     const contentType = response.headers.get('content-type');
-    const declaredLength = Number(response.headers.get('content-length'));
-    if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
-      throw new JellyfinApiError(
-        `API response exceeds --max-bytes (${declaredLength} > ${maxResponseBytes})`,
-        response.status,
-      );
-    }
     if (method === 'HEAD' || response.status === 204) {
       return {
         status: response.status,
@@ -136,6 +129,13 @@ export class ApiClientBase {
         byteLength: 0,
         data: null,
       };
+    }
+    const declaredLength = Number(response.headers.get('content-length'));
+    if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
+      throw new JellyfinApiError(
+        `API response exceeds --max-bytes (${declaredLength} > ${maxResponseBytes})`,
+        response.status,
+      );
     }
 
     const chunks: Uint8Array[] = [];

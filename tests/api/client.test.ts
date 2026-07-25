@@ -137,6 +137,29 @@ describe('JellyfinApiClient', () => {
     });
   });
 
+  describe('executeOperation', () => {
+    it('ignores declared representation length for bodyless HEAD responses', async () => {
+      mockFetch.mockResolvedValueOnce(new Response(null, {
+        status: 200,
+        headers: { 'content-length': '4096' },
+      }));
+
+      await expect(client.executeOperation(
+        'HEAD',
+        '/Large',
+        {},
+        undefined,
+        undefined,
+        1,
+      )).resolves.toMatchObject({
+        status: 200,
+        encoding: 'empty',
+        byteLength: 0,
+        data: null,
+      });
+    });
+  });
+
   describe('getPublicSystemInfo', () => {
     it('should fetch public system info', async () => {
       const mockInfo = { ServerName: 'Test Server', Version: '10.8.0' };
