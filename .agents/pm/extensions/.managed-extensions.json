@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-07-26T00:18:54.058Z",
+  "updated_at": "2026-07-26T05:46:53.842Z",
   "entries": [
     {
       "name": "builtin-governance-audit",
@@ -38,10 +38,10 @@
         "schema"
       ],
       "installed_at": "2026-07-21T17:01:47.160Z",
-      "updated_at": "2026-07-26T00:18:54.023Z",
+      "updated_at": "2026-07-26T05:46:53.828Z",
       "source": {
         "kind": "npm",
-        "input": "npm:pm-changelog@2026.7.25",
+        "input": "npm:pm-changelog",
         "location": "package",
         "package": "pm-changelog",
         "version": "2026.7.25"
