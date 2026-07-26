@@ -641,7 +641,7 @@ Batch manifests are strict JSON objects with `version: 1` and a non-empty `reque
 }
 ```
 
-Every request is resolved and validated before the first network operation. Batch execution accepts
+Every request is resolved and validated before the first target-operation request. Batch execution accepts
 only `GET`, `HEAD`, and `OPTIONS`, preserves manifest order and caller IDs, reuses one authenticated
 client, returns structured per-request failures, and exits nonzero if any request fails. Use
 `--stdin` for pipelines; exactly one of `--file` or `--stdin` is required. Manifests are limited to

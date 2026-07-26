@@ -134,6 +134,9 @@ describe('api batch command', () => {
       ['--format', 'markdown', 'api', 'batch', '--stdin'],
       manifest,
     );
+    for (const run of [json, yaml, raw, table, markdown]) {
+      expect(run.code).toBe(0);
+    }
     expect(() => JSON.parse(json.stdout)).not.toThrow();
     expect(() => YAML.parse(yaml.stdout)).not.toThrow();
     expect(() => JSON.parse(raw.stdout)).not.toThrow();

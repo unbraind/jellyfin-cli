@@ -6,8 +6,8 @@ status: closed
 priority: 0
 tags[8]: agents,api,batch,contracts,openapi,read-only,release,tool-schema
 created_at: "2026-07-25T22:29:31.042Z"
-updated_at: "2026-07-25T23:31:46.115Z"
-closed_at: "2026-07-25T23:31:06.010Z"
+updated_at: "2026-07-26T00:19:46.403Z"
+closed_at: "2026-07-26T00:19:45.774Z"
 author: codex-jellyfin-batch
 estimated_minutes: 720
 acceptance_criteria: JSON manifests from a file or stdin preflight every request before target-operation execution and reject all non-read-only operations; Request count per-response size and aggregate response size are strictly bounded and deterministic ordered results preserve caller request identifiers; Dry-run emits resolved OpenAPI contracts without executing target operations; schema discovery remains a read-only contract fetch; TOON JSON YAML Markdown table and raw outputs plus function-calling schemas describe and validate the batch interface; Full release validation PM integrity private-data scans packaged consumer proof exact-head CI and terminal review inventory pass without publishing
@@ -40,7 +40,7 @@ dependencies[13]{id,kind,created_at,author,source_kind}:
   jf-tike,related,"2026-07-25T22:29:31.042Z",null,null
   jf-0ea5,implements,"2026-07-25T22:36:35.890Z",codex-jellyfin-batch,null
   jf-sylm,verifies,"2026-07-25T22:36:38.236Z",codex-jellyfin-batch,null
-comments[7]{created_at,author,text}:
+comments[9]{created_at,author,text}:
   "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"All 42 PM items, their statuses and rich recent lineage, project graph, latest official Jellyfin 10.11.11 release, live sanitized 429-operation schema, configured profile permissions, and current GitHub head were reviewed. No duplicate batch-execution item exists."
   "2026-07-25T22:48:55.403Z",codex-jellyfin-batch,"Implementation validation so far: 14 focused Bun tests and 20 focused portable tests pass; compiled live batch returned 2/2 ordered successes; isolated npm-installed jf-cli resolved from an unrelated prefix and passed dry-run plus live batch. Full release validation, audits, and Trivy are green. Honest repository baselines are 39.84 statements, 40.13 branches, 51.10 functions, 39.45 lines and 8.44 percent duplicated lines, so canonical P0 items jf-mkzh and jf-lpki remain open and are not represented as complete."
   "2026-07-25T22:55:33.015Z",codex-jellyfin-batch,"PM linked-test result: focused and live commands passed (14/14 and 181/181). validate:release reached the final changelog check after all tests/build/package/security smokes, then reproduced known core pm-cli issue #682 because the tracker sandbox has 43/43 items but lacks source Git tag identity. Direct source-workspace validation is being rerun; no duplicate upstream issue will be filed."
@@ -48,6 +48,8 @@ comments[7]{created_at,author,text}:
   "2026-07-25T23:28:32.348Z",codex-jellyfin-batch,"The CodeRabbit review summary contained a sixth actionable finding outside the diff: HEAD and 204 responses must short-circuit before declared content-length enforcement. Accepted it, moved the guard below the bodyless-response return, and added a regression test for a large declared HEAD representation with a one-byte response budget."
   "2026-07-25T23:31:05.264Z",codex-jellyfin-batch,"PR #40: https://github.com/unbraind/jellyfin-cli/pull/40 . Exact reviewed head before tracker closeout: 2431439f08514ba7678f9d5822ce3c9f10ad4d1a. Final tracker/changelog commit will retrigger required checks and bot inventory before merge."
   "2026-07-25T23:31:46.114Z",codex-jellyfin-batch,"Closeout generation exposed package.json pinning changelog PM execution to 2026.7.24-3. Updated the deterministic npm-exec pin to current 2026.7.25, matching the installed global CLI and managed pm-changelog package."
+  "2026-07-26T00:18:52.537Z",codex-jellyfin-batch,"Final exact-head CodeRabbit review reported five actionable hardening findings: exact managed-extension provenance pin, precise target-operation preflight wording, shared numeric defaults, successful exit-code assertions across formatter tests, and portable stdin EPIPE handling. All are accepted for implementation before merge."
+  "2026-07-26T00:19:45.103Z",codex-jellyfin-batch,"Implemented all five final-review findings. pm install npm:pm-changelog@2026.7.25 replaced replayable latest provenance through the managed extension lifecycle; README now distinguishes schema-fetch I/O from target-operation preflight; batch defaults share named constants; the formatter matrix asserts all exit codes; and the Node portable stdin adapter consumes expected early-exit stream errors. Focused Bun and portable suites pass 14/14 each."
 notes[1]{created_at,author,text}:
   "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"Privacy boundary: credentials, server address, entity IDs, raw live responses, and cached OpenAPI documents remain only in environment variables and owner-only ~/.jellyfin-cli. PM, git, CI, PRs, and summaries may contain only public versions, aggregate counts, and synthetic fixtures."
 learnings[2]{created_at,author,text}:
@@ -79,7 +81,7 @@ docs[6]{path,scope,note}:
   docs/README.md,project,Documentation quickstart
   docs/release-readiness.md,project,Live read-only acceptance gate
   README.md,project,User-facing batch quickstart and manifest contract
-close_reason: "Delivered bounded read-only Jellyfin API batches with strict whole-manifest preflight, deterministic execution, request and byte budgets, TOON-first schemas and all output formats, latest official 10.11.11 compatibility, private compiled live and installed-consumer proof, complete docs, release dry-run, clean PM graph, and fully dispositioned PR #40 review findings. No package was published. Repository-wide 100% coverage/docstring/duplication debt remains honestly open in canonical P0 items jf-mkzh and jf-lpki."
+close_reason: "Final review hardening implemented and focused tests passed; proceed to regenerated changelog, full release validation, exact-head review, and merge."
 plan_mode: completed
 plan_scope: "Read-only API batch manifests, dry-run preflight, request and response budgets, tool/output schemas, help, documentation, meaningful tests, private live acceptance, release validation, and PR review closeout."
 plan_harness: codex

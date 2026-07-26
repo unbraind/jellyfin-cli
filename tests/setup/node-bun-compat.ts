@@ -93,6 +93,9 @@ if (typeof globalThis.Bun === 'undefined') {
       });
       if (!child.stdout || !child.stderr) throw new Error('Failed to create child pipes');
       if (options.stdin && child.stdin) {
+        child.stdin.on('error', () => {
+          // The child may exit before draining stdin after an intentional validation failure.
+        });
         void options.stdin.arrayBuffer().then((buffer) => {
           child.stdin?.end(Buffer.from(buffer));
         }, (error: unknown) => {

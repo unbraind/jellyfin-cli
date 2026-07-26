@@ -13,6 +13,9 @@ import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from '.
 
 const MAX_MANIFEST_BYTES = 1_048_576;
 const MAX_BATCH_OPERATIONS = 100;
+const DEFAULT_MAX_OPERATIONS = '25';
+const DEFAULT_MAX_BYTES = '1048576';
+const DEFAULT_MAX_TOTAL_BYTES = '10485760';
 
 type ApiBatchOptions = FormatOptions & {
   server?: string | undefined;
@@ -80,14 +83,18 @@ export function attachApiBatchSubcommand(cmd: Command): void {
     .option('--file <path>', 'Read the JSON batch manifest from a file')
     .option('--stdin', 'Read the JSON batch manifest from standard input')
     .option('--dry-run', 'Resolve and validate every operation without executing requests')
-    .option('--max-operations <count>', 'Maximum manifest request count', '25')
-    .option('--max-bytes <bytes>', 'Maximum bytes accepted from one response', '1048576')
-    .option('--max-total-bytes <bytes>', 'Maximum bytes accepted across all responses', '10485760')
+    .option('--max-operations <count>', 'Maximum manifest request count', DEFAULT_MAX_OPERATIONS)
+    .option('--max-bytes <bytes>', 'Maximum bytes accepted from one response', DEFAULT_MAX_BYTES)
+    .option(
+      '--max-total-bytes <bytes>',
+      'Maximum bytes accepted across all responses',
+      DEFAULT_MAX_TOTAL_BYTES,
+    )
     .action(async function (this: Command, options: ApiBatchOptions) {
       const format = resolveOutputFormat(this, options);
       try {
         const maxOperations = parsePositiveInteger(
-          String(options.maxOperations ?? '25'),
+          String(options.maxOperations ?? DEFAULT_MAX_OPERATIONS),
           'Maximum operations',
           format,
         );
@@ -95,12 +102,12 @@ export function attachApiBatchSubcommand(cmd: Command): void {
           throw new Error(`Maximum operations cannot exceed ${MAX_BATCH_OPERATIONS}`);
         }
         const maxBytes = parsePositiveInteger(
-          String(options.maxBytes ?? '1048576'),
+          String(options.maxBytes ?? DEFAULT_MAX_BYTES),
           'Maximum response bytes',
           format,
         );
         const maxTotalBytes = parsePositiveInteger(
-          String(options.maxTotalBytes ?? '10485760'),
+          String(options.maxTotalBytes ?? DEFAULT_MAX_TOTAL_BYTES),
           'Maximum total response bytes',
           format,
         );
