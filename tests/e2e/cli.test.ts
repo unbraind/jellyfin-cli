@@ -227,6 +227,25 @@ describe.skipIf(skip)('E2E api operations', () => {
       encoding: 'json',
     });
   }, T);
+
+  it('executes a preflighted read-only API batch against the compiled CLI', async () => {
+    const result = await runJfWithCode(
+      ['api', 'batch', '--file', 'tests/fixtures/live-read-batch.json'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const envelope = decodeEnvelope(result.stdout);
+    expect(envelope.type).toBe('api_batch_response');
+    expect(envelope.data).toMatchObject({
+      request_count: 2,
+      success_count: 2,
+      failure_count: 0,
+      results: [
+        { id: 'public-system-info', operation_id: 'GetPublicSystemInfo', ok: true },
+        { id: 'system-info', operation_id: 'GetSystemInfo', ok: true },
+      ],
+    });
+  }, T);
 });
 
 // -------------------------------------------------------------------------

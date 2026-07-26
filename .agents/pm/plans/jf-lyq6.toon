@@ -1,0 +1,153 @@
+id: jf-lyq6
+title: Add bounded read-only Jellyfin API batches
+description: "Add an agent-first manifest execution surface that resolves and preflights multiple exact Jellyfin OpenAPI read operations once, executes them deterministically through one authenticated client, and returns bounded structured results without permitting server mutations."
+type: Plan
+status: closed
+priority: 0
+tags[8]: agents,api,batch,contracts,openapi,read-only,release,tool-schema
+created_at: "2026-07-25T22:29:31.042Z"
+updated_at: "2026-07-26T00:19:46.403Z"
+closed_at: "2026-07-26T00:19:45.774Z"
+author: codex-jellyfin-batch
+estimated_minutes: 720
+acceptance_criteria: JSON manifests from a file or stdin preflight every request before target-operation execution and reject all non-read-only operations; Request count per-response size and aggregate response size are strictly bounded and deterministic ordered results preserve caller request identifiers; Dry-run emits resolved OpenAPI contracts without executing target operations; schema discovery remains a read-only contract fetch; TOON JSON YAML Markdown table and raw outputs plus function-calling schemas describe and validate the batch interface; Full release validation PM integrity private-data scans packaged consumer proof exact-head CI and terminal review inventory pass without publishing
+definition_of_ready: Latest official Jellyfin release and OpenAPI sources verified; all-status PM duplicate search complete; private config permissions verified; existing exact-operation contracts understood.
+goal: jf-mqpo
+value: Let agents gather related Jellyfin facts safely in one deterministic invocation.
+impact: Reduces repeated schema fetches and process overhead while making multi-operation automation preflightable and bounded.
+outcome: A production-ready read-only batch API contract complementing typed commands and exact single-operation execution.
+why_now: "All 429 live operations are individually reachable, but multi-step agent workflows still require repetitive process orchestration and cannot preflight a complete read plan."
+parent: jf-gn5j
+reviewer: github-review-bots
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+release: next-manual-release
+resolution: "Implemented and reviewed bounded read-only API batch execution with whole-manifest preflight, exact OpenAPI resolution, strict budgets, deterministic outputs, schemas, docs, live acceptance, and no publication."
+expected_result: "Agents can submit a bounded manifest of exact GET HEAD or OPTIONS operations, reject the full plan before target execution when invalid, and consume schema-valid ordered results without modifying Jellyfin data."
+actual_result: "The CLI provides jf api batch with file or stdin input, dry-run contracts, 25-request default and 100-request hard ceiling, one-MiB per-response and ten-MiB aggregate defaults, all output formats, 181 compiled live read-only acceptances, installed consumer proof, and fully dispositioned PR findings."
+dependencies[13]{id,kind,created_at,author,source_kind}:
+  jf-0ea5,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-644n,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-axko,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-cqqy,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-gn5j,parent,"2026-07-25T22:29:31.042Z",null,null
+  jf-lpki,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-mkzh,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-mqpo,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-rjox,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-sylm,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-tike,related,"2026-07-25T22:29:31.042Z",null,null
+  jf-0ea5,implements,"2026-07-25T22:36:35.890Z",codex-jellyfin-batch,null
+  jf-sylm,verifies,"2026-07-25T22:36:38.236Z",codex-jellyfin-batch,null
+comments[9]{created_at,author,text}:
+  "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"All 42 PM items, their statuses and rich recent lineage, project graph, latest official Jellyfin 10.11.11 release, live sanitized 429-operation schema, configured profile permissions, and current GitHub head were reviewed. No duplicate batch-execution item exists."
+  "2026-07-25T22:48:55.403Z",codex-jellyfin-batch,"Implementation validation so far: 14 focused Bun tests and 20 focused portable tests pass; compiled live batch returned 2/2 ordered successes; isolated npm-installed jf-cli resolved from an unrelated prefix and passed dry-run plus live batch. Full release validation, audits, and Trivy are green. Honest repository baselines are 39.84 statements, 40.13 branches, 51.10 functions, 39.45 lines and 8.44 percent duplicated lines, so canonical P0 items jf-mkzh and jf-lpki remain open and are not represented as complete."
+  "2026-07-25T22:55:33.015Z",codex-jellyfin-batch,"PM linked-test result: focused and live commands passed (14/14 and 181/181). validate:release reached the final changelog check after all tests/build/package/security smokes, then reproduced known core pm-cli issue #682 because the tracker sandbox has 43/43 items but lacks source Git tag identity. Direct source-workspace validation is being rerun; no duplicate upstream issue will be filed."
+  "2026-07-25T23:25:15.264Z",codex-jellyfin-batch,"CodeRabbit exact-head review produced five valid findings. Accepted all: clarify PM request-count bound, document the complete GET/HEAD/OPTIONS allowlist, name input-selection booleans, parse manifests before OpenAPI I/O, and validate dry-run output against api_batch_plan. Added docstrings to all new source helpers while applying the fixes."
+  "2026-07-25T23:28:32.348Z",codex-jellyfin-batch,"The CodeRabbit review summary contained a sixth actionable finding outside the diff: HEAD and 204 responses must short-circuit before declared content-length enforcement. Accepted it, moved the guard below the bodyless-response return, and added a regression test for a large declared HEAD representation with a one-byte response budget."
+  "2026-07-25T23:31:05.264Z",codex-jellyfin-batch,"PR #40: https://github.com/unbraind/jellyfin-cli/pull/40 . Exact reviewed head before tracker closeout: 2431439f08514ba7678f9d5822ce3c9f10ad4d1a. Final tracker/changelog commit will retrigger required checks and bot inventory before merge."
+  "2026-07-25T23:31:46.114Z",codex-jellyfin-batch,"Closeout generation exposed package.json pinning changelog PM execution to 2026.7.24-3. Updated the deterministic npm-exec pin to current 2026.7.25, matching the installed global CLI and managed pm-changelog package."
+  "2026-07-26T00:18:52.537Z",codex-jellyfin-batch,"Final exact-head CodeRabbit review reported five actionable hardening findings: exact managed-extension provenance pin, precise target-operation preflight wording, shared numeric defaults, successful exit-code assertions across formatter tests, and portable stdin EPIPE handling. All are accepted for implementation before merge."
+  "2026-07-26T00:19:45.103Z",codex-jellyfin-batch,"Implemented all five final-review findings. pm install npm:pm-changelog@2026.7.25 replaced replayable latest provenance through the managed extension lifecycle; README now distinguishes schema-fetch I/O from target-operation preflight; batch defaults share named constants; the formatter matrix asserts all exit codes; and the Node portable stdin adapter consumes expected early-exit stream errors. Focused Bun and portable suites pass 14/14 each."
+notes[1]{created_at,author,text}:
+  "2026-07-25T22:29:31.042Z",codex-jellyfin-batch,"Privacy boundary: credentials, server address, entity IDs, raw live responses, and cached OpenAPI documents remain only in environment variables and owner-only ~/.jellyfin-cli. PM, git, CI, PRs, and summaries may contain only public versions, aggregate counts, and synthetic fixtures."
+learnings[2]{created_at,author,text}:
+  "2026-07-25T22:55:35.102Z",codex-jellyfin-batch,"For stdin CLI behavior under portable Vitest, the Node Bun.spawn compatibility adapter must explicitly pipe Blob input; Bun-native success alone is insufficient cross-runtime evidence."
+  "2026-07-25T22:55:42.543Z",codex-jellyfin-batch,Validate explicitly supplied official artifact identifiers before fetching a live baseline. Early syntactic and prerelease-policy rejection prevents unnecessary authenticated probes and makes security tests deterministic under host load.
+files[14]{path,scope,note}:
+  package.json,project,Latest deterministic PM CLI pin for package-owned changelog generation
+  src/api/base.ts,project,Exact response byte accounting
+  src/commands/api-batch.ts,project,Bounded deterministic CLI orchestration
+  src/commands/api.ts,project,Batch command registration
+  src/commands/schema-api-batch-def.ts,project,Batch plan and response output schemas
+  src/commands/schema-compatibility.ts,project,Reject unsafe target versions before schema probes
+  src/utils/api-batch.ts,project,Strict typed manifest parsing and complete read-only preflight
+  src/utils/openapi-source.ts,project,Early trusted artifact identifier validation
+  tests/commands/api-batch.test.ts,project,Isolated CLI and formatter integration
+  tests/commands/schema-compatibility.test.ts,project,Existing early-rejection regression coverage
+  tests/e2e/cli.test.ts,project,Compiled private live read-only acceptance
+  tests/fixtures/live-read-batch.json,project,Public operation-only live fixture
+  tests/setup/node-bun-compat.ts,project,Portable Blob stdin support for subprocess manifests
+  tests/utils/api-batch.test.ts,project,Manifest and preflight behavior
+tests[3]{command,path,scope,timeout_seconds,pm_context_mode}:
+  "bun run validate:release",package.json,project,1800,tracker
+  bun test tests/utils/api-batch.test.ts tests/commands/api-batch.test.ts,package.json,project,300,tracker
+  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker
+docs[6]{path,scope,note}:
+  docs/agent-integration.md,project,Agent batch workflow and safety contract
+  docs/api-research.md,project,Latest official and live sanitized evidence
+  docs/api.md,project,Complete command reference
+  docs/README.md,project,Documentation quickstart
+  docs/release-readiness.md,project,Live read-only acceptance gate
+  README.md,project,User-facing batch quickstart and manifest contract
+close_reason: "Final review hardening implemented and focused tests passed; proceed to regenerated changelog, full release validation, exact-head review, and merge."
+plan_mode: completed
+plan_scope: "Read-only API batch manifests, dry-run preflight, request and response budgets, tool/output schemas, help, documentation, meaningful tests, private live acceptance, release validation, and PR review closeout."
+plan_harness: codex
+plan_resume_context: Official stable and live Jellyfin 10.11.11 contracts are current. Existing jf api handles one exact operation per process. Implement bounded read-only batch manifests with full preflight and deterministic output; use only owner-only config and JELLYFIN_READ_ONLY=1 for live tests.
+plan_validation[2]{text,command,expected}:
+  Compiled CLI must execute a synthetic multi-operation read manifest against the configured server in enforced read-only mode.,JELLYFIN_READ_ONLY=1 jf-cli api batch --file <owner-only-manifest> --format json,All synthetic requests preflight and complete in input order; no mutating method is accepted and no private payload is retained.
+  Final source-workspace release gate passed on the implementation state.,"bun run validate:release",All release checks complete without lowering thresholds or publishing.
+plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "2026-07-25T22:29:53.351Z",codex-jellyfin-batch,Add read-only batch execution below the typed command interface and beside exact single-operation execution.,Agents need one schema resolution and one authenticated process for related reads. Full preflight plus method enforcement prevents partial execution caused by invalid manifests and excludes mutations by construction.,"Current jf api exposes inspect, get, and mutate for one operation per invocation; no PM item or command implements bounded multi-operation manifests."
+plan_discoveries[4]{ts,author,text}:
+  "2026-07-25T22:29:52.375Z",codex-jellyfin-batch,Official Jellyfin v10.11.11 remains the latest stable release. The official core artifact contains 388 operations; the configured 10.11.11 server exposes 429 operations across 356 paths because live documents include installed plugin contracts.
+  "2026-07-25T22:48:52.041Z",codex-jellyfin-batch,"Portable Vitest initially exposed that the Node Bun.spawn adapter ignored Blob stdin, so batch stdin tests could pass under Bun while failing in the cross-runtime gate. The adapter now pipes Blob bytes into child stdin and focused portable tests pass."
+  "2026-07-25T22:48:53.669Z",codex-jellyfin-batch,"Coverage contention exposed an existing compatibility path that validated an unsafe target artifact only after fetching the live baseline. Target identifiers are now rejected before any schema probe, matching the existing security test's stated contract."
+  "2026-07-25T23:03:05.543Z",codex-jellyfin-batch,Release preparation found project-managed pm-changelog 2026.7.24 while npm latest is 2026.7.25; pm upgrade refreshed the managed extension to 2026.7.25 without changing CLI release contents.
+plan_steps[6]:
+  - id: plan-step-001
+    order: 1
+    title: Record latest official and sanitized live Jellyfin contract evidence
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T22:29:54.960Z"
+    evidence: "Verified official jellyfin/jellyfin v10.11.11 release and exact official core artifact; live owner-only CLI reported 356 paths and 429 operations, current official compatibility is clean, profile permissions are 0700/0600, and all live research used JELLYFIN_READ_ONLY=1."
+    completed_at: "2026-07-25T22:29:54.960Z"
+  - id: plan-step-002
+    order: 2
+    title: Design and implement typed bounded batch manifest validation
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T22:36:39.409Z"
+    evidence: "Added typed strict version-1 manifests, unique caller IDs, exact parameter validation, full preflight, read-only method enforcement, deterministic sequential execution, one authenticated client, 25/100 request budgets, one-MiB manifest ceiling, per-response and aggregate response ceilings, byte accounting, and structured partial failures."
+    completed_at: "2026-07-25T22:36:39.409Z"
+    linked_items[2]{id,kind,note}:
+      jf-0ea5,implements,Extends exact single-operation execution into validated batches
+      jf-axko,depends_on,Reuses version-aware exact OpenAPI source resolution
+  - id: plan-step-003
+    order: 3
+    title: Integrate CLI help schemas output formats and documentation
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T22:36:41.900Z"
+    evidence: "Registered jf api batch with detailed local/global help, read-only tool-schema classification, api_batch_plan/api_batch_response JSON Schemas, official TOON and five alternate format validation, README and complete docs/api, agent, research, index, and release-readiness guidance."
+    completed_at: "2026-07-25T22:36:41.900Z"
+  - id: plan-step-004
+    order: 4
+    title: Add unit integration packaged and compiled live read-only acceptance
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T22:55:29.334Z"
+    evidence: Focused Bun 14/14 and portable 20/20 pass; all six format paths validate; 181/181 compiled live tests pass under JELLYFIN_READ_ONLY=1 including 2/2 batch operations; isolated npm-installed jf-cli resolves from an unrelated prefix and passes dry-run plus live batch; no server mutation executed.
+    completed_at: "2026-07-25T22:55:29.334Z"
+    linked_items[1]{id,kind,note}:
+      jf-sylm,verifies,Expands complete read-only compiled interface acceptance
+  - id: plan-step-005
+    order: 5
+    title: Run strict release coverage duplication security and PM gates
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T23:01:56.773Z"
+    evidence: "Final source-workspace validate:release passed: 954 Bun tests, 945 portable Vitest tests, 9 release tests, build, dist smoke, file-length, secret current/history, pack, isolated npx, bunx, and changelog checks. Four-metric portable coverage remains honestly below 100% at 39.84/40.13/51.10/39.45 and jscpd remains 8.44%, tracked by canonical open P0 jf-mkzh and jf-lpki; no thresholds were weakened. Bun/npm audits and Trivy reported zero findings. PM validation, health, graph audit, path validation, and all-status fuzzy dedupe are clean."
+    completed_at: "2026-07-25T23:01:56.773Z"
+  - id: plan-step-006
+    order: 6
+    title: Publish PR process all bot feedback merge and close lineage
+    status: completed
+    created_at: "2026-07-25T22:29:31.037Z"
+    updated_at: "2026-07-25T23:31:04.545Z"
+    evidence: "PR #40 exact head 2431439 passed CodeQL and both GitHub analysis jobs. Six first-cycle CodeRabbit findings were accepted, fixed, regression-tested, upvoted, replied to, and all five inline threads resolved; second-cycle Gemini sunset and CodeRabbit rate-limit responses were read and upvoted, with no new code finding, while Greptile produced no response and Sourcery remained quota-limited. Exact-head inventory has zero unresolved review threads."
+    completed_at: "2026-07-25T23:31:04.545Z"
+body: ""

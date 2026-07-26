@@ -1,6 +1,6 @@
 {
   "version": 1,
-  "updated_at": "2026-07-25T05:30:21.267Z",
+  "updated_at": "2026-07-26T00:18:54.058Z",
   "entries": [
     {
       "name": "builtin-governance-audit",
@@ -29,7 +29,7 @@
       "name": "pm-changelog",
       "directory": "pm-changelog",
       "scope": "project",
-      "manifest_version": "2026.7.24",
+      "manifest_version": "2026.7.25",
       "manifest_entry": "./dist/extension.js",
       "capabilities": [
         "commands",
@@ -38,13 +38,13 @@
         "schema"
       ],
       "installed_at": "2026-07-21T17:01:47.160Z",
-      "updated_at": "2026-07-24T21:11:10.412Z",
+      "updated_at": "2026-07-26T00:18:54.023Z",
       "source": {
         "kind": "npm",
-        "input": "npm:pm-changelog",
+        "input": "npm:pm-changelog@2026.7.25",
         "location": "package",
         "package": "pm-changelog",
-        "version": "2026.7.24"
+        "version": "2026.7.25"
       }
     }
   ]

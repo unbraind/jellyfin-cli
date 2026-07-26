@@ -77,6 +77,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Startup Wizard Configuration**: `jf setup update-configuration` updates `/Startup/Configuration`
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
+- **Bounded API Batches**: preflight and execute ordered read-only operation manifests in one process
 - **Explain Mode**: global `--explain` or `JELLYFIN_EXPLAIN=1` prints redacted request metadata to `stderr`
 - **Release Guardrails**: built-in file length + secret scanning checks for safe releases
 - **Plugin Management**: List, configure, and manage plugins
@@ -204,6 +205,7 @@ jf system info --format raw
 - `jf schema compatibility` - Compare exact official API versions or audit live/plugin drift
 - `jf api inspect <operationId>` - Inspect one exact OpenAPI operation and its declared inputs
 - `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
+- `jf api batch --file <manifest.json>` - Preflight and execute a bounded read-only operation batch
 - `jf api mutate <operationId> --confirm` - Execute a validated mutation (blocked by `--read-only`)
 
 ## Release Validation
@@ -602,6 +604,12 @@ jf api get GetUserById --path-param userId=USER_ID
 # Repeated query values are preserved
 jf api get GetItems --query userId=USER_ID --query genres=Drama --query genres=Comedy
 
+# Preflight an entire read plan without executing any API operations
+jf api batch --file reads.json --dry-run
+
+# Execute the same plan with per-response and aggregate byte ceilings
+jf api batch --file reads.json --max-bytes 1048576 --max-total-bytes 10485760
+
 # Mutations require both the mutation-specific command and explicit confirmation
 jf api mutate UpdateDeviceOptions --path-param deviceId=DEVICE_ID \
   --body-json '{"CustomName":"Living room"}' --confirm
@@ -613,6 +621,31 @@ support JSON (`--body-json`), text (`--body-text`), and file-backed binary/text 
 responses use base64 so TOON/JSON/YAML/Markdown/table output stays structurally valid. Exact
 operation IDs come from the configured server OpenAPI document, with the existing exact-version
 official fallback when a local schema is unavailable.
+
+Batch manifests are strict JSON objects with `version: 1` and a non-empty `requests` array:
+
+```json
+{
+  "version": 1,
+  "requests": [
+    {
+      "id": "server",
+      "operation_id": "GetPublicSystemInfo"
+    },
+    {
+      "id": "user",
+      "operation_id": "GetUserById",
+      "path_params": { "userId": "USER_ID" }
+    }
+  ]
+}
+```
+
+Every request is resolved and validated before the first target-operation request. Batch execution accepts
+only `GET`, `HEAD`, and `OPTIONS`, preserves manifest order and caller IDs, reuses one authenticated
+client, returns structured per-request failures, and exits nonzero if any request fails. Use
+`--stdin` for pipelines; exactly one of `--file` or `--stdin` is required. Manifests are limited to
+25 requests by default (configurable up to 100) and one MiB of input.
 
 ## Agent/LLM Optimization
 

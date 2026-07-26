@@ -5,6 +5,7 @@ import { compareOpenApiDocuments } from '../utils/openapi-compatibility.js';
 import {
   fetchOfficialOpenApiDocument,
   fetchOpenApiDocumentWithOptions,
+  validateOfficialOpenApiArtifactVersion,
 } from '../utils/openapi-source.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 
@@ -45,6 +46,12 @@ export function attachSchemaCompatibilitySubcommand(cmd: Command): void {
       }
 
       try {
+        if (options.targetVersion !== undefined) {
+          validateOfficialOpenApiArtifactVersion(
+            options.targetVersion,
+            options.allowPrerelease,
+          );
+        }
         const baseline = await fetchOpenApiDocumentWithOptions(config, {
           endpointPath: options.endpoint,
         });

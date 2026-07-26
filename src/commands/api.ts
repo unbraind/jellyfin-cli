@@ -10,6 +10,7 @@ import {
 import { getConfig } from '../utils/config.js';
 import { createApiClient, handleError, output } from './utils.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import { attachApiBatchSubcommand } from './api-batch.js';
 
 type ApiInputOptions = FormatOptions & {
   server?: string | undefined;
@@ -257,5 +258,6 @@ export function createApiCommand(): Command {
     await executeOperation(this, operationId, options, false);
   });
 
+  attachApiBatchSubcommand(cmd);
   return cmd;
 }

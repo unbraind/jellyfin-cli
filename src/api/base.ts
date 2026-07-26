@@ -12,6 +12,7 @@ export type ApiOperationResponse = {
   status: number;
   contentType: string | null;
   encoding: 'json' | 'text' | 'base64' | 'empty';
+  byteLength: number;
   data: unknown;
 };
 
@@ -120,15 +121,21 @@ export class ApiClientBase {
       true,
     );
     const contentType = response.headers.get('content-type');
+    if (method === 'HEAD' || response.status === 204) {
+      return {
+        status: response.status,
+        contentType,
+        encoding: 'empty',
+        byteLength: 0,
+        data: null,
+      };
+    }
     const declaredLength = Number(response.headers.get('content-length'));
     if (Number.isFinite(declaredLength) && declaredLength > maxResponseBytes) {
       throw new JellyfinApiError(
         `API response exceeds --max-bytes (${declaredLength} > ${maxResponseBytes})`,
         response.status,
       );
-    }
-    if (method === 'HEAD' || response.status === 204) {
-      return { status: response.status, contentType, encoding: 'empty', data: null };
     }
 
     const chunks: Uint8Array[] = [];
@@ -152,7 +159,13 @@ export class ApiClientBase {
       }
     }
     if (byteLength === 0) {
-      return { status: response.status, contentType, encoding: 'empty', data: null };
+      return {
+        status: response.status,
+        contentType,
+        encoding: 'empty',
+        byteLength: 0,
+        data: null,
+      };
     }
     const bytes = new Uint8Array(byteLength);
     let offset = 0;
@@ -168,6 +181,7 @@ export class ApiClientBase {
           status: response.status,
           contentType,
           encoding: 'json',
+          byteLength,
           data: JSON.parse(text) as unknown,
         };
       } catch {
@@ -179,12 +193,19 @@ export class ApiClientBase {
       contentType?.includes('xml') ||
       contentType?.includes('mpegurl')
     ) {
-      return { status: response.status, contentType, encoding: 'text', data: text };
+      return {
+        status: response.status,
+        contentType,
+        encoding: 'text',
+        byteLength,
+        data: text,
+      };
     }
     return {
       status: response.status,
       contentType,
       encoding: 'base64',
+      byteLength,
       data: Buffer.from(bytes).toString('base64'),
     };
   }

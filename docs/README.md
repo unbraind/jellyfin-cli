@@ -88,6 +88,9 @@ jf schema compatibility --target-version 12.0-rc3 --allow-prerelease
 # Audit local plugin/server extensions against the matching official contract
 jf schema compatibility --baseline live --fail-on-breaking --format json
 
+# Preflight a bounded multi-operation read manifest before execution
+jf api batch --file reads.json --dry-run
+
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info
 

@@ -1,4 +1,8 @@
 import { OPENAPI_COMPATIBILITY_SCHEMA } from './schema-compatibility-def.js';
+import {
+  API_BATCH_PLAN_SCHEMA,
+  API_BATCH_RESPONSE_SCHEMA,
+} from './schema-api-batch-def.js';
 
 export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   message: {
@@ -226,6 +230,8 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
+  api_batch_plan: API_BATCH_PLAN_SCHEMA,
+  api_batch_response: API_BATCH_RESPONSE_SCHEMA,
   openapi_compatibility: OPENAPI_COMPATIBILITY_SCHEMA,
 };
 
