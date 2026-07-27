@@ -3242,7 +3242,7 @@ separate from the REST OpenAPI document.
 
 ### events types
 
-List the Jellyfin 10.11 message catalog, semantic categories, and the three periodic read
+List the Jellyfin 10.11.11 message catalog, semantic categories, and the three periodic read
 subscriptions:
 
 ```bash
@@ -3269,9 +3269,10 @@ jf events watch \
 ```
 
 The default aggregate contract is TOON output type `event_watch`, capped at 10 emitted records and
-30 seconds. The hard limits are 1,000 records and one hour; periodic intervals cannot be below 500
-milliseconds. Messages are capped at one MiB by default. Keepalive traffic is processed
-automatically and omitted unless `--include-control` is supplied.
+30 seconds. Connections default to a 10-second timeout and periodic subscriptions default to a
+1,000-millisecond interval. The hard limits are 1,000 records, one hour, and 16 MiB per message;
+periodic intervals cannot be below 500 milliseconds. Messages are capped at one MiB by default.
+Keepalive traffic is processed automatically and omitted unless `--include-control` is supplied.
 
 `--subscribe` sends only Jellyfin's official periodic read requests: `SessionsStart`,
 `ActivityLogEntryStart`, or `ScheduledTasksInfoStart`, followed by the matching stop message.

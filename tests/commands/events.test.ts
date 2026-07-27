@@ -95,7 +95,10 @@ describe('events command', () => {
     const cases = [
       [['events', 'watch', '--count', '1001'], '--count cannot exceed 1000'],
       [['events', 'watch', '--duration', '3601'], '--duration cannot exceed 3600 seconds'],
+      [['events', 'watch', '--duration', '1.5'], '--duration must be a positive integer'],
       [['events', 'watch', '--interval', '499'], '--interval cannot be less than 500'],
+      [['events', 'watch', '--count', '1oops'], '--count must be a positive integer'],
+      [['events', 'watch', '--max-message-bytes', '16777217'], '--max-message-bytes cannot exceed 16777216'],
       [['events', 'watch', '--type', 'NotAnEvent'], 'Unknown event type'],
       [['events', 'watch', '--subscribe', 'unknown'], 'Unknown subscription'],
       [['events', 'watch', '--stream'], '--stream requires --format json'],

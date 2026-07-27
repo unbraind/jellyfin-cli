@@ -19,6 +19,7 @@ const DEFAULT_MAX_MESSAGE_BYTES = '1048576';
 const DEFAULT_INTERVAL_MS = '1000';
 const MAX_COUNT = 1000;
 const MAX_DURATION_SECONDS = 3600;
+const MAX_MESSAGE_BYTES = 16 * 1024 * 1024;
 const MIN_INTERVAL_MS = 500;
 
 type EventsWatchOptions = {
@@ -152,6 +153,9 @@ export function createEventsCommand(): Command {
         if (count > MAX_COUNT) throw new Error(`--count cannot exceed ${MAX_COUNT}`);
         if (durationSeconds > MAX_DURATION_SECONDS) {
           throw new Error(`--duration cannot exceed ${MAX_DURATION_SECONDS} seconds`);
+        }
+        if (maxMessageBytes > MAX_MESSAGE_BYTES) {
+          throw new Error(`--max-message-bytes cannot exceed ${MAX_MESSAGE_BYTES}`);
         }
         if (intervalMs < MIN_INTERVAL_MS) {
           throw new Error(`--interval cannot be less than ${MIN_INTERVAL_MS} milliseconds`);

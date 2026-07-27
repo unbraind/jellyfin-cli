@@ -6,7 +6,7 @@ status: closed
 priority: 0
 tags[7]: agents,events,jellyfin-10.11.11,ndjson,read-only,realtime,websocket
 created_at: "2026-07-27T21:16:28.541Z"
-updated_at: "2026-07-27T21:51:06.692Z"
+updated_at: "2026-07-27T22:09:31.040Z"
 closed_at: "2026-07-27T21:50:47.433Z"
 author: codex-jellyfin-realtime
 estimated_minutes: 480
@@ -34,15 +34,16 @@ dependencies[8]{id,kind,created_at,author,source_kind}:
   jf-mkzh,related,"2026-07-27T21:16:28.541Z",codex-jellyfin-realtime,"cli:create:dep"
   jf-sylm,related,"2026-07-27T21:16:28.541Z",codex-jellyfin-realtime,"cli:create:dep"
   jf-tike,related,"2026-07-27T21:16:28.541Z",codex-jellyfin-realtime,"cli:create:dep"
-comments[3]{created_at,author,text}:
+comments[4]{created_at,author,text}:
   "2026-07-27T21:16:50.125Z",codex-jellyfin-realtime,"Implementation boundary: passive server notifications and the three official periodic read subscriptions only. No playback/control messages will be sent, all live acceptance uses JELLYFIN_READ_ONLY=1, and no raw event payloads or identifiers will be persisted in PM or Git."
   "2026-07-27T21:41:21.772Z",codex-jellyfin-realtime,"Validation truth on 2026-07-27: live compiled suite 183/183 passed without mutation; Bun/npm audits report zero vulnerabilities; tracked/current-history secret scans and 300-line source gate pass. Repo-wide four-metric coverage is 40.75/40.83/51.37/40.43 and jscpd is 8.19%, so canonical roadmap items jf-mkzh and jf-lpki remain open; this feature does not weaken or falsely satisfy those gates. Release dry-run correctly refuses a dirty tree and will be rerun after the reviewed commit."
   "2026-07-27T21:48:14.796Z",codex-jellyfin-realtime,"The PM tracker sandbox exposed ambient PM_PROJECT_DIR influencing the release changelog check. The release script now passes --pm-path .agents/pm explicitly and tests this contract, so source-tracker changelog validation is deterministic under PM linked-test isolation and CI."
+  "2026-07-27T22:09:31.040Z",codex-jellyfin-realtime,"CodeRabbit review improvements applied: seconds-correct keepalive timing, serialized mixed-frame decoding, connecting-socket closure, 16 MiB hard message ceiling, strict safe-integer parsing, exact catalog/default docs, markdown numbering, and explicit mutable test subscription typing. Full release validation and compiled live read-only event acceptance pass after the fixes."
 notes[1]{created_at,author,text,edited_at}:
   "2026-07-27T21:16:51.264Z",codex-jellyfin-realtime,"Streaming contract uses one JSON object per line for --stream --format json and bounded aggregate envelopes otherwise. Credentials are resolved through existing environment/settings auth; the official protocol requires an in-memory ApiKey query parameter, which must never appear in output, explanations, errors, fixtures, snapshots, proxy logs, PM, or Git.","2026-07-27T21:30:08.557Z"
 learnings[1]{created_at,author,text}:
   "2026-07-27T21:50:46.489Z",codex-jellyfin-realtime,Tracker-aware release scripts must pass --pm-path .agents/pm explicitly; ambient PM linked-test isolation can otherwise make a repository changelog check compare against a sandbox tracker while writing the source workspace.
-files[22]{path,scope,note}:
+files[23]{path,scope,note}:
   .agents/pm/extensions/.managed-extensions.json,project,Latest managed pm-changelog pin
   .gitattributes,project,PM field-aware merge fence
   CHANGELOG.md,project,Package-owned generated change history
@@ -56,6 +57,7 @@ files[22]{path,scope,note}:
   src/cli-program.ts,project,Top-level events command registration
   src/commands/events.ts,project,Typed event catalog command schemas and WebSocket transport
   src/commands/index.ts,project,Events command export
+  src/commands/number-options.ts,project,Strict full-string safe-integer parsing hardened during bot review
   src/commands/schema-defs.ts,project,Event schema registry
   src/commands/schema-events-def.ts,project,Typed event catalog command schemas and WebSocket transport
   src/types/events.ts,project,Typed event catalog command schemas and WebSocket transport

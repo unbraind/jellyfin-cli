@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest';
+import type { JellyfinEventSubscription } from '../../src/types/events.js';
 import {
   buildJellyfinWebSocketUrl,
   parseJellyfinSocketMessage,
@@ -49,7 +50,7 @@ const baseOptions = {
   serverUrl: 'https://media.example.test/jellyfin',
   accessToken: 'secret token',
   eventTypes: [] as string[],
-  subscriptions: [] as const,
+  subscriptions: [] as JellyfinEventSubscription[],
   includeControl: false,
   count: 1,
   durationMs: 10_000,
@@ -106,8 +107,8 @@ describe('Jellyfin WebSocket events', () => {
     });
 
     socket.open();
-    socket.message('{"MessageType":"ForceKeepAlive","Data":2}');
-    await new Promise((resolve) => setTimeout(resolve, 5));
+    socket.message('{"MessageType":"ForceKeepAlive","Data":1}');
+    await new Promise((resolve) => setTimeout(resolve, 510));
     expect(socket.sent.some((value) => value.includes('"MessageType":"KeepAlive"'))).toBe(true);
     socket.message('{"MessageType":"LibraryChanged","Data":{}}');
     socket.message(new Blob(['{"MessageType":"Sessions","Data":[]}']));
@@ -158,6 +159,7 @@ describe('Jellyfin WebSocket events', () => {
     }, { createSocket: () => abortSocket });
     controller.abort();
     expect((await abortPromise).stop_reason).toBe('aborted');
+    expect(abortSocket.closeCalls[0]?.code).toBe(1000);
 
     const errorSocket = new FakeSocket();
     const errorPromise = watchJellyfinEvents(baseOptions, { createSocket: () => errorSocket });
@@ -173,6 +175,7 @@ describe('Jellyfin WebSocket events', () => {
     }, { createSocket: () => timeoutSocket })).rejects.toThrow(
       'Timed out connecting to Jellyfin WebSocket',
     );
+    expect(timeoutSocket.closeCalls[0]?.code).toBe(1011);
 
     const encodingSocket = new FakeSocket();
     const encodingPromise = watchJellyfinEvents(baseOptions, {
@@ -194,6 +197,28 @@ describe('Jellyfin WebSocket events', () => {
     rejectionSocket.open();
     rejectionSocket.message(new RejectingBlob());
     await expect(rejectionPromise).rejects.toThrow('Failed to process WebSocket message');
+  });
+
+  it('preserves receive order across asynchronously decoded frames', async () => {
+    class DelayedBlob extends Blob {
+      override async text(): Promise<string> {
+        await new Promise((resolve) => setTimeout(resolve, 5));
+        return super.text();
+      }
+    }
+    const socket = new FakeSocket();
+    const resultPromise = watchJellyfinEvents({
+      ...baseOptions,
+      count: 2,
+    }, { createSocket: () => socket });
+    socket.open();
+    socket.message(new DelayedBlob(['{"MessageType":"LibraryChanged"}']));
+    socket.message('{"MessageType":"Sessions"}');
+
+    expect((await resultPromise).events.map((event) => event.message_type)).toEqual([
+      'LibraryChanged',
+      'Sessions',
+    ]);
   });
 
   it('uses the native WebSocket constructor when no transport adapter is supplied', async () => {

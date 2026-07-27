@@ -391,9 +391,9 @@ JELLYFIN_READ_ONLY=1 jf events watch \
   --format json
 ```
 
-5. If a quiet server legitimately emits no events, increase `--duration`; a zero-event
+1. If a quiet server legitimately emits no events, increase `--duration`; a zero-event
    `duration_reached` summary is successful and does not indicate a transport failure.
-6. Do not print or share the credential-bearing WebSocket URL while debugging.
+2. Do not print or share the credential-bearing WebSocket URL while debugging.
 
 ## Performance Issues
 

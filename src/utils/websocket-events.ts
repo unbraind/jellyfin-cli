@@ -7,6 +7,8 @@ import type {
 } from '../types/events.js';
 
 const OPEN_STATE = 1;
+const CLOSING_STATE = 2;
+const CLOSED_STATE = 3;
 const CONTROL_TYPES = new Set(['ForceKeepAlive', 'KeepAlive']);
 const SUBSCRIPTION_MESSAGES: Record<
   JellyfinEventSubscription,
@@ -133,6 +135,7 @@ export function watchJellyfinEvents(
 
   return new Promise((resolve, reject) => {
     let settled = false;
+    let pendingMessage: Promise<void> = Promise.resolve();
     let keepAliveTimer: ReturnType<typeof setTimeout> | undefined;
     const connectTimer = setTimeout(
       () => finishError(new Error('Timed out connecting to Jellyfin WebSocket')),
@@ -161,6 +164,8 @@ export function watchJellyfinEvents(
         for (const subscription of options.subscriptions) {
           socket.send(JSON.stringify({ MessageType: SUBSCRIPTION_MESSAGES[subscription].stop }));
         }
+      }
+      if (socket.readyState !== CLOSING_STATE && socket.readyState !== CLOSED_STATE) {
         socket.close(1000, 'bounded watch complete');
       }
       cleanup();
@@ -178,7 +183,9 @@ export function watchJellyfinEvents(
     function finishError(error: Error): void {
       if (settled) return;
       settled = true;
-      if (socket.readyState === OPEN_STATE) socket.close(1011, 'event watch failed');
+      if (socket.readyState !== CLOSING_STATE && socket.readyState !== CLOSED_STATE) {
+        socket.close(1011, 'event watch failed');
+      }
       cleanup();
       reject(error);
     }
@@ -194,15 +201,22 @@ export function watchJellyfinEvents(
     }
 
     function onMessage(event: Event): void {
-      void messageText((event as SocketMessageEvent).data).then((text) => {
+      pendingMessage = pendingMessage.then(async () => {
+        if (settled) return;
+        const text = await messageText((event as SocketMessageEvent).data);
+        if (settled) return;
         const message = parseJellyfinSocketMessage(text, options.maxMessageBytes);
-        if (message.MessageType === 'ForceKeepAlive' && typeof message.Data === 'number') {
+        if (
+          message.MessageType === 'ForceKeepAlive'
+          && typeof message.Data === 'number'
+          && message.Data > 0
+        ) {
           if (keepAliveTimer) clearTimeout(keepAliveTimer);
           keepAliveTimer = setTimeout(() => {
             if (socket.readyState === OPEN_STATE) {
               socket.send(JSON.stringify({ MessageType: 'KeepAlive' }));
             }
-          }, Math.max(1, message.Data / 2));
+          }, Math.max(1, message.Data * 500));
         }
         const selected = acceptedTypes.size === 0 || acceptedTypes.has(message.MessageType);
         if (!selected || (!options.includeControl && CONTROL_TYPES.has(message.MessageType))) return;
