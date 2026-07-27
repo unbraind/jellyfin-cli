@@ -10,7 +10,8 @@ export function changelogCheckArgs(releaseVersion = '') {
     throw new Error(`Invalid PM_CHANGELOG_RELEASE_VERSION: ${releaseVersion}`);
   }
   const args = [
-    'exec', '--yes', '--package', pmCliPackage, '--', 'pm', 'changelog', 'generate',
+    'exec', '--yes', '--package', pmCliPackage, '--', 'pm',
+    '--pm-path', '.agents/pm', 'changelog', 'generate',
     '--output', 'CHANGELOG.md', '--title', 'Changelog', '--mode', 'replace',
     '--all-release-tags', '--status', 'closed',
     '--item-url-base', 'https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm',

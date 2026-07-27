@@ -249,6 +249,44 @@ describe.skipIf(skip)('E2E api operations', () => {
 });
 
 // -------------------------------------------------------------------------
+// Real-time WebSocket events
+// -------------------------------------------------------------------------
+
+describe.skipIf(skip)('E2E events', () => {
+  it('lists the official event catalog through the compiled CLI', async () => {
+    const out = await jf('events', 'types');
+    const envelope = decodeEnvelope(out);
+    expect(envelope.type).toBe('event_types');
+    expect(Array.isArray(envelope.data)).toBe(true);
+  }, T);
+
+  it('completes a bounded authenticated read-only event watch', async () => {
+    const result = await runJfWithCode(
+      [
+        'events',
+        'watch',
+        '--include-control',
+        '--count',
+        '1',
+        '--duration',
+        '15',
+        '--format',
+        'json',
+      ],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const payload = JSON.parse(result.stdout) as {
+      event_count?: number;
+      events?: Array<{ message_type?: string }>;
+    };
+    expect(payload.event_count).toBe(1);
+    expect(payload.events?.[0]?.message_type).toMatch(/KeepAlive/);
+    expect(`${result.stdout}${result.stderr}`).not.toContain(API_KEY);
+  }, T);
+});
+
+// -------------------------------------------------------------------------
 // Library commands
 // -------------------------------------------------------------------------
 

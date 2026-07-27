@@ -60,6 +60,14 @@ export class ApiClientBase {
   }
 
   /**
+   * Returns the active API key or authenticated session token for non-HTTP transports.
+   * @returns The in-memory access token, when authentication has completed.
+   */
+  getAccessToken(): string | undefined {
+    return this.apiKey;
+  }
+
+  /**
    * Retrieves or derives backend url without mutating Jellyfin state.
    * @returns - The normalized string representation.
    */

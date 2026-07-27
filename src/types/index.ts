@@ -21,6 +21,19 @@ export type { DeviceInfo, DeviceCapabilities, DeviceOptions } from './devices.js
 export type { BrandingOptions, ServerConfiguration, ServerEndpoints, ItemCounts } from './server.js';
 export type { ApiKeyInfo, ApiKeyCreation } from './apikeys.js';
 export type { NotificationTypeInfo, NotificationOption, NotificationResult, Notification, NotificationLevel } from './notifications.js';
+export {
+  JELLYFIN_EVENT_SUBSCRIPTIONS,
+  JELLYFIN_EVENT_TYPES,
+} from './events.js';
+export type {
+  JellyfinEventRecord,
+  JellyfinEventStopReason,
+  JellyfinEventSubscription,
+  JellyfinEventType,
+  JellyfinEventTypeInfo,
+  JellyfinEventWatchResult,
+  JellyfinSocketMessage,
+} from './events.js';
 
 export type {
   QuickConnectResult,
