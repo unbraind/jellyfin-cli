@@ -100,6 +100,17 @@ chmod 600 ~/.jellyfin-cli/settings.json
 
 ## Network Security
 
+### WebSocket credentials
+
+Jellyfin's official WebSocket clients authenticate `/socket` with an `ApiKey` query parameter
+because browser WebSocket constructors cannot attach the normal token header. `jf events watch`
+constructs that URL only in memory and never includes it in output or errors.
+
+Treat reverse-proxy access logs as credential-bearing data. Disable query-string logging for
+`/socket`, restrict log access and retention, and prefer TLS (`wss:`) outside a trusted private
+network. Never copy a WebSocket URL from a debugger into an issue, PM item, CI log, or shell
+history.
+
 ### Use HTTPS
 
 Always use HTTPS in production:

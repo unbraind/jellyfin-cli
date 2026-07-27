@@ -4,6 +4,7 @@
 
 ### Added
 
+- Add bounded real-time Jellyfin event streaming ([jf-7sjs](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-7sjs.toon))
 - Add bounded read-only Jellyfin API batches ([jf-lyq6](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-lyq6.toon))
 
 ## 2026.7.25 - 2026-07-25

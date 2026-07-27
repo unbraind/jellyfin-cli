@@ -13,6 +13,7 @@ import {
   flagBool,
   flagString,
   parseFlags,
+  pmChangelogPackage,
   pmCliPackage,
   repoRoot,
   runCommand,
@@ -86,7 +87,7 @@ function prepareReleaseChangelog(targetVersion) {
   const temporaryDirectory = mkdtempSync(path.join(tmpdir(), 'jellyfin-cli-release-'));
   const generatedPath = path.join(temporaryDirectory, 'CHANGELOG.md');
   try {
-    runPm(['install', 'npm:pm-changelog', '--project']);
+    runPm(['install', pmChangelogPackage, '--project']);
     runPm([
       'changelog', 'generate', '--output', generatedPath, '--title', 'Changelog', '--mode', 'replace',
       '--release-version', targetVersion, '--all-release-tags', '--status', 'closed',

@@ -78,6 +78,8 @@ jf sessions play SESSION_ID ITEM_ID
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
 - **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
 - **Bounded API Batches**: preflight and execute ordered read-only operation manifests in one process
+- **Real-Time Events**: bounded WebSocket watches with filters, read subscriptions, TOON aggregates,
+  and opt-in NDJSON streaming
 - **Explain Mode**: global `--explain` or `JELLYFIN_EXPLAIN=1` prints redacted request metadata to `stderr`
 - **Release Guardrails**: built-in file length + secret scanning checks for safe releases
 - **Plugin Management**: List, configure, and manage plugins
@@ -207,6 +209,9 @@ jf system info --format raw
 - `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
 - `jf api batch --file <manifest.json>` - Preflight and execute a bounded read-only operation batch
 - `jf api mutate <operationId> --confirm` - Execute a validated mutation (blocked by `--read-only`)
+- `jf events types` - List the Jellyfin 10.11 WebSocket event and subscription catalog
+- `jf events watch --count 10 --duration 30` - Collect a bounded real-time event window
+- `jf events watch --stream --format json` - Emit one NDJSON event per line plus a summary
 
 ## Release Validation
 

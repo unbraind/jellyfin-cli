@@ -2,7 +2,13 @@
 
 import { existsSync, readFileSync, writeFileSync } from 'node:fs';
 import path from 'node:path';
-import { commandFor, pmCliPackage, repoRoot, runCommand } from './utils.mjs';
+import {
+  commandFor,
+  pmChangelogPackage,
+  pmCliPackage,
+  repoRoot,
+  runCommand,
+} from './utils.mjs';
 
 const registryPath = path.join(repoRoot, '.agents', 'pm', 'extensions', '.managed-extensions.json');
 
@@ -21,7 +27,7 @@ export function ensurePmChangelog() {
   if (available.status === 0) return { installed: false, registryChanged: false };
 
   const originalRegistry = existsSync(registryPath) ? readFileSync(registryPath, 'utf8') : null;
-  pmCommand(['install', 'npm:pm-changelog', '--project']);
+  pmCommand(['install', pmChangelogPackage, '--project']);
   const installedRegistry = readFileSync(registryPath, 'utf8');
   const registryChanged = JSON.stringify(entriesFrom(originalRegistry)) !== JSON.stringify(entriesFrom(installedRegistry));
 

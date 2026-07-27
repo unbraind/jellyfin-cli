@@ -257,6 +257,39 @@ jf api mutate UpdateDeviceOptions \
 `JELLYFIN_READ_ONLY=1` / `--read-only`. `--explain` reports only body content type and byte length
 for generic calls; it never writes body contents to diagnostics.
 
+## Real-Time Event Automation
+
+Jellyfin's WebSocket messages are not described by OpenAPI. Discover the supported 10.11 contract
+locally, then request a bounded window:
+
+```bash
+jf events types --format toon
+JELLYFIN_READ_ONLY=1 jf events watch \
+  --subscribe sessions \
+  --type Sessions \
+  --count 2 \
+  --duration 15 \
+  --format toon
+```
+
+For a low-latency pipeline, use newline-delimited JSON:
+
+```bash
+JELLYFIN_READ_ONLY=1 jf events watch \
+  --type LibraryChanged UserDataChanged \
+  --count 20 \
+  --duration 60 \
+  --stream \
+  --format json |
+while IFS= read -r record; do
+  printf '%s\n' "$record" | jf schema validate event_stream_record --from json --format json
+done
+```
+
+The last line is always a `kind: "summary"` record. Earlier lines are ordered `kind: "event"`
+records. Treat payloads as private server data: process them in memory, select only required
+fields, and do not store raw records in prompts, CI logs, PM, or source control.
+
 ## Help Discovery
 
 Every command exposes local help and inherited global options:

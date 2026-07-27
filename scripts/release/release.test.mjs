@@ -46,7 +46,12 @@ test('published version parsing lets transient invalid JSON be retried', () => {
 });
 
 test('changelog checks distinguish pending and prepared release contexts', () => {
-  assert.equal(changelogCheckArgs().includes('--release-version'), false);
+  const pendingArgs = changelogCheckArgs();
+  assert.equal(pendingArgs.includes('--release-version'), false);
+  assert.deepEqual(
+    pendingArgs.slice(pendingArgs.indexOf('--pm-path'), pendingArgs.indexOf('changelog')),
+    ['--pm-path', '.agents/pm'],
+  );
   const releaseArgs = changelogCheckArgs('2026.7.21');
   assert.deepEqual(releaseArgs.slice(releaseArgs.indexOf('--release-version'), -1), ['--release-version', '2026.7.21']);
   assert.throws(() => changelogCheckArgs('not-a-version'), /Invalid PM_CHANGELOG_RELEASE_VERSION/);

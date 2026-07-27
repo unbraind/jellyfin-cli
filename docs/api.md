@@ -3235,6 +3235,52 @@ before network execution. `--body-file` requires an explicit `--content-type`; e
 type must match the operation's OpenAPI declaration. Responses are size-bounded and binary data is
 base64-encoded inside the structured output envelope.
 
+## events
+
+Authenticated, read-only access to Jellyfin's `/socket` WebSocket protocol. This protocol is
+separate from the REST OpenAPI document.
+
+### events types
+
+List the Jellyfin 10.11 message catalog, semantic categories, and the three periodic read
+subscriptions:
+
+```bash
+jf events types [--format <format>]
+```
+
+Output type: `event_types`.
+
+### events watch
+
+Watch a bounded event window:
+
+```bash
+jf events watch \
+  [--type <messageType...>] \
+  [--subscribe <activity|sessions|tasks...>] \
+  [--include-control] \
+  [--count <number>] \
+  [--duration <seconds>] \
+  [--connect-timeout <seconds>] \
+  [--max-message-bytes <bytes>] \
+  [--interval <milliseconds>] \
+  [--stream --format json]
+```
+
+The default aggregate contract is TOON output type `event_watch`, capped at 10 emitted records and
+30 seconds. The hard limits are 1,000 records and one hour; periodic intervals cannot be below 500
+milliseconds. Messages are capped at one MiB by default. Keepalive traffic is processed
+automatically and omitted unless `--include-control` is supplied.
+
+`--subscribe` sends only Jellyfin's official periodic read requests: `SessionsStart`,
+`ActivityLogEntryStart`, or `ScheduledTasksInfoStart`, followed by the matching stop message.
+Playback and administrative control messages are never sent.
+
+For incremental automation, `--stream --format json` emits one compact JSON object per line,
+followed by a summary record. Validate each line against `jf schema event_stream_record`; aggregate
+TOON output validates against `jf schema event_watch`.
+
 ## schema
 
 JSON Schema commands for LLM/Agent integration.

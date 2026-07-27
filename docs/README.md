@@ -91,6 +91,10 @@ jf schema compatibility --baseline live --fail-on-breaking --format json
 # Preflight a bounded multi-operation read manifest before execution
 jf api batch --file reads.json --dry-run
 
+# Inspect and watch the non-OpenAPI real-time event protocol
+jf events types
+JELLYFIN_READ_ONLY=1 jf events watch --subscribe sessions --count 1 --duration 15
+
 # Explain actual Jellyfin request mapping (safe redacted metadata on stderr)
 jf --explain system info
 
@@ -260,6 +264,7 @@ Notes:
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
 | `jf schema compatibility` | Compare trusted official versions or explicitly audit live/plugin API drift with CI breaking-change gates |
 | `jf api inspect/get/mutate` | Inspect or execute an exact OpenAPI operation with declared-input validation and read-only safeguards |
+| `jf events types/watch` | Discover and consume bounded authenticated Jellyfin WebSocket events |
 | `jf schema suggest` | Generate candidate CLI command names from intent-matched or uncovered OpenAPI operations |
 | `jf schema validate` | Validate TOON/JSON/YAML payloads against CLI schemas for CI and agent safety |
 

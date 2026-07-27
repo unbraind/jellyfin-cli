@@ -372,14 +372,28 @@ jf config set --server http://your-server:8096
 ### Issue: WebSocket connection fails
 
 **Symptoms:**
-- Real-time features not working
-- Session updates delayed
+- `jf events watch` reports a connection failure or closes without events
+- periodic session/task/activity updates are missing
 
 **Solutions:**
 
-1. WebSocket uses same port as HTTP
-2. Check proxy configuration
-3. Ensure WebSocket protocol is allowed
+1. Verify the normal profile first with `jf setup validate --require-all`.
+2. WebSocket uses the configured HTTP(S) origin and `/socket`; do not configure a second port.
+3. Ensure a reverse proxy permits WebSocket upgrade headers for `/socket`.
+4. Test a deterministic periodic read:
+
+```bash
+JELLYFIN_READ_ONLY=1 jf events watch \
+  --subscribe sessions \
+  --type Sessions \
+  --count 1 \
+  --duration 15 \
+  --format json
+```
+
+5. If a quiet server legitimately emits no events, increase `--duration`; a zero-event
+   `duration_reached` summary is successful and does not indicate a transport failure.
+6. Do not print or share the credential-bearing WebSocket URL while debugging.
 
 ## Performance Issues
 

@@ -13,6 +13,7 @@ import {
   formatSessions,
   formatSystemInfo,
   formatTasks,
+  formatToon,
   formatUsers,
 } from '../../src/formatters/toon.js';
 import { validateJsonSchema } from '../../src/utils/schema-validate.js';
@@ -80,6 +81,27 @@ const representativeOutputs = {
   }]),
   message: formatMessage('Complete'),
   error: formatError('Failed', 500, { retryable: false }),
+  event_types: formatToon([{
+    message_type: 'Sessions',
+    category: 'session',
+    periodic_subscription: 'sessions',
+    read_only_safe: true,
+  }], 'event_types'),
+  event_watch: formatToon({
+    kind: 'summary',
+    stop_reason: 'count_reached',
+    event_count: 1,
+    duration_ms: 25,
+    subscriptions: ['sessions'],
+    event_types: ['Sessions'],
+    events: [{
+      kind: 'event',
+      sequence: 1,
+      received_at: '2026-07-27T20:00:00.000Z',
+      message_type: 'Sessions',
+      data: [],
+    }],
+  }, 'event_watch'),
 } as const;
 
 describe('TOON formatter schema contracts', () => {
@@ -92,4 +114,26 @@ describe('TOON formatter schema contracts', () => {
       expect(validation.valid).toBe(true);
     });
   }
+
+  it('validates raw NDJSON event and summary records', () => {
+    const schema = getSchema('event_stream_record');
+    const event = validateJsonSchema({
+      kind: 'event',
+      sequence: 1,
+      received_at: '2026-07-27T20:00:00.000Z',
+      message_type: 'LibraryChanged',
+      data: {},
+    }, schema);
+    const summary = validateJsonSchema({
+      kind: 'summary',
+      stop_reason: 'duration_reached',
+      event_count: 0,
+      duration_ms: 1000,
+      subscriptions: [],
+      event_types: [],
+    }, schema);
+
+    expect(event.valid).toBe(true);
+    expect(summary.valid).toBe(true);
+  });
 });

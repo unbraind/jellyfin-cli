@@ -197,6 +197,26 @@ This avoids treating local utility commands as API implementation gaps.
 
 ## Latest Agent-Focused Improvements
 
+### Bounded Jellyfin 10.11 WebSocket events
+
+The configured Jellyfin 10.11.11 server currently exposes `356` OpenAPI paths and `429` REST
+operations, all mapped by the CLI intent inventory. The remaining major server API surface is the
+authenticated `/socket` protocol, which is intentionally outside OpenAPI.
+
+`jf events types` now models all 28 values in Jellyfin 10.11.11's official
+`SessionMessageType`, including library, user-data, session, task, plugin, timer, server-lifecycle,
+playback, and SyncPlay messages. `jf events watch` follows the official TypeScript SDK behavior:
+
+- authenticate through the `ApiKey` WebSocket query parameter without printing or persisting it;
+- respond to `ForceKeepAlive` at half the server-provided interval;
+- support the official `Sessions`, `ActivityLogEntry`, and `ScheduledTasksInfo` periodic reads;
+- stop by record count, duration, socket closure, or signal;
+- enforce connection, message-size, record-count, duration, and subscription-rate bounds;
+- emit aggregate TOON by default or explicit NDJSON with `--stream --format json`.
+
+Live compiled acceptance used only read subscriptions with `JELLYFIN_READ_ONLY=1`; no Jellyfin data
+was modified and raw payloads were not persisted.
+
 ### Exact-version OpenAPI source resilience
 
 Schema discovery prefers the configured server. If all local OpenAPI candidates fail, it resolves
@@ -292,6 +312,8 @@ export JELLYFIN_READ_ONLY=1
 - [Jellyfin server repository and hosted Swagger path](https://github.com/jellyfin/jellyfin#accessing-the-hosted-web-client)
 - [Jellyfin 10.11.11 release](https://github.com/jellyfin/jellyfin/releases/tag/v10.11.11)
 - [Jellyfin stable OpenAPI artifacts](https://repo.jellyfin.org/files/openapi/stable/)
+- [Jellyfin 10.11.11 WebSocket message enum](https://github.com/jellyfin/jellyfin/blob/v10.11.11/MediaBrowser.Model/Session/SessionMessageType.cs)
+- [Official Jellyfin TypeScript SDK WebSocket service](https://github.com/jellyfin/jellyfin-sdk-typescript/blob/master/src/websocket/websocket-service.ts)
 - [Official TOON TypeScript implementation](https://github.com/toon-format/toon)
 - [TOON specification](https://github.com/toon-format/spec)
 - [Bun coverage documentation](https://bun.sh/docs/test/code-coverage)
