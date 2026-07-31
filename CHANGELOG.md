@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Added
+
+- Add typed OpenAPI invocation contracts for agents ([jf-snok](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-snok.toon))
+
 ## 2026.7.28 - 2026-07-28
 
 ### Added
