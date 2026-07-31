@@ -222,6 +222,11 @@ The CLI rejects unknown operation IDs, undeclared query/path parameters, missing
 unsupported request content types, and oversized responses. Binary responses are base64-encoded
 inside the normal structured envelope.
 
+The inspection response is the canonical request-construction contract for agents. It includes
+merged path- and operation-level parameters, bounded recursive schema metadata, declared request
+content types, response status/content types, security alternatives, and an
+`invocation.argv_template`. Fill placeholders explicitly; inspection never sends an API request.
+
 For related reads, submit one strict manifest so the CLI can resolve the schema once and preflight
 the entire plan before execution:
 

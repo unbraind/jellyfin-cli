@@ -45,6 +45,9 @@ parameters, request-body presence, and request content types before execution.
   `jf api get`.
 - Non-read-only operations require `jf api mutate ... --confirm`.
 - Global read-only mode blocks `api mutate` before any request.
+- Exact inspection merges path- and operation-level parameters and exposes types, formats,
+  constraints, defaults, examples, bounded body schemas, response contracts, security alternatives,
+  and a ready-to-fill argv template without duplicating catalog or batch dry-run surfaces.
 - The schema declares `76` JSON-capable request-body operations, `2` text bodies, and `4` image
   bodies (media-type declarations overlap for JSON variants).
 - JSON, text, and file-backed binary/text bodies are supported without allowing custom origins or

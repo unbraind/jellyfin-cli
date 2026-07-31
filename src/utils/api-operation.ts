@@ -56,11 +56,8 @@ function operationShape(value: unknown): OpenApiOperationShape | undefined {
     : undefined;
 }
 
-function operationParameters(value: unknown): ApiOperationParameter[] {
-  if (!Array.isArray(value)) {
-    return [];
-  }
-  return value.flatMap((entry) => {
+function operationParameters(...values: unknown[]): ApiOperationParameter[] {
+  const parameters: ApiOperationParameter[] = values.flatMap((value) => Array.isArray(value) ? value : []).flatMap((entry): ApiOperationParameter[] => {
     if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
       return [];
     }
@@ -78,6 +75,8 @@ function operationParameters(value: unknown): ApiOperationParameter[] {
       required: parameter.required === true || location === 'path',
     }];
   });
+  return parameters.filter((parameter, index) => !parameters.slice(index + 1).some((candidate) =>
+    candidate.name === parameter.name && candidate.location === parameter.location));
 }
 
 function requestBodyRequired(value: unknown): boolean {
@@ -136,7 +135,10 @@ export function resolveApiOperation(
           : [],
         deprecated: operation.deprecated === true,
         readOnlySafe: method === 'GET' || method === 'HEAD' || method === 'OPTIONS',
-        parameters: operationParameters(operation.parameters),
+        parameters: operationParameters(
+          (pathItem as Record<string, unknown>).parameters,
+          operation.parameters,
+        ),
         requestBodyAllowed: operation.requestBody !== undefined,
         requestBodyRequired: requestBodyRequired(operation.requestBody),
         requestBodyContentTypes: requestBodyContentTypes(operation.requestBody),

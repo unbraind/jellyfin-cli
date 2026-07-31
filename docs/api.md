@@ -3168,8 +3168,9 @@ groups elsewhere in this reference for routine use.
 ### api inspect
 
 Resolve an exact operation ID and report its HTTP method, path template, tags, safety
-classification, declared path/query parameters, request-body requirement, and accepted content
-types. No API operation is executed.
+classification, typed parameter constraints, request-body schemas, response status/content types,
+security alternatives, and deterministic `invocation.argv_template`. Recursive schemas are bounded
+to four levels and 100 properties per object. No API operation is executed.
 
 ```bash
 jf api inspect <operationId> [--endpoint <path>] [--format <format>]

@@ -205,7 +205,7 @@ jf system info --format raw
 - `jf schema coverage` - Estimate API coverage, list unmatched OpenAPI operations, and suggest command names
 - `jf schema suggest` - Generate candidate CLI command patterns from OpenAPI intent matches or coverage gaps
 - `jf schema compatibility` - Compare exact official API versions or audit live/plugin drift
-- `jf api inspect <operationId>` - Inspect one exact OpenAPI operation and its declared inputs
+- `jf api inspect <operationId>` - Inspect typed inputs, bodies, responses, security, and an argv template
 - `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
 - `jf api batch --file <manifest.json>` - Preflight and execute a bounded read-only operation batch
 - `jf api mutate <operationId> --confirm` - Execute a validated mutation (blocked by `--read-only`)
@@ -626,6 +626,11 @@ support JSON (`--body-json`), text (`--body-text`), and file-backed binary/text 
 responses use base64 so TOON/JSON/YAML/Markdown/table output stays structurally valid. Exact
 operation IDs come from the configured server OpenAPI document, with the existing exact-version
 official fallback when a local schema is unavailable.
+
+`api inspect` is side-effect free and returns a bounded invocation contract: merged path- and
+operation-level parameters with types, formats, descriptions, enums, defaults, examples, and
+constraints; request-body schemas by content type; response status/content-type summaries; security
+alternatives; and a deterministic `argv_template`. Placeholders are never populated from live data.
 
 Batch manifests are strict JSON objects with `version: 1` and a non-empty `requests` array:
 

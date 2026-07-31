@@ -104,6 +104,21 @@ describe('api command', () => {
       path_template: '/Users/{userId}',
       read_only_safe: true,
       request_body_allowed: false,
+      parameters: [
+        {
+          name: 'userId',
+          in: 'path',
+          required: true,
+            description: 'Operation-specific user identifier.',
+          schema: { type: 'string', format: 'uuid' },
+        },
+        {
+          name: 'includeDisabled',
+          in: 'query',
+          required: false,
+          schema: { type: 'boolean', default: false },
+        },
+      ],
     });
 
     const toon = await runCli(['api', 'inspect', 'GetUserById']);
@@ -112,6 +127,37 @@ describe('api command', () => {
       decode(toon.stdout),
       getSchema('api_operation'),
     ).errors).toEqual([]);
+  });
+
+  it('describes required request bodies and confirmed mutation templates', async () => {
+    const [result, yaml, raw, table, markdown] = await Promise.all([
+      runCli(['--format', 'json', 'api', 'inspect', 'CreateUser']),
+      runCli(['--format', 'yaml', 'api', 'inspect', 'CreateUser']),
+      runCli(['--format', 'raw', 'api', 'inspect', 'CreateUser']),
+      runCli(['--format', 'table', 'api', 'inspect', 'CreateUser']),
+      runCli(['--format', 'markdown', 'api', 'inspect', 'CreateUser']),
+    ]);
+    expect(result.code).toBe(0);
+    expect(JSON.parse(result.stdout)).toMatchObject({
+      request_bodies: [{
+        content_type: 'application/json',
+        schema: {
+          ref: '#/components/schemas/CreateUserByName',
+          type: 'object',
+          required: ['Name'],
+          properties: { Name: { type: 'string', minLength: 1, example: 'New user' } },
+        },
+      }],
+      invocation: {
+        command: 'mutate',
+        argv_template: ['jf', 'api', 'mutate', 'CreateUser', '--confirm', '--body-json', '<json>'],
+        requires_confirmation: true,
+      },
+    });
+    expect(() => YAML.parse(yaml.stdout)).not.toThrow();
+    expect(() => JSON.parse(raw.stdout)).not.toThrow();
+    expect(table.stdout).toContain('invocation: [Object]');
+    expect(markdown.stdout).toContain('**invocation**');
   });
 
   it('executes validated read-only operations with structured output', async () => {

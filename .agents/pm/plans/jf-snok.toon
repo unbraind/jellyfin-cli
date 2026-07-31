@@ -1,0 +1,125 @@
+id: jf-snok
+title: Add typed OpenAPI invocation contracts for agents
+description: "Enrich exact Jellyfin OpenAPI operation inspection with parameter types, formats, constraints, defaults, examples, request-body schemas, response contracts, security requirements, and deterministic executable CLI templates so agents can construct valid requests without guessing or mutating the live server during discovery."
+type: Plan
+status: in_progress
+priority: 0
+tags[7]: agents,api,contracts,openapi,read-only,schemas,typescript
+created_at: "2026-07-31T20:20:37.363Z"
+updated_at: "2026-07-31T20:43:31.911Z"
+assignee: codex-jellyfin-contracts
+author: codex-jellyfin-contracts
+estimated_minutes: 720
+acceptance_criteria: "jf api inspect exposes deterministic parameter schema metadata, request bodies, responses, security requirements, and a ready-to-fill jf api get or mutate argv template; All nested help and TOON, JSON, YAML, Markdown, table, and raw outputs remain valid and documented; Implementation is fully typed, uses top-level imports and erasable syntax, preserves the 300-code-line rule, and reads external contracts rather than guessing; Focused tests, full release validation, generated changelog parity, strict PM validation, and compiled live read-only acceptance pass without persisting private data"
+definition_of_ready: All-status PM lineage and duplicate search are complete; Jellyfin 10.11.11 is confirmed latest stable; local main is refreshed; owner-only global profile exists.
+goal: jf-mqpo
+value: Give humans and LLM agents enough machine-readable contract detail to invoke every OpenAPI operation correctly on the first attempt.
+impact: Reduces invalid requests and dangerous guesswork while making the generic all-API executor genuinely usable in automated workflows.
+outcome: "Exact Jellyfin operation inspection becomes a complete, deterministic invocation contract rather than a shallow name list."
+why_now: "The live coverage report maps all 429 operations, but current exact inspection omits the schemas and response/security details agents need to use that coverage safely."
+parent: jf-gn5j
+reviewer: github-review-bots
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+release: next-manual-release
+dependencies[9]{id,kind,created_at,author,source_kind,author_source}:
+  jf-0ea5,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-7sjs,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-axko,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-gn5j,parent,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-lpki,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-lyq6,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-mkzh,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-rjox,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+  jf-sylm,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
+comments[3]{created_at,author,text}:
+  "2026-07-31T20:35:16.446Z",codex-jellyfin-contracts,"Measured final pre-PR diagnostics: validate:release passed; portable Vitest 963 passed with one intentional skip; four-metric coverage is 41.69% statements, 42.07% branches, 52.09% functions, and 41.41% lines; compiled live read-only acceptance passed 183/183; Bun/npm audits and tracked/history secret scans passed; jscpd remains red at 8.09% duplicated lines and 220 clones, with no new clone from this bundle after removing a redundant assertion. Coverage and zero-duplication remain canonical open jf-mkzh/jf-lpki work."
+  "2026-07-31T20:40:56.439Z",codex-jellyfin-contracts,"PM-native linked validation passed on 2026-07-31: portable coverage suite 963 passed/1 intentional skip; full release validation passed; compiled CLI live read-only E2E against Jellyfin 10.11.11 passed 183/183; focused OpenAPI contract/schema suite passed 31/31. Process TMPDIR was moved under ~/.cache because host /tmp was inode-exhausted; no private values or live payloads were stored in PM evidence."
+  "2026-07-31T20:43:31.910Z",codex-jellyfin-contracts,"Pre-commit contract review corrected OpenAPI parameter precedence: operation-level parameters now override matching path-level parameters in routing and rich metadata, per OpenAPI semantics. Focused suite remains 31/31; TypeScript typecheck, ESLint, and diff whitespace checks pass."
+notes[1]{created_at,author,text}:
+  "2026-07-31T20:20:52.200Z",codex-jellyfin-contracts,"Privacy boundary: credentials, private URLs, raw live schemas, cache paths, IDs, inventories, and payloads remain only under owner-controlled ~/.jellyfin-cli and process environment. PM/Git/docs may retain only public version facts, aggregate operation counts, and synthetic fixtures."
+files[13]{path,scope,note}:
+  .agents/pm/extensions/.managed-extensions.json,project,Latest managed pm-changelog provenance
+  .gitattributes,project,Latest PM wildcard merge-fence mapping
+  package.json,project,Latest PM CLI-backed changelog invocation
+  scripts/release/utils.mjs,project,Pinned latest PM CLI and pm-changelog package
+  src/commands/api.ts,project,Rich exact inspection output and help
+  src/commands/schema-api-operation-def.ts,project,Strict output JSON Schema
+  src/commands/schema-defs.ts,project,Output schema registration
+  src/utils/api-operation.ts,project,Path-level plus operation-level parameter merging
+  src/utils/openapi-operation-contract.ts,project,Bounded recursive OpenAPI schema and invocation contract extraction
+  tests/commands/api.test.ts,project,Actual CLI and six-format contract coverage
+  tests/fixtures/api-operation.ts,project,Synthetic typed OpenAPI fixture
+  tests/utils/api-operation.test.ts,project,Exact resolver regression coverage
+  tests/utils/openapi-operation-contract.test.ts,project,Contract extraction behavior
+tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
+  "bun run test:coverage:four",package.json,project,600,tracker
+  "bun run validate:release",package.json,project,1800,tracker
+  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker
+  TMPDIR=/home/steve/.cache/jf-cli-test-tmp bun test tests/utils/api-operation.test.ts tests/utils/openapi-operation-contract.test.ts tests/commands/api.test.ts tests/formatters/schema-contract.test.ts,package.json,project,300,tracker
+docs[5]{path,scope,note}:
+  docs/agent-integration.md,project,Canonical agent request-construction guidance
+  docs/api-research.md,project,Sanitized current-version research evidence
+  docs/api.md,project,Complete command reference
+  docs/README.md,project,Command index
+  README.md,project,User-facing exact invocation workflow
+plan_mode: executing
+plan_scope: "Official and live 10.11.11 OpenAPI contract extraction, agent-ready jf api inspect output, exact argument templates, schema-valid formats, docs, behavior tests, read-only live acceptance, and production PR closeout."
+plan_harness: codex
+plan_resume_context: "Latest stable and configured server are Jellyfin 10.11.11. Generic exact operation execution already exists, but inspect only exposes parameter names/requiredness and body content types, forcing agents to guess types, enums, defaults, schemas, security, responses, and CLI construction. Preserve owner-only credentials and use JELLYFIN_READ_ONLY=1 for live proof."
+plan_validation[1]{text,command,expected}:
+  "Complete release validation passed; exact portable coverage remains below the governed repository target; zero-duplication remains red without any clone introduced by this bundle; compiled live read-only suite passed all 183 commands; dependency and secret audits are clean; strict PM validation, graph audit, and duplicate scan pass after refreshing the merge fence.","bun run validate:release; bun run test:coverage:four; bun run check:duplicates; JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts; pm --no-extensions validate ... --strict-exit",Release and live gates pass; canonical project-wide coverage and duplication debt remains honestly open.
+plan_decisions[2]{ts,author,decision,rationale,evidence}:
+  "2026-07-31T20:20:51.509Z",codex-jellyfin-contracts,Extend exact operation inspection instead of adding a duplicate catalog or dry-run command.,jf schema openapi already catalogs operations and jf api batch --dry-run already plans execution. The non-duplicative gap is complete per-operation invocation metadata at the exact execution boundary.,"Current command/help/source inspection and all-status PM search across jf-0ea5, jf-lyq6, and jf-axko."
+  "2026-07-31T20:34:56.476Z",codex-jellyfin-contracts,Refresh the repository PM merge fence with the latest CLI installer.,"Strict storage validation detected stale per-type JSON mapping and missing wildcard TOON, Markdown, and JSON rules after the PM CLI upgrade.",pm merge install --dry-run produced a deterministic .gitattributes-only update; pm merge install applied it and configured clone-local drivers.
+plan_discoveries[1]{ts,author,text}:
+  "2026-07-31T20:20:50.798Z",codex-jellyfin-contracts,"The configured Jellyfin 10.11.11 live schema exposes 429 operations across 356 paths, including plugin extensions; intent mapping reports 100 percent but jf api inspect currently exposes only names, requiredness, and body content types. OpenAPI parameter schemas, request schemas, response contracts, security requirements, and executable argument templates are omitted."
+plan_steps[6]:
+  - id: plan-step-001
+    order: 1
+    title: Record current official/live OpenAPI contract gaps and privacy boundary
+    status: completed
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:20:52.877Z"
+    evidence: "Confirmed v10.11.11 as latest official stable from the primary release API and refreshed the configured live schema under JELLYFIN_READ_ONLY=1. Sanitized aggregate: 356 live paths and 429 operations. Existing exact inspect metadata gap and non-duplication boundary recorded."
+    completed_at: "2026-07-31T20:20:52.877Z"
+  - id: plan-step-002
+    order: 2
+    title: Implement typed recursive operation contract extraction and invocation templates
+    status: completed
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:30:06.872Z"
+    evidence: "Implemented typed bounded schema extraction with local-ref resolution and cycle/depth/property guards; merged path/operation parameters; added body, response, security, and deterministic get/mutate argv contracts. Typecheck, lint, file-length, and 31 focused assertions pass."
+    completed_at: "2026-07-31T20:30:06.872Z"
+  - id: plan-step-003
+    order: 3
+    title: "Integrate schema-valid output, complete help, and agent documentation"
+    status: completed
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:30:08.035Z"
+    evidence: "Registered the expanded api_operation JSON Schema, updated nested help, and refreshed README, API reference, agent integration, research, and docs index guidance. Latest @unbrained/pm-cli 2026.7.31 and pm-changelog 2026.7.29-1 are pinned for repository tooling."
+    completed_at: "2026-07-31T20:30:08.035Z"
+  - id: plan-step-004
+    order: 4
+    title: "Add focused unit, command, format, and read-only live acceptance tests"
+    status: completed
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:30:09.059Z"
+    evidence: "Focused unit and actual-CLI command tests pass 31/31 across TOON, JSON, YAML, raw, table, and Markdown; compiled live read-only GetPublicSystemInfo inspection returned a valid rich contract without sending the target API operation or exposing private data."
+    completed_at: "2026-07-31T20:30:09.059Z"
+  - id: plan-step-005
+    order: 5
+    title: "Run release, coverage, duplication, security, changelog, and PM gates"
+    status: completed
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:35:17.222Z"
+    evidence: Release validator passed; 963 portable assertions plus one intentional skip; 183 compiled live read-only E2E passed; audits/secret scans clean; strict PM validation and 45-node/108-edge graph audit clean. Honest project baselines remain 41.69/42.07/52.09/41.41 coverage and 8.09% duplicated lines/220 clones under jf-mkzh and jf-lpki.
+    completed_at: "2026-07-31T20:35:17.222Z"
+  - id: plan-step-006
+    order: 6
+    title: "Publish PR, process exact-head checks and bot reviews, merge, and close lineage"
+    status: in_progress
+    created_at: "2026-07-31T20:20:37.357Z"
+    updated_at: "2026-07-31T20:35:17.974Z"
+body: ""
