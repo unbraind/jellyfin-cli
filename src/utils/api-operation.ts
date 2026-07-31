@@ -56,8 +56,13 @@ function operationShape(value: unknown): OpenApiOperationShape | undefined {
     : undefined;
 }
 
-function operationParameters(...values: unknown[]): ApiOperationParameter[] {
-  const parameters: ApiOperationParameter[] = values.flatMap((value) => Array.isArray(value) ? value : []).flatMap((entry): ApiOperationParameter[] => {
+/**
+ * Resolves parameters once with operation-level definitions overriding path-level definitions.
+ * @param values - Path-level followed by operation-level OpenAPI parameter arrays.
+ * @returns Winning normalized parameter contracts paired with their raw source definitions.
+ */
+export function resolveApiOperationParameters(...values: unknown[]): Array<ApiOperationParameter & { source: Record<string, unknown> }> {
+  const parameters = values.flatMap((value) => Array.isArray(value) ? value : []).flatMap((entry): Array<ApiOperationParameter & { source: Record<string, unknown> }> => {
     if (typeof entry !== 'object' || entry === null || Array.isArray(entry)) {
       return [];
     }
@@ -73,6 +78,7 @@ function operationParameters(...values: unknown[]): ApiOperationParameter[] {
       name: parameter.name,
       location,
       required: parameter.required === true || location === 'path',
+      source: parameter,
     }];
   });
   return parameters.filter((parameter, index) => !parameters.slice(index + 1).some((candidate) =>
@@ -135,10 +141,10 @@ export function resolveApiOperation(
           : [],
         deprecated: operation.deprecated === true,
         readOnlySafe: method === 'GET' || method === 'HEAD' || method === 'OPTIONS',
-        parameters: operationParameters(
+        parameters: resolveApiOperationParameters(
           (pathItem as Record<string, unknown>).parameters,
           operation.parameters,
-        ),
+        ).map(({ source: _source, ...parameter }) => parameter),
         requestBodyAllowed: operation.requestBody !== undefined,
         requestBodyRequired: requestBodyRequired(operation.requestBody),
         requestBodyContentTypes: requestBodyContentTypes(operation.requestBody),

@@ -1,4 +1,4 @@
-import type { ResolvedApiOperation } from './api-operation.js';
+import { resolveApiOperationParameters, type ResolvedApiOperation } from './api-operation.js';
 import type { OpenApiDocument } from './openapi-source.js';
 
 type ObjectValue = Record<string, unknown>;
@@ -142,10 +142,10 @@ function parameterContracts(
   operation: ResolvedApiOperation,
   root: ObjectValue,
 ): ApiParameterContract[] {
-  const rawParameters = Array.isArray(raw.parameters) ? raw.parameters : [];
+  const rawParameters = resolveApiOperationParameters(raw.parameters);
   return operation.parameters.map((parameter) => {
-    const source = rawParameters.slice().reverse().map(objectValue).find((candidate) =>
-      candidate?.name === parameter.name && candidate.in === parameter.location);
+    const source = rawParameters.find((candidate) =>
+      candidate.name === parameter.name && candidate.location === parameter.location)?.source;
     return {
       name: parameter.name,
       in: parameter.location,

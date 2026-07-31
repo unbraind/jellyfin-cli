@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[7]: agents,api,contracts,openapi,read-only,schemas,typescript
 created_at: "2026-07-31T20:20:37.363Z"
-updated_at: "2026-07-31T20:43:31.911Z"
+updated_at: "2026-07-31T20:58:10.157Z"
 assignee: codex-jellyfin-contracts
 author: codex-jellyfin-contracts
 estimated_minutes: 720
@@ -33,10 +33,12 @@ dependencies[9]{id,kind,created_at,author,source_kind,author_source}:
   jf-mkzh,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
   jf-rjox,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
   jf-sylm,related,"2026-07-31T20:20:37.363Z",codex-jellyfin-contracts,"cli:create:dep",detected
-comments[3]{created_at,author,text}:
+comments[5]{created_at,author,text}:
   "2026-07-31T20:35:16.446Z",codex-jellyfin-contracts,"Measured final pre-PR diagnostics: validate:release passed; portable Vitest 963 passed with one intentional skip; four-metric coverage is 41.69% statements, 42.07% branches, 52.09% functions, and 41.41% lines; compiled live read-only acceptance passed 183/183; Bun/npm audits and tracked/history secret scans passed; jscpd remains red at 8.09% duplicated lines and 220 clones, with no new clone from this bundle after removing a redundant assertion. Coverage and zero-duplication remain canonical open jf-mkzh/jf-lpki work."
   "2026-07-31T20:40:56.439Z",codex-jellyfin-contracts,"PM-native linked validation passed on 2026-07-31: portable coverage suite 963 passed/1 intentional skip; full release validation passed; compiled CLI live read-only E2E against Jellyfin 10.11.11 passed 183/183; focused OpenAPI contract/schema suite passed 31/31. Process TMPDIR was moved under ~/.cache because host /tmp was inode-exhausted; no private values or live payloads were stored in PM evidence."
   "2026-07-31T20:43:31.910Z",codex-jellyfin-contracts,"Pre-commit contract review corrected OpenAPI parameter precedence: operation-level parameters now override matching path-level parameters in routing and rich metadata, per OpenAPI semantics. Focused suite remains 31/31; TypeScript typecheck, ESLint, and diff whitespace checks pass."
+  "2026-07-31T20:46:06.248Z",codex-jellyfin-contracts,"Opened PR #47 at exact implementation head de99432 with PM link, privacy boundary, latest Jellyfin 10.11.11 compatibility evidence, automatic-release dry run, live read-only E2E, packaging, security, and measured repository-wide coverage/duplication disclosures."
+  "2026-07-31T20:58:10.157Z",codex-jellyfin-contracts,"PR #47 review round 1: CodeRabbit findings accepted. Removed the machine-specific TMPDIR from current linked tests and used audited pm history-redact to sanitize its prior append-only event with verified hashes. Consolidated path/operation parameter precedence into one exported typed resolver shared by execution and inspection. Typecheck, ESLint, 31 focused tests, and strict PM validation pass. Gemini and Sourcery were unavailable; CodeRabbit rate-limited its full run after posting findings."
 notes[1]{created_at,author,text}:
   "2026-07-31T20:20:52.200Z",codex-jellyfin-contracts,"Privacy boundary: credentials, private URLs, raw live schemas, cache paths, IDs, inventories, and payloads remain only under owner-controlled ~/.jellyfin-cli and process environment. PM/Git/docs may retain only public version facts, aggregate operation counts, and synthetic fixtures."
 files[13]{path,scope,note}:
@@ -56,8 +58,8 @@ files[13]{path,scope,note}:
 tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
   "bun run test:coverage:four",package.json,project,600,tracker
   "bun run validate:release",package.json,project,1800,tracker
+  bun test tests/utils/api-operation.test.ts tests/utils/openapi-operation-contract.test.ts tests/commands/api.test.ts tests/formatters/schema-contract.test.ts,package.json,project,300,tracker
   JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker
-  TMPDIR=/home/steve/.cache/jf-cli-test-tmp bun test tests/utils/api-operation.test.ts tests/utils/openapi-operation-contract.test.ts tests/commands/api.test.ts tests/formatters/schema-contract.test.ts,package.json,project,300,tracker
 docs[5]{path,scope,note}:
   docs/agent-integration.md,project,Canonical agent request-construction guidance
   docs/api-research.md,project,Sanitized current-version research evidence
