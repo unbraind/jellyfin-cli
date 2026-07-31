@@ -263,7 +263,7 @@ Notes:
 | `jf schema tools` | Export command tool schemas with typed input schema/read-only flags, plus optional live OpenAPI endpoint matches (`--openapi-match`) |
 | `jf schema coverage` | Estimate OpenAPI coverage by CLI intents, sample unmatched operations and unmatched tools, and optionally suggest command names |
 | `jf schema compatibility` | Compare trusted official versions or explicitly audit live/plugin API drift with CI breaking-change gates |
-| `jf api inspect/get/mutate` | Inspect or execute an exact OpenAPI operation with declared-input validation and read-only safeguards |
+| `jf api inspect/get/mutate` | Inspect a typed invocation contract or execute an exact OpenAPI operation with declared-input validation and read-only safeguards |
 | `jf events types/watch` | Discover and consume bounded authenticated Jellyfin WebSocket events |
 | `jf schema suggest` | Generate candidate CLI command names from intent-matched or uncovered OpenAPI operations |
 | `jf schema validate` | Validate TOON/JSON/YAML payloads against CLI schemas for CI and agent safety |

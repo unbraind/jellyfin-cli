@@ -1,4 +1,6 @@
 # pm-cli:merge-drivers:start
+".agents/pm/**/*.toon" merge=pm-item-toon
+".agents/pm/**/*.md" merge=pm-item-markdown
 ".agents/pm/chores/*.toon" merge=pm-item-toon
 ".agents/pm/chores/*.md" merge=pm-item-markdown
 ".agents/pm/decisions/*.toon" merge=pm-item-toon
@@ -30,5 +32,5 @@
 ".agents/pm/**/*.jsonl" merge=pm-relationship
 ".agents/pm/history/*.jsonl" merge=pm-history
 ".agents/pm/settings.json" merge=pm-json
-".agents/pm/schema/*.json" merge=pm-json
+".agents/pm/**/*.json" merge=pm-json
 # pm-cli:merge-drivers:end

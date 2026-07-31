@@ -8,6 +8,7 @@ import {
   EVENT_TYPES_SCHEMA,
   EVENT_WATCH_SCHEMA,
 } from './schema-events-def.js';
+import { API_OPERATION_SCHEMA } from './schema-api-operation-def.js';
 
 export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   message: {
@@ -172,40 +173,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
     },
     required: ['type', 'data'],
   },
-  api_operation: {
-    type: 'object',
-    properties: {
-      type: { const: 'api_operation' },
-      data: {
-        type: 'object',
-        properties: {
-          operation_id: { type: 'string' },
-          method: { type: 'string' },
-          path_template: { type: 'string' },
-          read_only_safe: { type: 'boolean' },
-          deprecated: { type: 'boolean' },
-          parameters: { type: 'array' },
-          request_body_allowed: { type: 'boolean' },
-          request_body_required: { type: 'boolean' },
-          request_body_content_types: { type: 'array' },
-          openapi_source: { type: 'string' },
-        },
-        required: [
-          'operation_id',
-          'method',
-          'path_template',
-          'read_only_safe',
-          'deprecated',
-          'parameters',
-          'request_body_allowed',
-          'request_body_required',
-          'request_body_content_types',
-          'openapi_source',
-        ],
-      },
-    },
-    required: ['type', 'data'],
-  },
+  api_operation: API_OPERATION_SCHEMA,
   api_operation_response: {
     type: 'object',
     properties: {

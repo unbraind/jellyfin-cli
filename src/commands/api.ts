@@ -8,6 +8,7 @@ import {
   type ResolvedApiOperation,
 } from '../utils/api-operation.js';
 import { getConfig } from '../utils/config.js';
+import { buildApiInvocationContract } from '../utils/openapi-operation-contract.js';
 import { createApiClient, handleError, output } from './utils.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 import { attachApiBatchSubcommand } from './api-batch.js';
@@ -124,7 +125,7 @@ function parseBody(
 async function resolveOperation(
   operationId: string,
   options: ApiInputOptions,
-): Promise<{ operation: ResolvedApiOperation; sourceKind: string }> {
+): Promise<{ operation: ResolvedApiOperation; sourceKind: string; document: Awaited<ReturnType<typeof fetchOpenApiDocumentWithOptions>>['document'] }> {
   const config = getConfig(options.server);
   if (!config.serverUrl) {
     throw new Error('No server URL configured. Use: jf config set --server <url>');
@@ -135,6 +136,7 @@ async function resolveOperation(
   return {
     operation: resolveApiOperation(source.document, operationId),
     sourceKind: source.sourceKind,
+    document: source.document,
   };
 }
 
@@ -214,7 +216,7 @@ export function createApiCommand(): Command {
 
   cmd
     .command('inspect <operationId>')
-    .description('Inspect an exact operation ID and its declared inputs without executing it')
+    .description('Inspect a rich, executable OpenAPI operation contract without sending a request')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--server <name>', 'Server name from config')
     .option('--endpoint <path>', 'Preferred OpenAPI document path')
@@ -228,6 +230,7 @@ export function createApiCommand(): Command {
         const resolved = await resolveOperation(operationId, options);
         output({
           ...operationContract(resolved.operation),
+          ...buildApiInvocationContract(resolved.document, resolved.operation),
           openapi_source: resolved.sourceKind,
         }, format, 'api_operation');
       } catch (error) {
