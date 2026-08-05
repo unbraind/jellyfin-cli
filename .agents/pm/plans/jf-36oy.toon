@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[11]: agents,api,formats,json,markdown,quality,raw,read-only,table,toon,yaml
 created_at: "2026-08-05T20:20:16.290Z"
-updated_at: "2026-08-05T21:25:24.321Z"
+updated_at: "2026-08-05T21:29:49.670Z"
 assignee: codex-jellyfin-format-20260805
 author: codex-jellyfin-format-20260805
 estimated_minutes: 900
@@ -152,13 +152,15 @@ plan_mode: executing
 plan_scope: "Repository-wide dedicated command output formatting, contract tests, docs, and release validation; live validation remains read-only."
 plan_harness: codex
 plan_resume_context: Clean main at 84a5614; Jellyfin and local server are 10.11.11; five live read-only command probes proved requested JSON is emitted as TOON; owner-only settings remain under ~/.jellyfin-cli.
-plan_validation[3]{text,command,expected}:
+plan_validation[4]{text,command,expected}:
   Compiled live Jellyfin validation passed all 183 E2E cases with JELLYFIN_READ_ONLY=1 and no mutations; five representative commands also passed all six output encodings.,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,"183 pass, 0 fail; no server data changes"
   "All CodeRabbit fixes pass 34 focused tests plus TypeScript, ESLint, and 155-file source LOC gates.",bun test tests/commands/client-output-errors.test.ts tests/commands/config.test.ts tests/commands/global-options.test.ts tests/commands/output-format-contracts.test.ts,"34 pass, 0 fail"
   "Post-review full release gate passes 1000 Bun tests plus 183 live skips, 990 portable tests plus 1 intentional skip, release/build/package/privacy gates, and a separate 183/183 compiled live read-only rerun.","bun run validate:release && JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts","All release gates pass; live 183 pass, 0 fail, no mutations"
-plan_decisions[2]{ts,author,decision,rationale,evidence}:
+  "Extended AST guard detects aliased renderer calls, literal TOON formatOutput calls, and direct JSON console/stdout writes while enforcing exact intentional exception counts.",bun test tests/commands/output-format-contracts.test.ts && bun run typecheck && bun run lint,7 tests pass; TypeScript and ESLint pass
+plan_decisions[3]{ts,author,decision,rationale,evidence}:
   "2026-08-05T20:28:20.201Z",codex-jellyfin-format-20260805,Bind the legacy renderer method set to the resolved output format at createApiClient and prohibit direct TOON renderer use in command handlers.,"This preserves existing TOON normalization and minimizes behavior change while making the final serialization boundary authoritative for JSON, YAML, Markdown, table, and raw.","Source inventory, five sanitized live reproductions, and existing shared formatOutput/typed formatter contracts."
   "2026-08-05T21:20:04.561Z",codex-jellyfin-format-20260805,"Accept all five CodeRabbit findings, including the already-resolved documentation correction; preserve JSON server-list arrays and canonical system-info fields, format pre-client failures, and strengthen semantic and AST contracts.",Each finding reproduced against the exact PR head; config list also needed secret-safe projection before using the shared formatter.,PR 52 review 4868807502 and threads PRRT_kwDORbJJhM6WyvJr through PRRT_kwDORbJJhM6WyvKL.
+  "2026-08-05T21:29:48.682Z",codex-jellyfin-format-20260805,Encode the only legitimate hard-coded TOON and direct JSON output exceptions as exact AST counts.,schema-utils and schema-validate each need one TOON fallback for an invalid requested format; events needs exactly two JSON.stringify writes for its documented NDJSON stream. Any added or removed exception now fails the guard.,CodeRabbit inline verification comment 3724157214 and repository AST inventory.
 plan_discoveries[1]{ts,author,text}:
   "2026-08-05T20:28:18.488Z",codex-jellyfin-format-20260805,"Static inventory found 291 direct TOON renderer calls across 45 command modules despite 368 createApiClient format resolutions; live JSON parsing failed for artists, playlists, libraries, and genres while the server remained read-only."
 plan_steps[6]:

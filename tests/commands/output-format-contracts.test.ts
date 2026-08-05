@@ -73,6 +73,7 @@ describe('dedicated command output format contracts', () => {
         const source = readFileSync(join(commandsDirectory, name), 'utf8');
         const sourceFile = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, true);
         const forbiddenBindings = new Set<string>();
+        const formatOutputBindings = new Set<string>();
         sourceFile.forEachChild((node) => {
           if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) return;
           if (!node.moduleSpecifier.text.includes('/formatters/')) return;
@@ -84,10 +85,13 @@ describe('dedicated command output format contracts', () => {
               if (['toon', 'formatToon', 'formatMessage'].includes(importedName)) {
                 forbiddenBindings.add(element.name.text);
               }
+              if (importedName === 'formatOutput') formatOutputBindings.add(element.name.text);
             }
           }
         });
         let bypassFound = false;
+        let hardCodedToonCalls = 0;
+        let directJsonOutputCalls = 0;
         const visit = (node: ts.Node): void => {
           if (
             ts.isCallExpression(node)
@@ -100,9 +104,42 @@ describe('dedicated command output format contracts', () => {
             && ts.isIdentifier(node.expression)
             && forbiddenBindings.has(node.expression.text)
           ) bypassFound = true;
+          if (
+            ts.isCallExpression(node)
+            && ts.isIdentifier(node.expression)
+            && formatOutputBindings.has(node.expression.text)
+            && node.arguments[1]
+            && ts.isStringLiteral(node.arguments[1])
+            && node.arguments[1].text === 'toon'
+          ) hardCodedToonCalls += 1;
+          if (
+            ts.isCallExpression(node)
+            && ts.isPropertyAccessExpression(node.expression)
+            && ts.isIdentifier(node.expression.expression)
+            && node.expression.expression.text === 'JSON'
+            && node.expression.name.text === 'stringify'
+          ) {
+            let ancestor: ts.Node | undefined = node.parent;
+            while (ancestor && !ts.isStatement(ancestor)) {
+              if (ts.isCallExpression(ancestor) && ts.isPropertyAccessExpression(ancestor.expression)) {
+                const target = ancestor.expression.expression.getText(sourceFile);
+                const method = ancestor.expression.name.text;
+                if ((target === 'console' && ['log', 'error'].includes(method))
+                  || (target === 'process.stdout' && method === 'write')) {
+                  directJsonOutputCalls += 1;
+                  break;
+                }
+              }
+              ancestor = ancestor.parent;
+            }
+          }
           ts.forEachChild(node, visit);
         };
         visit(sourceFile);
+        const expectedToonFallbacks = ['schema-utils.ts', 'schema-validate.ts'].includes(name) ? 1 : 0;
+        const expectedNdjsonWrites = name === 'events.ts' ? 2 : 0;
+        if (hardCodedToonCalls !== expectedToonFallbacks) bypassFound = true;
+        if (directJsonOutputCalls !== expectedNdjsonWrites) bypassFound = true;
         return bypassFound ? [name] : [];
       });
 
