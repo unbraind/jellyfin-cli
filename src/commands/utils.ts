@@ -1,6 +1,5 @@
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
-import { toon } from '../formatters/index.js';
-import { formatOutput } from '../formatters/index.js';
+import { formatOutput, toon } from '../formatters/index.js';
 import type {
   BaseItemDto,
   JellyfinConfig,
@@ -56,13 +55,16 @@ export async function createApiClient(options: {
   const format = parseOutputFormat(options.format, config.outputFormat ?? 'toon');
 
   if (!config.serverUrl) {
-    console.error('No server URL configured. Use: jf config set --server <url>');
+    console.error(formatError('No server URL configured. Use: jf config set --server <url>', format));
     process.exit(1);
   }
 
   if (!config.apiKey && !config.username) {
     console.error(
-      'No API key or username configured. Use: jf config set --api-key <key> or --username <user>',
+      formatError(
+        'No API key or username configured. Use: jf config set --api-key <key> or --username <user>',
+        format,
+      ),
     );
     process.exit(1);
   }
@@ -74,7 +76,7 @@ export async function createApiClient(options: {
       await client.authenticate(config.username, config.password);
     } catch (err) {
       const message = err instanceof JellyfinApiError ? err.message : 'Authentication failed';
-      console.error(`Authentication failed: ${message}`);
+      console.error(formatError(`Authentication failed: ${message}`, format));
       process.exit(1);
     }
   } else if (config.apiKey && !config.userId) {
@@ -303,7 +305,15 @@ export function formatSystemInfo(info: SystemInfo, format: OutputFormat): string
   if (format === 'toon') {
     return toon.formatSystemInfo(info);
   }
-  return formatOutput(info, format, 'system_info');
+  return formatOutput({
+    name: info.ServerName,
+    version: info.Version,
+    id: info.Id,
+    local_address: info.LocalAddress,
+    operating_system: info.OperatingSystem,
+    has_pending_restart: info.HasPendingRestart,
+    can_self_restart: info.CanSelfRestart,
+  }, format, 'system_info');
 }
 
 /**
@@ -316,7 +326,13 @@ export function formatConfig(config: JellyfinConfig, format: OutputFormat): stri
   if (format === 'toon') {
     return toon.formatConfig(config);
   }
-  return formatOutput(config, format, 'config');
+  return formatOutput({
+    server_url: config.serverUrl ?? null,
+    username: config.username ?? null,
+    user_id: config.userId ?? null,
+    output_format: config.outputFormat ?? 'toon',
+    timeout: config.timeout ?? 30_000,
+  }, format, 'config');
 }
 
 /**
@@ -332,7 +348,12 @@ export function formatServers(
   if (format === 'toon') {
     return toon.formatServers(servers);
   }
-  return formatOutput(servers, format, 'servers');
+  return formatOutput(servers.map((server) => ({
+    name: server.name,
+    server_url: server.config.serverUrl,
+    username: server.config.username ?? null,
+    is_default: server.isDefault,
+  })), format, 'servers');
 }
 
 /**

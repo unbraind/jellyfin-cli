@@ -330,4 +330,70 @@ describe('config output format support', () => {
     expect(payload.apiKey).toBeUndefined();
     expect(payload.password).toBeUndefined();
   });
+
+  it('preserves the safe server-list array shape in JSON output', async () => {
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: 'http://default.local:8096',
+        apiKey: 'default-secret',
+        password: 'default-password',
+        username: 'default-user',
+      },
+      servers: {
+        local: {
+          serverUrl: 'http://local.local:8096',
+          apiKey: 'local-secret',
+          password: 'local-password',
+          username: 'local-user',
+        },
+      },
+      currentServer: 'local',
+    }));
+
+    const result = await runCli(['config', 'list', '--format', 'json']);
+    const payload = JSON.parse(result.stdout) as Record<string, unknown>[];
+    expect(result.code).toBe(0);
+    expect(Array.isArray(payload)).toBe(true);
+    expect(payload).toHaveLength(2);
+    expect(payload[0]).toHaveProperty('server_url');
+    expect(payload.every((entry) => !('apiKey' in entry) && !('password' in entry))).toBe(true);
+  });
+
+  it('preserves the canonical system-info projection in config test output', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/System/Info/Public': Response.json({
+          ServerName: 'Test Jellyfin',
+          Version: '10.11.11',
+          Id: 'server-1',
+          LocalAddress: 'http://127.0.0.1:8096',
+          OperatingSystem: 'Linux',
+          HasPendingRestart: false,
+          CanSelfRestart: true,
+        }),
+      },
+      fetch: () => new Response('Not Found', { status: 404 }),
+    });
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: `http://127.0.0.1:${mockServer.port}`,
+        apiKey: 'test-key',
+      },
+    }));
+
+    const result = await runCli(['config', 'test', '--format', 'json']);
+    expect(result.code).toBe(0);
+    expect(JSON.parse(result.stdout)).toEqual({
+      name: 'Test Jellyfin',
+      version: '10.11.11',
+      id: 'server-1',
+      local_address: 'http://127.0.0.1:8096',
+      operating_system: 'Linux',
+      has_pending_restart: false,
+      can_self_restart: true,
+    });
+  });
 });

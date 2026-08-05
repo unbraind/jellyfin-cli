@@ -2,6 +2,7 @@ import { decode } from '@toon-format/toon';
 import { readdirSync, readFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { describe, expect, it } from 'vitest';
+import ts from 'typescript';
 import { parse as parseYaml } from 'yaml';
 import { createCommandOutputFormatter } from '../../src/commands/utils.js';
 import type { OutputFormat } from '../../src/types/index.js';
@@ -54,6 +55,14 @@ describe('dedicated command output format contracts', () => {
       if (format === 'yaml') expect(() => parseYaml(rendered)).not.toThrow();
       if (format === 'toon') expect(() => decode(rendered)).not.toThrow();
     }
+    const [capability, message, error] = representativeOutputs(format);
+    if (format === 'table') expect(capability).toBe('available: Yes');
+    if (format === 'raw') {
+      expect(capability).toBe('{"available":true}');
+      expect(message).toBe('Complete');
+      expect(error).toBe('Error: Failed');
+    }
+    if (format === 'markdown') expect(capability).toBe('**available**: Yes');
   });
 
   it('prevents command handlers from bypassing the resolved formatter with TOON-only calls', () => {
@@ -62,9 +71,39 @@ describe('dedicated command output format contracts', () => {
       .filter((name) => name.endsWith('.ts') && name !== 'utils.ts')
       .flatMap((name) => {
         const source = readFileSync(join(commandsDirectory, name), 'utf8');
-        return /\btoon\.format[A-Z]/.test(source) || /import\s+\{[^}]*\btoon\b/.test(source)
-          ? [name]
-          : [];
+        const sourceFile = ts.createSourceFile(name, source, ts.ScriptTarget.Latest, true);
+        const forbiddenBindings = new Set<string>();
+        sourceFile.forEachChild((node) => {
+          if (!ts.isImportDeclaration(node) || !ts.isStringLiteral(node.moduleSpecifier)) return;
+          if (!node.moduleSpecifier.text.includes('/formatters/')) return;
+          const bindings = node.importClause?.namedBindings;
+          if (bindings && ts.isNamespaceImport(bindings)) forbiddenBindings.add(bindings.name.text);
+          if (bindings && ts.isNamedImports(bindings)) {
+            for (const element of bindings.elements) {
+              const importedName = element.propertyName?.text ?? element.name.text;
+              if (['toon', 'formatToon', 'formatMessage'].includes(importedName)) {
+                forbiddenBindings.add(element.name.text);
+              }
+            }
+          }
+        });
+        let bypassFound = false;
+        const visit = (node: ts.Node): void => {
+          if (
+            ts.isCallExpression(node)
+            && ts.isPropertyAccessExpression(node.expression)
+            && ts.isIdentifier(node.expression.expression)
+            && forbiddenBindings.has(node.expression.expression.text)
+          ) bypassFound = true;
+          if (
+            ts.isCallExpression(node)
+            && ts.isIdentifier(node.expression)
+            && forbiddenBindings.has(node.expression.text)
+          ) bypassFound = true;
+          ts.forEachChild(node, visit);
+        };
+        visit(sourceFile);
+        return bypassFound ? [name] : [];
       });
 
     expect(bypasses).toEqual([]);

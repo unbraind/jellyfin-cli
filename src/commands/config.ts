@@ -5,6 +5,7 @@ import { formatSuccess, formatError, formatOutput } from '../formatters/index.js
 import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { addConfigDoctorCommand } from './config-doctor.js';
 import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
+import { formatServers, formatSystemInfo } from './utils.js';
 import type { JellyfinConfig, OutputFormat } from '../types/index.js';
 
 function resolveConfigSaveServerName(explicitName: string | undefined): string | undefined {
@@ -156,18 +157,7 @@ export function createConfigCommand(): Command {
     .action(function (this: Command, options: ConfigCommandOptions) {
       const servers = listServers();
       const format = resolveConfigRuntimeFormat(this, options);
-      printConfigPayload(
-        {
-          servers: servers.map((server) => ({
-            name: server.name,
-            server_url: server.config.serverUrl,
-            username: server.config.username ?? null,
-            is_default: server.isDefault,
-          })),
-        },
-        format,
-        'servers',
-      );
+      console.log(formatServers(servers, format));
     });
 
   cmd
@@ -237,16 +227,7 @@ export function createConfigCommand(): Command {
       try {
         const client = new JellyfinApiClient(config);
         const info = await client.getPublicSystemInfo();
-        printConfigPayload(
-          {
-            server_name: info.ServerName,
-            version: info.Version,
-            server_id: info.Id,
-            local_address: info.LocalAddress ?? null,
-          },
-          format,
-          'system_info',
-        );
+        console.log(formatSystemInfo(info, format));
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Connection failed';
         console.error(formatError(message, format));

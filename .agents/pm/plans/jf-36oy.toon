@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[11]: agents,api,formats,json,markdown,quality,raw,read-only,table,toon,yaml
 created_at: "2026-08-05T20:20:16.290Z"
-updated_at: "2026-08-05T20:57:08.891Z"
+updated_at: "2026-08-05T21:25:24.321Z"
 assignee: codex-jellyfin-format-20260805
 author: codex-jellyfin-format-20260805
 estimated_minutes: 900
@@ -32,16 +32,17 @@ dependencies[8]{id,kind,created_at,author,source_kind,author_source}:
   jf-mkzh,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
   jf-snok,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
   jf-tike,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
-comments[4]{created_at,author,text}:
+comments[5]{created_at,author,text}:
   "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Reviewed the complete all-status PM inventory, active goals, closed output/TOON/API lineage, relationship audit, official latest release, live server version, and sanitized format probes before creation; no duplicate repo-wide format-contract plan exists."
   "2026-08-05T20:51:50.696Z",codex,"Quality measurement: 978 portable tests passed with 1 intentional skip; coverage is statements 43.36%, branches 44.01%, functions 54.11%, lines 43.18%. The canonical coverage goal jf-mkzh remains open; this tranche improves the formatter boundary but does not claim repository-wide 100%."
   "2026-08-05T20:51:51.974Z",codex,Zero-duplication diagnostic remains red at 225 clones and 8.16% duplicated lines (8.00% tokens); canonical quality goal jf-lpki remains open. Bun audit and Trivy report zero vulnerabilities/secrets/misconfigurations; npm audit transport returned a registry endpoint error and will be retried.
   "2026-08-05T20:53:16.143Z",codex-jellyfin-format-20260805,"PM telemetry is operational but transport is intermittent: the last successful flush was 2026-08-05T20:52:42Z; a subsequent explicit flush retained 4 queued events with fetch failed, and status then showed 6 queued events. This is an observability delivery limitation, not a product or tracker-integrity failure."
+  "2026-08-05T21:20:05.997Z",codex-jellyfin-format-20260805,"PR 52 first exact-head review: CodeRabbit produced five actionable findings after an initial quota warning; Sourcery skipped detailed review because the diff exceeded its 150000-character limit; Cubic and Sourcery checks skipped. All CodeRabbit findings were verified and fixed, including safe config-list projection, canonical system-info shape, structured setup errors, format semantics, AST alias detection, and force-flag docs."
 notes[1]{created_at,author,text}:
   "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Privacy boundary: credentials, server URL, user/server/item IDs, raw schemas, and payloads stay in environment variables or owner-only ~/.jellyfin-cli. PM and Git retain only public versions, commands, classifications, and aggregate outcomes."
 learnings[1]{created_at,author,text}:
   "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,Resolving a format in createApiClient is insufficient when command handlers call TOON-specific renderers directly; format correctness must be enforced at the final output boundary.
-files[87]{path,scope,note}:
+files[90]{path,scope,note}:
   src/commands/api-batch.ts,project,Dedicated command output boundary
   src/commands/api.ts,project,Dedicated command output boundary
   src/commands/apikeys.ts,project,Dedicated command output boundary
@@ -126,13 +127,17 @@ files[87]{path,scope,note}:
   src/commands/years.ts,project,Dedicated command output boundary
   src/formatters/index.ts,project,Shared success and error serializers
   tests/commands/api.test.ts,project,Five-format API response contract and coverage timeout resilience
+  tests/commands/client-output-errors.test.ts,project,All-format setup failure integration contracts
+  tests/commands/config.test.ts,project,Safe server-list and canonical system-info shape regressions
+  tests/commands/global-options.test.ts,project,Canonical JSON system-info regression
   tests/commands/notifications.test.ts,project,Six-format notification contract and portable timeout resilience
   tests/commands/output-format-contracts.test.ts,project,Six-format renderer and bypass guard
   tests/commands/setup.test.ts,project,Portable subprocess timeout resilience under release load
-tests[5]{command,path,scope,timeout_seconds,pm_context_mode,note}:
+tests[6]{command,path,scope,timeout_seconds,pm_context_mode,note}:
   "bun run check:duplicates",package.json,project,600,tracker,Zero-duplication diagnostic gate
   "bun run test:coverage:four",package.json,project,900,tracker,Authoritative four-metric coverage measurement
   "bun run validate:release",package.json,project,1800,tracker,Complete production release gate
+  bun test tests/commands/client-output-errors.test.ts tests/commands/config.test.ts tests/commands/global-options.test.ts tests/commands/output-format-contracts.test.ts,package.json,project,600,tracker,Bot-feedback structured errors payload shapes and AST guard
   bun test tests/commands/output-format-contracts.test.ts tests/commands/global-options.test.ts tests/commands/help-global-options-all.test.ts tests/formatters/schema-contract.test.ts,package.json,project,600,tracker,Focused unit integration help and schema contracts
   JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker,Compiled live read-only acceptance
 docs[7]{path,scope,note}:
@@ -147,10 +152,13 @@ plan_mode: executing
 plan_scope: "Repository-wide dedicated command output formatting, contract tests, docs, and release validation; live validation remains read-only."
 plan_harness: codex
 plan_resume_context: Clean main at 84a5614; Jellyfin and local server are 10.11.11; five live read-only command probes proved requested JSON is emitted as TOON; owner-only settings remain under ~/.jellyfin-cli.
-plan_validation[1]{text,command,expected}:
+plan_validation[3]{text,command,expected}:
   Compiled live Jellyfin validation passed all 183 E2E cases with JELLYFIN_READ_ONLY=1 and no mutations; five representative commands also passed all six output encodings.,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,"183 pass, 0 fail; no server data changes"
-plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "All CodeRabbit fixes pass 34 focused tests plus TypeScript, ESLint, and 155-file source LOC gates.",bun test tests/commands/client-output-errors.test.ts tests/commands/config.test.ts tests/commands/global-options.test.ts tests/commands/output-format-contracts.test.ts,"34 pass, 0 fail"
+  "Post-review full release gate passes 1000 Bun tests plus 183 live skips, 990 portable tests plus 1 intentional skip, release/build/package/privacy gates, and a separate 183/183 compiled live read-only rerun.","bun run validate:release && JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts","All release gates pass; live 183 pass, 0 fail, no mutations"
+plan_decisions[2]{ts,author,decision,rationale,evidence}:
   "2026-08-05T20:28:20.201Z",codex-jellyfin-format-20260805,Bind the legacy renderer method set to the resolved output format at createApiClient and prohibit direct TOON renderer use in command handlers.,"This preserves existing TOON normalization and minimizes behavior change while making the final serialization boundary authoritative for JSON, YAML, Markdown, table, and raw.","Source inventory, five sanitized live reproductions, and existing shared formatOutput/typed formatter contracts."
+  "2026-08-05T21:20:04.561Z",codex-jellyfin-format-20260805,"Accept all five CodeRabbit findings, including the already-resolved documentation correction; preserve JSON server-list arrays and canonical system-info fields, format pre-client failures, and strengthen semantic and AST contracts.",Each finding reproduced against the exact PR head; config list also needed secret-safe projection before using the shared formatter.,PR 52 review 4868807502 and threads PRRT_kwDORbJJhM6WyvJr through PRRT_kwDORbJJhM6WyvKL.
 plan_discoveries[1]{ts,author,text}:
   "2026-08-05T20:28:18.488Z",codex-jellyfin-format-20260805,"Static inventory found 291 direct TOON renderer calls across 45 command modules despite 368 createApiClient format resolutions; live JSON parsing failed for artists, playlists, libraries, and genres while the server remained read-only."
 plan_steps[6]:
