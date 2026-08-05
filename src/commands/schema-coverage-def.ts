@@ -3,7 +3,15 @@ const TOOL_CLASSIFICATION_SCHEMA = {
   properties: {
     command: { type: 'string' },
     read_only_safe: { type: 'boolean' },
-    reason: { type: 'string' },
+    reason: {
+      enum: [
+        'no_openapi_match_above_min_score',
+        'local_only_command',
+        'openapi_orchestration',
+        'websocket_transport',
+        'optional_plugin_api',
+      ],
+    },
   },
   required: ['command', 'read_only_safe', 'reason'],
 };
@@ -30,6 +38,7 @@ const COVERAGE_SNAPSHOT_PROPERTIES = {
   tool_scope_count: { type: 'number' },
   mapped_tool_count: { type: 'number' },
   unmatched_operations_total: { type: 'number' },
+  unmatched_operations_truncated: { type: 'boolean' },
   unmatched_tools_total: { type: 'number' },
   unmatched_tools_truncated: { type: 'boolean' },
   local_only_tools_total: { type: 'number' },
@@ -40,6 +49,19 @@ const COVERAGE_SNAPSHOT_PROPERTIES = {
   local_only_tools: { type: 'array', items: TOOL_CLASSIFICATION_SCHEMA },
   non_endpoint_tools: { type: 'array', items: TOOL_CLASSIFICATION_SCHEMA },
   unmatched_operations: { type: 'array', items: OPERATION_SCHEMA },
+  unmatched_by_tag_total: { type: 'number' },
+  unmatched_by_tag: {
+    type: 'array',
+    items: {
+      type: 'object',
+      properties: {
+        tag: { type: 'string' },
+        operations: { type: 'number' },
+        sample_paths: { type: 'array', items: { type: 'string' } },
+      },
+      required: ['tag', 'operations', 'sample_paths'],
+    },
+  },
 };
 
 const COVERAGE_SNAPSHOT_REQUIRED = [
@@ -52,8 +74,16 @@ const COVERAGE_SNAPSHOT_REQUIRED = [
   'mapped_tool_count',
   'unmatched_operations_total',
   'unmatched_tools_total',
+  'unmatched_tools_truncated',
   'local_only_tools_total',
+  'local_only_tools_truncated',
   'non_endpoint_tools_total',
+  'non_endpoint_tools_truncated',
+  'unmatched_tools',
+  'local_only_tools',
+  'non_endpoint_tools',
+  'unmatched_by_tag_total',
+  'unmatched_by_tag',
 ];
 
 /** TOON envelope schema for `jf schema coverage` output. */
@@ -78,6 +108,8 @@ export const OPENAPI_COVERAGE_SCHEMA = {
         'path_count',
         'operation_count',
         ...COVERAGE_SNAPSHOT_REQUIRED,
+        'unmatched_operations',
+        'unmatched_operations_truncated',
         'min_score',
       ],
     },

@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[10]: agents,api,coverage,jellyfin-10.11.11,openapi,plugins,read-only,research,typescript,websocket
 created_at: "2026-08-05T19:15:54.840Z"
-updated_at: "2026-08-05T19:40:31.140Z"
+updated_at: "2026-08-05T19:58:44.792Z"
 assignee: codex-jellyfin-api-20260805
 author: codex-jellyfin-api-20260805
 estimated_minutes: 600
@@ -34,9 +34,10 @@ dependencies[10]{id,kind,created_at,author,source_kind,author_source}:
   jf-mkzh,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
   jf-snok,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
   jf-sylm,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
-comments[2]{created_at,author,text}:
+comments[3]{created_at,author,text}:
   "2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"Reviewed the complete 45-item all-status PM inventory, graph health, closed OpenAPI/event/compatibility lineage, latest official Jellyfin sources, and sanitized live schema results before creation; no duplicate plan exists."
   "2026-08-05T19:39:47.208Z",codex-jellyfin-api-20260805,"Release validation passes: 981 Bun tests with 183 live skips, 971 portable Vitest tests, release policy, build, package smoke tests, 155-file source LOC gate, secrets and history scans, and changelog check. Explicit compiled live run then passed 183 of 183 tests against 10.11.11 under JELLYFIN_READ_ONLY=1. Trivy is clean; bun audit is clean after safe transitive override refresh. Existing project goals remain honest: coverage is 42.22 statements, 42.30 branches, 52.43 functions, 41.96 lines; jscpd reports 8.14 percent duplicated lines."
+  "2026-08-05T19:58:44.792Z",codex-jellyfin-api-20260805,"Exact-head bot review disposition: accepted executable full_scope.unmatched_tools_total release assertion and exhaustive coverage-schema fields/reason enums; focused typecheck, lint, 50 tests, and LOC gate pass. Rejected changing pm-changelog importer capability because pm health reports the exporter loaded and the PM capability contract has importers but no exporters capability. Rejected preserving the dated changelog heading on feature branches because docs/RELEASING.md and changelog:pm:check explicitly require Unreleased outside release preparation."
 notes[1]{created_at,author,text}:
   "2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"Privacy boundary: raw schemas, URLs, credentials, IDs, and live payloads remain owner-only under ~/.jellyfin-cli. PM and Git may retain only public versions, aggregate counts, classifications, commands, and sanitized outcomes."
 learnings[1]{created_at,author,text}:
@@ -102,8 +103,9 @@ plan_harness: codex
 plan_resume_context: "Latest stable and live server are Jellyfin 10.11.11. Exact operation execution already covers all 429 live OpenAPI operations. Current schema research falsely reports meta/WebSocket/plugin tools as endpoint gaps; classify them explicitly, preserve privacy/read-only behavior, and prove every structured output."
 plan_validation[1]{text,command,expected}:
   Live compiled coverage snapshot contains no false unmatched tools and retains 100 percent operation coverage,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,All read-only tests pass; full scope reports explicit non-endpoint classifications without server mutation
-plan_decisions[1]{ts,author,decision,rationale,evidence}:
+plan_decisions[2]{ts,author,decision,rationale,evidence}:
   "2026-08-05T19:16:11.270Z",codex-jellyfin-api-20260805,Model API coverage as direct endpoint mappings plus explicit non-endpoint transport classes.,"Fuzzy matching WebSocket, OpenAPI orchestration, compatibility analysis, or plugin-only tools to arbitrary REST operations corrupts both mapped-tool counts and agent roadmap decisions.",Sanitized live schema research and official v10.11.11 repository/release inspection.
+  "2026-08-05T19:58:44.210Z",codex-jellyfin-api-20260805,Adopt bot finding for executable zero-unmatched release proof and exhaustive coverage output schemas.,"Operation coverage alone cannot prove that every endpoint-shaped CLI tool maps, and permissive schemas weaken agent contracts.",CodeRabbit review threads on docs/release-readiness.md and src/commands/schema-coverage-def.ts; focused 50-test validation passes.
 plan_discoveries[2]{ts,author,text}:
   "2026-08-05T19:16:10.402Z",codex-jellyfin-api-20260805,"Official Jellyfin release v10.11.11 is the latest stable; the configured live server also reports 10.11.11 with 356 paths, 429 operations, and 257 read-only operations. All operations map, but seven tools are reported unmatched and one generic API tool is falsely mapped."
   "2026-08-05T19:16:10.857Z",codex-jellyfin-api-20260805,"The official v10.11.11 server tree contains notification models but no Notifications controller; the live OpenAPI document contains zero notification operations. The CLI notification routes are optional legacy/plugin surfaces: types degrades to unavailable, while list is unavailable on this instance."
