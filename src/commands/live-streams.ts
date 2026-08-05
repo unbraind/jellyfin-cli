@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the live streams command tree with validated options and actions.
@@ -19,7 +18,7 @@ export function createLiveStreamsCommand(): Command {
     .option('--direct-play', 'Enable direct play')
     .option('--direct-stream', 'Enable direct stream')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.openLiveStream({
           openToken: options.token,
@@ -29,7 +28,7 @@ export function createLiveStreamsCommand(): Command {
           enableDirectPlay: options.directPlay,
           enableDirectStream: options.directStream,
         });
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           media_source_id: result.MediaSourceId,
           media_source: result.MediaSource,
         }, 'live_stream_opened'));
@@ -39,10 +38,10 @@ export function createLiveStreamsCommand(): Command {
   cmd.command('close <liveStreamId>').description('Close an open live stream by its ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (liveStreamId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.closeLiveStream(liveStreamId);
-        console.log(toon.formatMessage(`Live stream ${liveStreamId} closed`, true));
+        console.log(formatter.formatMessage(`Live stream ${liveStreamId} closed`, true));
       } catch (err) { handleError(err, format); }
     });
 

@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the livetv admin command tree with validated options and actions.
@@ -15,13 +14,13 @@ export function createLivetvAdminCommand(): Command {
     .option('--limit <number>', 'Limit', '100')
     .option('--offset <number>', 'Offset', '0')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.livetv.getLiveTvSeriesRecordings({
           limit: parseInt(options.limit, 10),
           startIndex: parseInt(options.offset, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -29,10 +28,10 @@ export function createLivetvAdminCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--program <id>', 'Program ID to get defaults for')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const defaults = await client.livetv.getLiveTvTimerDefaults({ programId: options.program });
-        console.log(toon.formatItem(defaults));
+        console.log(formatter.formatItem(defaults));
       } catch (err) { handleError(err, format); }
     });
 
@@ -45,7 +44,7 @@ export function createLivetvAdminCommand(): Command {
     .option('--pre-padding <seconds>', 'Pre-padding seconds')
     .option('--post-padding <seconds>', 'Post-padding seconds')
     .action(async (timerId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.updateLiveTvTimer(timerId, {
           channelId: options.channel,
@@ -55,7 +54,7 @@ export function createLivetvAdminCommand(): Command {
           prePaddingSeconds: options.prePadding ? parseInt(options.prePadding, 10) : undefined,
           postPaddingSeconds: options.postPadding ? parseInt(options.postPadding, 10) : undefined,
         });
-        console.log(toon.formatMessage(`Timer ${timerId} updated`, true));
+        console.log(formatter.formatMessage(`Timer ${timerId} updated`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -69,7 +68,7 @@ export function createLivetvAdminCommand(): Command {
     .option('--pre-padding <seconds>', 'Pre-padding seconds', '60')
     .option('--post-padding <seconds>', 'Post-padding seconds', '300')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.createLiveTvSeriesTimer({
           channelId: options.channel,
@@ -80,7 +79,7 @@ export function createLivetvAdminCommand(): Command {
           prePaddingSeconds: parseInt(options.prePadding, 10),
           postPaddingSeconds: parseInt(options.postPadding, 10),
         });
-        console.log(toon.formatMessage('Series timer created', true));
+        console.log(formatter.formatMessage('Series timer created', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -92,7 +91,7 @@ export function createLivetvAdminCommand(): Command {
     .option('--tuner-count <count>', 'Number of tuners', '2')
     .option('--allow-hw-transcode', 'Allow hardware transcoding')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.livetv.addTunerHost({
           Url: options.url,
@@ -101,7 +100,7 @@ export function createLivetvAdminCommand(): Command {
           EnabledTunerCount: parseInt(options.tunerCount, 10),
           AllowHWTranscoding: options.allowHwTranscode,
         });
-        console.log(toon.formatToon({ id: result.Id, url: result.Url, type: result.Type, name: result.FriendlyName, added: true }, 'tuner_host'));
+        console.log(formatter.formatToon({ id: result.Id, url: result.Url, type: result.Type, name: result.FriendlyName, added: true }, 'tuner_host'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -109,21 +108,21 @@ export function createLivetvAdminCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) { console.error('Use --force to confirm deletion'); process.exit(1); }
       try {
         await client.livetv.deleteTunerHost(id);
-        console.log(toon.formatMessage(`Tuner host ${id} deleted`, true));
+        console.log(formatter.formatMessage(`Tuner host ${id} deleted`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('reset-tuner <tunerId>').description('Reset a tuner device')
     .option('-f, --format <format>', 'Output format')
     .action(async (tunerId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.livetv.resetTuner(tunerId);
-        console.log(toon.formatMessage(`Tuner ${tunerId} reset`, true));
+        console.log(formatter.formatMessage(`Tuner ${tunerId} reset`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -137,7 +136,7 @@ export function createLivetvAdminCommand(): Command {
     .option('--country <code>', 'Country code')
     .option('--path <path>', 'Path to local file (for XmlTv)')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.livetv.addListingProvider({
           Type: options.type,
@@ -148,7 +147,7 @@ export function createLivetvAdminCommand(): Command {
           Country: options.country,
           Path: options.path,
         });
-        console.log(toon.formatToon({ id: result.Id, type: result.Type, added: true }, 'listing_provider'));
+        console.log(formatter.formatToon({ id: result.Id, type: result.Type, added: true }, 'listing_provider'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -156,11 +155,11 @@ export function createLivetvAdminCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) { console.error('Use --force to confirm deletion'); process.exit(1); }
       try {
         await client.livetv.deleteListingProvider(id);
-        console.log(toon.formatMessage(`Listing provider ${id} deleted`, true));
+        console.log(formatter.formatMessage(`Listing provider ${id} deleted`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -168,10 +167,10 @@ export function createLivetvAdminCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--provider <id>', 'Provider ID')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.livetv.getChannelMappingOptions({ providerId: options.provider });
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           provider_name: result.ProviderName,
           tuner_channels: result.TunerChannels?.map((c) => ({ id: c.Id, name: c.Name })),
           provider_channels: result.ProviderChannels?.map((c) => ({ id: c.Id, name: c.Name })),
@@ -185,11 +184,11 @@ export function createLivetvAdminCommand(): Command {
     .requiredOption('--provider <id>', 'Provider ID')
     .requiredOption('--mappings <json>', 'Channel mappings as JSON array of {tuner, provider} objects')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const mappings = JSON.parse(options.mappings) as Record<string, string>[];
         await client.livetv.setChannelMappings({ providerId: options.provider, mappings });
-        console.log(toon.formatMessage('Channel mappings updated', true));
+        console.log(formatter.formatMessage('Channel mappings updated', true));
       } catch (err) { handleError(err, format); }
     });
 

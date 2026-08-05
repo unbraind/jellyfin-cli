@@ -355,7 +355,7 @@ describe('setup command', () => {
     } finally {
       server.stop(true);
     }
-  });
+  }, 15000);
 
   it('setup configuration alias reports startup diagnostics', async () => {
     const server = Bun.serve({

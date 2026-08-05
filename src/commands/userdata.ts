@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the user data command tree with validated options and actions.
@@ -15,10 +14,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.markFavorite(itemId, options.user);
-        console.log(toon.formatMessage('Favorited'));
+        console.log(formatter.formatMessage('Favorited'));
       } catch (err) {
         handleError(err, format);
       }
@@ -30,10 +29,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.unmarkFavorite(itemId, options.user);
-        console.log(toon.formatMessage('Unfavorited'));
+        console.log(formatter.formatMessage('Unfavorited'));
       } catch (err) {
         handleError(err, format);
       }
@@ -46,10 +45,10 @@ export function createUserDataCommand(): Command {
     .option('--user <userId>', 'User ID')
     .option('--date <date>', 'Date played (ISO format)')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.markPlayed(itemId, options.user, options.date);
-        console.log(toon.formatMessage('Marked played'));
+        console.log(formatter.formatMessage('Marked played'));
       } catch (err) {
         handleError(err, format);
       }
@@ -61,10 +60,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.unmarkPlayed(itemId, options.user);
-        console.log(toon.formatMessage('Marked unplayed'));
+        console.log(formatter.formatMessage('Marked unplayed'));
       } catch (err) {
         handleError(err, format);
       }
@@ -76,10 +75,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.updateUserItemRating(itemId, options.user, true);
-        console.log(toon.formatMessage('Liked'));
+        console.log(formatter.formatMessage('Liked'));
       } catch (err) {
         handleError(err, format);
       }
@@ -91,10 +90,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.updateUserItemRating(itemId, options.user, false);
-        console.log(toon.formatMessage('Disliked'));
+        console.log(formatter.formatMessage('Disliked'));
       } catch (err) {
         handleError(err, format);
       }
@@ -106,10 +105,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.deleteUserItemRating(itemId, options.user);
-        console.log(toon.formatMessage('Rating removed'));
+        console.log(formatter.formatMessage('Rating removed'));
       } catch (err) {
         handleError(err, format);
       }
@@ -119,10 +118,10 @@ export function createUserDataCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID (defaults to current user)')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const data = await client.getUserItemData(itemId, options.user);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           is_favorite: data.IsFavorite,
           played: data.Played,
           play_count: data.PlayCount,
@@ -139,7 +138,7 @@ export function createUserDataCommand(): Command {
     .option('--types <types>', 'Item types (comma-separated)')
     .option('--recursive', 'Recursive search')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getItems({
           isPlayed: true,
@@ -149,7 +148,7 @@ export function createUserDataCommand(): Command {
           sortBy: 'DatePlayed',
           sortOrder: 'Descending',
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -162,7 +161,7 @@ export function createUserDataCommand(): Command {
     .option('--position <ticks>', 'Set playback position in ticks')
     .option('--rating <number>', 'Set community rating (0-10)')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const data: { IsFavorite?: boolean; Played?: boolean; PlayCount?: number; PlaybackPositionTicks?: number; Rating?: number } = {};
         if (options.favorite !== undefined) data.IsFavorite = options.favorite === 'true';
@@ -171,7 +170,7 @@ export function createUserDataCommand(): Command {
         if (options.position !== undefined) data.PlaybackPositionTicks = parseInt(options.position, 10);
         if (options.rating !== undefined) data.Rating = parseFloat(options.rating);
         const result = await client.updateUserItemData(itemId, data, options.user);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           is_favorite: result.IsFavorite,
           played: result.Played,
           play_count: result.PlayCount,

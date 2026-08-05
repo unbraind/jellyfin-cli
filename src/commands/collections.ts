@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the collections command tree with validated options and actions.
@@ -15,7 +14,7 @@ export function createCollectionsCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--limit <number>', 'Limit', '50')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getItems({
           includeItemTypes: ['BoxSet'],
@@ -23,7 +22,7 @@ export function createCollectionsCommand(): Command {
           limit: parseInt(options.limit, 10),
           sortBy: 'SortName',
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -34,10 +33,10 @@ export function createCollectionsCommand(): Command {
     .description('Get collection details')
     .option('-f, --format <format>', 'Output format')
     .action(async (collectionId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getItem(collectionId);
-        console.log(toon.formatItem(item));
+        console.log(formatter.formatItem(item));
       } catch (err) {
         handleError(err, format);
       }
@@ -49,13 +48,13 @@ export function createCollectionsCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--limit <number>', 'Limit', '100')
     .action(async (collectionId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getItems({
           parentId: collectionId,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -68,14 +67,14 @@ export function createCollectionsCommand(): Command {
     .option('--items <ids>', 'Item IDs to add (comma-separated)')
     .option('--parent <id>', 'Parent folder ID')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.createCollection({
           name,
           ids: options.items?.split(',').map((id: string) => id.trim()),
           parentId: options.parent,
         });
-        console.log(toon.formatToon({ id: result.Id, name: name, created: true }, 'collection_created'));
+        console.log(formatter.formatToon({ id: result.Id, name: name, created: true }, 'collection_created'));
       } catch (err) {
         handleError(err, format);
       }
@@ -86,10 +85,10 @@ export function createCollectionsCommand(): Command {
     .description('Add items to a collection')
     .option('-f, --format <format>', 'Output format')
     .action(async (collectionId, itemIds, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.addToCollection(collectionId, itemIds);
-        console.log(toon.formatMessage('Items added to collection'));
+        console.log(formatter.formatMessage('Items added to collection'));
       } catch (err) {
         handleError(err, format);
       }
@@ -100,10 +99,10 @@ export function createCollectionsCommand(): Command {
     .description('Remove items from a collection')
     .option('-f, --format <format>', 'Output format')
     .action(async (collectionId, itemIds, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.removeFromCollection(collectionId, itemIds);
-        console.log(toon.formatMessage('Items removed from collection'));
+        console.log(formatter.formatMessage('Items removed from collection'));
       } catch (err) {
         handleError(err, format);
       }

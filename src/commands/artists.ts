@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the artists command tree with validated options and actions.
@@ -19,7 +18,7 @@ export function createArtistsCommand(): Command {
     .option('--sort <field>', 'Sort field (e.g. SortName, DateCreated)')
     .option('--order <dir>', 'Sort order (Ascending, Descending)')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getArtists({
           parentId: options.parent,
@@ -27,7 +26,7 @@ export function createArtistsCommand(): Command {
           sortBy: options.sort,
           sortOrder: options.order,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -40,7 +39,7 @@ export function createArtistsCommand(): Command {
     .option('--sort <field>', 'Sort field')
     .option('--order <dir>', 'Sort order')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getAlbumArtists({
           parentId: options.parent,
@@ -48,7 +47,7 @@ export function createArtistsCommand(): Command {
           sortBy: options.sort,
           sortOrder: options.order,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -57,10 +56,10 @@ export function createArtistsCommand(): Command {
     .description('Get an artist by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const artist = await client.getArtistByName(name);
-        console.log(toon.formatItem(artist));
+        console.log(formatter.formatItem(artist));
       } catch (err) { handleError(err, format); }
     });
 

@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the discover command tree with validated options and actions.
@@ -16,7 +15,7 @@ export function createDiscoverCommand(): Command {
     .option('--categories <number>', 'Category limit', '6')
     .option('--items <number>', 'Items per category', '8')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const recommendations = await client.getRecommendations({
           categoryLimit: parseInt(options.categories, 10),
@@ -33,7 +32,7 @@ export function createDiscoverCommand(): Command {
             year: i.ProductionYear,
           })),
         }));
-        console.log(toon.formatToon(simplified, 'recommendations'));
+        console.log(formatter.formatToon(simplified, 'recommendations'));
       } catch (err) {
         handleError(err, format);
       }
@@ -45,12 +44,12 @@ export function createDiscoverCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--limit <number>', 'Limit', '50')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getInstantMix(itemId, {
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -59,50 +58,50 @@ export function createDiscoverCommand(): Command {
   cmd.command('album-mix <albumId>').description('Get instant mix based on an album')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
     .action(async (albumId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getAlbumInstantMix(albumId, { limit: parseInt(options.limit, 10) });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('song-mix <songId>').description('Get instant mix based on a song')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
     .action(async (songId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getSongInstantMix(songId, { limit: parseInt(options.limit, 10) });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('artist-mix <artistId>').description('Get instant mix based on an artist ID')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
     .action(async (artistId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getArtistInstantMix(artistId, { limit: parseInt(options.limit, 10) });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('genre-mix <genreName>').description('Get instant mix based on a music genre name')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
     .action(async (genreName, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getMusicGenreInstantMix(genreName, { limit: parseInt(options.limit, 10) });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('playlist-mix <playlistId>').description('Get instant mix based on a playlist')
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '50')
     .action(async (playlistId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getPlaylistInstantMix(playlistId, { limit: parseInt(options.limit, 10) });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -110,7 +109,7 @@ export function createDiscoverCommand(): Command {
     .option('-f, --format <format>', 'Output format').option('--limit <number>', 'Limit', '20')
     .option('--offset <number>', 'Start index', '0').option('--sort <field>', 'Sort field')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         // Try the dedicated /Trailers endpoint first (requires Trailers plugin).
         // Fall back to Items API with IncludeItemTypes=Trailer for servers without the plugin.
@@ -132,7 +131,7 @@ export function createDiscoverCommand(): Command {
           });
           items = result.Items ?? [];
         }
-        console.log(toon.formatItems(items));
+        console.log(formatter.formatItems(items));
       } catch (err) { handleError(err, format); }
     });
 

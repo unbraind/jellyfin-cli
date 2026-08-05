@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the favorites command tree with validated options and actions.
@@ -17,7 +16,7 @@ export function createFavoritesCommand(): Command {
     .option('--limit <number>', 'Limit', '50')
     .option('--offset <number>', 'Offset', '0')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getItems({
           filters: ['IsFavorite'],
@@ -27,7 +26,7 @@ export function createFavoritesCommand(): Command {
           startIndex: parseInt(options.offset, 10),
           sortBy: 'SortName',
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -39,10 +38,10 @@ export function createFavoritesCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.markFavorite(itemId, options.user);
-        console.log(toon.formatMessage('Item added to favorites', true));
+        console.log(formatter.formatMessage('Item added to favorites', true));
       } catch (err) {
         handleError(err, format);
       }
@@ -54,10 +53,10 @@ export function createFavoritesCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.unmarkFavorite(itemId, options.user);
-        console.log(toon.formatMessage('Item removed from favorites', true));
+        console.log(formatter.formatMessage('Item removed from favorites', true));
       } catch (err) {
         handleError(err, format);
       }

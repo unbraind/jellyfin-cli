@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 import { attachMediaUrlCommands } from './media-urls.js';
 
 /**
@@ -13,10 +12,10 @@ export function createMediaCommand(): Command {
   cmd.command('segments <itemId>').description('Get media segments for an item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getMediaSegments(itemId);
-        console.log(toon.formatToon((result.Items ?? []).map((s) => ({
+        console.log(formatter.formatToon((result.Items ?? []).map((s) => ({
           id: s.Id,
           type: s.Type,
           start_ticks: s.StartTicks,
@@ -28,10 +27,10 @@ export function createMediaCommand(): Command {
   cmd.command('lyrics <itemId>').description('Get lyrics for an audio item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const lyrics = await client.getLyrics(itemId);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           metadata: lyrics.Metadata,
           lyrics: lyrics.Lyrics?.map((l) => ({
             text: l.Text,
@@ -45,10 +44,10 @@ export function createMediaCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--inherit', 'Include inherited theme songs')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getThemeSongs(itemId, undefined, options.inherit);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           items: result.Items?.map((i) => ({
             id: i.Id,
             name: i.Name,
@@ -64,10 +63,10 @@ export function createMediaCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--inherit', 'Include inherited theme videos')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getThemeVideos(itemId, undefined, options.inherit);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           items: result.Items?.map((i) => ({
             id: i.Id,
             name: i.Name,
@@ -82,10 +81,10 @@ export function createMediaCommand(): Command {
   cmd.command('external-ids <itemId>').description('Get external ID info for an item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const ids = await client.getExternalIdInfos(itemId);
-        console.log(toon.formatToon(ids.map((id) => ({
+        console.log(formatter.formatToon(ids.map((id) => ({
           name: id.Name,
           key: id.Key,
           url: id.Url,
@@ -97,10 +96,10 @@ export function createMediaCommand(): Command {
   cmd.command('external-id-infos <itemId>').description('Alias for external-ids')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const ids = await client.getExternalIdInfos(itemId);
-        console.log(toon.formatToon(ids.map((id) => ({
+        console.log(formatter.formatToon(ids.map((id) => ({
           name: id.Name,
           key: id.Key,
           url: id.Url,
@@ -114,13 +113,13 @@ export function createMediaCommand(): Command {
     .option('--type <type>', 'Image type')
     .option('--limit <number>', 'Limit')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getRemoteImages(itemId, {
           type: options.type,
           limit: options.limit ? parseInt(options.limit, 10) : undefined,
         });
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           total_count: result.TotalRecordCount,
           providers: result.Providers,
           images: result.Images?.map((img) => ({
@@ -141,10 +140,10 @@ export function createMediaCommand(): Command {
     .option('--type <type>', 'Image type')
     .option('--url <url>', 'Image URL')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.downloadRemoteImage(itemId, { type: options.type, imageUrl: options.url });
-        console.log(toon.formatMessage(`Image downloaded to item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Image downloaded to item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -154,14 +153,14 @@ export function createMediaCommand(): Command {
     .option('--synced', 'Mark as synced lyrics')
     .option('--data <text>', 'Lyrics data (LRC or plain text)')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.uploadLyrics(itemId, {
           language: options.language,
           isSynced: !!options.synced,
           data: options.data ?? '',
         });
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           metadata: result.Metadata,
           lyrics: result.Lyrics?.map((l) => ({ text: l.Text, start: l.Start })),
         }, 'lyrics'));
@@ -171,20 +170,20 @@ export function createMediaCommand(): Command {
   cmd.command('lyrics-delete <itemId>').description('Delete lyrics from an audio item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.deleteLyrics(itemId);
-        console.log(toon.formatMessage(`Lyrics deleted from item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Lyrics deleted from item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('lyrics-remote-search <itemId>').description('Search for remote lyrics for an audio item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const results = await client.searchRemoteLyrics(itemId);
-        console.log(toon.formatToon(results.map((r) => ({
+        console.log(formatter.formatToon(results.map((r) => ({
           id: r.Id,
           name: r.Name,
           provider: r.ProviderName,
@@ -198,10 +197,10 @@ export function createMediaCommand(): Command {
   cmd.command('lyrics-remote-download <itemId> <lyricId>').description('Download and apply remote lyrics to an audio item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, lyricId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.downloadRemoteLyrics(itemId, lyricId);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           metadata: result.Metadata,
           lyrics: result.Lyrics?.map((l) => ({ text: l.Text, start: l.Start })),
         }, 'lyrics'));
@@ -215,7 +214,7 @@ export function createMediaCommand(): Command {
     .option('--subtitle-stream <index>', 'Subtitle stream index')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getHlsMasterPlaylistUrl(itemId, {
           mediaSourceId: options.mediaSource,
@@ -223,7 +222,7 @@ export function createMediaCommand(): Command {
           subtitleStreamIndex: options.subtitleStream ? parseInt(options.subtitleStream, 10) : undefined,
           maxStreamingBitrate: options.maxBitrate ? parseInt(options.maxBitrate, 10) : undefined,
         });
-        console.log(toon.formatToon({ url, item_id: itemId }, 'hls_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId }, 'hls_url'));
       } catch (err) { handleError(err, format); }
     });
   attachMediaUrlCommands(cmd);

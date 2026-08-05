@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the persons command tree with validated options and actions.
@@ -17,7 +16,7 @@ export function createPersonsCommand(): Command {
     .option('--limit <number>', 'Maximum results', '100')
     .option('--search <term>', 'Search by name')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getPersons({
           parentId: options.parent,
@@ -27,7 +26,7 @@ export function createPersonsCommand(): Command {
         const filtered = options.search
           ? items.filter((p) => p.Name?.toLowerCase().includes(options.search.toLowerCase()))
           : items;
-        console.log(toon.formatItems(filtered));
+        console.log(formatter.formatItems(filtered));
       } catch (err) { handleError(err, format); }
     });
 
@@ -36,10 +35,10 @@ export function createPersonsCommand(): Command {
     .description('Get a person by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const person = await client.getPersonByName(name);
-        console.log(toon.formatItem(person));
+        console.log(formatter.formatItem(person));
       } catch (err) { handleError(err, format); }
     });
 

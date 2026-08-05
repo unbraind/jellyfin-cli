@@ -157,8 +157,11 @@ describe('global CLI option propagation', () => {
     const result = await runCli(['--format', 'json', 'system', 'info']);
     expect(result.code).toBe(0);
     const parsed = JSON.parse(result.stdout);
-    expect(parsed.ServerName).toBe('Test Server');
-    expect(parsed.Version).toBe('10.11.6');
+    expect(parsed.name).toBe('Test Server');
+    expect(parsed.version).toBe('10.11.6');
+    expect(parsed.id).toBe('server-1');
+    expect(parsed.has_pending_restart).toBe(false);
+    expect(parsed.can_self_restart).toBe(true);
   });
 
   it('applies global --format json to users me output', async () => {

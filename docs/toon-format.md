@@ -111,6 +111,20 @@ jf users list --format markdown
 
 `yaml` is a separate format. It is not an alias for `toon`.
 
+Format selection is enforced at the final command-output boundary. Dedicated command families do
+not call the TOON renderer directly, so `--format json` cannot silently return TOON and YAML,
+Markdown, table, and raw output cannot fall back to a TOON success or error envelope. Both global
+placement (`jf --format json artists list`) and command-local placement
+(`jf artists list --format json`) resolve to the same serializer.
+
+For programmatic workflows, validate the selected syntax before consuming fields:
+
+```bash
+jf artists list --limit 1 --format json | jq -e .
+jf system info --format yaml | bun -e \
+  "import YAML from 'yaml'; YAML.parse(await new Response(Bun.stdin.stream()).text())"
+```
+
 ## Decoding and Round-Trip Validation
 
 Use the official TypeScript package for programmatic decoding:

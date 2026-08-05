@@ -202,7 +202,7 @@ jf config list
 Switch to a named server configuration.
 
 ```bash
-jf config use <name>
+jf config use <name> [-f format]
 ```
 
 ### config delete
@@ -210,7 +210,7 @@ jf config use <name>
 Delete a server configuration.
 
 ```bash
-jf config delete <name> --force
+jf config delete <name> --force [-f format]
 ```
 
 ### config reset
@@ -218,7 +218,7 @@ jf config delete <name> --force
 Reset all configuration (clear settings file).
 
 ```bash
-jf config reset --force
+jf config reset --force [-f format]
 ```
 
 ### config test

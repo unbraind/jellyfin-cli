@@ -1,6 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { formatSuccess, toon } from '../formatters/index.js';
+import { formatSuccess } from '../formatters/index.js';
 
 /**
  * Builds the branding command tree with validated options and actions.
@@ -14,7 +14,7 @@ export function createBrandingCommand(): Command {
     .description('Get branding configuration')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const branding = await client.getBranding();
         const simplified = {
@@ -22,7 +22,7 @@ export function createBrandingCommand(): Command {
           custom_css: branding.CustomCss?.slice(0, 500),
           splashscreen_enabled: branding.SplashscreenEnabled,
         };
-        console.log(toon.formatToon(simplified, 'branding'));
+        console.log(formatter.formatToon(simplified, 'branding'));
       } catch (err) {
         handleError(err, format);
       }
@@ -33,13 +33,13 @@ export function createBrandingCommand(): Command {
     .description('Get the server custom CSS')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const css = await client.getBrandingCss();
-        if (format === 'raw' || format === 'json') {
+        if (format === 'raw') {
           console.log(css);
         } else {
-          console.log(toon.formatToon({ css: css || '(no custom CSS)' }, 'branding_css'));
+          console.log(formatter.formatToon({ css: css || '(no custom CSS)' }, 'branding_css'));
         }
       } catch (err) {
         handleError(err, format);
@@ -51,10 +51,10 @@ export function createBrandingCommand(): Command {
     .description('Get the URL of the server splashscreen image')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = await client.getSplashscreenUrl();
-        console.log(toon.formatToon({ url }, 'splashscreen'));
+        console.log(formatter.formatToon({ url }, 'splashscreen'));
       } catch (err) {
         handleError(err, format);
       }

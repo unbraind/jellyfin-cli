@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the library command tree with validated options and actions.
@@ -14,10 +13,10 @@ export function createLibraryCommand(): Command {
     .description('List all libraries')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const libraries = await client.getLibraries();
-        console.log(toon.formatLibraries(libraries));
+        console.log(formatter.formatLibraries(libraries));
       } catch (err) {
         handleError(err, format);
       }
@@ -31,14 +30,14 @@ export function createLibraryCommand(): Command {
     .option('--replace-metadata', 'Replace all metadata')
     .option('--replace-images', 'Replace all images')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.refreshLibrary({
           recursive: options.recursive,
           replaceAllMetadata: options.replaceMetadata,
           replaceAllImages: options.replaceImages,
         });
-        console.log(toon.formatMessage('Refresh started'));
+        console.log(formatter.formatMessage('Refresh started'));
       } catch (err) {
         handleError(err, format);
       }
@@ -51,12 +50,12 @@ export function createLibraryCommand(): Command {
     .option('--parent <id>', 'Parent ID')
     .option('--limit <number>', 'Limit', '100')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getGenres({
           parentId: options.parent,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -69,13 +68,13 @@ export function createLibraryCommand(): Command {
     .option('--parent <id>', 'Parent ID')
     .option('--limit <number>', 'Limit results', '100')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getStudios({
           parentId: options.parent,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -88,13 +87,13 @@ export function createLibraryCommand(): Command {
     .option('--parent <id>', 'Parent ID')
     .option('--limit <number>', 'Limit', '100')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getPersons({
           parentId: options.parent,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -107,13 +106,13 @@ export function createLibraryCommand(): Command {
     .option('--parent <id>', 'Parent ID')
     .option('--limit <number>', 'Limit', '100')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getArtists({
           parentId: options.parent,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -126,13 +125,13 @@ export function createLibraryCommand(): Command {
     .option('--parent <id>', 'Parent ID')
     .option('--limit <number>', 'Limit', '100')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getAlbumArtists({
           parentId: options.parent,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -143,10 +142,10 @@ export function createLibraryCommand(): Command {
     .description('Get a genre by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getGenreByName(name);
-        console.log(toon.formatItem(item));
+        console.log(formatter.formatItem(item));
       } catch (err) { handleError(err, format); }
     });
 
@@ -155,10 +154,10 @@ export function createLibraryCommand(): Command {
     .description('Get a person (actor, director, etc.) by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getPersonByName(name);
-        console.log(toon.formatItem(item));
+        console.log(formatter.formatItem(item));
       } catch (err) { handleError(err, format); }
     });
 
@@ -167,10 +166,10 @@ export function createLibraryCommand(): Command {
     .description('Get a studio by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getStudioByName(name);
-        console.log(toon.formatItem(item));
+        console.log(formatter.formatItem(item));
       } catch (err) { handleError(err, format); }
     });
 
@@ -179,10 +178,10 @@ export function createLibraryCommand(): Command {
     .description('List all virtual folders (library sources with paths)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const folders = await client.getVirtualFolders();
-        console.log(toon.formatToon(folders.map((f) => ({
+        console.log(formatter.formatToon(folders.map((f) => ({
           id: f.ItemId,
           name: f.Name,
           type: f.CollectionType,
@@ -202,7 +201,7 @@ export function createLibraryCommand(): Command {
     .option('--paths <paths>', 'Comma-separated media paths')
     .option('--refresh', 'Refresh library after adding')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.addVirtualFolder({
           name: options.name,
@@ -210,7 +209,7 @@ export function createLibraryCommand(): Command {
           paths: options.paths?.split(',').map((p: string) => p.trim()),
           refreshLibrary: options.refresh,
         });
-        console.log(toon.formatMessage(`Virtual folder '${options.name}' added`, true));
+        console.log(formatter.formatMessage(`Virtual folder '${options.name}' added`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -221,11 +220,11 @@ export function createLibraryCommand(): Command {
     .option('--refresh', 'Refresh library after removing')
     .option('--force', 'Skip confirmation')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) { console.error('Use --force to confirm removal'); process.exit(1); }
       try {
         await client.removeVirtualFolder(name, options.refresh);
-        console.log(toon.formatMessage(`Virtual folder '${name}' removed`, true));
+        console.log(formatter.formatMessage(`Virtual folder '${name}' removed`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -235,10 +234,10 @@ export function createLibraryCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--refresh', 'Refresh library after renaming')
     .action(async (name, newName, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.renameVirtualFolder(name, newName, options.refresh);
-        console.log(toon.formatMessage(`Virtual folder renamed from '${name}' to '${newName}'`, true));
+        console.log(formatter.formatMessage(`Virtual folder renamed from '${name}' to '${newName}'`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -249,10 +248,10 @@ export function createLibraryCommand(): Command {
     .option('--network-path <path>', 'Network path override')
     .option('--refresh', 'Refresh library after adding')
     .action(async (folderName, path, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.addMediaPath({ name: folderName, path, networkPath: options.networkPath, refreshLibrary: options.refresh });
-        console.log(toon.formatMessage(`Path '${path}' added to '${folderName}'`, true));
+        console.log(formatter.formatMessage(`Path '${path}' added to '${folderName}'`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -262,10 +261,10 @@ export function createLibraryCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--refresh', 'Refresh library after removing')
     .action(async (folderName, path, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.removeMediaPath(folderName, path, options.refresh);
-        console.log(toon.formatMessage(`Path '${path}' removed from '${folderName}'`, true));
+        console.log(formatter.formatMessage(`Path '${path}' removed from '${folderName}'`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -273,30 +272,30 @@ export function createLibraryCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--include-hidden', 'Include hidden folders')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getMediaFolders(options.includeHidden ? undefined : false);
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('physical-paths').description('List physical paths registered on the server')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const paths = await client.getPhysicalPaths();
-        console.log(toon.formatToon(paths.map((p) => ({ path: p })), 'physical_paths'));
+        console.log(formatter.formatToon(paths.map((p) => ({ path: p })), 'physical_paths'));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('available-options').description('Get available library creation options (supported media types, subtitle downloaders, etc.)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const opts = await client.getAvailableLibraryOptions();
-        console.log(toon.formatToon(opts, 'library_options'));
+        console.log(formatter.formatToon(opts, 'library_options'));
       } catch (err) { handleError(err, format); }
     });
 

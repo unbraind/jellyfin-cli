@@ -252,9 +252,9 @@ Notes:
 | `jf config get` | Display current configuration |
 | `jf config path` | Show configuration file path |
 | `jf config list` | List all configured servers |
-| `jf config use <name>` | Switch to a named server |
-| `jf config delete <name>` | Delete a server configuration |
-| `jf config reset` | Reset all configuration |
+| `jf config use <name> [--format <format>]` | Switch to a named server |
+| `jf config delete <name> --force [--format <format>]` | Delete a server configuration |
+| `jf config reset --force [--format <format>]` | Reset all configuration |
 | `jf config test` | Test connection to server |
 | `jf config doctor` | Structured diagnostics for config, auth, and OpenAPI availability |
 | `jf config doctor --validate-formats` | Adds machine-oriented formatter validation (`toon/json/table/raw/yaml/markdown`) to diagnostics |

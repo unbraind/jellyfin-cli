@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the genres command tree with validated options and actions.
@@ -18,13 +17,13 @@ export function createGenresCommand(): Command {
     .option('--sort <field>', 'Sort field (e.g. SortName, DateCreated)', 'SortName')
     .option('--order <dir>', 'Sort order (Ascending, Descending)', 'Ascending')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getGenres({
           parentId: options.parent,
           limit: parseInt(options.limit, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 
@@ -33,10 +32,10 @@ export function createGenresCommand(): Command {
     .description('Get a genre by name')
     .option('-f, --format <format>', 'Output format')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const genre = await client.getGenreByName(name);
-        console.log(toon.formatItem(genre));
+        console.log(formatter.formatItem(genre));
       } catch (err) { handleError(err, format); }
     });
 

@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the tasks command tree with validated options and actions.
@@ -14,10 +13,10 @@ export function createTasksCommand(): Command {
     server?: string | undefined;
   };
   const runTask = async (taskId: string, options: TaskCommandOptions): Promise<void> => {
-    const { client, format } = await createApiClient(options);
+    const { client, format, formatter } = await createApiClient(options);
     try {
       await client.startTask(taskId);
-      console.log(toon.formatMessage('Task started'));
+      console.log(formatter.formatMessage('Task started'));
     } catch (err) {
       handleError(err, format);
     }
@@ -29,10 +28,10 @@ export function createTasksCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--hidden', 'Include hidden tasks')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const tasks = await client.getScheduledTasks({ isHidden: options.hidden });
-        console.log(toon.formatTasks(tasks));
+        console.log(formatter.formatTasks(tasks));
       } catch (err) {
         handleError(err, format);
       }
@@ -43,10 +42,10 @@ export function createTasksCommand(): Command {
     .description('Get task by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (taskId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const task = await client.getScheduledTask(taskId);
-        console.log(toon.formatTask(task));
+        console.log(formatter.formatTask(task));
       } catch (err) {
         handleError(err, format);
       }
@@ -73,10 +72,10 @@ export function createTasksCommand(): Command {
     .description('Stop a running task')
     .option('-f, --format <format>', 'Output format')
     .action(async (taskId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.stopTask(taskId);
-        console.log(toon.formatMessage('Task stopped'));
+        console.log(formatter.formatMessage('Task stopped'));
       } catch (err) {
         handleError(err, format);
       }
@@ -87,10 +86,10 @@ export function createTasksCommand(): Command {
     .description('List task triggers')
     .option('-f, --format <format>', 'Output format')
     .action(async (taskId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const triggers = await client.getTaskTriggers(taskId);
-        console.log(toon.formatTaskTriggers(triggers));
+        console.log(formatter.formatTaskTriggers(triggers));
       } catch (err) {
         handleError(err, format);
       }
@@ -105,7 +104,7 @@ export function createTasksCommand(): Command {
     .option('--time <ticks>', 'Time of day in ticks (for DailyTrigger/WeeklyTrigger)')
     .option('--days <days>', 'Days of week (comma-separated, for WeeklyTrigger)')
     .action(async (taskId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.createTaskTrigger(taskId, {
           type: options.type,
@@ -113,7 +112,7 @@ export function createTasksCommand(): Command {
           timeOfDayTicks: options.time ? parseInt(options.time, 10) : undefined,
           dayOfWeek: options.days?.split(','),
         });
-        console.log(toon.formatMessage('Task trigger added'));
+        console.log(formatter.formatMessage('Task trigger added'));
       } catch (err) {
         handleError(err, format);
       }
@@ -124,10 +123,10 @@ export function createTasksCommand(): Command {
     .description('Delete a task trigger')
     .option('-f, --format <format>', 'Output format')
     .action(async (taskId, triggerId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.deleteTaskTrigger(taskId, triggerId);
-        console.log(toon.formatMessage('Task trigger deleted'));
+        console.log(formatter.formatMessage('Task trigger deleted'));
       } catch (err) {
         handleError(err, format);
       }

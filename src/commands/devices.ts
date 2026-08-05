@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the devices command tree with validated options and actions.
@@ -14,7 +13,7 @@ export function createDevicesCommand(): Command {
     .description('List all devices')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getDevices();
         const simplified = (result.Items ?? []).map((d) => ({
@@ -27,7 +26,7 @@ export function createDevicesCommand(): Command {
           last_user_id: d.LastUserId,
           last_activity: d.DateLastActivity,
         }));
-        console.log(toon.formatToon(simplified, 'devices'));
+        console.log(formatter.formatToon(simplified, 'devices'));
       } catch (err) {
         handleError(err, format);
       }
@@ -38,7 +37,7 @@ export function createDevicesCommand(): Command {
     .description('Get device info (auto-resolves first device when omitted)')
     .option('-f, --format <format>', 'Output format')
     .action(async (deviceId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const resolvedDeviceId = typeof deviceId === 'string' && deviceId.trim().length > 0
           ? deviceId
@@ -62,7 +61,7 @@ export function createDevicesCommand(): Command {
             supports_sync: device.Capabilities.SupportsSync,
           } : null,
         };
-        console.log(toon.formatToon(simplified, 'device'));
+        console.log(formatter.formatToon(simplified, 'device'));
       } catch (err) {
         handleError(err, format);
       }
@@ -73,7 +72,7 @@ export function createDevicesCommand(): Command {
     .description('Get device details')
     .option('-f, --format <format>', 'Output format')
     .action(async (deviceId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const device = await client.getDevice(deviceId);
         const simplified = {
@@ -91,7 +90,7 @@ export function createDevicesCommand(): Command {
             supports_sync: device.Capabilities.SupportsSync,
           } : null,
         };
-        console.log(toon.formatToon(simplified, 'device'));
+        console.log(formatter.formatToon(simplified, 'device'));
       } catch (err) {
         handleError(err, format);
       }
@@ -102,10 +101,10 @@ export function createDevicesCommand(): Command {
     .description('Set custom device name')
     .option('-f, --format <format>', 'Output format')
     .action(async (deviceId, name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.updateDeviceOptions(deviceId, { customName: name });
-        console.log(toon.formatMessage('Device name updated', true));
+        console.log(formatter.formatMessage('Device name updated', true));
       } catch (err) {
         handleError(err, format);
       }
@@ -117,14 +116,14 @@ export function createDevicesCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (deviceId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) {
         console.error('Use --force to confirm deletion');
         process.exit(1);
       }
       try {
         await client.deleteDevice(deviceId);
-        console.log(toon.formatMessage('Device deleted', true));
+        console.log(formatter.formatMessage('Device deleted', true));
       } catch (err) {
         handleError(err, format);
       }

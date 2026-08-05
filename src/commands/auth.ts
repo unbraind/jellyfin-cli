@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the auth command tree with validated options and actions.
@@ -14,10 +13,10 @@ export function createAuthCommand(): Command {
     .description('List authentication providers')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const providers = await client.getAuthProviders();
-        console.log(toon.formatToon(providers.map((p) => ({
+        console.log(formatter.formatToon(providers.map((p) => ({
           id: p.Id,
           name: p.Name,
         })), 'auth_providers'));
@@ -28,10 +27,10 @@ export function createAuthCommand(): Command {
     .description('List password reset providers')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const providers = await client.getPasswordResetProviders();
-        console.log(toon.formatToon(providers.map((p) => ({
+        console.log(formatter.formatToon(providers.map((p) => ({
           id: p.Id,
           name: p.Name,
         })), 'password_reset_providers'));
@@ -42,10 +41,10 @@ export function createAuthCommand(): Command {
     .description('List API keys (read-only alias for auth key inventory)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getApiKeys();
-        console.log(toon.formatToon((result.Items ?? []).map((entry) => ({
+        console.log(formatter.formatToon((result.Items ?? []).map((entry) => ({
           app_name: entry.AppName,
           key: entry.AccessToken,
           created: entry.DateCreated,

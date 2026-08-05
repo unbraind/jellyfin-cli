@@ -120,6 +120,17 @@ jf-cli --format yaml system info \
 These commands are read-only and verify that key output formats remain machine-parseable.
 The `--help` checks above ensure global flags are discoverable from every command surface.
 
+The automated output-contract suite additionally exercises every bound command formatter method in
+all six formats and statically rejects direct TOON imports/calls from command handlers:
+
+```bash
+bun test tests/commands/output-format-contracts.test.ts
+```
+
+For a privacy-safe live matrix, validate representative read-only command families without saving
+their payloads. Current acceptance covers artists, playlists, libraries, genres, and item counts in
+TOON, JSON, YAML, Markdown, table, and raw modes.
+
 ## 5) Run discovery diagnostics against live server
 
 ```bash

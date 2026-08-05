@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 // Webhook-style notification commands — tell Jellyfin a file has changed so it rescans.
 // Useful in CI/CD pipelines after moving/encoding media files.
@@ -17,10 +16,10 @@ export function createLibraryNotifyCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--path <path>', 'Path of the updated media file')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.notifyLibraryMediaUpdated([{ Path: options.path, UpdateType: 'Modified' }]);
-        console.log(toon.formatMessage('Library media update notification sent', true));
+        console.log(formatter.formatMessage('Library media update notification sent', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -28,10 +27,10 @@ export function createLibraryNotifyCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--path <path>', 'Path of the added movie file')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.notifyMoviesAdded([{ Path: options.path, UpdateType: 'Created' }]);
-        console.log(toon.formatMessage('Movie added notification sent', true));
+        console.log(formatter.formatMessage('Movie added notification sent', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -39,10 +38,10 @@ export function createLibraryNotifyCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--path <path>', 'Path of the updated movie file')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.notifyMoviesUpdated([{ Path: options.path, UpdateType: 'Modified' }]);
-        console.log(toon.formatMessage('Movie updated notification sent', true));
+        console.log(formatter.formatMessage('Movie updated notification sent', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -50,10 +49,10 @@ export function createLibraryNotifyCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--path <path>', 'Path of the added series directory')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.notifySeriesAdded([{ Path: options.path, UpdateType: 'Created' }]);
-        console.log(toon.formatMessage('Series added notification sent', true));
+        console.log(formatter.formatMessage('Series added notification sent', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -61,10 +60,10 @@ export function createLibraryNotifyCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--path <path>', 'Path of the updated series directory')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.notifySeriesUpdated([{ Path: options.path, UpdateType: 'Modified' }]);
-        console.log(toon.formatMessage('Series updated notification sent', true));
+        console.log(formatter.formatMessage('Series updated notification sent', true));
       } catch (err) { handleError(err, format); }
     });
 

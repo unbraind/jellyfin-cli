@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the clientlog command tree with validated options and actions.
@@ -18,7 +17,7 @@ export function createClientlogCommand(): Command {
     .option('--level <level>', 'Log level (Debug, Information, Warning, Error)', 'Information')
     .option('--name <name>', 'Logger name', 'jellyfin-cli')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.logClientDocument([{
           Name: options.name,
@@ -26,7 +25,7 @@ export function createClientlogCommand(): Command {
           Message: options.message,
           Level: options.level,
         }]);
-        console.log(toon.formatMessage('Log entry sent to server', true));
+        console.log(formatter.formatMessage('Log entry sent to server', true));
       } catch (err) { handleError(err, format); }
     });
 
