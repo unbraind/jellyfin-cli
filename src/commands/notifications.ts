@@ -1,6 +1,5 @@
 import { Command } from 'commander';
-import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
+import { createApiClient, formatMessage, formatToon, handleError } from './utils.js';
 
 /**
  * Builds the notifications command tree with validated options and actions.
@@ -23,10 +22,13 @@ export function createNotificationsCommand(): Command {
           enabled: t.Enabled,
           category: t.Category,
         }));
-        console.log(toon.formatToon(simplified, 'notification_types'));
+        console.log(formatToon(simplified, format, 'notification_types'));
       } catch (err) {
         if (err instanceof Error && err.message.includes('404')) {
-          console.log(toon.formatToon({ available: false, message: 'Notification types endpoint not available on this server version' }, 'notification_types'));
+          console.log(formatToon({
+            available: false,
+            message: 'Optional notification endpoint is not available on this server',
+          }, format, 'notification_types'));
         } else {
           handleError(err, format);
         }
@@ -51,7 +53,7 @@ export function createNotificationsCommand(): Command {
           date: n.Date,
           url: n.Url,
         }));
-        console.log(toon.formatToon(simplified, 'notifications'));
+        console.log(formatToon(simplified, format, 'notifications'));
       } catch (err) {
         handleError(err, format);
       }
@@ -74,7 +76,7 @@ export function createNotificationsCommand(): Command {
           url: options.url,
           level: options.level,
         });
-        console.log(toon.formatMessage('Notification sent', true));
+        console.log(formatMessage('Notification sent', format));
       } catch (err) {
         handleError(err, format);
       }

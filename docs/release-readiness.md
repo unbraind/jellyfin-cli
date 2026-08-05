@@ -144,6 +144,15 @@ All commands above are read-only and provide machine-parseable discovery output 
 The batch fixture contains only public operation IDs; live response content is never written to the
 repository.
 
+For full-scope coverage, require `unmatched_tools_total: 0` independently from operation coverage.
+Do not count `local_only_tools` or `non_endpoint_tools` as missing REST work; the latter carries an
+explicit OpenAPI orchestration, WebSocket, or optional-plugin reason.
+
+```bash
+jf schema research --include-unmatched --require-coverage 100 --format json \
+  | jq -e '.full_scope.unmatched_tools_total == 0'
+```
+
 ## 6) Verify executable names
 
 Installed binaries:

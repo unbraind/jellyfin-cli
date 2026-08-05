@@ -25,6 +25,15 @@ export type UnmatchedToolSummary = {
 };
 
 /**
+ * Represents an API-related CLI tool that intentionally has no one-to-one OpenAPI operation.
+ */
+export type NonEndpointToolSummary = {
+  command: string;
+  read_only_safe: boolean;
+  reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
+};
+
+/**
  * Represents the coverage mapping result values accepted by the typed Jellyfin interface.
  */
 export type CoverageMappingResult = {
@@ -32,6 +41,7 @@ export type CoverageMappingResult = {
   mappedToolCount: number;
   unmatchedTools: UnmatchedToolSummary[];
   localOnlyTools: UnmatchedToolSummary[];
+  nonEndpointTools: NonEndpointToolSummary[];
 };
 
 const LOCAL_ONLY_COMMANDS = new Set([
@@ -56,6 +66,16 @@ const LOCAL_ONLY_COMMANDS = new Set([
   'jf setup wizard',
 ]);
 
+const NON_ENDPOINT_COMMAND_PREFIXES: ReadonlyArray<{
+  prefix: string;
+  reason: NonEndpointToolSummary['reason'];
+}> = [
+  { prefix: 'jf api ', reason: 'openapi_orchestration' },
+  { prefix: 'jf events ', reason: 'websocket_transport' },
+  { prefix: 'jf notifications ', reason: 'optional_plugin_api' },
+  { prefix: 'jf schema compatibility', reason: 'openapi_orchestration' },
+];
+
 function isLocalOnlyCommand(command: string): boolean {
   return LOCAL_ONLY_COMMANDS.has(command);
 }
@@ -76,6 +96,7 @@ export function mapOpenApiCoverageToTools(
   let mappedToolCount = 0;
   const unmatchedTools: UnmatchedToolSummary[] = [];
   const localOnlyTools: UnmatchedToolSummary[] = [];
+  const nonEndpointTools: NonEndpointToolSummary[] = [];
 
   for (const tool of tools) {
     if (isLocalOnlyCommand(tool.command)) {
@@ -83,6 +104,18 @@ export function mapOpenApiCoverageToTools(
         command: tool.command,
         read_only_safe: tool.read_only_safe,
         reason: 'local_only_command',
+      });
+      continue;
+    }
+
+    const nonEndpointReason = NON_ENDPOINT_COMMAND_PREFIXES.find(
+      ({ prefix }) => tool.command.startsWith(prefix),
+    )?.reason;
+    if (nonEndpointReason) {
+      nonEndpointTools.push({
+        command: tool.command,
+        read_only_safe: tool.read_only_safe,
+        reason: nonEndpointReason,
       });
       continue;
     }
@@ -124,6 +157,7 @@ export function mapOpenApiCoverageToTools(
     mappedToolCount,
     unmatchedTools,
     localOnlyTools,
+    nonEndpointTools,
   };
 }
 

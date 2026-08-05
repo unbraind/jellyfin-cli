@@ -42,7 +42,7 @@
     "smoke:npx": "sh -c 'PKG=\"$(npm pack --silent)\" && npm exec --yes --package \"./$PKG\" jf -- --version && rm -f \"$PKG\"'",
     "smoke:bunx": "node scripts/smoke-bunx.mjs",
     "changelog:pm:install": "node scripts/release/ensure-pm-changelog.mjs",
-    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.7.31 -- pm --pm-path .agents/pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
+    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.8.5 -- pm --pm-path .agents/pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
     "changelog:pm:check": "node scripts/release/check-changelog.mjs",
     "test:release": "node --test scripts/release/release.test.mjs",
     "release:notes": "node scripts/release/generate-release-notes.mjs",
@@ -84,19 +84,19 @@
     "@vitest/coverage-v8": "^4.1.10",
     "eslint": "^10.8.0",
     "eslint-plugin-jsdoc": "63.2.2",
-    "globals": "^17.7.0",
+    "globals": "^17.9.0",
     "jscpd": "5.0.12",
-    "tsx": "^4.23.1",
+    "tsx": "^4.23.8",
     "typescript": "^5.9.3",
-    "typescript-eslint": "^8.65.0",
+    "typescript-eslint": "^8.66.0",
     "vitest": "^4.1.10"
   },
   "overrides": {
-    "brace-expansion": "5.0.8",
+    "brace-expansion": "5.0.9",
     "esbuild": "0.28.1",
     "flatted": "3.4.2",
     "picomatch": "4.0.5",
-    "postcss": "8.5.21",
+    "postcss": "8.5.25",
     "vite": "8.1.5"
   },
   "files": [

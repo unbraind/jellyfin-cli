@@ -99,9 +99,13 @@ describe('schema research command', () => {
     expect(result.stdout).toContain('operation_scope_count: 2');
     expect(result.stdout).toContain('unmatched_tools_total:');
     expect(result.stdout).toContain('local_only_tools_total:');
+    expect(result.stdout).toContain('non_endpoint_tools_total:');
     expect(result.stdout).toContain('unmatched_tools[5]{command,read_only_safe,reason}:');
     expect(result.stdout).toContain(
       'local_only_tools[5]{command,read_only_safe,reason}:',
+    );
+    expect(result.stdout).toContain(
+      'non_endpoint_tools[5]{command,read_only_safe,reason}:',
     );
     expect(result.stdout).toContain('include_unmatched: true');
   });
@@ -148,11 +152,13 @@ describe('schema research command', () => {
         operation_scope_count: number;
         unmatched_tools_total: number;
         local_only_tools_total: number;
+        non_endpoint_tools_total: number;
       };
       read_only_scope: {
         operation_scope_count: number;
         unmatched_tools_total: number;
         local_only_tools_total: number;
+        non_endpoint_tools_total: number;
       };
     };
 
@@ -163,6 +169,8 @@ describe('schema research command', () => {
     expect(parsed.read_only_scope.unmatched_tools_total).toBeGreaterThanOrEqual(0);
     expect(parsed.full_scope.local_only_tools_total).toBeGreaterThanOrEqual(0);
     expect(parsed.read_only_scope.local_only_tools_total).toBeGreaterThanOrEqual(0);
+    expect(parsed.full_scope.non_endpoint_tools_total).toBeGreaterThanOrEqual(0);
+    expect(parsed.read_only_scope.non_endpoint_tools_total).toBeGreaterThanOrEqual(0);
   });
 
   it('supports coverage requirement checks and fails when unmet', async () => {

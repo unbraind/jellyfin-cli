@@ -439,9 +439,12 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 ### Notifications
 
-- `jf notifications types` - List notification types
-- `jf notifications list` - List user notifications
-- `jf notifications send` - Send admin notification
+- `jf notifications types` - List optional notification types or report structured unavailability
+- `jf notifications list` - List user notifications when the optional route is installed
+- `jf notifications send` - Send an admin notification when the optional route is installed
+
+Jellyfin 10.11.11 does not expose notification routes in its core OpenAPI document. These commands
+are retained as an optional compatibility surface and support all global output formats.
 
 ### SyncPlay
 

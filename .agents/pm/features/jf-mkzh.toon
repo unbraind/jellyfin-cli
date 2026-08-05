@@ -6,7 +6,7 @@ status: open
 priority: 0
 tags[5]: active-ratchet,coverage,quality,roadmap,testing
 created_at: "2026-07-16T17:00:03.971Z"
-updated_at: "2026-07-23T05:14:21.420Z"
+updated_at: "2026-08-05T19:39:47.768Z"
 author: codex
 estimated_minutes: 1440
 acceptance_criteria: "Statements, branches, functions, and lines each measure exactly 100 percent across all source code; Coverage thresholds are enforced globally and per-file in every release and pull-request gate; Tests assert observable behavior and failure paths without coverage-only no-op execution or duplicated cases; Read-only live E2E, packaged-binary smoke, acceptance, performance, and dogfood suites are mandatory documented gates; Coverage cannot be reduced through ignore directives, source exclusions, or threshold changes without explicit governance failure"
@@ -19,12 +19,25 @@ parent: jf-gn5j
 risk: critical
 confidence: high
 sprint: jellyfin-10.11.11
-dependencies[4]{id,kind,created_at,author,source_kind}:
-  jf-rjox,related_to,"2026-07-21T19:15:59.347Z",codex-jellyfin,explicit
-  jf-7jxa,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
-  jf-fgfd,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
-  jf-sylm,related_to,"2026-07-21T19:50:13.328Z",codex-jellyfin,null
-comments[7]{created_at,author,text}:
+dependencies[4]:
+  - id: jf-rjox
+    kind: related_to
+    created_at: "2026-07-21T19:15:59.347Z"
+    author: codex-jellyfin
+    source_kind: explicit
+  - id: jf-7jxa
+    kind: related_to
+    created_at: "2026-07-21T19:50:13.328Z"
+    author: codex-jellyfin
+  - id: jf-fgfd
+    kind: related_to
+    created_at: "2026-07-21T19:50:13.328Z"
+    author: codex-jellyfin
+  - id: jf-sylm
+    kind: related_to
+    created_at: "2026-07-21T19:50:13.328Z"
+    author: codex-jellyfin
+comments[8]{created_at,author,text}:
   "2026-07-21T19:16:04.867Z",codex-jellyfin,Highest-priority requirement accepted. Current Bun coverage reports only functions and lines; evaluating LCOV/four-dimension enforcement and coverage capture for command subprocesses before selecting the non-cheatable gate.
   "2026-07-21T19:52:49.060Z",codex-jellyfin,Coverage remains the principal release blocker. Bun coverage reports 58.83% lines and 44.93% functions; Vitest can express all four 100% thresholds but its Node runtime currently fails 254 tests across 14 Bun-specific suites using Bun.spawn or Bun.serve. No artificial exclusions or mocked coverage inflation will be accepted.
   "2026-07-21T20:04:29.442Z",codex-jellyfin,"Latest post-change coverage run: 901 pass, 177 live-only skips, 0 fail; 58.64% lines and 44.56% functions. Command callbacks execute primarily in subprocess acceptance tests and are not attributed to the parent Bun coverage profile, which is the dominant instrumentation gap."
@@ -32,6 +45,7 @@ comments[7]{created_at,author,text}:
   "2026-07-22T04:50:16.913Z",codex-jellyfin,"Portability foundation completed: typed Node adapters make 894 deterministic tests pass under Vitest; authoritative four-metric baseline is 38.19 statements, 37.40 branches, 49.92 functions, 37.87 lines. Live compiled CLI read-only suite passed 177/177. Item remains in progress because genuine 100/100/100/100 is not met."
   "2026-07-23T04:51:19.423Z",codex-jellyfin,"2026-07-23 continuation: full all-status PM lineage, live GitHub state, official Jellyfin sources, and private-profile boundaries reviewed. Measuring exact current four-metric gaps before adding behavior-focused tests; no exclusions or threshold weakening."
   "2026-07-23T05:14:21.420Z",codex-jellyfin,"2026-07-23 diagnostic after official TOON work: portable Vitest gate passes 906/906 with 38.24% statements, 37.38% branches, 50.00% functions, and 37.90% lines. The 100/100/100/100 acceptance requirement remains open and is not claimed complete."
+  "2026-08-05T19:39:47.768Z",codex-jellyfin-api-20260805,"2026-08-05 measurement from jf-935b: Vitest coverage is 42.22% statements, 42.30% branches, 52.43% functions, and 41.96% lines. The new coverage classification is directly unit-tested and schema-validated, but the repository-wide 100% goal remains open and was not claimed by this tranche."
 notes[4]{created_at,author,text}:
   "2026-07-16T17:00:03.971Z",codex,"Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
   "2026-07-21T19:13:34.272Z",codex-jellyfin,"Baseline measured with bun test --coverage on 2026-07-21: 898 pass, 177 skipped, 0 fail; 44.93% functions and 58.83% lines. Bun's text reporter exposes only functions/lines, so the mandatory gate must use a four-dimension instrumenter and per-file thresholds while preserving Bun compatibility."
@@ -40,16 +54,16 @@ notes[4]{created_at,author,text}:
 learnings[2]{created_at,author,text}:
   "2026-07-21T20:04:30.337Z",codex-jellyfin,"Bun 1.3.11 exposes text and LCOV reporters but only native line/function threshold dimensions; Vitest exposes four dimensions but does not merge Bun child-process coverage automatically. Reaching the governed target requires in-process command execution or an explicit child-profile merge, followed by real missing-branch tests."
   "2026-07-22T04:50:17.571Z",codex-jellyfin,Bun subprocess acceptance tests provide strong black-box behavior proof but child execution is not attributed to parent coverage. Keep them mandatory and separate; use typed Node-compatible harnesses plus in-process command tests for deterministic four-metric attribution.
-files[3]{path,scope,note}:
-  package.json,project,null
-  tests/setup/node-bun-compat.ts,project,null
-  vitest.config.ts,project,null
+files[3]{path,scope}:
+  package.json,project
+  tests/setup/node-bun-compat.ts,project
+  vitest.config.ts,project
 tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
   "bun run test:coverage",package.json,project,1200,tracker
   "bun run test:coverage:four",package.json,project,300,tracker
   "bun run test:portable",package.json,project,300,tracker
   JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1200,tracker
-docs[2]{path,scope,note}:
-  docs/api-research.md,project,null
-  docs/release-readiness.md,project,null
+docs[2]{path,scope}:
+  docs/api-research.md,project
+  docs/release-readiness.md,project
 body: ""

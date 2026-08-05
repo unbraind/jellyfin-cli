@@ -32,6 +32,8 @@ type CoverageSnapshot = {
   unmatched_tools_truncated: boolean;
   local_only_tools_total: number;
   local_only_tools_truncated: boolean;
+  non_endpoint_tools_total: number;
+  non_endpoint_tools_truncated: boolean;
   unmatched_by_tag_total: number;
   unmatched_by_tag: Array<{ tag: string; operations: number; sample_paths: string[] }>;
   unmatched_tools?: Array<{
@@ -43,6 +45,11 @@ type CoverageSnapshot = {
     command: string;
     read_only_safe: boolean;
     reason: 'no_openapi_match_above_min_score' | 'local_only_command';
+  }>;
+  non_endpoint_tools?: Array<{
+    command: string;
+    read_only_safe: boolean;
+    reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
   }>;
   unmatched_operations?: Array<{
     method: string;
@@ -87,10 +94,13 @@ function buildCoverageSnapshot(
     unmatched_tools_truncated: coverageMapping.unmatchedTools.length > unmatchedLimit,
     local_only_tools_total: coverageMapping.localOnlyTools.length,
     local_only_tools_truncated: coverageMapping.localOnlyTools.length > unmatchedLimit,
+    non_endpoint_tools_total: coverageMapping.nonEndpointTools.length,
+    non_endpoint_tools_truncated: coverageMapping.nonEndpointTools.length > unmatchedLimit,
     unmatched_by_tag_total: unmatchedByTag.length,
     unmatched_by_tag: unmatchedByTag,
     unmatched_tools: coverageMapping.unmatchedTools.slice(0, unmatchedLimit),
     local_only_tools: coverageMapping.localOnlyTools.slice(0, unmatchedLimit),
+    non_endpoint_tools: coverageMapping.nonEndpointTools.slice(0, unmatchedLimit),
     unmatched_operations: includeUnmatched
       ? unmatched.slice(0, unmatchedLimit).map((operation) => ({
         method: operation.method,
@@ -111,7 +121,7 @@ function buildCoverageSnapshot(
 export function attachSchemaResearchSubcommand(cmd: Command): void {
   cmd
     .command('research')
-    .description('Create an agent-friendly OpenAPI + coverage research snapshot from a live server')
+    .description('Create an agent-friendly OpenAPI and transport coverage research snapshot')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--name <name>', 'Server name')
     .option('--method <method>', 'Filter operations by HTTP method')

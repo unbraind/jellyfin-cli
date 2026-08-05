@@ -9,6 +9,10 @@ import {
   EVENT_WATCH_SCHEMA,
 } from './schema-events-def.js';
 import { API_OPERATION_SCHEMA } from './schema-api-operation-def.js';
+import {
+  OPENAPI_COVERAGE_SCHEMA,
+  OPENAPI_RESEARCH_SCHEMA,
+} from './schema-coverage-def.js';
 
 export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   message: {
@@ -206,6 +210,8 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   api_batch_plan: API_BATCH_PLAN_SCHEMA,
   api_batch_response: API_BATCH_RESPONSE_SCHEMA,
   openapi_compatibility: OPENAPI_COMPATIBILITY_SCHEMA,
+  openapi_coverage: OPENAPI_COVERAGE_SCHEMA,
+  openapi_research: OPENAPI_RESEARCH_SCHEMA,
   event_types: EVENT_TYPES_SCHEMA,
   event_watch: EVENT_WATCH_SCHEMA,
   event_stream_record: EVENT_STREAM_RECORD_SCHEMA,

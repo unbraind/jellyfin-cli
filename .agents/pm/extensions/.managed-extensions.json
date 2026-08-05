@@ -1,6 +1,4 @@
 {
-  "version": 1,
-  "updated_at": "2026-08-01T05:41:53.836Z",
   "entries": [
     {
       "name": "builtin-governance-audit",
@@ -15,6 +13,61 @@
         "schema",
         "services"
       ],
+      "contributions": {
+        "schema_version": 1,
+        "commands": [
+          "comments-audit",
+          "dedupe-audit",
+          "dedupe-merge",
+          "normalize"
+        ],
+        "command_overrides": [],
+        "command_handlers": [
+          "comments-audit",
+          "dedupe-audit",
+          "dedupe-merge",
+          "normalize"
+        ],
+        "hooks": [
+          "on_write",
+          "on_read"
+        ],
+        "flag_commands": [
+          "comments",
+          "comments-audit",
+          "dedupe-audit",
+          "dedupe-merge",
+          "docs",
+          "files",
+          "learnings",
+          "normalize",
+          "notes",
+          "release",
+          "update",
+          "update-many"
+        ],
+        "item_types": [],
+        "item_fields": [],
+        "migrations": [],
+        "profiles": [],
+        "importers": [],
+        "exporters": [],
+        "search_providers": [],
+        "vector_store_adapters": [],
+        "parser_overrides": [
+          "comments",
+          "learnings",
+          "notes",
+          "release",
+          "update",
+          "update-many"
+        ],
+        "service_overrides": [
+          "command_result"
+        ],
+        "renderer_overrides": [],
+        "preflight_overrides": 0
+      },
       "installed_at": "2026-07-21T19:48:03.687Z",
       "updated_at": "2026-07-21T19:48:03.687Z",
       "source": {
@@ -29,7 +82,7 @@
       "name": "pm-changelog",
       "directory": "pm-changelog",
       "scope": "project",
-      "manifest_version": "2026.7.29-1",
+      "manifest_version": "2026.8.4",
       "manifest_entry": "./dist/extension.js",
       "capabilities": [
         "commands",
@@ -37,15 +90,69 @@
         "renderers",
         "schema"
       ],
+      "contributions": {
+        "schema_version": 1,
+        "commands": [
+          "changelog export",
+          "changelog generate"
+        ],
+        "command_overrides": [],
+        "command_handlers": [
+          "changelog export",
+          "changelog generate"
+        ],
+        "hooks": [],
+        "flag_commands": [
+          "changelog export",
+          "changelog generate"
+        ],
+        "item_types": [],
+        "item_fields": [],
+        "migrations": [],
+        "profiles": [],
+        "importers": [],
+        "exporters": [
+          "changelog"
+        ],
+        "search_providers": [],
+        "vector_store_adapters": [],
+        "parser_overrides": [],
+        "service_overrides": [],
+        "renderer_overrides": [
+          "json",
+          "toon"
+        ],
+        "preflight_overrides": 0,
+        "renderer_ownership": [
+          {
+            "format": "json",
+            "commands": [
+              "changelog export",
+              "changelog generate"
+            ],
+            "result_discriminator": true
+          },
+          {
+            "format": "toon",
+            "commands": [
+              "changelog export",
+              "changelog generate"
+            ],
+            "result_discriminator": true
+          }
+        ]
+      },
       "installed_at": "2026-07-21T17:01:47.160Z",
-      "updated_at": "2026-07-31T20:27:15.045Z",
+      "updated_at": "2026-08-05T19:24:39.984Z",
       "source": {
         "kind": "npm",
-        "input": "npm:pm-changelog@2026.7.29-1",
+        "input": "npm:pm-changelog@latest",
         "location": "package",
         "package": "pm-changelog",
-        "version": "2026.7.29-1"
+        "version": "2026.8.4"
       }
     }
-  ]
+  ],
+  "updated_at": "2026-08-05T19:24:39.984Z",
+  "version": 1
 }
