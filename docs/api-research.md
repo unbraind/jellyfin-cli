@@ -3,6 +3,19 @@
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
+## August 5 Structured-Output Contract Refresh
+
+Read-only probes against the configured Jellyfin 10.11.11 server found that several dedicated
+command families resolved `--format` correctly but called TOON-only renderers afterward. JSON
+consumers therefore received non-JSON stdout even though the generic OpenAPI and selected core
+commands already honored the requested format.
+
+The command runtime now binds all legacy-named item, user, session, task, message, error, and generic
+renderers to the resolved final format. A repository guard rejects direct TOON calls from command
+handlers. Sanitized compiled-CLI acceptance validated five representative API command families
+across all six formats (`30` executions) without persisting or printing server payloads and without
+mutating Jellyfin data.
+
 ## Verification Scope
 
 - Verification date: **August 5, 2026**

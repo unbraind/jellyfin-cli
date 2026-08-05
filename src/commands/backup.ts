@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the backup command tree with validated options and actions.
@@ -12,10 +11,10 @@ export function createBackupCommand(): Command {
   cmd.command('list').description('List available backups')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const backups = await client.getBackups();
-        console.log(toon.formatToon(backups.map((b) => ({
+        console.log(formatter.formatToon(backups.map((b) => ({
           name: b.Name,
           path: b.Path,
           size: b.Size,
@@ -27,30 +26,30 @@ export function createBackupCommand(): Command {
   cmd.command('create').description('Create a backup')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.createBackup();
-        console.log(toon.formatMessage('Backup created successfully', true));
+        console.log(formatter.formatMessage('Backup created successfully', true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('restore <backupPath>').description('Restore from a backup')
     .option('-f, --format <format>', 'Output format')
     .action(async (backupPath, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.restoreBackup(backupPath);
-        console.log(toon.formatMessage(`Backup restored from ${backupPath}`, true));
+        console.log(formatter.formatMessage(`Backup restored from ${backupPath}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('manifest <backupPath>').description('Get the manifest of an existing backup archive')
     .option('-f, --format <format>', 'Output format')
     .action(async (backupPath, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const manifest = await client.getBackupManifest(backupPath);
-        console.log(toon.formatToon(manifest, 'backup_manifest'));
+        console.log(formatter.formatToon(manifest, 'backup_manifest'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -58,14 +57,14 @@ export function createBackupCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (backupPath, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) {
         console.error('Use --force to confirm deletion');
         process.exit(1);
       }
       try {
         await client.deleteBackup(backupPath);
-        console.log(toon.formatMessage(`Backup ${backupPath} deleted`, true));
+        console.log(formatter.formatMessage(`Backup ${backupPath} deleted`, true));
       } catch (err) { handleError(err, format); }
     });
 

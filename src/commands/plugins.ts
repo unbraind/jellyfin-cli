@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the plugins command tree with validated options and actions.
@@ -14,7 +13,7 @@ export function createPluginsCommand(): Command {
     .description('List all installed plugins')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const plugins = await client.getPlugins();
         const simplified = plugins.map((p) => ({
@@ -25,7 +24,7 @@ export function createPluginsCommand(): Command {
           description: p.Description?.slice(0, 100),
           can_uninstall: p.CanUninstall,
         }));
-        console.log(toon.formatToon(simplified, 'plugins'));
+        console.log(formatter.formatToon(simplified, 'plugins'));
       } catch (err) {
         handleError(err, format);
       }
@@ -36,7 +35,7 @@ export function createPluginsCommand(): Command {
     .description('Get plugin details')
     .option('-f, --format <format>', 'Output format')
     .action(async (pluginId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const plugin = await client.getPlugin(pluginId);
         const simplified = {
@@ -50,7 +49,7 @@ export function createPluginsCommand(): Command {
           configuration_file: plugin.ConfigurationFileName,
           data_path: plugin.DataFolderPath,
         };
-        console.log(toon.formatToon(simplified, 'plugin'));
+        console.log(formatter.formatToon(simplified, 'plugin'));
       } catch (err) {
         handleError(err, format);
       }
@@ -61,10 +60,10 @@ export function createPluginsCommand(): Command {
     .description('Get plugin configuration')
     .option('-f, --format <format>', 'Output format')
     .action(async (pluginId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const config = await client.getPluginConfiguration(pluginId);
-        console.log(toon.formatToon(config, 'plugin_config'));
+        console.log(formatter.formatToon(config, 'plugin_config'));
       } catch (err) {
         handleError(err, format);
       }
@@ -76,14 +75,14 @@ export function createPluginsCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (pluginId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) {
         console.error('Use --force to confirm uninstall');
         process.exit(1);
       }
       try {
         await client.uninstallPlugin(pluginId);
-        console.log(toon.formatMessage('Plugin uninstalled', true));
+        console.log(formatter.formatMessage('Plugin uninstalled', true));
       } catch (err) {
         handleError(err, format);
       }
@@ -94,10 +93,10 @@ export function createPluginsCommand(): Command {
     .description('Enable a disabled plugin by ID and version')
     .option('-f, --format <format>', 'Output format')
     .action(async (pluginId, version, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.enablePlugin(pluginId, version);
-        console.log(toon.formatMessage(`Plugin ${pluginId} v${version} enabled`, true));
+        console.log(formatter.formatMessage(`Plugin ${pluginId} v${version} enabled`, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -108,10 +107,10 @@ export function createPluginsCommand(): Command {
     .description('Disable a plugin by ID and version (without uninstalling)')
     .option('-f, --format <format>', 'Output format')
     .action(async (pluginId, version, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.disablePlugin(pluginId, version);
-        console.log(toon.formatMessage(`Plugin ${pluginId} v${version} disabled`, true));
+        console.log(formatter.formatMessage(`Plugin ${pluginId} v${version} disabled`, true));
       } catch (err) {
         handleError(err, format);
       }

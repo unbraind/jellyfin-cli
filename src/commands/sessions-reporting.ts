@@ -1,6 +1,5 @@
 import type { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Performs the add reporting commands operation through the typed Jellyfin API boundary.
@@ -13,14 +12,14 @@ export function addReportingCommands(cmd: Command): void {
     .option('--commands <cmds>', 'Supported commands (comma-separated, e.g. Play,Stop)')
     .option('--media-control', 'Indicate this client supports media control')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.reportSessionCapabilities({
           playableMediaTypes: options.mediaTypes?.split(','),
           supportedCommands: options.commands?.split(','),
           supportsMediaControl: !!options.mediaControl,
         });
-        console.log(toon.formatMessage('Session capabilities reported', true));
+        console.log(formatter.formatMessage('Session capabilities reported', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -32,7 +31,7 @@ export function addReportingCommands(cmd: Command): void {
     .option('--content-uploading', 'Supports content uploading')
     .option('--sync', 'Supports sync')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.reportFullSessionCapabilities({
           playableMediaTypes: options.mediaTypes?.split(','),
@@ -41,7 +40,7 @@ export function addReportingCommands(cmd: Command): void {
           supportsContentUploading: !!options.contentUploading,
           supportsSync: !!options.sync,
         });
-        console.log(toon.formatMessage('Full session capabilities reported', true));
+        console.log(formatter.formatMessage('Full session capabilities reported', true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -52,7 +51,7 @@ export function addReportingCommands(cmd: Command): void {
     .option('--subtitle-stream <index>', 'Subtitle stream index')
     .option('--position <ticks>', 'Start position in ticks')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.reportPlayingItemStart(itemId, {
           mediaSourceId: options.mediaSource,
@@ -60,7 +59,7 @@ export function addReportingCommands(cmd: Command): void {
           subtitleStreamIndex: options.subtitleStream !== undefined ? parseInt(options.subtitleStream, 10) : undefined,
           positionTicks: options.position !== undefined ? parseInt(options.position, 10) : undefined,
         });
-        console.log(toon.formatMessage(`Playback started reported for item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Playback started reported for item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -71,7 +70,7 @@ export function addReportingCommands(cmd: Command): void {
     .option('--paused', 'Mark as paused')
     .option('--muted', 'Mark as muted')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.reportPlayingItemProgress(itemId, {
           mediaSourceId: options.mediaSource,
@@ -79,7 +78,7 @@ export function addReportingCommands(cmd: Command): void {
           isPaused: !!options.paused,
           isMuted: !!options.muted,
         });
-        console.log(toon.formatMessage(`Playback progress reported for item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Playback progress reported for item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -88,23 +87,23 @@ export function addReportingCommands(cmd: Command): void {
     .option('--media-source <id>', 'Media source ID')
     .option('--position <ticks>', 'Final position in ticks')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.reportPlayingItemStopped(itemId, {
           mediaSourceId: options.mediaSource,
           positionTicks: options.position !== undefined ? parseInt(options.position, 10) : undefined,
         });
-        console.log(toon.formatMessage(`Playback stopped reported for item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Playback stopped reported for item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('ping-playback <playSessionId>').description('Ping an active playback session to keep it alive')
     .option('-f, --format <format>', 'Output format')
     .action(async (playSessionId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.pingPlaybackSession(playSessionId);
-        console.log(toon.formatMessage(`Playback session ${playSessionId} pinged`, true));
+        console.log(formatter.formatMessage(`Playback session ${playSessionId} pinged`, true));
       } catch (err) { handleError(err, format); }
     });
 }

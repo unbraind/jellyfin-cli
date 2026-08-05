@@ -1,7 +1,6 @@
 import { Command } from 'commander';
 import { writeFile } from 'node:fs/promises';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the fonts command tree with validated options and actions.
@@ -14,10 +13,10 @@ export function createFontsCommand(): Command {
   cmd.command('list').description('List all installed fallback fonts')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const fonts = await client.getFallbackFonts();
-        console.log(toon.formatToon(fonts.map((f) => ({
+        console.log(formatter.formatToon(fonts.map((f) => ({
           name: f.Name,
           filename: f.Filename,
           size: f.FileSize,
@@ -30,12 +29,12 @@ export function createFontsCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--output <path>', 'Output file path (defaults to font name)')
     .action(async (name, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const data = await client.getFallbackFont(name);
         const outPath = options.output ?? name;
         await writeFile(outPath, Buffer.from(data));
-        console.log(toon.formatToon({ name, saved_to: outPath }, 'font_downloaded'));
+        console.log(formatter.formatToon({ name, saved_to: outPath }, 'font_downloaded'));
       } catch (err) { handleError(err, format); }
     });
 

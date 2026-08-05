@@ -1,7 +1,7 @@
 import { Command } from 'commander';
 import { JellyfinApiClient, JellyfinApiError } from '../api/client.js';
 import { getConfig, saveConfig, getSettingsPath, listServers, setCurrentServer, deleteServer, writeSettingsFile } from '../utils/config.js';
-import { formatSuccess, formatError, formatOutput, toon } from '../formatters/index.js';
+import { formatSuccess, formatError, formatOutput } from '../formatters/index.js';
 import { outputFormatChoices, parseOutputFormat } from '../utils/output-format.js';
 import { addConfigDoctorCommand } from './config-doctor.js';
 import { resolveOutputFormat, type FormatOptions } from './schema-utils.js';
@@ -36,10 +36,6 @@ function toSafeConfig(config: JellyfinConfig): Record<string, unknown> {
 }
 
 function printConfigPayload(data: Record<string, unknown>, format: OutputFormat, typeHint: string): void {
-  if (format === 'toon') {
-    console.log(toon.formatToon(data, typeHint));
-    return;
-  }
   console.log(formatOutput(data, format, typeHint));
 }
 
@@ -136,10 +132,6 @@ export function createConfigCommand(): Command {
     .action(function (this: Command, options: ConfigCommandOptions) {
       const config = getConfig(options.name);
       const format = resolveConfigRuntimeFormat(this, options);
-      if (format === 'toon') {
-        console.log(toon.formatConfig(config));
-        return;
-      }
       printConfigPayload(toSafeConfig(config), format, 'config');
     });
 
@@ -164,10 +156,6 @@ export function createConfigCommand(): Command {
     .action(function (this: Command, options: ConfigCommandOptions) {
       const servers = listServers();
       const format = resolveConfigRuntimeFormat(this, options);
-      if (format === 'toon') {
-        console.log(toon.formatServers(servers));
-        return;
-      }
       printConfigPayload(
         {
           servers: servers.map((server) => ({
@@ -185,12 +173,14 @@ export function createConfigCommand(): Command {
   cmd
     .command('use <name>')
     .description('Switch to a named server configuration')
-    .action((name) => {
+    .option('-f, --format <format>', 'Output format')
+    .action(function (this: Command, name: string, options: ConfigCommandOptions) {
+      const format = resolveConfigRuntimeFormat(this, options);
       const success = setCurrentServer(name);
       if (success) {
-        console.log(toon.formatMessage(`Switched to server: ${name}`, true));
+        console.log(formatSuccess(`Switched to server: ${name}`, format));
       } else {
-        console.error(formatError(`Server '${name}' not found`, 'toon'));
+        console.error(formatError(`Server '${name}' not found`, format));
         process.exit(1);
       }
     });
@@ -198,17 +188,19 @@ export function createConfigCommand(): Command {
   cmd
     .command('delete <name>')
     .description('Delete a server configuration')
+    .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
-    .action((name, options) => {
+    .action(function (this: Command, name: string, options: ConfigCommandOptions & { force?: boolean }) {
+      const format = resolveConfigRuntimeFormat(this, options);
       if (!options.force) {
-        console.error('Use --force to confirm deletion');
+        console.error(formatError('Use --force to confirm deletion', format));
         process.exit(1);
       }
       const success = deleteServer(name);
       if (success) {
-        console.log(toon.formatMessage(`Server '${name}' deleted`, true));
+        console.log(formatSuccess(`Server '${name}' deleted`, format));
       } else {
-        console.error(formatError(`Server '${name}' not found`, 'toon'));
+        console.error(formatError(`Server '${name}' not found`, format));
         process.exit(1);
       }
     });
@@ -216,14 +208,16 @@ export function createConfigCommand(): Command {
   cmd
     .command('reset')
     .description('Reset all configuration (clear settings file)')
+    .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
-    .action((options) => {
+    .action(function (this: Command, options: ConfigCommandOptions & { force?: boolean }) {
+      const format = resolveConfigRuntimeFormat(this, options);
       if (!options.force) {
-        console.error('Use --force to confirm reset');
+        console.error(formatError('Use --force to confirm reset', format));
         process.exit(1);
       }
       writeSettingsFile({});
-      console.log(toon.formatMessage('Configuration reset', true));
+      console.log(formatSuccess('Configuration reset', format));
     });
 
   cmd
@@ -243,20 +237,16 @@ export function createConfigCommand(): Command {
       try {
         const client = new JellyfinApiClient(config);
         const info = await client.getPublicSystemInfo();
-        if (format === 'toon') {
-          console.log(toon.formatSystemInfo(info));
-        } else {
-          printConfigPayload(
-            {
-              server_name: info.ServerName,
-              version: info.Version,
-              server_id: info.Id,
-              local_address: info.LocalAddress ?? null,
-            },
-            format,
-            'system_info',
-          );
-        }
+        printConfigPayload(
+          {
+            server_name: info.ServerName,
+            version: info.Version,
+            server_id: info.Id,
+            local_address: info.LocalAddress ?? null,
+          },
+          format,
+          'system_info',
+        );
       } catch (err) {
         const message = err instanceof JellyfinApiError ? err.message : 'Connection failed';
         console.error(formatError(message, format));

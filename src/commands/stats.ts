@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the stats command tree with validated options and actions.
@@ -14,7 +13,7 @@ export function createStatsCommand(): Command {
     .description('Get library item counts')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const counts = await client.getItemCounts();
         const simplified = {
@@ -29,7 +28,7 @@ export function createStatsCommand(): Command {
           books: counts.BookCount,
           trailers: counts.TrailerCount,
         };
-        console.log(toon.formatToon(simplified, 'item_counts'));
+        console.log(formatter.formatToon(simplified, 'item_counts'));
       } catch (err) {
         handleError(err, format);
       }

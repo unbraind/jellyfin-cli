@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Implements attach livetv extended commands for the typed Jellyfin CLI runtime.
@@ -19,7 +18,7 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .option('--pre-padding <seconds>', 'Pre-padding seconds', '60')
     .option('--post-padding <seconds>', 'Post-padding seconds', '300')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.createLiveTvTimer({
           channelId: options.channel,
@@ -30,7 +29,7 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
           prePaddingSeconds: parseInt(options.prePadding, 10),
           postPaddingSeconds: parseInt(options.postPadding, 10),
         });
-        console.log(toon.formatMessage('Timer created'));
+        console.log(formatter.formatMessage('Timer created'));
       } catch (err) {
         handleError(err, format);
       }
@@ -41,10 +40,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Delete a Live TV timer')
     .option('-f, --format <format>', 'Output format')
     .action(async (timerId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.deleteLiveTvTimer(timerId);
-        console.log(toon.formatMessage('Timer deleted'));
+        console.log(formatter.formatMessage('Timer deleted'));
       } catch (err) {
         handleError(err, format);
       }
@@ -55,10 +54,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('List Live TV series timers')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvSeriesTimers();
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -69,10 +68,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Get Live TV series timer by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const timer = await client.getLiveTvSeriesTimer(id);
-        console.log(toon.formatItem(timer));
+        console.log(formatter.formatItem(timer));
       } catch (err) {
         handleError(err, format);
       }
@@ -83,10 +82,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Delete a Live TV series timer')
     .option('-f, --format <format>', 'Output format')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.deleteLiveTvSeriesTimer(id);
-        console.log(toon.formatMessage('Series timer deleted'));
+        console.log(formatter.formatMessage('Series timer deleted'));
       } catch (err) {
         handleError(err, format);
       }
@@ -96,10 +95,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Get TV guide date range')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const info = await client.getLiveTvGuideInfo();
-        console.log(toon.formatToon({ start_date: info.StartDate, end_date: info.EndDate }, 'guide_info'));
+        console.log(formatter.formatToon({ start_date: info.StartDate, end_date: info.EndDate }, 'guide_info'));
       } catch (err) {
         handleError(err, format);
       }
@@ -112,14 +111,14 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .option('--is-airing', 'Only currently airing')
     .option('--has-aired', 'Only programs that have aired')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvRecommendedPrograms({
           limit: parseInt(options.limit, 10),
           isAiring: options.isAiring,
           hasAired: options.hasAired,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -129,10 +128,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('List Live TV recording folder collections')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvRecordingFolders();
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -142,10 +141,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('List Live TV recording groups')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvRecordingGroups();
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -155,10 +154,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Get Live TV recording by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const recording = await client.getLiveTvRecordingById(id);
-        console.log(toon.formatItem(recording));
+        console.log(formatter.formatItem(recording));
       } catch (err) {
         handleError(err, format);
       }
@@ -169,14 +168,14 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .option('-f, --format <format>', 'Output format')
     .option('--force', 'Skip confirmation')
     .action(async (id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       if (!options.force) {
         console.error('Use --force to confirm deletion');
         process.exit(1);
       }
       try {
         await client.deleteLiveTvRecording(id);
-        console.log(toon.formatMessage(`Recording ${id} deleted`, true));
+        console.log(formatter.formatMessage(`Recording ${id} deleted`, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -186,10 +185,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('Discover available tuner devices on the network')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const tuners = await client.discoverTuners();
-        console.log(toon.formatToon(tuners.map((t) => ({ type: t.Type, url: t.Url })), 'tuners'));
+        console.log(formatter.formatToon(tuners.map((t) => ({ type: t.Type, url: t.Url })), 'tuners'));
       } catch (err) {
         handleError(err, format);
       }
@@ -199,10 +198,10 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('List supported tuner host types')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const types = await client.getTunerHostTypes();
-        console.log(toon.formatToon(types.map((t) => ({ id: t.Id, name: t.Name })), 'tuner_types'));
+        console.log(formatter.formatToon(types.map((t) => ({ id: t.Id, name: t.Name })), 'tuner_types'));
       } catch (err) {
         handleError(err, format);
       }
@@ -212,11 +211,11 @@ export function attachLivetvExtendedCommands(cmd: Command): void {
     .description('List Schedules Direct countries and postal code patterns')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const payload = await client.getSchedulesDirectCountries();
         const normalized = typeof payload === 'string' ? { raw: payload } : payload;
-        console.log(toon.formatToon(normalized, 'schedules_direct_countries'));
+        console.log(formatter.formatToon(normalized, 'schedules_direct_countries'));
       } catch (err) {
         handleError(err, format);
       }

@@ -154,7 +154,10 @@ export function formatSuccess(message: string, format: OutputFormat): string {
   if (format === 'raw') {
     return message;
   }
-  return toon.formatMessage(message, true);
+  if (format === 'toon') {
+    return toon.formatMessage(message, true);
+  }
+  return formatOutput({ success: true, message }, format, 'message');
 }
 
 /**
@@ -172,5 +175,8 @@ export function formatError(error: string, format: OutputFormat, code?: number, 
   if (format === 'raw') {
     return `Error: ${error}`;
   }
-  return toon.formatError(error, code, details);
+  if (format === 'toon') {
+    return toon.formatError(error, code, details);
+  }
+  return formatOutput({ success: false, error, code, details }, format, 'error');
 }

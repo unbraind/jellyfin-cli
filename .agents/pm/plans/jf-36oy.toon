@@ -1,0 +1,204 @@
+id: jf-36oy
+title: Enforce structured output formats across dedicated Jellyfin commands
+description: "Replace TOON-only command output paths with the shared typed formatter so every advertised format remains syntactically valid and schema-consistent across read and mutation command families, while preserving TOON as the default."
+type: Plan
+status: in_progress
+priority: 0
+tags[11]: agents,api,formats,json,markdown,quality,raw,read-only,table,toon,yaml
+created_at: "2026-08-05T20:20:16.290Z"
+updated_at: "2026-08-05T20:57:08.891Z"
+assignee: codex-jellyfin-format-20260805
+author: codex-jellyfin-format-20260805
+estimated_minutes: 900
+acceptance_criteria: Every leaf command that advertises or inherits format selection honors toon json yaml markdown table and raw through one typed output boundary; TOON remains the default and preserves existing normalized envelopes; JSON stdout parses for every covered command and formatter schemas round-trip; mutation commands are tested only against isolated fixtures and live Jellyfin testing remains read-only; help and documentation describe exact output behavior; release validation PM validation security privacy review and auto-release readiness gates pass
+definition_of_ready: All 46 PM items and histories inspected at project/relevant-detail level; all-status duplicate and graph audits clean; latest pm-cli and pm-changelog verified; clean main; official release and live server both 10.11.11; defect reproduced without exposing private data.
+goal: jf-mqpo
+value: "Make jf-cli dependable in jq, CI, YAML, Markdown, and agent pipelines instead of silently returning the wrong serialization."
+impact: Removes a repo-wide automation footgun across hundreds of dedicated Jellyfin commands and all supported output consumers.
+outcome: A single enforceable structured-output contract across the complete dedicated command surface with read-only live proof.
+why_now: "The newest API coverage tranche proved endpoint reach, but direct live probes show the dedicated interface still violates its advertised serialization contract."
+parent: jf-gn5j
+reviewer: github-review-bots
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+release: next-manual-release
+dependencies[8]{id,kind,created_at,author,source_kind,author_source}:
+  jf-59hr,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-644n,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-935b,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-gn5j,parent,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-lpki,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-mkzh,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-snok,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+  jf-tike,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
+comments[4]{created_at,author,text}:
+  "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Reviewed the complete all-status PM inventory, active goals, closed output/TOON/API lineage, relationship audit, official latest release, live server version, and sanitized format probes before creation; no duplicate repo-wide format-contract plan exists."
+  "2026-08-05T20:51:50.696Z",codex,"Quality measurement: 978 portable tests passed with 1 intentional skip; coverage is statements 43.36%, branches 44.01%, functions 54.11%, lines 43.18%. The canonical coverage goal jf-mkzh remains open; this tranche improves the formatter boundary but does not claim repository-wide 100%."
+  "2026-08-05T20:51:51.974Z",codex,Zero-duplication diagnostic remains red at 225 clones and 8.16% duplicated lines (8.00% tokens); canonical quality goal jf-lpki remains open. Bun audit and Trivy report zero vulnerabilities/secrets/misconfigurations; npm audit transport returned a registry endpoint error and will be retried.
+  "2026-08-05T20:53:16.143Z",codex-jellyfin-format-20260805,"PM telemetry is operational but transport is intermittent: the last successful flush was 2026-08-05T20:52:42Z; a subsequent explicit flush retained 4 queued events with fetch failed, and status then showed 6 queued events. This is an observability delivery limitation, not a product or tracker-integrity failure."
+notes[1]{created_at,author,text}:
+  "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Privacy boundary: credentials, server URL, user/server/item IDs, raw schemas, and payloads stay in environment variables or owner-only ~/.jellyfin-cli. PM and Git retain only public versions, commands, classifications, and aggregate outcomes."
+learnings[1]{created_at,author,text}:
+  "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,Resolving a format in createApiClient is insufficient when command handlers call TOON-specific renderers directly; format correctness must be enforced at the final output boundary.
+files[87]{path,scope,note}:
+  src/commands/api-batch.ts,project,Dedicated command output boundary
+  src/commands/api.ts,project,Dedicated command output boundary
+  src/commands/apikeys.ts,project,Dedicated command output boundary
+  src/commands/artists.ts,project,Dedicated command output boundary
+  src/commands/auth.ts,project,Dedicated command output boundary
+  src/commands/backup.ts,project,Dedicated command output boundary
+  src/commands/branding.ts,project,Dedicated command output boundary
+  src/commands/channels.ts,project,Dedicated command output boundary
+  src/commands/clientlog.ts,project,Dedicated command output boundary
+  src/commands/collections.ts,project,Dedicated command output boundary
+  src/commands/config-doctor.ts,project,Dedicated command output boundary
+  src/commands/config.ts,project,Dedicated command output boundary
+  src/commands/dashboard.ts,project,Dedicated command output boundary
+  src/commands/devices.ts,project,Dedicated command output boundary
+  src/commands/discover.ts,project,Dedicated command output boundary
+  src/commands/environment.ts,project,Dedicated command output boundary
+  src/commands/events.ts,project,Dedicated command output boundary
+  src/commands/favorites.ts,project,Dedicated command output boundary
+  src/commands/fonts.ts,project,Dedicated command output boundary
+  src/commands/genres.ts,project,Dedicated command output boundary
+  src/commands/images.ts,project,Dedicated command output boundary
+  src/commands/index.ts,project,Dedicated command output boundary
+  src/commands/items-metadata.ts,project,Dedicated command output boundary
+  src/commands/items.ts,project,Dedicated command output boundary
+  src/commands/library-notify.ts,project,Dedicated command output boundary
+  src/commands/library.ts,project,Dedicated command output boundary
+  src/commands/live-streams.ts,project,Dedicated command output boundary
+  src/commands/livetv-admin.ts,project,Dedicated command output boundary
+  src/commands/livetv-extended.ts,project,Dedicated command output boundary
+  src/commands/livetv.ts,project,Dedicated command output boundary
+  src/commands/localization.ts,project,Dedicated command output boundary
+  src/commands/media-urls.ts,project,Dedicated command output boundary
+  src/commands/media.ts,project,Dedicated command output boundary
+  src/commands/music-genres.ts,project,Dedicated command output boundary
+  src/commands/notifications.ts,project,Dedicated command output boundary
+  src/commands/number-options.ts,project,Dedicated command output boundary
+  src/commands/packages.ts,project,Dedicated command output boundary
+  src/commands/persons.ts,project,Dedicated command output boundary
+  src/commands/playlists.ts,project,Dedicated command output boundary
+  src/commands/plugins-ext.ts,project,Dedicated command output boundary
+  src/commands/plugins.ts,project,Dedicated command output boundary
+  src/commands/quickconnect.ts,project,Dedicated command output boundary
+  src/commands/reports.ts,project,Dedicated command output boundary
+  src/commands/schema-api-batch-def.ts,project,Dedicated command output boundary
+  src/commands/schema-api-operation-def.ts,project,Dedicated command output boundary
+  src/commands/schema-compatibility-def.ts,project,Dedicated command output boundary
+  src/commands/schema-compatibility.ts,project,Dedicated command output boundary
+  src/commands/schema-coverage-command.ts,project,Dedicated command output boundary
+  src/commands/schema-coverage-def.ts,project,Dedicated command output boundary
+  src/commands/schema-coverage.ts,project,Dedicated command output boundary
+  src/commands/schema-defs.ts,project,Dedicated command output boundary
+  src/commands/schema-events-def.ts,project,Dedicated command output boundary
+  src/commands/schema-research.ts,project,Dedicated command output boundary
+  src/commands/schema-suggest.ts,project,Dedicated command output boundary
+  src/commands/schema-utils.ts,project,Dedicated command output boundary
+  src/commands/schema-validate.ts,project,Dedicated command output boundary
+  src/commands/schema.ts,project,Dedicated command output boundary
+  src/commands/sessions-reporting.ts,project,Dedicated command output boundary
+  src/commands/sessions.ts,project,Dedicated command output boundary
+  src/commands/setup-env.ts,project,Dedicated command output boundary
+  src/commands/setup-startup.ts,project,Dedicated command output boundary
+  src/commands/setup-status.ts,project,Dedicated command output boundary
+  src/commands/setup-utils.ts,project,Dedicated command output boundary
+  src/commands/setup-validate.ts,project,Dedicated command output boundary
+  src/commands/setup.ts,project,Dedicated command output boundary
+  src/commands/stats.ts,project,Dedicated command output boundary
+  src/commands/studios.ts,project,Dedicated command output boundary
+  src/commands/subtitles.ts,project,Dedicated command output boundary
+  src/commands/suggestions.ts,project,Dedicated command output boundary
+  src/commands/syncplay.ts,project,Dedicated command output boundary
+  src/commands/system.ts,project,Dedicated command output boundary
+  src/commands/tasks.ts,project,Dedicated command output boundary
+  src/commands/trailers.ts,project,Dedicated command output boundary
+  src/commands/trickplay.ts,project,Dedicated command output boundary
+  src/commands/tvshows.ts,project,Dedicated command output boundary
+  src/commands/usage-stats.ts,project,Dedicated command output boundary
+  src/commands/userdata.ts,project,Dedicated command output boundary
+  src/commands/users-admin.ts,project,Dedicated command output boundary
+  src/commands/users.ts,project,Dedicated command output boundary
+  src/commands/utils.ts,project,Dedicated command output boundary
+  src/commands/videos.ts,project,Dedicated command output boundary
+  src/commands/years.ts,project,Dedicated command output boundary
+  src/formatters/index.ts,project,Shared success and error serializers
+  tests/commands/api.test.ts,project,Five-format API response contract and coverage timeout resilience
+  tests/commands/notifications.test.ts,project,Six-format notification contract and portable timeout resilience
+  tests/commands/output-format-contracts.test.ts,project,Six-format renderer and bypass guard
+  tests/commands/setup.test.ts,project,Portable subprocess timeout resilience under release load
+tests[5]{command,path,scope,timeout_seconds,pm_context_mode,note}:
+  "bun run check:duplicates",package.json,project,600,tracker,Zero-duplication diagnostic gate
+  "bun run test:coverage:four",package.json,project,900,tracker,Authoritative four-metric coverage measurement
+  "bun run validate:release",package.json,project,1800,tracker,Complete production release gate
+  bun test tests/commands/output-format-contracts.test.ts tests/commands/global-options.test.ts tests/commands/help-global-options-all.test.ts tests/formatters/schema-contract.test.ts,package.json,project,600,tracker,Focused unit integration help and schema contracts
+  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1800,tracker,Compiled live read-only acceptance
+docs[7]{path,scope,note}:
+  docs/agent-integration.md,project,Agent parsing guarantee
+  docs/api-research.md,project,Sanitized live research evidence
+  docs/api.md,project,Complete command reference
+  docs/README.md,project,Command index format syntax
+  docs/release-readiness.md,project,Format contract release gates
+  docs/toon-format.md,project,Final serialization boundary
+  README.md,project,Configuration format syntax
+plan_mode: executing
+plan_scope: "Repository-wide dedicated command output formatting, contract tests, docs, and release validation; live validation remains read-only."
+plan_harness: codex
+plan_resume_context: Clean main at 84a5614; Jellyfin and local server are 10.11.11; five live read-only command probes proved requested JSON is emitted as TOON; owner-only settings remain under ~/.jellyfin-cli.
+plan_validation[1]{text,command,expected}:
+  Compiled live Jellyfin validation passed all 183 E2E cases with JELLYFIN_READ_ONLY=1 and no mutations; five representative commands also passed all six output encodings.,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,"183 pass, 0 fail; no server data changes"
+plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "2026-08-05T20:28:20.201Z",codex-jellyfin-format-20260805,Bind the legacy renderer method set to the resolved output format at createApiClient and prohibit direct TOON renderer use in command handlers.,"This preserves existing TOON normalization and minimizes behavior change while making the final serialization boundary authoritative for JSON, YAML, Markdown, table, and raw.","Source inventory, five sanitized live reproductions, and existing shared formatOutput/typed formatter contracts."
+plan_discoveries[1]{ts,author,text}:
+  "2026-08-05T20:28:18.488Z",codex-jellyfin-format-20260805,"Static inventory found 291 direct TOON renderer calls across 45 command modules despite 368 createApiClient format resolutions; live JSON parsing failed for artists, playlists, libraries, and genres while the server remained read-only."
+plan_steps[6]:
+  - id: plan-step-001
+    order: 1
+    title: Inventory every dedicated command output and define one typed formatter boundary
+    status: completed
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:28:22.004Z"
+    evidence: "Inventoried all command renderer calls and selected a typed bound-formatter design; 291 direct calls across 45 modules were in scope, with config/success/error paths included."
+    completed_at: "2026-08-05T20:28:22.004Z"
+  - id: plan-step-002
+    order: 2
+    title: Replace TOON-only output calls across command families without changing API behavior
+    status: completed
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:28:28.495Z"
+    evidence: "Rewired 45 command modules to a resolved CommandOutputFormatter; fixed config mutation and branding format paths plus YAML/Markdown success/error fallbacks; typecheck, ESLint, and 155-file LOC gate pass."
+    completed_at: "2026-08-05T20:28:28.495Z"
+  - id: plan-step-003
+    order: 3
+    title: Add exhaustive synthetic multi-format and schema regression coverage
+    status: completed
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:51:44.752Z"
+    evidence: "Added a six-format typed renderer matrix with JSON/YAML/official TOON decoding and a static direct-TOON bypass guard; focused tests pass, both Bun and portable suites pass, and load-sensitive multi-process tests have bounded 15-second timeouts without weakened assertions."
+    completed_at: "2026-08-05T20:51:44.752Z"
+  - id: plan-step-004
+    order: 4
+    title: "Update user, API, agent, research, and release documentation"
+    status: completed
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:51:46.317Z"
+    evidence: "Updated README plus API, command-index, TOON, agent-integration, release-readiness, and August 5 API research docs with exact format behavior, examples, privacy boundary, and read-only live matrix."
+    completed_at: "2026-08-05T20:51:46.317Z"
+  - id: plan-step-005
+    order: 5
+    title: "Run PM, coverage, duplication, security, privacy, release, and live read-only gates"
+    status: completed
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:57:08.154Z"
+    evidence: "Full validate:release passes: 988 Bun tests with 183 live skips, 978 portable tests with 1 intentional skip, 9 release-policy tests, build/dist/npm-pack/npm-exec/bunx smokes, 155-file LOC, secret/history, and changelog checks. Separate compiled live suite passes 183/183 read-only. PM strict validation, graph, history, duplicates, Bun/npm audits, and Trivy pass; coverage and duplication debt remain explicitly linked to jf-mkzh/jf-lpki."
+    completed_at: "2026-08-05T20:57:08.154Z"
+  - id: plan-step-006
+    order: 6
+    title: Publish PR and converge exact-head CI and bot review feedback
+    status: in_progress
+    created_at: "2026-08-05T20:20:16.284Z"
+    updated_at: "2026-08-05T20:57:08.890Z"
+    evidence: Preparing intentional commit and PR after clean local release and PM gates.
+body: ""

@@ -62,6 +62,12 @@ Use JSON when an automation runtime does not have a TOON decoder:
 jf users list --format json
 ```
 
+The selected serializer is applied at the final output boundary across dedicated API commands,
+local configuration commands, success messages, and structured errors. An agent may therefore
+treat successful `--format json` stdout as JSON rather than probing whether a command family
+silently emitted the default TOON format. The release gate also rejects direct TOON renderer calls
+from command handlers so new commands cannot bypass this contract.
+
 See [`toon-format.md`](toon-format.md) for syntax, decoding, strict validation, and examples.
 
 ## TypeScript Integration

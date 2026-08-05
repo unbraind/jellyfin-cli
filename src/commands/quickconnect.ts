@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the quick connect command tree with validated options and actions.
@@ -12,20 +11,20 @@ export function createQuickConnectCommand(): Command {
   cmd.command('status').description('Check if Quick Connect is enabled')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const enabled = await client.quickConnectEnabled();
-        console.log(toon.formatToon({ enabled }, 'quickconnect_status'));
+        console.log(formatter.formatToon({ enabled }, 'quickconnect_status'));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('init').description('Initialize Quick Connect')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.quickConnectInitiate();
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           secret: result.Secret,
           code: result.Code,
           device_id: result.DeviceId,
@@ -37,10 +36,10 @@ export function createQuickConnectCommand(): Command {
   cmd.command('check <secret>').description('Check Quick Connect status')
     .option('-f, --format <format>', 'Output format')
     .action(async (secret, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.quickConnectConnect(secret);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           secret: result.Secret,
           code: result.Code,
           authenticated: !!result.Authentication,
@@ -53,10 +52,10 @@ export function createQuickConnectCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID to authorize')
     .action(async (code, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.quickConnectAuthorize(code, options.user);
-        console.log(toon.formatMessage(`Quick Connect authorization ${result ? 'successful' : 'failed'}`, result));
+        console.log(formatter.formatMessage(`Quick Connect authorization ${result ? 'successful' : 'failed'}`, result));
       } catch (err) { handleError(err, format); }
     });
 

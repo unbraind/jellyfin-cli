@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 import { attachLivetvExtendedCommands } from './livetv-extended.js';
 
 /**
@@ -15,10 +14,10 @@ export function createLivetvCommand(): Command {
     .description('Get Live TV info')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const info = await client.getLiveTvInfo();
-        console.log(toon.formatLiveTvInfo(info));
+        console.log(formatter.formatLiveTvInfo(info));
       } catch (err) {
         handleError(err, format);
       }
@@ -31,13 +30,13 @@ export function createLivetvCommand(): Command {
     .option('--limit <number>', 'Limit', '100')
     .option('--offset <number>', 'Offset', '0')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvChannels({
           limit: parseInt(options.limit, 10),
           startIndex: parseInt(options.offset, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -48,10 +47,10 @@ export function createLivetvCommand(): Command {
     .description('Get Live TV channel by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (channelId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const channel = await client.getLiveTvChannel(channelId);
-        console.log(toon.formatItem(channel));
+        console.log(formatter.formatItem(channel));
       } catch (err) {
         handleError(err, format);
       }
@@ -68,7 +67,7 @@ export function createLivetvCommand(): Command {
     .option('--max-date <date>', 'Maximum start date')
     .option('--aired', 'Only show programs that have aired')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvPrograms({
           channelId: options.channel,
@@ -78,7 +77,7 @@ export function createLivetvCommand(): Command {
           maxStartDate: options.maxDate,
           hasAired: options.aired,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -89,10 +88,10 @@ export function createLivetvCommand(): Command {
     .description('Get Live TV program by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (programId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const program = await client.getLiveTvProgram(programId);
-        console.log(toon.formatItem(program));
+        console.log(formatter.formatItem(program));
       } catch (err) {
         handleError(err, format);
       }
@@ -105,13 +104,13 @@ export function createLivetvCommand(): Command {
     .option('--limit <number>', 'Limit', '100')
     .option('--offset <number>', 'Offset', '0')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvRecordings({
           limit: parseInt(options.limit, 10),
           startIndex: parseInt(options.offset, 10),
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -123,12 +122,12 @@ export function createLivetvCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--channel <id>', 'Channel ID')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getLiveTvTimers({
           channelId: options.channel,
         });
-        console.log(toon.formatItems(result.Items ?? []));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) {
         handleError(err, format);
       }
@@ -139,10 +138,10 @@ export function createLivetvCommand(): Command {
     .description('Get Live TV timer by ID')
     .option('-f, --format <format>', 'Output format')
     .action(async (timerId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const timer = await client.getLiveTvTimer(timerId);
-        console.log(toon.formatItem(timer));
+        console.log(formatter.formatItem(timer));
       } catch (err) {
         handleError(err, format);
       }

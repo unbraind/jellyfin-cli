@@ -1,6 +1,5 @@
 import type { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Performs the add metadata commands operation through the typed Jellyfin API boundary.
@@ -22,7 +21,7 @@ export function addMetadataCommands(cmd: Command): void {
     .option('--sort-name <name>', 'Sort name')
     .option('--trailer-url <url>', 'Trailer URL')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getItem(itemId);
         if (options.name !== undefined) item.Name = options.name;
@@ -37,7 +36,7 @@ export function addMetadataCommands(cmd: Command): void {
         if (options.sortName !== undefined) item.SortName = options.sortName;
         if (options.trailerUrl !== undefined) item.RemoteTrailers = [{ Url: options.trailerUrl }];
         await client.updateItem(itemId, item);
-        console.log(toon.formatMessage(`Item ${itemId} updated successfully`, true));
+        console.log(formatter.formatMessage(`Item ${itemId} updated successfully`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -49,7 +48,7 @@ export function addMetadataCommands(cmd: Command): void {
     .option('--year <year>', 'Override search year')
     .option('--provider <name>', 'Specific provider name (e.g. TheMovieDb)')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const item = await client.getItem(itemId);
         const typeMap: Record<string, string> = {
@@ -66,7 +65,7 @@ export function addMetadataCommands(cmd: Command): void {
           SearchProviderName: options.provider,
           IncludeDisabledProviders: false,
         });
-        console.log(toon.formatToon(results.map((r) => ({
+        console.log(formatter.formatToon(results.map((r) => ({
           name: r.Name,
           year: r.ProductionYear,
           premiere: r.PremiereDate,
@@ -84,23 +83,23 @@ export function addMetadataCommands(cmd: Command): void {
     .option('--provider <name>', 'Provider name')
     .option('--replace-images', 'Replace all images')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.applySearchResult(itemId, {
           searchProviderName: options.provider,
           replaceAllImages: options.replaceImages,
         });
-        console.log(toon.formatMessage(`Metadata match applied to item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Metadata match applied to item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('critic-reviews <itemId>').description('Get critic reviews for an item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getCriticReviews(itemId);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           total: result.TotalRecordCount,
           reviews: (result.Items ?? []).map((r) => ({
             reviewer: r.ReviewerName,
@@ -116,40 +115,40 @@ export function addMetadataCommands(cmd: Command): void {
   cmd.command('download-url <itemId>').description('Get direct download URL for an item')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getItemDownloadUrl(itemId);
-        console.log(toon.formatToon({ url, item_id: itemId }, 'download_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId }, 'download_url'));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('root').description('Get the root virtual folder for the current user')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const root = await client.getItemRootFolder();
-        console.log(toon.formatItem(root));
+        console.log(formatter.formatItem(root));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('set-content-type <itemId> <contentType>').description('Set content type for an item (e.g. TvShows, Movies, Music)')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, contentType, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.setItemContentType(itemId, contentType);
-        console.log(toon.formatMessage(`Content type set to '${contentType}' for item ${itemId}`, true));
+        console.log(formatter.formatMessage(`Content type set to '${contentType}' for item ${itemId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('metadata-editor <itemId>').description('Get metadata editor data for an item (external IDs, lock status, content type options)')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const info = await client.getMetadataEditorInfo(itemId);
-        console.log(toon.formatToon(info, 'metadata_editor'));
+        console.log(formatter.formatToon(info, 'metadata_editor'));
       } catch (err) { handleError(err, format); }
     });
 }

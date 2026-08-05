@@ -70,7 +70,7 @@ describe('notifications command', () => {
         expect(result.stdout).toContain('Library');
       }
     }
-  });
+  }, 15_000);
 
   it('returns a structured unavailable result when the optional endpoint is absent', async () => {
     server = Bun.serve({

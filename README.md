@@ -192,9 +192,9 @@ jf system info --format raw
 - `jf config get` - Display current configuration
 - `jf config path` - Show configuration file path
 - `jf config list` - List all configured servers
-- `jf config use <name>` - Switch to a named server configuration
-- `jf config delete <name> --force` - Delete a server configuration
-- `jf config reset --force` - Reset all configuration
+- `jf config use <name> [--format <format>]` - Switch to a named server configuration
+- `jf config delete <name> --force [--format <format>]` - Delete a server configuration
+- `jf config reset --force [--format <format>]` - Reset all configuration
 - `jf config test` - Test connection to server
 - `jf config doctor` - Check config/auth/connectivity/OpenAPI diagnostics
 - `jf setup validate --require-all --validate-formats --format json` - Setup wizard readiness gate for CI/agents

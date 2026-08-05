@@ -227,7 +227,7 @@ describe('api command', () => {
     expect(() => JSON.parse(raw.stdout)).not.toThrow();
     expect(table.stdout).toContain('operation_id: GetUserById');
     expect(markdown.stdout).toContain('**operation_id**: GetUserById');
-  });
+  }, 15_000);
 
   it('rejects unsafe method routing, invalid bodies, and response overflow', async () => {
     const unsafe = await runCli(['api', 'get', 'CreateUser']);

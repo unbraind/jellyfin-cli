@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Builds the packages command tree with validated options and actions.
@@ -14,7 +13,7 @@ export function createPackagesCommand(): Command {
     .description('List available packages (plugins)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const packages = await client.getPackages();
         const simplified = packages.map((p) => ({
@@ -25,7 +24,7 @@ export function createPackagesCommand(): Command {
           image_url: p.imageUrl,
           versions: (p.versions ?? []).slice(0, 3).map((v) => v.version),
         }));
-        console.log(toon.formatToon(simplified, 'packages'));
+        console.log(formatter.formatToon(simplified, 'packages'));
       } catch (err) {
         handleError(err, format);
       }
@@ -36,7 +35,7 @@ export function createPackagesCommand(): Command {
     .description('Get package details')
     .option('-f, --format <format>', 'Output format')
     .action(async (packageId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const pkg = await client.getPackageInfo(packageId);
         const simplified = {
@@ -53,7 +52,7 @@ export function createPackagesCommand(): Command {
             timestamp: v.timestamp,
           })),
         };
-        console.log(toon.formatToon(simplified, 'package'));
+        console.log(formatter.formatToon(simplified, 'package'));
       } catch (err) {
         handleError(err, format);
       }
@@ -66,10 +65,10 @@ export function createPackagesCommand(): Command {
     .option('--version <version>', 'Version to install')
     .option('--repository <url>', 'Repository URL')
     .action(async (packageId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.installPackage(packageId, options.version, options.repository);
-        console.log(toon.formatMessage(`Package ${packageId} installation initiated`, true));
+        console.log(formatter.formatMessage(`Package ${packageId} installation initiated`, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -80,10 +79,10 @@ export function createPackagesCommand(): Command {
     .description('Cancel a package installation')
     .option('-f, --format <format>', 'Output format')
     .action(async (installationId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         await client.cancelPackageInstallation(installationId);
-        console.log(toon.formatMessage(`Installation ${installationId} cancelled`, true));
+        console.log(formatter.formatMessage(`Installation ${installationId} cancelled`, true));
       } catch (err) {
         handleError(err, format);
       }
@@ -94,7 +93,7 @@ export function createPackagesCommand(): Command {
     .description('List currently installing packages')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const installing = await client.getInstallingPackages();
         const simplified = installing.map((i) => ({
@@ -103,7 +102,7 @@ export function createPackagesCommand(): Command {
           version: i.Version,
           status: i.Status,
         }));
-        console.log(toon.formatToon(simplified, 'installing_packages'));
+        console.log(formatter.formatToon(simplified, 'installing_packages'));
       } catch (err) {
         handleError(err, format);
       }
@@ -114,7 +113,7 @@ export function createPackagesCommand(): Command {
     .description('List plugin repositories')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const repos = await client.getRepositories();
         const simplified = repos.map((r) => ({
@@ -122,7 +121,7 @@ export function createPackagesCommand(): Command {
           url: r.Url,
           enabled: r.Enabled,
         }));
-        console.log(toon.formatToon(simplified, 'repositories'));
+        console.log(formatter.formatToon(simplified, 'repositories'));
       } catch (err) {
         handleError(err, format);
       }
@@ -134,7 +133,7 @@ export function createPackagesCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--data <json>', 'JSON array of repositories: [{"Name":"x","Url":"y","Enabled":true}]')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         let repos: { Name?: string; Url?: string; Enabled?: boolean }[];
         if (options.data) {
@@ -146,7 +145,7 @@ export function createPackagesCommand(): Command {
           repos = JSON.parse(Buffer.concat(chunks).toString('utf8').trim());
         }
         await client.setRepositories(repos);
-        console.log(toon.formatMessage(`Set ${repos.length} repository/repositories`, true));
+        console.log(formatter.formatMessage(`Set ${repos.length} repository/repositories`, true));
       } catch (err) {
         handleError(err, format);
       }

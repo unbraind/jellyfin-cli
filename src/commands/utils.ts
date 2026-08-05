@@ -19,8 +19,15 @@ import { EXPLAIN_ENV_KEY, isExplainModeEnabled } from '../utils/explain.js';
 interface ClientResult {
   client: JellyfinApiClient;
   format: OutputFormat;
+  formatter: CommandOutputFormatter;
   config: ReturnType<typeof getConfig>;
 }
+
+/**
+ * Provides the legacy-named formatter methods used by command handlers while honoring the
+ * resolved output format at the final serialization boundary.
+ */
+export type CommandOutputFormatter = Omit<typeof toon, 'toon'>;
 
 /**
  * Performs the create api client operation through the typed Jellyfin API boundary.
@@ -83,7 +90,45 @@ export async function createApiClient(options: {
     }
   }
 
-  return { client, format, config };
+  return { client, format, formatter: createCommandOutputFormatter(format), config };
+}
+
+/**
+ * Binds every legacy-named command renderer to one resolved output format.
+ * @param format - The requested machine-readable or human-readable output format.
+ * @returns - A formatter compatible with existing command rendering calls.
+ */
+export function createCommandOutputFormatter(format: OutputFormat): CommandOutputFormatter {
+  return {
+    formatToon: (data, typeHint) => formatToon(data, format, typeHint),
+    formatMessage: (message, success) => formatMessage(message, format, success),
+    formatError: (error, code, details) => formatError(error, format, code, details),
+    formatSystemInfo: (info) => formatSystemInfo(info, format),
+    formatUsers: (users) => formatUsers(users, format),
+    formatUser: (user) => formatUser(user, format),
+    formatConfig: (resolvedConfig) => formatConfig(resolvedConfig, format),
+    formatServers: (servers) => formatServers(servers, format),
+    formatItems: (items) => formatItems(items, format),
+    formatItem: (item) => formatItem(item, format),
+    formatQueryResult: (result, itemFormatter) => format === 'toon'
+      ? toon.formatQueryResult(result, itemFormatter)
+      : formatOutput(result, format, 'query_result'),
+    formatSearchResult: (result) => formatSearchResult(result, format),
+    formatLibraries: (libraries) => formatLibraries(libraries, format),
+    formatActivityLog: (log) => format === 'toon'
+      ? toon.formatActivityLog(log)
+      : formatOutput(log, format, 'activity_log'),
+    formatLiveTvInfo: (info) => format === 'toon'
+      ? toon.formatLiveTvInfo(info)
+      : formatOutput(info, format, 'livetv'),
+    formatSessions: (sessions) => formatSessions(sessions, format),
+    formatSession: (session) => formatSession(session, format),
+    formatTasks: (tasks) => formatTasks(tasks, format),
+    formatTask: (task) => formatTask(task, format),
+    formatTaskTriggers: (triggers) => format === 'toon'
+      ? toon.formatTaskTriggers(triggers)
+      : formatOutput(triggers, format, 'triggers'),
+  };
 }
 
 /**

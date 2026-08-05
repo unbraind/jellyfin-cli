@@ -1,6 +1,5 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 function parseOptionalInt(value: string | undefined): number | undefined {
   if (!value) {
@@ -22,7 +21,7 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--subtitle-stream <index>', 'Subtitle stream index')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const streamParams = {
           mediaSourceId: options.mediaSource,
@@ -34,7 +33,7 @@ export function attachMediaUrlCommands(cmd: Command): void {
           ? client.getVideoStreamByContainerUrl(itemId, options.container, streamParams)
           : client.getStreamUrl(itemId, streamParams);
         console.log(
-          toon.formatToon({ url, item_id: itemId, container: options.container ?? null }, 'video_stream_url'),
+          formatter.formatToon({ url, item_id: itemId, container: options.container ?? null }, 'video_stream_url'),
         );
       } catch (err) { handleError(err, format); }
     });
@@ -47,7 +46,7 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--audio-stream <index>', 'Audio stream index')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const streamParams = {
           mediaSourceId: options.mediaSource,
@@ -60,7 +59,7 @@ export function attachMediaUrlCommands(cmd: Command): void {
             ? client.getAudioStreamByContainerUrl(itemId, options.container, streamParams)
             : client.getAudioStreamUrl(itemId, streamParams);
         console.log(
-          toon.formatToon(
+          formatter.formatToon(
             {
               url,
               item_id: itemId,
@@ -79,14 +78,14 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--audio-stream <index>', 'Audio stream index')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getAudioHlsMasterPlaylistUrl(itemId, {
           mediaSourceId: options.mediaSource,
           audioStreamIndex: parseOptionalInt(options.audioStream),
           maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
         });
-        console.log(toon.formatToon({ url, item_id: itemId }, 'audio_hls_master_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId }, 'audio_hls_master_url'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -96,14 +95,14 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--audio-stream <index>', 'Audio stream index')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getAudioHlsVariantPlaylistUrl(itemId, {
           mediaSourceId: options.mediaSource,
           audioStreamIndex: parseOptionalInt(options.audioStream),
           maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
         });
-        console.log(toon.formatToon({ url, item_id: itemId }, 'audio_hls_variant_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId }, 'audio_hls_variant_url'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -112,13 +111,13 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--media-source <id>', 'Media source ID')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, playlistId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getLegacyHlsVideoPlaylistUrl(itemId, playlistId, {
           mediaSourceId: options.mediaSource,
           maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
         });
-        console.log(toon.formatToon({ url, item_id: itemId, playlist_id: playlistId }, 'hls_legacy_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId, playlist_id: playlistId }, 'hls_legacy_url'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -127,23 +126,23 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('--media-source <id>', 'Media source ID')
     .option('--max-bitrate <bps>', 'Max streaming bitrate')
     .action(async (itemId, segmentId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getLegacyHlsAudioSegmentUrl(itemId, segmentId, {
           mediaSourceId: options.mediaSource,
           maxStreamingBitrate: parseOptionalInt(options.maxBitrate),
         });
-        console.log(toon.formatToon({ url, item_id: itemId, segment_id: segmentId }, 'hls_audio_segment_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId, segment_id: segmentId }, 'hls_audio_segment_url'));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('item-file-url <itemId>').description('Get direct item file URL')
     .option('-f, --format <format>', 'Output format')
     .action(async (itemId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getItemFileUrl(itemId);
-        console.log(toon.formatToon({ url, item_id: itemId }, 'item_file_url'));
+        console.log(formatter.formatToon({ url, item_id: itemId }, 'item_file_url'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -151,20 +150,20 @@ export function attachMediaUrlCommands(cmd: Command): void {
     .option('-f, --format <format>', 'Output format')
     .option('--parent-id <parentId>', 'Optional parent ID')
     .action(async (type, id, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getKodiStrmUrl(type, id, options.parentId);
-        console.log(toon.formatToon({ url, type, id, parent_id: options.parentId ?? null }, 'kodi_strm_url'));
+        console.log(formatter.formatToon({ url, type, id, parent_id: options.parentId ?? null }, 'kodi_strm_url'));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('branding-css-url').description('Get static branding CSS URL (/Branding/Css.css)')
     .option('-f, --format <format>', 'Output format')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const url = client.getBrandingCssStaticUrl();
-        console.log(toon.formatToon({ url }, 'branding_css_url'));
+        console.log(formatter.formatToon({ url }, 'branding_css_url'));
       } catch (err) { handleError(err, format); }
     });
 }

@@ -1,6 +1,5 @@
 import type { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
-import { toon } from '../formatters/index.js';
 
 /**
  * Performs the add admin commands operation through the typed Jellyfin API boundary.
@@ -10,10 +9,10 @@ export function addAdminCommands(cmd: Command): void {
   cmd.command('policy <userId>').description('Get user policy')
     .option('-f, --format <format>', 'Output format')
     .action(async (userId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const user = await client.getUserById(userId);
-        console.log(toon.formatToon(user.Policy ?? {}, 'user_policy'));
+        console.log(formatter.formatToon(user.Policy ?? {}, 'user_policy'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -29,7 +28,7 @@ export function addAdminCommands(cmd: Command): void {
     .option('--transcoding <boolean>', 'Enable transcoding (true/false)')
     .option('--delete-content <boolean>', 'Enable content deletion (true/false)')
     .action(async (userId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const user = await client.getUserById(userId);
         const policy = user.Policy ?? {};
@@ -43,17 +42,17 @@ export function addAdminCommands(cmd: Command): void {
         if (options.transcoding !== undefined) policy.EnableVideoPlaybackTranscoding = options.transcoding === 'true';
         if (options.deleteContent !== undefined) policy.EnableContentDeletion = options.deleteContent === 'true';
         await client.updateUserPolicy(userId, policy as Record<string, unknown>);
-        console.log(toon.formatMessage(`Policy updated for user ${userId}`, true));
+        console.log(formatter.formatMessage(`Policy updated for user ${userId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
   cmd.command('config <userId>').description('Get user configuration')
     .option('-f, --format <format>', 'Output format')
     .action(async (userId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const user = await client.getUserById(userId);
-        console.log(toon.formatToon(user.Configuration ?? {}, 'user_config'));
+        console.log(formatter.formatToon(user.Configuration ?? {}, 'user_config'));
       } catch (err) { handleError(err, format); }
     });
 
@@ -65,7 +64,7 @@ export function addAdminCommands(cmd: Command): void {
     .option('--hide-played <boolean>', 'Hide played items in latest (true/false)')
     .option('--auto-play-next <boolean>', 'Auto-play next episode (true/false)')
     .action(async (userId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const user = await client.getUserById(userId);
         const config = user.Configuration ?? {};
@@ -75,7 +74,7 @@ export function addAdminCommands(cmd: Command): void {
         if (options.hidePlayed !== undefined) config.HidePlayedInLatest = options.hidePlayed === 'true';
         if (options.autoPlayNext !== undefined) config.EnableNextEpisodeAutoPlay = options.autoPlayNext === 'true';
         await client.updateUserConfiguration(userId, config as Record<string, unknown>);
-        console.log(toon.formatMessage(`Configuration updated for user ${userId}`, true));
+        console.log(formatter.formatMessage(`Configuration updated for user ${userId}`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -83,10 +82,10 @@ export function addAdminCommands(cmd: Command): void {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID (defaults to current user)')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getUserViews(options.user);
-        console.log(toon.formatToon((result.Items ?? []).map((v) => ({
+        console.log(formatter.formatToon((result.Items ?? []).map((v) => ({
           id: v.Id,
           name: v.Name,
           type: v.CollectionType ?? v.Type,
@@ -99,10 +98,10 @@ export function addAdminCommands(cmd: Command): void {
     .option('--client <client>', 'Client name', 'emby')
     .option('--user <userId>', 'User ID (defaults to current user)')
     .action(async (prefsId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const prefs = await client.getDisplayPreferences(prefsId, options.user, options.client);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           id: prefs.Id,
           client: prefs.Client,
           sort_by: prefs.SortBy,
@@ -128,7 +127,7 @@ export function addAdminCommands(cmd: Command): void {
     .option('--remember-indexing', 'Remember indexing preferences')
     .option('--no-remember-indexing', 'Do not remember indexing preferences')
     .action(async (prefsId, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const current = await client.getDisplayPreferences(prefsId, options.user, options.client);
         if (options.sortBy !== undefined) current.SortBy = options.sortBy;
@@ -138,7 +137,7 @@ export function addAdminCommands(cmd: Command): void {
         if (options.rememberSorting !== undefined) current.RememberSorting = options.rememberSorting;
         if (options.rememberIndexing !== undefined) current.RememberIndexing = options.rememberIndexing;
         await client.updateDisplayPreferences(prefsId, current, options.user, options.client);
-        console.log(toon.formatMessage(`Display preferences '${prefsId}' updated`, true));
+        console.log(formatter.formatMessage(`Display preferences '${prefsId}' updated`, true));
       } catch (err) { handleError(err, format); }
     });
 
@@ -146,10 +145,10 @@ export function addAdminCommands(cmd: Command): void {
     .option('-f, --format <format>', 'Output format')
     .option('--user <userId>', 'User ID (defaults to current user)')
     .action(async (options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const opts = await client.getUserViewGroupingOptions(options.user);
-        console.log(toon.formatToon(opts.map((o) => ({
+        console.log(formatter.formatToon(opts.map((o) => ({
           name: o.Name,
           id: o.Id,
         })), 'view_grouping_options'));
@@ -159,10 +158,10 @@ export function addAdminCommands(cmd: Command): void {
   cmd.command('forgot-password <username>').description('Initiate forgot password flow for a user')
     .option('-f, --format <format>', 'Output format')
     .action(async (username, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.forgotPassword(username);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           action: result.Action,
           pin_file: result.PinFile,
           pin_expires: result.PinExpirationDate,
@@ -173,10 +172,10 @@ export function addAdminCommands(cmd: Command): void {
   cmd.command('redeem-pin <pin>').description('Redeem a forgot-password PIN to reset a user account')
     .option('-f, --format <format>', 'Output format')
     .action(async (pin, options) => {
-      const { client, format } = await createApiClient(options);
+      const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.redeemForgotPasswordPin(pin);
-        console.log(toon.formatToon({
+        console.log(formatter.formatToon({
           success: result.Success,
           users_reset: result.UsersReset,
         }, 'pin_redeemed'));
