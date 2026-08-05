@@ -80,10 +80,6 @@ function isLocalOnlyCommand(command: string): boolean {
   return LOCAL_ONLY_COMMANDS.has(command);
 }
 
-function getNonEndpointReason(command: string): NonEndpointToolSummary['reason'] | undefined {
-  return NON_ENDPOINT_COMMAND_PREFIXES.find(({ prefix }) => command.startsWith(prefix))?.reason;
-}
-
 /**
  * Implements map open api coverage to tools for the typed Jellyfin CLI runtime.
  * @param operations - The operations value required by this operation.
@@ -112,7 +108,9 @@ export function mapOpenApiCoverageToTools(
       continue;
     }
 
-    const nonEndpointReason = getNonEndpointReason(tool.command);
+    const nonEndpointReason = NON_ENDPOINT_COMMAND_PREFIXES.find(
+      ({ prefix }) => tool.command.startsWith(prefix),
+    )?.reason;
     if (nonEndpointReason) {
       nonEndpointTools.push({
         command: tool.command,
