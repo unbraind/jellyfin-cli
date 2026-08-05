@@ -4,6 +4,7 @@
 
 ### Other
 
+- Enforce structured output formats across dedicated Jellyfin commands ([jf-36oy](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-36oy.toon))
 - Classify non-OpenAPI Jellyfin CLI surfaces in coverage research ([jf-935b](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-935b.toon))
 
 ## 2026.8.1 - 2026-08-01

@@ -2,12 +2,13 @@ id: jf-36oy
 title: Enforce structured output formats across dedicated Jellyfin commands
 description: "Replace TOON-only command output paths with the shared typed formatter so every advertised format remains syntactically valid and schema-consistent across read and mutation command families, while preserving TOON as the default."
 type: Plan
-status: in_progress
+status: closed
 priority: 0
 tags[11]: agents,api,formats,json,markdown,quality,raw,read-only,table,toon,yaml
 created_at: "2026-08-05T20:20:16.290Z"
-updated_at: "2026-08-05T21:29:49.670Z"
-assignee: codex-jellyfin-format-20260805
+updated_at: "2026-08-05T21:34:47.764Z"
+closed_at: "2026-08-05T21:34:34.009Z"
+completed_at: "2026-08-05T21:34:34.009Z"
 author: codex-jellyfin-format-20260805
 estimated_minutes: 900
 acceptance_criteria: Every leaf command that advertises or inherits format selection honors toon json yaml markdown table and raw through one typed output boundary; TOON remains the default and preserves existing normalized envelopes; JSON stdout parses for every covered command and formatter schemas round-trip; mutation commands are tested only against isolated fixtures and live Jellyfin testing remains read-only; help and documentation describe exact output behavior; release validation PM validation security privacy review and auto-release readiness gates pass
@@ -23,6 +24,9 @@ risk: high
 confidence: high
 sprint: jellyfin-10.11.11
 release: next-manual-release
+resolution: "All dedicated commands now route final success, failure, and safe configuration projections through the selected typed serializer; TOON remains default and explicit JSON, YAML, Markdown, table, and raw contracts are enforced by tests and static guards."
+expected_result: "Every advertised output format is honored by dedicated commands and remains parseable, schema-consistent, privacy-safe, documented, and compatible with Jellyfin 10.11.11."
+actual_result: Six output encodings pass focused contracts; the complete release gate and 183 compiled live read-only cases pass; PR 52 review findings are resolved; no Jellyfin data or package registry state was modified.
 dependencies[8]{id,kind,created_at,author,source_kind,author_source}:
   jf-59hr,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
   jf-644n,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
@@ -32,12 +36,13 @@ dependencies[8]{id,kind,created_at,author,source_kind,author_source}:
   jf-mkzh,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
   jf-snok,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
   jf-tike,related,"2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"cli:create:dep",detected
-comments[5]{created_at,author,text}:
+comments[6]{created_at,author,text}:
   "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Reviewed the complete all-status PM inventory, active goals, closed output/TOON/API lineage, relationship audit, official latest release, live server version, and sanitized format probes before creation; no duplicate repo-wide format-contract plan exists."
   "2026-08-05T20:51:50.696Z",codex,"Quality measurement: 978 portable tests passed with 1 intentional skip; coverage is statements 43.36%, branches 44.01%, functions 54.11%, lines 43.18%. The canonical coverage goal jf-mkzh remains open; this tranche improves the formatter boundary but does not claim repository-wide 100%."
   "2026-08-05T20:51:51.974Z",codex,Zero-duplication diagnostic remains red at 225 clones and 8.16% duplicated lines (8.00% tokens); canonical quality goal jf-lpki remains open. Bun audit and Trivy report zero vulnerabilities/secrets/misconfigurations; npm audit transport returned a registry endpoint error and will be retried.
   "2026-08-05T20:53:16.143Z",codex-jellyfin-format-20260805,"PM telemetry is operational but transport is intermittent: the last successful flush was 2026-08-05T20:52:42Z; a subsequent explicit flush retained 4 queued events with fetch failed, and status then showed 6 queued events. This is an observability delivery limitation, not a product or tracker-integrity failure."
   "2026-08-05T21:20:05.997Z",codex-jellyfin-format-20260805,"PR 52 first exact-head review: CodeRabbit produced five actionable findings after an initial quota warning; Sourcery skipped detailed review because the diff exceeded its 150000-character limit; Cubic and Sourcery checks skipped. All CodeRabbit findings were verified and fixed, including safe config-list projection, canonical system-info shape, structured setup errors, format semantics, AST alias detection, and force-flag docs."
+  "2026-08-05T21:34:30.345Z",codex-jellyfin-format-20260805,"Final exact-head review inventory for PR 52: head 93f60648bd727730be82ffa5ae1b1ebbced040a4, all runnable checks green, zero unresolved review threads, every bot artifact reacted to and answered/dispositioned. Substantive CodeRabbit findings are resolved; third-round rate limits, Sourcery size skip, and absent Greptile/Gemini responses are explicitly retained as limitations."
 notes[1]{created_at,author,text}:
   "2026-08-05T20:20:16.290Z",codex-jellyfin-format-20260805,"Privacy boundary: credentials, server URL, user/server/item IDs, raw schemas, and payloads stay in environment variables or owner-only ~/.jellyfin-cli. PM and Git retain only public versions, commands, classifications, and aggregate outcomes."
 learnings[1]{created_at,author,text}:
@@ -148,7 +153,8 @@ docs[7]{path,scope,note}:
   docs/release-readiness.md,project,Format contract release gates
   docs/toon-format.md,project,Final serialization boundary
   README.md,project,Configuration format syntax
-plan_mode: executing
+close_reason: "Delivered shared structured-output enforcement across dedicated Jellyfin commands; validated six formats, safe projections and structured setup errors; passed 1000 Bun tests, 990 portable tests, 9 release tests, packaging/privacy/security gates, and 183/183 compiled live read-only cases; converged PR 52 review findings at exact head 93f6064. Repository-wide coverage and duplication targets remain honestly open in jf-mkzh and jf-lpki. No package or release was published."
+plan_mode: completed
 plan_scope: "Repository-wide dedicated command output formatting, contract tests, docs, and release validation; live validation remains read-only."
 plan_harness: codex
 plan_resume_context: Clean main at 84a5614; Jellyfin and local server are 10.11.11; five live read-only command probes proved requested JSON is emitted as TOON; owner-only settings remain under ~/.jellyfin-cli.
@@ -163,52 +169,11 @@ plan_decisions[3]{ts,author,decision,rationale,evidence}:
   "2026-08-05T21:29:48.682Z",codex-jellyfin-format-20260805,Encode the only legitimate hard-coded TOON and direct JSON output exceptions as exact AST counts.,schema-utils and schema-validate each need one TOON fallback for an invalid requested format; events needs exactly two JSON.stringify writes for its documented NDJSON stream. Any added or removed exception now fails the guard.,CodeRabbit inline verification comment 3724157214 and repository AST inventory.
 plan_discoveries[1]{ts,author,text}:
   "2026-08-05T20:28:18.488Z",codex-jellyfin-format-20260805,"Static inventory found 291 direct TOON renderer calls across 45 command modules despite 368 createApiClient format resolutions; live JSON parsing failed for artists, playlists, libraries, and genres while the server remained read-only."
-plan_steps[6]:
-  - id: plan-step-001
-    order: 1
-    title: Inventory every dedicated command output and define one typed formatter boundary
-    status: completed
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:28:22.004Z"
-    evidence: "Inventoried all command renderer calls and selected a typed bound-formatter design; 291 direct calls across 45 modules were in scope, with config/success/error paths included."
-    completed_at: "2026-08-05T20:28:22.004Z"
-  - id: plan-step-002
-    order: 2
-    title: Replace TOON-only output calls across command families without changing API behavior
-    status: completed
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:28:28.495Z"
-    evidence: "Rewired 45 command modules to a resolved CommandOutputFormatter; fixed config mutation and branding format paths plus YAML/Markdown success/error fallbacks; typecheck, ESLint, and 155-file LOC gate pass."
-    completed_at: "2026-08-05T20:28:28.495Z"
-  - id: plan-step-003
-    order: 3
-    title: Add exhaustive synthetic multi-format and schema regression coverage
-    status: completed
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:51:44.752Z"
-    evidence: "Added a six-format typed renderer matrix with JSON/YAML/official TOON decoding and a static direct-TOON bypass guard; focused tests pass, both Bun and portable suites pass, and load-sensitive multi-process tests have bounded 15-second timeouts without weakened assertions."
-    completed_at: "2026-08-05T20:51:44.752Z"
-  - id: plan-step-004
-    order: 4
-    title: "Update user, API, agent, research, and release documentation"
-    status: completed
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:51:46.317Z"
-    evidence: "Updated README plus API, command-index, TOON, agent-integration, release-readiness, and August 5 API research docs with exact format behavior, examples, privacy boundary, and read-only live matrix."
-    completed_at: "2026-08-05T20:51:46.317Z"
-  - id: plan-step-005
-    order: 5
-    title: "Run PM, coverage, duplication, security, privacy, release, and live read-only gates"
-    status: completed
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:57:08.154Z"
-    evidence: "Full validate:release passes: 988 Bun tests with 183 live skips, 978 portable tests with 1 intentional skip, 9 release-policy tests, build/dist/npm-pack/npm-exec/bunx smokes, 155-file LOC, secret/history, and changelog checks. Separate compiled live suite passes 183/183 read-only. PM strict validation, graph, history, duplicates, Bun/npm audits, and Trivy pass; coverage and duplication debt remain explicitly linked to jf-mkzh/jf-lpki."
-    completed_at: "2026-08-05T20:57:08.154Z"
-  - id: plan-step-006
-    order: 6
-    title: Publish PR and converge exact-head CI and bot review feedback
-    status: in_progress
-    created_at: "2026-08-05T20:20:16.284Z"
-    updated_at: "2026-08-05T20:57:08.890Z"
-    evidence: Preparing intentional commit and PR after clean local release and PM gates.
+plan_steps[6]{id,order,title,status,created_at,updated_at,evidence,completed_at}:
+  plan-step-001,1,Inventory every dedicated command output and define one typed formatter boundary,completed,"2026-08-05T20:20:16.284Z","2026-08-05T20:28:22.004Z","Inventoried all command renderer calls and selected a typed bound-formatter design; 291 direct calls across 45 modules were in scope, with config/success/error paths included.","2026-08-05T20:28:22.004Z"
+  plan-step-002,2,Replace TOON-only output calls across command families without changing API behavior,completed,"2026-08-05T20:20:16.284Z","2026-08-05T20:28:28.495Z","Rewired 45 command modules to a resolved CommandOutputFormatter; fixed config mutation and branding format paths plus YAML/Markdown success/error fallbacks; typecheck, ESLint, and 155-file LOC gate pass.","2026-08-05T20:28:28.495Z"
+  plan-step-003,3,Add exhaustive synthetic multi-format and schema regression coverage,completed,"2026-08-05T20:20:16.284Z","2026-08-05T20:51:44.752Z","Added a six-format typed renderer matrix with JSON/YAML/official TOON decoding and a static direct-TOON bypass guard; focused tests pass, both Bun and portable suites pass, and load-sensitive multi-process tests have bounded 15-second timeouts without weakened assertions.","2026-08-05T20:51:44.752Z"
+  plan-step-004,4,"Update user, API, agent, research, and release documentation",completed,"2026-08-05T20:20:16.284Z","2026-08-05T20:51:46.317Z","Updated README plus API, command-index, TOON, agent-integration, release-readiness, and August 5 API research docs with exact format behavior, examples, privacy boundary, and read-only live matrix.","2026-08-05T20:51:46.317Z"
+  plan-step-005,5,"Run PM, coverage, duplication, security, privacy, release, and live read-only gates",completed,"2026-08-05T20:20:16.284Z","2026-08-05T20:57:08.154Z","Full validate:release passes: 988 Bun tests with 183 live skips, 978 portable tests with 1 intentional skip, 9 release-policy tests, build/dist/npm-pack/npm-exec/bunx smokes, 155-file LOC, secret/history, and changelog checks. Separate compiled live suite passes 183/183 read-only. PM strict validation, graph, history, duplicates, Bun/npm audits, and Trivy pass; coverage and duplication debt remain explicitly linked to jf-mkzh/jf-lpki.","2026-08-05T20:57:08.154Z"
+  plan-step-006,6,Publish PR and converge exact-head CI and bot review feedback,completed,"2026-08-05T20:20:16.284Z","2026-08-05T21:34:29.321Z","PR 52 exact head 93f60648bd727730be82ffa5ae1b1ebbced040a4 is green across quality, CodeQL, security, npm compatibility, commit/title, and analysis checks. CodeRabbit's five findings plus its AST-guard follow-up were fixed, acknowledged, and resolved; all bot artifacts were inspected, reacted to, and dispositioned. The final CodeRabbit round was rate-limited, Sourcery exceeded its diff limit, and Greptile/Gemini produced no response; these are reviewer limitations, not approvals. Fresh inventory reports zero unresolved threads.","2026-08-05T21:34:29.321Z"
 body: ""
