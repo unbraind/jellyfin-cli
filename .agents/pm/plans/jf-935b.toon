@@ -1,0 +1,163 @@
+id: jf-935b
+title: Classify non-OpenAPI Jellyfin CLI surfaces in coverage research
+description: "Correct agent-facing Jellyfin API coverage evidence so commands backed by WebSocket, optional legacy plugin routes, and OpenAPI orchestration are not reported as missing REST endpoint mappings; keep exact endpoint coverage and genuine unmatched tools distinct across structured formats."
+type: Plan
+status: in_progress
+priority: 0
+tags[10]: agents,api,coverage,jellyfin-10.11.11,openapi,plugins,read-only,research,typescript,websocket
+created_at: "2026-08-05T19:15:54.840Z"
+updated_at: "2026-08-05T19:40:31.140Z"
+assignee: codex-jellyfin-api-20260805
+author: codex-jellyfin-api-20260805
+estimated_minutes: 600
+acceptance_criteria: "schema coverage and schema research distinguish direct OpenAPI mappings, local commands, and intentional non-endpoint transports without false unmatched-tool claims; OpenAPI orchestration, WebSocket events, and optional notification plugin routes carry deterministic machine-readable reasons in TOON JSON YAML Markdown table and raw output; Notification read commands honor every advertised output format and unavailable optional routes remain structured and non-mutating; Official 10.11.11 sources and live read-only evidence are documented without server URL, credentials, entity IDs, or raw payloads entering Git or PM; Focused tests, complete release validation, linked PM tests, compiled jf-cli read-only acceptance, privacy checks, and exact-head GitHub checks pass"
+definition_of_ready: All-status PM duplicate search completed; latest pm-cli verified; clean main checkout; official latest stable and live server both 10.11.11; owner-only settings valid; no live mutation required.
+goal: jf-mqpo
+value: Give agents truthful coverage evidence that separates transport architecture from actual API gaps.
+impact: Prevents automated roadmaps from chasing false endpoint gaps and makes optional plugin behavior format-safe and diagnosable.
+outcome: A deterministic multi-surface coverage model with zero false unmatched tools on the configured 10.11.11 server and documented compatibility boundaries.
+why_now: "The current live report says all 429 operations are mapped but simultaneously reports seven unmatched tools, six of which are intentionally not one-to-one REST commands and one of which targets an optional route absent from the official schema."
+parent: jf-gn5j
+reviewer: github-review-bots
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+release: next-manual-release
+dependencies[10]{id,kind,created_at,author,source_kind,author_source}:
+  jf-0ea5,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-59hr,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-644n,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-7sjs,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-axko,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-gn5j,parent,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-lpki,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-mkzh,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-snok,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+  jf-sylm,related,"2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"cli:create:dep",detected
+comments[2]{created_at,author,text}:
+  "2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"Reviewed the complete 45-item all-status PM inventory, graph health, closed OpenAPI/event/compatibility lineage, latest official Jellyfin sources, and sanitized live schema results before creation; no duplicate plan exists."
+  "2026-08-05T19:39:47.208Z",codex-jellyfin-api-20260805,"Release validation passes: 981 Bun tests with 183 live skips, 971 portable Vitest tests, release policy, build, package smoke tests, 155-file source LOC gate, secrets and history scans, and changelog check. Explicit compiled live run then passed 183 of 183 tests against 10.11.11 under JELLYFIN_READ_ONLY=1. Trivy is clean; bun audit is clean after safe transitive override refresh. Existing project goals remain honest: coverage is 42.22 statements, 42.30 branches, 52.43 functions, 41.96 lines; jscpd reports 8.14 percent duplicated lines."
+notes[1]{created_at,author,text}:
+  "2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"Privacy boundary: raw schemas, URLs, credentials, IDs, and live payloads remain owner-only under ~/.jellyfin-cli. PM and Git may retain only public versions, aggregate counts, classifications, commands, and sanitized outcomes."
+learnings[1]{created_at,author,text}:
+  "2026-08-05T19:15:54.840Z",codex-jellyfin-api-20260805,"Coverage of server operations and coverage of CLI transports are different sets: WebSocket, plugin-only, local, and OpenAPI orchestration tools must not be forced into one-operation fuzzy matches."
+files[16]{path,scope,note}:
+  .agents/pm/extensions/.managed-extensions.json,project,Managed pm-changelog 2026.8.4 manifest
+  bun.lock,project,Audited compatible dependency resolution and safe transitive overrides
+  package-lock.json,project,Audited npm resolution for dual Bun and npm workflows
+  package.json,project,Latest PM CLI release tooling pin
+  scripts/release/utils.mjs,project,Latest PM CLI and pm-changelog pins
+  src/commands/notifications.ts,project,Cross-format optional notification compatibility
+  src/commands/schema-coverage-command.ts,project,Machine-readable non-endpoint coverage output
+  src/commands/schema-coverage-def.ts,project,Coverage and research JSON Schema contracts
+  src/commands/schema-coverage.ts,project,Typed exhaustive tool transport classification
+  src/commands/schema-defs.ts,project,Built-in schema registry integration
+  src/commands/schema-research.ts,project,Full and read-only research classification
+  tests/commands/notifications.test.ts,project,Six-format optional route integration
+  tests/commands/schema-coverage.test.ts,project,Direct classification unit coverage
+  tests/commands/schema-research.test.ts,project,Research output contract regression
+  tests/commands/schema.test.ts,project,CLI coverage output integration
+  tests/formatters/schema-contract.test.ts,project,Decoded TOON schema validation
+tests[6]:
+  - command: bun audit
+    path: package.json
+    scope: project
+    timeout_seconds: 300
+    note: Zero known dependency advisories
+  - command: "bun run check:duplicates"
+    path: package.json
+    scope: project
+    timeout_seconds: 600
+    pm_context_mode: tracker
+  - command: "bun run test:coverage:four"
+    path: package.json
+    scope: project
+    timeout_seconds: 600
+    pm_context_mode: tracker
+  - command: "bun run validate:release"
+    path: package.json
+    scope: project
+    timeout_seconds: 1800
+    pm_context_mode: tracker
+  - command: bun test tests/commands/schema-coverage.test.ts tests/commands/schema.test.ts tests/commands/schema-research.test.ts tests/commands/notifications.test.ts tests/formatters/schema-contract.test.ts
+    path: package.json
+    scope: project
+    timeout_seconds: 300
+    pm_context_mode: tracker
+  - command: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts
+    path: package.json
+    scope: project
+    timeout_seconds: 1800
+    pm_context_mode: tracker
+docs[6]{path,scope,note}:
+  docs/agent-integration.md,project,Agent planning semantics
+  docs/api-research.md,project,Official and sanitized live 10.11.11 evidence
+  docs/api.md,project,Command and output field reference
+  docs/README.md,project,Coverage classification workflow
+  docs/release-readiness.md,project,Release interpretation gate
+  README.md,project,Optional notification compatibility guidance
+plan_mode: executing
+plan_scope: "Live Jellyfin 10.11.11 and official stable API research, typed coverage classification, notification format correctness, documentation, read-only acceptance, and release-ready PR convergence."
+plan_harness: codex
+plan_resume_context: "Latest stable and live server are Jellyfin 10.11.11. Exact operation execution already covers all 429 live OpenAPI operations. Current schema research falsely reports meta/WebSocket/plugin tools as endpoint gaps; classify them explicitly, preserve privacy/read-only behavior, and prove every structured output."
+plan_validation[1]{text,command,expected}:
+  Live compiled coverage snapshot contains no false unmatched tools and retains 100 percent operation coverage,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,All read-only tests pass; full scope reports explicit non-endpoint classifications without server mutation
+plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "2026-08-05T19:16:11.270Z",codex-jellyfin-api-20260805,Model API coverage as direct endpoint mappings plus explicit non-endpoint transport classes.,"Fuzzy matching WebSocket, OpenAPI orchestration, compatibility analysis, or plugin-only tools to arbitrary REST operations corrupts both mapped-tool counts and agent roadmap decisions.",Sanitized live schema research and official v10.11.11 repository/release inspection.
+plan_discoveries[2]{ts,author,text}:
+  "2026-08-05T19:16:10.402Z",codex-jellyfin-api-20260805,"Official Jellyfin release v10.11.11 is the latest stable; the configured live server also reports 10.11.11 with 356 paths, 429 operations, and 257 read-only operations. All operations map, but seven tools are reported unmatched and one generic API tool is falsely mapped."
+  "2026-08-05T19:16:10.857Z",codex-jellyfin-api-20260805,"The official v10.11.11 server tree contains notification models but no Notifications controller; the live OpenAPI document contains zero notification operations. The CLI notification routes are optional legacy/plugin surfaces: types degrades to unavailable, while list is unavailable on this instance."
+plan_steps[6]:
+  - id: plan-step-001
+    order: 1
+    title: "Record official stable, live OpenAPI, and plugin-route evidence"
+    status: completed
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:25:38.902Z"
+    owner: codex-jellyfin-api-20260805
+    evidence: "Official v10.11.11 release, official server tree, SDK guidance, live 10.11.11 schema, and safe optional route behavior verified; only versions and aggregate counts retained."
+    completed_at: "2026-08-05T19:25:38.902Z"
+  - id: plan-step-002
+    order: 2
+    title: Implement typed non-endpoint classification and notification format fixes
+    status: completed
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:25:40.256Z"
+    owner: codex-jellyfin-api-20260805
+    evidence: "Added disjoint local/non-endpoint/unmatched mapping, three stable transport reasons, coverage/research output fields, schema registry contracts, and shared notification formatters."
+    completed_at: "2026-08-05T19:25:40.256Z"
+  - id: plan-step-003
+    order: 3
+    title: "Add unit, integration, schema, help, and read-only live acceptance tests"
+    status: completed
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:25:41.138Z"
+    owner: codex-jellyfin-api-20260805
+    evidence: "53 focused tests pass across classification, CLI research, all six notification formats, structured absence, isolated mutation, and decoded TOON schema contracts; typecheck, lint, and source LOC gates pass."
+    completed_at: "2026-08-05T19:25:41.138Z"
+  - id: plan-step-004
+    order: 4
+    title: "Update complete user, agent, API research, and release documentation"
+    status: completed
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:25:42.214Z"
+    owner: codex-jellyfin-api-20260805
+    evidence: "Updated README and complete docs index, API reference, research evidence, agent guidance, and release interpretation for direct, local, and non-endpoint tool classes."
+    completed_at: "2026-08-05T19:25:42.214Z"
+  - id: plan-step-005
+    order: 5
+    title: "Run PM, quality, coverage, security, privacy, and release gates"
+    status: completed
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:39:48.830Z"
+    owner: codex-jellyfin-api-20260805
+    evidence: "Release validation green; compiled CLI passed 183/183 live read-only tests; Trivy, secret/history, bun audit, PM validate, graph audit, and dedupe audit clean. Existing linked coverage and duplication goals measured honestly at 42.22/42.30/52.43/41.96 and 8.14 percent."
+    completed_at: "2026-08-05T19:39:48.830Z"
+  - id: plan-step-006
+    order: 6
+    title: Publish PR and converge exact-head CI and bot review feedback
+    status: in_progress
+    created_at: "2026-08-05T19:15:54.833Z"
+    updated_at: "2026-08-05T19:39:49.327Z"
+    evidence: Preparing privacy-reviewed exact-head branch and PR for CI and bot convergence.
+body: ""

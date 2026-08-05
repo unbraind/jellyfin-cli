@@ -24,7 +24,7 @@ import {
 export function attachSchemaCoverageSubcommand(cmd: Command): void {
   cmd
     .command('coverage')
-    .description('Estimate live OpenAPI operation coverage by existing CLI command intents')
+    .description('Classify live OpenAPI operation and CLI transport coverage')
     .option('-f, --format <format>', 'Output format (toon, json, table, raw, yaml, markdown)', 'toon')
     .option('--name <name>', 'Server name')
     .option('--method <method>', 'Filter operations by HTTP method')
@@ -74,6 +74,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
         const coverageMapping = mapOpenApiCoverageToTools(filteredOperations, tools, minScore);
         const unmatchedTools = coverageMapping.unmatchedTools;
         const localOnlyTools = coverageMapping.localOnlyTools;
+        const nonEndpointTools = coverageMapping.nonEndpointTools;
 
         const unmatched = filteredOperations.filter(
           (operation) => !coverageMapping.mappedOperationKeys.has(`${operation.method} ${operation.path}`),
@@ -128,6 +129,9 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           local_only_tools: localOnlyTools.slice(0, limit),
           local_only_tools_total: localOnlyTools.length,
           local_only_tools_truncated: localOnlyTools.length > limit,
+          non_endpoint_tools: nonEndpointTools.slice(0, limit),
+          non_endpoint_tools_total: nonEndpointTools.length,
+          non_endpoint_tools_truncated: nonEndpointTools.length > limit,
           unmatched_by_tag_total: unmatchedByTag.length,
           unmatched_by_tag: unmatchedByTag,
           summary: {
@@ -136,6 +140,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
             unmapped_operation_count: unmatched.length,
             unmapped_tool_count: unmatchedTools.length,
             local_only_tool_count: localOnlyTools.length,
+            non_endpoint_tool_count: nonEndpointTools.length,
             coverage_percent: coverage,
             tool_scope_count: tools.length,
             mapped_tool_count: coverageMapping.mappedToolCount,

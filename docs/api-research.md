@@ -1,11 +1,11 @@
-# Jellyfin API Research (Validated July 25, 2026)
+# Jellyfin API Research (Validated August 5, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
 ## Verification Scope
 
-- Verification date: **July 25, 2026**
+- Verification date: **August 5, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -26,7 +26,8 @@ Observed:
 - Operation count: `429`
 - Intent-mapper coverage at the compatibility threshold (`min_score=3`): `100%` (`429/429`)
 - Intent-mapper coverage at a stricter diagnostic threshold (`min_score=8`): `71.1%` (`305/429`)
-- Unmatched tool intents at `min_score=3`: `1` (`jf notifications list`)
+- Full-scope unmatched direct endpoint tools at `min_score=3`: `0`
+- Intentional non-endpoint tools: `10` (OpenAPI orchestration, WebSocket, and optional notification API surfaces)
 - The strict-threshold gaps include many commands that are implemented and live-tested (for example
   artists, devices, genres, items, plugins, sessions, and users). The score is therefore a fuzzy
   naming diagnostic, not proof that an endpoint is implemented or absent.
@@ -255,15 +256,29 @@ Validation outcomes:
   - `tests/utils/openapi-tokenize.test.ts`
   - `tests/utils/openapi.test.ts`
 
-### Remaining OpenAPI documentation gap (server-side)
+### Direct endpoints versus non-endpoint transports
 
-The last unmatched full-scope tool is:
+Coverage reports now keep four disjoint tool classes so agents do not invent work from false fuzzy
+matches:
 
-- `jf notifications list`
+- `mapped_tool_count`: commands with a direct OpenAPI operation match;
+- `unmatched_tools`: direct endpoint commands with no match above the requested score;
+- `local_only_tools`: configuration, setup, and schema utilities that do not contact an API;
+- `non_endpoint_tools`: API-related tools that intentionally have no one-to-one REST operation.
 
-This command works against the live server, but its endpoint does not score above threshold against
-the published OpenAPI schema on this Jellyfin build. This is treated as an OpenAPI documentation
-gap rather than a CLI implementation gap.
+The live full-scope result contains `375` direct mappings, `19` local tools, `10` non-endpoint
+tools, and `0` unmatched tools across `404` leaf commands. All `429` operations remain mapped.
+The non-endpoint reasons are stable machine values:
+
+- `openapi_orchestration` for `jf api *` and `jf schema compatibility`;
+- `websocket_transport` for `jf events *`;
+- `optional_plugin_api` for `jf notifications *`.
+
+The official Jellyfin `v10.11.11` server tree and the live OpenAPI document contain no notification
+controller/operations. Notification commands therefore remain an explicitly optional compatibility
+surface rather than being misreported as missing core OpenAPI coverage. `notifications types`
+returns a structured `available: false` response when absent, and notification reads honor all six
+output formats. Mutation behavior is tested only against an isolated loopback fixture.
 
 ### Top-level help audit for global option discoverability
 

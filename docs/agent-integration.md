@@ -186,6 +186,11 @@ Intent coverage is a naming/mapping diagnostic. It does not prove that every ope
 executable, semantically complete command. For implementation decisions, inspect operation IDs,
 request/response schemas, command behavior, tests, and read-only live evidence together.
 
+Treat the tool classifications as disjoint sets. `unmatched_tools` are genuine direct-mapping
+candidates; `local_only_tools` need no server endpoint; and `non_endpoint_tools` already use an
+OpenAPI orchestration, WebSocket, or optional plugin transport. Agents should not create endpoint
+implementation tasks from the latter two lists.
+
 ## Version Compatibility
 
 Before an upgrade, compare the configured server's official core version with the candidate:

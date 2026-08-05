@@ -1635,11 +1635,14 @@ jf apikeys delete <key> --force
 
 ## notifications
 
-Notification commands.
+Optional notification compatibility commands. Jellyfin 10.11.11 does not publish these routes in
+its core OpenAPI document; availability depends on the server/plugin combination. Read commands
+honor `toon`, `json`, `yaml`, `markdown`, `table`, and `raw` output.
 
 ### notifications types
 
-List notification types.
+List notification types. When the optional route is absent, the command succeeds with a structured
+`available: false` diagnostic.
 
 ```bash
 jf notifications types
@@ -3375,6 +3378,8 @@ Notes:
 - Coverage is intent-based (heuristic) and intended for discovery prioritization.
 - `unmatched_operations` provides a deterministic sample for roadmap planning.
 - `unmatched_tools` provides a deterministic sample of CLI commands that did not map above the active `--min-score`, with `reason` metadata for agent automation.
+- `local_only_tools` lists commands that intentionally operate only on local CLI state.
+- `non_endpoint_tools` prevents one-to-many OpenAPI orchestration, WebSocket transports, and optional plugin routes from being counted as direct endpoint gaps. Reasons are `openapi_orchestration`, `websocket_transport`, or `optional_plugin_api`.
 
 ### schema suggest
 
@@ -3404,7 +3409,7 @@ Output type: `openapi_research`
 Notes:
 - Useful for one-shot API discovery reports in CI/agent workflows.
 - Includes both `full_scope` and `read_only_scope` summaries in one payload.
-- Scope summaries include both unmatched operations and unmatched CLI-tool samples (`unmatched_tools_total`, `unmatched_tools`).
+- Scope summaries separate unmatched operations, unmatched direct endpoint tools, local-only tools, and intentional non-endpoint tools. Their totals make the classification exhaustive and machine-checkable.
 - `--save <path>` persists the same payload to a JSON file and returns `saved_to` in stdout output.
 
 ### schema compatibility

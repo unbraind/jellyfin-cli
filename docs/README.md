@@ -67,7 +67,7 @@ jf items list --limit 1 | jf schema validate items --from toon
 jf schema coverage --method GET --read-only-ops --command-prefix items --min-score 3 --require-coverage 100 --limit 25
 jf schema coverage --read-only-ops --suggest-commands --require-coverage 100 --limit 20
 jf schema coverage --endpoint /api-docs/openapi.json --read-only-ops --limit 20
-# Include unmatched CLI-tool samples (commands that did not map above min-score)
+# Separate genuine unmatched tools from local and intentional non-endpoint transports
 jf schema coverage --read-only-ops --limit 20 --format json
 
 # Generate a single API research snapshot (OpenAPI + coverage)

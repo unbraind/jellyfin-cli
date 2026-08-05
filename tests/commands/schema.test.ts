@@ -435,6 +435,46 @@ describe('schema coverage command', () => {
     expect(result.stdout).toContain('jf config doctor,true,local_only_command');
   });
 
+  it('classifies non-endpoint API transports separately from unmatched tools', async () => {
+    mockServer = Bun.serve({
+      port: 0,
+      routes: {
+        '/api-docs/openapi.json': Response.json({
+          info: { version: '10.11.11' },
+          paths: {
+            '/System/Info': {
+              get: { tags: ['System'], operationId: 'GetSystemInfo', summary: 'System info' },
+            },
+          },
+        }),
+      },
+      fetch() { return new Response('Not Found', { status: 404 }); },
+    });
+    mkdirSync(testConfigDir, { recursive: true });
+    writeFileSync(join(testConfigDir, 'settings.json'), JSON.stringify({
+      defaultServer: {
+        serverUrl: `http://127.0.0.1:${mockServer.port}`,
+        apiKey: 'test-api-key',
+        outputFormat: 'toon',
+      },
+    }));
+
+    const result = await runCli([
+      'schema',
+      'coverage',
+      '--command-prefix',
+      'events',
+      '--limit',
+      '10',
+    ]);
+
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('unmatched_tools_total: 0');
+    expect(result.stdout).toContain('non_endpoint_tools_total: 2');
+    expect(result.stdout).toContain('jf events watch,true,websocket_transport');
+    expect(result.stdout).toContain('non_endpoint_tool_count: 2');
+  });
+
   it('returns error for invalid --min-score', async () => {
     const result = await runCli(['schema', 'coverage', '--min-score', '0']);
     expect(result.code).toBe(1);
