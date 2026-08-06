@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[12]: agents,api,compatibility,coverage,jellyfin-10.11.11,jellyfin-12,openapi,read-only,release,research,toon,typescript
 created_at: "2026-08-06T17:49:39.419Z"
-updated_at: "2026-08-06T18:30:30.674Z"
+updated_at: "2026-08-06T18:56:38.354Z"
 assignee: codex-jellyfin-api-20260806
 author: codex-jellyfin-api-20260806
 estimated_minutes: 720
@@ -35,12 +35,14 @@ dependencies[11]{id,kind,created_at,author,source_kind,author_source}:
   jf-rjox,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-snok,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-tike,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
-comments[5]{created_at,author,text}:
+comments[7]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Reviewed complete all-status PM metadata, active comments/notes/learnings, prior API/compatibility/coverage/format plans, official latest releases, live 10.11.11 schema, help, dependencies, and sanitized research output before creation; no duplicate current-version discovery or read-only scope correction item exists."
   "2026-08-06T18:02:37.684Z",codex-jellyfin-api-20260806,"Implementation checkpoint: schema versions and dynamic compatibility aliases are operational; read-only coverage reports the correct 275-tool safe scope instead of comparing 405 total tools to GET/HEAD operations. No Jellyfin mutation was performed and no credentials were written to the repository."
   "2026-08-06T18:13:31.277Z",codex-jellyfin-api-20260806,"Quality checkpoint: release suite, 996-test portable suite, 184-command live read-only suite, dependency audits, Trivy, secret/history scans, current-file zero duplication, PM graph/duplicate/health/storage checks all pass. Repository-wide coverage is 43.76/44.86/54.37/43.51 and legacy jscpd remains red; those pre-existing mandates stay canonical and open as jf-mkzh and jf-lpki."
   "2026-08-06T18:18:20.226Z",codex-jellyfin-api-20260806,"Correction to the earlier 275-tool checkpoint: that intermediate number exposed 25 non-verb mutations still classified safe. After explicit deny rules, the verified read-only population is 250 tools; 215 map directly, 19 are local, 8 are non-endpoint transports, and 8 safe direct commands remain lexical mapping candidates."
   "2026-08-06T18:30:30.674Z",codex-jellyfin-api-20260806,"Ready for PR: final validate:release passes; compiled live read-only suite passes 185/185; exact selector validation is fail-before-network; current coverage baseline is 43.78/44.87/54.37/43.53. Only jf-einj is claimed and in progress for the review/merge loop."
+  "2026-08-06T18:51:48.642Z",codex-jellyfin-release,"Review pass 1 disposition: CodeRabbit correctly identified that the managed pm-changelog source still recorded @latest and that the explicit sessions logout safety test did not prove pre-network interception. Applied the PM-native exact upgrade to npm:pm-changelog@2026.8.6, added a local request-counting E2E fixture asserting zero requests, and expanded high-quality docstrings on the new release/policy helpers in response to the diff coverage warning. These changes preserve read-only live testing and avoid private configuration in the repository."
+  "2026-08-06T18:56:38.354Z",codex-jellyfin-release,"Canonical release gate rerun without a global read-only override passes: 1009 Bun tests plus 999 portable Vitest tests (1 skipped), 9 release-policy tests, build, distribution smoke, 300-line gate, current/history secret scans, dry-run package, npx consumer, bunx consumer, and changelog consistency. The separately compiled E2E safety test ran with JELLYFIN_READ_ONLY=1 and proved sessions logout made zero requests. The earlier environment-forced failure was expected because the unit test intentionally invokes a mutating command to validate error formatting."
 notes[1]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Privacy boundary: credentials, server URL, user/server/media IDs, raw live schemas, and payloads remain in environment variables or owner-only ~/.jellyfin-cli. Git and PM retain only public release facts, contract counts, commands, synthetic fixtures, and aggregate outcomes."
 learnings[1]{created_at,author,text}:
@@ -69,14 +71,37 @@ files[23]{path,scope,note}:
   tests/formatters/schema-contract.test.ts,project,TOON schema validation coverage
   tests/utils/jellyfin-releases.test.ts,project,release discovery privacy and selector unit coverage
   tests/utils/read-only-guard.test.ts,project,non-verb mutation regression coverage
-tests[7]{command,scope,timeout_seconds,note}:
-  "bun run check:duplicates",project,600,zero-duplication gate
-  "bun run test:coverage:four",project,1800,four-axis coverage gate
-  "bun run validate:release",project,1800,complete release readiness suite
-  bun test tests/utils/jellyfin-releases.test.ts tests/commands/schema-coverage.test.ts tests/commands/schema-compatibility.test.ts tests/commands/schema-research.test.ts tests/formatters/schema-contract.test.ts tests/commands/help-global-options-all.test.ts,project,120,focused unit integration formatter and help contracts
-  bun test tests/utils/read-only-guard.test.ts tests/commands/schema.test.ts tests/commands/schema-coverage.test.ts,project,180,read-only runtime and agent metadata safety regression
-  bunx jscpd src/utils/jellyfin-releases.ts src/commands/schema-versions.ts src/commands/schema-versions-def.ts src/utils/read-only-policy.ts src/utils/read-only-guard.ts tests/utils/jellyfin-releases.test.ts tests/utils/read-only-guard.test.ts --threshold 0 --exit-code 1,project,120,zero duplication for newly introduced release and safety files
-  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,project,1200,read-only live CLI acceptance
+tests[8]:
+  - command: "bun run check:duplicates"
+    scope: project
+    timeout_seconds: 600
+    note: zero-duplication gate
+  - command: "bun run test:coverage:four"
+    scope: project
+    timeout_seconds: 1800
+    note: four-axis coverage gate
+  - command: "bun run validate:release"
+    scope: project
+    timeout_seconds: 1800
+    note: complete release readiness suite
+  - command: bun test tests/utils/jellyfin-releases.test.ts tests/commands/schema-coverage.test.ts tests/commands/schema-compatibility.test.ts tests/commands/schema-research.test.ts tests/formatters/schema-contract.test.ts tests/commands/help-global-options-all.test.ts
+    scope: project
+    timeout_seconds: 120
+    note: focused unit integration formatter and help contracts
+  - command: bun test tests/utils/read-only-guard.test.ts tests/commands/schema.test.ts tests/commands/schema-coverage.test.ts
+    scope: project
+    timeout_seconds: 180
+    note: read-only runtime and agent metadata safety regression
+  - command: bunx jscpd src/utils/jellyfin-releases.ts src/commands/schema-versions.ts src/commands/schema-versions-def.ts src/utils/read-only-policy.ts src/utils/read-only-guard.ts tests/utils/jellyfin-releases.test.ts tests/utils/read-only-guard.test.ts --threshold 0 --exit-code 1
+    scope: project
+    timeout_seconds: 120
+    note: zero duplication for newly introduced release and safety files
+  - command: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts
+    scope: project
+    timeout_seconds: 1200
+    note: read-only live CLI acceptance
+  - command: "JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts -t \"blocks explicit non-verb mutations before request execution\""
+    scope: project
 docs[7]{path,scope,note}:
   docs/agent-integration.md,project,LLM version-selection workflow
   docs/api-research.md,project,current stable and preview evidence

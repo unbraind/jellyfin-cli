@@ -1732,13 +1732,32 @@ describe.skipIf(skip)('E2E read-only safety', () => {
   }, T);
 
   it('blocks explicit non-verb mutations before request execution', async () => {
-    const result = await runJfWithCode(
-      ['sessions', 'logout'],
-      { JELLYFIN_READ_ONLY: '1' },
-    );
-    expect(result.code).toBe(1);
-    expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
-    expect(`${result.stdout}${result.stderr}`).toMatch(/sessions logout/);
+    let requestCount = 0;
+    const server = Bun.serve({
+      hostname: '127.0.0.1',
+      port: 0,
+      fetch: () => {
+        requestCount += 1;
+        return new Response('unexpected request', { status: 500 });
+      },
+    });
+    try {
+      const result = await runJfWithCode(
+        ['sessions', 'logout'],
+        {
+          JELLYFIN_READ_ONLY: '1',
+          JELLYFIN_SERVER_URL: `http://127.0.0.1:${server.port}`,
+          JELLYFIN_API_KEY: 'request-counting-fixture',
+          JELLYFIN_USER_ID: 'request-counting-fixture',
+        },
+      );
+      expect(result.code).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/sessions logout/);
+      expect(requestCount).toBe(0);
+    } finally {
+      server.stop(true);
+    }
   }, T);
 
   it('allows setup command in read-only mode (local config only)', async () => {

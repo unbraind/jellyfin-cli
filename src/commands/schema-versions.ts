@@ -14,6 +14,11 @@ type VerifiedRelease = JellyfinRelease & {
   openapi_source_kind: Exclude<OpenApiSourceKind, 'server'>;
 };
 
+/**
+ * Builds a directly executable compatibility command for an official release channel.
+ * @param selector - Stable or preview moving selector resolved by the compatibility command.
+ * @returns CLI argument vector with the required preview opt-in when applicable.
+ */
 function compatibilityArgv(selector: 'latest-stable' | 'latest-preview'): string[] {
   const argv = ['jf', 'schema', 'compatibility', '--target-version', selector];
   return selector === 'latest-preview' ? [...argv, '--allow-prerelease'] : argv;

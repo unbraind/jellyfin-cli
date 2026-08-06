@@ -29,6 +29,11 @@ export type JellyfinReleaseChannels = {
   preview: JellyfinRelease | null;
 };
 
+/**
+ * Normalizes one untrusted GitHub release entry into the public Jellyfin release contract.
+ * @param value - Unknown JSON value returned by GitHub's releases endpoint.
+ * @returns A validated Jellyfin release, or undefined when the entry is unusable.
+ */
 function parseRelease(value: unknown): JellyfinRelease | undefined {
   if (typeof value !== 'object' || value === null) return undefined;
   const release = value as GitHubRelease;

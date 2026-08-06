@@ -1,3 +1,4 @@
+/** Reusable strict schema for a verified official Jellyfin release artifact. */
 const RELEASE_SCHEMA = {
   type: 'object',
   properties: {

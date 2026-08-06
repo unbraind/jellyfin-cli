@@ -56,6 +56,7 @@ export const MUTATING_VERBS = new Set([
   'split',
 ]);
 
+/** Exact state-changing commands whose semantics cannot be inferred from verb tokens alone. */
 export const READ_ONLY_DENIED = new Set([
   'library-notify media-updated',
   'library-notify movies-added',
