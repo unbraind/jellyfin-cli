@@ -1,4 +1,6 @@
 {
+  "version": 1,
+  "updated_at": "2026-08-06T05:34:20.217Z",
   "entries": [
     {
       "name": "builtin-governance-audit",
@@ -29,8 +31,8 @@
           "normalize"
         ],
         "hooks": [
-          "on_write",
-          "on_read"
+          "on_read",
+          "on_write"
         ],
         "flag_commands": [
           "comments",
@@ -122,37 +124,35 @@
           "json",
           "toon"
         ],
-        "preflight_overrides": 0,
         "renderer_ownership": [
           {
             "format": "json",
             "commands": [
-              "changelog export",
-              "changelog generate"
+              "changelog generate",
+              "changelog export"
             ],
             "result_discriminator": true
           },
           {
             "format": "toon",
             "commands": [
-              "changelog export",
-              "changelog generate"
+              "changelog generate",
+              "changelog export"
             ],
             "result_discriminator": true
           }
-        ]
+        ],
+        "preflight_overrides": 0
       },
       "installed_at": "2026-07-21T17:01:47.160Z",
-      "updated_at": "2026-08-05T19:24:39.984Z",
+      "updated_at": "2026-08-06T05:34:20.141Z",
       "source": {
         "kind": "npm",
-        "input": "npm:pm-changelog@latest",
+        "input": "npm:pm-changelog@2026.8.4",
         "location": "package",
         "package": "pm-changelog",
         "version": "2026.8.4"
       }
     }
-  ],
-  "updated_at": "2026-08-05T19:24:39.984Z",
-  "version": 1
+  ]
 }
