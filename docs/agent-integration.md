@@ -176,6 +176,7 @@ The local server is the primary contract source:
 
 ```bash
 jf schema openapi --include-paths --limit 50 --format json
+jf schema versions --format json
 jf schema research --include-unmatched --limit 100 --format json
 jf schema coverage --read-only-ops --include-unmatched --limit 100 --format json
 ```
@@ -199,11 +200,13 @@ implementation tasks from the latter two lists.
 
 ## Version Compatibility
 
-Before an upgrade, compare the configured server's official core version with the candidate:
+Before an upgrade, discover and compare the configured server's official core version with the
+current candidate:
 
 ```bash
+jf schema versions --format toon
 jf schema compatibility \
-  --target-version 12.0-rc3 \
+  --target-version latest-preview \
   --allow-prerelease \
   --fail-on-breaking \
   --format toon
@@ -213,11 +216,15 @@ The default baseline is the exact official artifact matching the live server's d
 This keeps plugin-provided operations out of core upgrade findings. Use `--baseline live` only when
 you intentionally want a server/plugin drift audit.
 
-The report separates artifact identity (for example, `12.0-rc3`) from the OpenAPI document version
+The report separates artifact identity (for example, `12.0-rc4`) from the OpenAPI document version
 (`12.0.0`) and classifies removed operations, operation ID changes, parameter requiredness and
 schema changes, request content types, response statuses, and component schemas. Prerelease
 artifacts require explicit opt-in. Official downloads never receive server credentials, and cached
 documents stay under `~/.jellyfin-cli/cache/openapi`.
+
+`latest-stable` and `latest-preview` are resolved from Jellyfin's official GitHub releases at
+execution time and then validated against the exact official OpenAPI artifact. This keeps automation
+current without weakening prerelease opt-in.
 
 ## Exact Operation Execution
 

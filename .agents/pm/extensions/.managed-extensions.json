@@ -1,6 +1,4 @@
 {
-  "version": 1,
-  "updated_at": "2026-08-06T05:34:20.217Z",
   "entries": [
     {
       "name": "builtin-governance-audit",
@@ -154,5 +152,7 @@
         "version": "2026.8.4"
       }
     }
-  ]
+  ],
+  "updated_at": "2026-08-06T05:34:20.217Z",
+  "version": 1
 }

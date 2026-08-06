@@ -39,6 +39,7 @@ export type NonEndpointToolSummary = {
 export type CoverageMappingResult = {
   mappedOperationKeys: Set<string>;
   mappedToolCount: number;
+  toolScopeCount: number;
   unmatchedTools: UnmatchedToolSummary[];
   localOnlyTools: UnmatchedToolSummary[];
   nonEndpointTools: NonEndpointToolSummary[];
@@ -61,6 +62,7 @@ const LOCAL_ONLY_COMMANDS = new Set([
   'jf schema suggest',
   'jf schema tools',
   'jf schema validate',
+  'jf schema versions',
   'jf setup env',
   'jf setup status',
   'jf setup wizard',
@@ -85,12 +87,14 @@ function isLocalOnlyCommand(command: string): boolean {
  * @param operations - The operations value required by this operation.
  * @param tools - The tools value required by this operation.
  * @param minScore - The min score value required by this operation.
+ * @param readOnlyToolsOnly - Whether mutating CLI tools are outside the compared scope.
  * @returns - The typed map open api coverage to tools result.
  */
 export function mapOpenApiCoverageToTools(
   operations: OpenApiOperationEntry[],
   tools: CliToolSchema[],
   minScore: number,
+  readOnlyToolsOnly = false,
 ): CoverageMappingResult {
   const mappedOperationKeys = new Set<string>();
   let mappedToolCount = 0;
@@ -98,7 +102,8 @@ export function mapOpenApiCoverageToTools(
   const localOnlyTools: UnmatchedToolSummary[] = [];
   const nonEndpointTools: NonEndpointToolSummary[] = [];
 
-  for (const tool of tools) {
+  const scopedTools = readOnlyToolsOnly ? tools.filter((tool) => tool.read_only_safe) : tools;
+  for (const tool of scopedTools) {
     if (isLocalOnlyCommand(tool.command)) {
       localOnlyTools.push({
         command: tool.command,
@@ -155,6 +160,7 @@ export function mapOpenApiCoverageToTools(
   return {
     mappedOperationKeys,
     mappedToolCount,
+    toolScopeCount: scopedTools.length,
     unmatchedTools,
     localOnlyTools,
     nonEndpointTools,

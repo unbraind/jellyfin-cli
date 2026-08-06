@@ -6,7 +6,7 @@ status: open
 priority: 0
 tags[5]: active-ratchet,coverage,quality,roadmap,testing
 created_at: "2026-07-16T17:00:03.971Z"
-updated_at: "2026-08-05T20:51:53.359Z"
+updated_at: "2026-08-06T18:30:28.097Z"
 author: codex
 estimated_minutes: 1440
 acceptance_criteria: "Statements, branches, functions, and lines each measure exactly 100 percent across all source code; Coverage thresholds are enforced globally and per-file in every release and pull-request gate; Tests assert observable behavior and failure paths without coverage-only no-op execution or duplicated cases; Read-only live E2E, packaged-binary smoke, acceptance, performance, and dogfood suites are mandatory documented gates; Coverage cannot be reduced through ignore directives, source exclusions, or threshold changes without explicit governance failure"
@@ -37,7 +37,7 @@ dependencies[4]:
     kind: related_to
     created_at: "2026-07-21T19:50:13.328Z"
     author: codex-jellyfin
-comments[9]{created_at,author,text}:
+comments[11]{created_at,author,text}:
   "2026-07-21T19:16:04.867Z",codex-jellyfin,Highest-priority requirement accepted. Current Bun coverage reports only functions and lines; evaluating LCOV/four-dimension enforcement and coverage capture for command subprocesses before selecting the non-cheatable gate.
   "2026-07-21T19:52:49.060Z",codex-jellyfin,Coverage remains the principal release blocker. Bun coverage reports 58.83% lines and 44.93% functions; Vitest can express all four 100% thresholds but its Node runtime currently fails 254 tests across 14 Bun-specific suites using Bun.spawn or Bun.serve. No artificial exclusions or mocked coverage inflation will be accepted.
   "2026-07-21T20:04:29.442Z",codex-jellyfin,"Latest post-change coverage run: 901 pass, 177 live-only skips, 0 fail; 58.64% lines and 44.56% functions. Command callbacks execute primarily in subprocess acceptance tests and are not attributed to the parent Bun coverage profile, which is the dominant instrumentation gap."
@@ -47,6 +47,8 @@ comments[9]{created_at,author,text}:
   "2026-07-23T05:14:21.420Z",codex-jellyfin,"2026-07-23 diagnostic after official TOON work: portable Vitest gate passes 906/906 with 38.24% statements, 37.38% branches, 50.00% functions, and 37.90% lines. The 100/100/100/100 acceptance requirement remains open and is not claimed complete."
   "2026-08-05T19:39:47.768Z",codex-jellyfin-api-20260805,"2026-08-05 measurement from jf-935b: Vitest coverage is 42.22% statements, 42.30% branches, 52.43% functions, and 41.96% lines. The new coverage classification is directly unit-tested and schema-validated, but the repository-wide 100% goal remains open and was not claimed by this tranche."
   "2026-08-05T20:51:53.359Z",codex,"2026-08-05 measurement from jf-36oy: statements 43.36%, branches 44.01%, functions 54.11%, lines 43.18%; 978 portable tests passed with 1 skip. Goal remains open and was not claimed."
+  "2026-08-06T18:11:25.731Z",codex-jellyfin-api-20260806,"2026-08-06 measurement from jf-einj: 996 portable tests passed with 1 skip; statements 43.76%, branches 44.86%, functions 54.37%, and lines 43.51%. New current-contract behaviors have focused assertions and live acceptance, but the repository-wide 100/100/100/100 goal remains open and was not claimed."
+  "2026-08-06T18:30:28.097Z",codex-jellyfin-api-20260806,"Final 2026-08-06 jf-einj measurement after read-only safety regressions: 999 portable tests passed with 1 skip; statements 43.78%, branches 44.87%, functions 54.37%, and lines 43.53%. The repository-wide 100/100/100/100 mandate remains open."
 notes[4]{created_at,author,text}:
   "2026-07-16T17:00:03.971Z",codex,"Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
   "2026-07-21T19:13:34.272Z",codex-jellyfin,"Baseline measured with bun test --coverage on 2026-07-21: 898 pass, 177 skipped, 0 fail; 44.93% functions and 58.83% lines. Bun's text reporter exposes only functions/lines, so the mandatory gate must use a four-dimension instrumenter and per-file thresholds while preserving Bun compatibility."

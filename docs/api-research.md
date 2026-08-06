@@ -1,7 +1,23 @@
-# Jellyfin API Research (Validated August 5, 2026)
+# Jellyfin API Research (Validated August 6, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
+
+## August 6 Current-Contract Discovery Refresh
+
+Official release discovery confirms Jellyfin `10.11.11` remains stable, the configured server
+matches it, and `12.0-rc4` is the current opt-in preview. `jf schema versions` now discovers those
+identities at execution time, validates both exact OpenAPI artifacts without forwarding local
+authentication, and emits ready-to-run compatibility argv. The compatibility command accepts
+`latest-stable` and `latest-preview` selectors so agent workflows do not fossilize an old RC.
+
+The same research pass corrected scope semantics: full coverage evaluates all `405` leaf tools,
+while read-only coverage evaluates only `250` tools classified safe under the global read-only
+policy. Mutating commands no longer appear as unmatched against a GET/HEAD/OPTIONS-only operation
+set. This includes explicit safety exceptions for state-changing command names such as session
+logout, remote-control dispatch, playlist sharing, SyncPlay reports, and plugin maintenance that
+cannot be classified reliably from a generic verb list. The official TOON runtime is refreshed to
+`4.1.1`.
 
 ## August 5 Structured-Output Contract Refresh
 
@@ -18,7 +34,7 @@ mutating Jellyfin data.
 
 ## Verification Scope
 
-- Verification date: **August 5, 2026**
+- Verification date: **August 6, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -87,25 +103,28 @@ plan without executing API operations. Live acceptance uses only `GetPublicSyste
 
 ## Version Compatibility Evidence
 
-Official primary sources identify `10.11.11` as the latest stable server release and `12.0 RC3` as
+Official primary sources identify `10.11.11` as the latest stable server release and `12.0 RC4` as
 an opt-in preview. The official artifacts contain:
 
 - `10.11.11`: `315` paths, `388` operations, and `357` component schemas.
-- `12.0-rc3` (document API version `12.0.0`): `294` paths, `364` operations, and `357` component
+- `12.0-rc4` (document API version `12.0.0`): `294` paths, `364` operations, and `357` component
   schemas.
 
 The live server additionally exposes plugin-provided contracts, so upgrade analysis uses an
-official-to-official baseline by default. The sanitized `10.11.11` to `12.0-rc3` comparison found
-`39` breaking findings, `115` review findings, and `26` non-breaking findings. These counts are an
+official-to-official baseline by default. The sanitized `10.11.11` to `12.0-rc4` comparison found
+`39` breaking findings, `129` review findings, and `26` non-breaking findings. These counts are an
 RC compatibility signal, not a claim about the eventual Jellyfin 12 stable contract.
 
 ```bash
 # Stable exact-version consistency check
 jf schema compatibility
 
+# Discover moving official stable and preview artifact identities
+jf schema versions
+
 # Explicit preview comparison; nonzero after output when breaking findings exist
 jf schema compatibility \
-  --target-version 12.0-rc3 \
+  --target-version latest-preview \
   --allow-prerelease \
   --fail-on-breaking
 
@@ -141,7 +160,7 @@ Observed:
 
 ## Official TOON Contract Validation
 
-The default `toon` format now uses `@toon-format/toon` 4.0.0, the official TypeScript
+The default `toon` format now uses `@toon-format/toon` 4.1.1, the official TypeScript
 implementation of Token-Oriented Object Notation. It is no longer a YAML-like custom serializer.
 The CLI preserves semantic empty arrays, null values, false values, and zero values during
 serialization.
@@ -279,8 +298,13 @@ matches:
 - `local_only_tools`: configuration, setup, and schema utilities that do not contact an API;
 - `non_endpoint_tools`: API-related tools that intentionally have no one-to-one REST operation.
 
-The live full-scope result contains `375` direct mappings, `19` local tools, `10` non-endpoint
-tools, and `0` unmatched tools across `404` leaf commands. All `429` operations remain mapped.
+The live full-scope result contains `375` direct mappings, `20` local tools, `10` non-endpoint
+tools, and `0` unmatched tools across `405` leaf commands. All `429` operations remain mapped.
+The read-only scope evaluates only the `250` read-only-safe tools; mutating tools are deliberately
+outside that population, and every emitted read-only classification has `read_only_safe: true`.
+The live naming diagnostic maps `215` direct tools, classifies `19` local and `8` non-endpoint
+tools, and retains `8` safe direct commands for manual mapping review; operation coverage is
+`255/257` (`99.22%`). These lexical gaps do not make mutating commands eligible for live tests.
 The non-endpoint reasons are stable machine values:
 
 - `openapi_orchestration` for `jf api *` and `jf schema compatibility`;
@@ -342,10 +366,12 @@ export JELLYFIN_READ_ONLY=1
 
 - [Jellyfin server repository and hosted Swagger path](https://github.com/jellyfin/jellyfin#accessing-the-hosted-web-client)
 - [Jellyfin 10.11.11 release](https://github.com/jellyfin/jellyfin/releases/tag/v10.11.11)
+- [Jellyfin 12.0-rc4 release](https://github.com/jellyfin/jellyfin/releases/tag/v12.0-rc4)
 - [Jellyfin stable OpenAPI artifacts](https://repo.jellyfin.org/files/openapi/stable/)
 - [Jellyfin 10.11.11 WebSocket message enum](https://github.com/jellyfin/jellyfin/blob/v10.11.11/MediaBrowser.Model/Session/SessionMessageType.cs)
 - [Official Jellyfin TypeScript SDK WebSocket service](https://github.com/jellyfin/jellyfin-sdk-typescript/blob/master/src/websocket/websocket-service.ts)
 - [Official TOON TypeScript implementation](https://github.com/toon-format/toon)
+- [TOON 4.1.1 release](https://github.com/toon-format/toon/releases/tag/v4.1.1)
 - [TOON specification](https://github.com/toon-format/spec)
 - [Bun coverage documentation](https://bun.sh/docs/test/code-coverage)
 - [Vitest coverage provider guidance](https://vitest.dev/guide/coverage.html)

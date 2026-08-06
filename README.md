@@ -201,10 +201,11 @@ jf system info --format raw
 - `jf config doctor --require-connected --require-auth --require-openapi --require-valid-formats --validate-formats` - Enforce machine-checkable release gates
 - `jf schema openapi` - Summarize live server OpenAPI capabilities for agent discovery
 - `jf schema research` - Emit consolidated OpenAPI + full/read-only coverage snapshot for API research
+- `jf schema versions` - Discover and validate the current official stable and preview API contracts
 - `jf schema tools` - Export command tool schemas for LLM function-calling, with optional live OpenAPI endpoint matches
 - `jf schema coverage` - Estimate API coverage, list unmatched OpenAPI operations, and suggest command names
 - `jf schema suggest` - Generate candidate CLI command patterns from OpenAPI intent matches or coverage gaps
-- `jf schema compatibility` - Compare exact official API versions or audit live/plugin drift
+- `jf schema compatibility` - Compare exact or current official API versions, or audit live/plugin drift
 - `jf api inspect <operationId>` - Inspect typed inputs, bodies, responses, security, and an argv template
 - `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
 - `jf api batch --file <manifest.json>` - Preflight and execute a bounded read-only operation batch
@@ -586,15 +587,17 @@ are retained as an optional compatibility surface and support all global output 
 - `jf schema validate [type] [--from auto|json|yaml|toon] [--input <payload>]` - Validate output payloads against CLI schemas (stdin or inline)
 - `jf schema openapi [--include-paths --limit 50] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--for-command "items list"]` - Fetch/summarize/filter OpenAPI and infer likely endpoints for a CLI intent
 - `jf schema research [--method GET] [--tag Users] [--path-prefix /Users] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--require-coverage 100] [--include-unmatched] [--limit 20]` - Generate one consolidated OpenAPI + full/read-only coverage snapshot
+- `jf schema versions [--name <server>]` - Discover current official releases, validate their OpenAPI artifacts, compare the public server version, and emit compatibility argv
 - `jf schema tools [--command <prefix> --limit <n> --openapi-match --name <server>]` - Export tool schemas with input schema, read-only metadata, and optional live OpenAPI endpoint matches per command
 - `jf schema coverage [--method GET] [--tag Users] [--path-prefix /Users] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--command-prefix items] [--min-score 3] [--require-coverage 100] [--suggest-commands] [--limit 50]` - Estimate intent-based OpenAPI coverage for current CLI command set and optionally generate candidate CLI names for unmapped endpoints
 - `jf schema suggest [--for-command "users list"] [--method GET] [--tag Users] [--path-prefix /Users] [--search text] [--read-only-ops] [--endpoint /api-docs/openapi.json] [--min-score 3] [--limit 20]` - Generate structured CLI command suggestions from live OpenAPI (intent mode with `--for-command`, or uncovered operation mode without it)
-- `jf schema compatibility [--baseline official|live] [--target-version 12.0-rc3 --allow-prerelease] [--fail-on-breaking] [--limit 50]` - Classify deterministic operation, parameter, body, response, and component-schema drift between trusted API contracts
+- `jf schema compatibility [--baseline official|live] [--target-version <exact|latest-stable|latest-preview> --allow-prerelease] [--fail-on-breaking] [--limit 50]` - Classify deterministic operation, parameter, body, response, and component-schema drift between trusted API contracts
 
 Official-to-official comparison is the default, using the configured server's API version as the
 baseline and target. This avoids misclassifying plugin endpoints as core Jellyfin removals. Use
 `--baseline live` to audit server/plugin drift explicitly. Alpha, beta, and RC artifacts require
-`--allow-prerelease`; their artifact identity is reported separately from the document API version.
+`--allow-prerelease`; use `latest-preview` to avoid hard-coding a stale release candidate. Artifact
+identity is reported separately from the document API version.
 `--fail-on-breaking` emits the complete structured report before returning a nonzero status.
 
 ### Exact OpenAPI Operations

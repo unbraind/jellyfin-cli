@@ -1,6 +1,6 @@
 import type { Command } from 'commander';
 import { formatToon } from '../formatters/base.js';
-import { MUTATING_VERBS, READ_ONLY_ALLOWED } from './read-only-policy.js';
+import { MUTATING_VERBS, READ_ONLY_ALLOWED, READ_ONLY_DENIED } from './read-only-policy.js';
 
 function normalizedPath(command: Command): string {
   return command
@@ -58,6 +58,10 @@ export function isReadOnlyModeEnabled(option: unknown, envValue: string | undefi
 export function isCommandBlockedInReadOnly(path: string): boolean {
   if (!path) {
     return false;
+  }
+
+  if (READ_ONLY_DENIED.has(path)) {
+    return true;
   }
 
   if (READ_ONLY_ALLOWED.has(path)) {

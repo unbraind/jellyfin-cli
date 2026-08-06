@@ -647,6 +647,21 @@ describe.skipIf(skip)('E2E schema', () => {
       summary: { breaking: 0 },
     });
   }, T);
+
+  it('schema versions discovers verified official stable and preview contracts', async () => {
+    const result = await runJfWithCode(
+      ['schema', 'versions'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const envelope = decodeEnvelope(result.stdout);
+    expect(envelope.type).toBe('jellyfin_versions');
+    expect(envelope.data).toMatchObject({
+      live_version: expect.any(String),
+      stable: { prerelease: false, openapi_available: true },
+      aliases: { latest_stable: expect.any(String) },
+    });
+  }, T);
 });
 
 // -------------------------------------------------------------------------
@@ -1714,6 +1729,16 @@ describe.skipIf(skip)('E2E read-only safety', () => {
     expect(result.code).toBe(1);
     expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
     expect(`${result.stdout}${result.stderr}`).toMatch(/users delete/);
+  }, T);
+
+  it('blocks explicit non-verb mutations before request execution', async () => {
+    const result = await runJfWithCode(
+      ['sessions', 'logout'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(1);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
+    expect(`${result.stdout}${result.stderr}`).toMatch(/sessions logout/);
   }, T);
 
   it('allows setup command in read-only mode (local config only)', async () => {

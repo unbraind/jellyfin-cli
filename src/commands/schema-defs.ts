@@ -13,6 +13,7 @@ import {
   OPENAPI_COVERAGE_SCHEMA,
   OPENAPI_RESEARCH_SCHEMA,
 } from './schema-coverage-def.js';
+import { JELLYFIN_VERSIONS_SCHEMA } from './schema-versions-def.js';
 
 export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   message: {
@@ -212,6 +213,7 @@ export const OUTPUT_SCHEMAS: Record<string, unknown> = {
   openapi_compatibility: OPENAPI_COMPATIBILITY_SCHEMA,
   openapi_coverage: OPENAPI_COVERAGE_SCHEMA,
   openapi_research: OPENAPI_RESEARCH_SCHEMA,
+  jellyfin_versions: JELLYFIN_VERSIONS_SCHEMA,
   event_types: EVENT_TYPES_SCHEMA,
   event_watch: EVENT_WATCH_SCHEMA,
   event_stream_record: EVENT_STREAM_RECORD_SCHEMA,

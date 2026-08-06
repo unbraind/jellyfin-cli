@@ -71,7 +71,12 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           readOnlySafe: options.readOnlyOps ? true : undefined,
         });
         const tools = generateCliToolSchemas(root, options.commandPrefix as string | undefined);
-        const coverageMapping = mapOpenApiCoverageToTools(filteredOperations, tools, minScore);
+        const coverageMapping = mapOpenApiCoverageToTools(
+          filteredOperations,
+          tools,
+          minScore,
+          Boolean(options.readOnlyOps),
+        );
         const unmatchedTools = coverageMapping.unmatchedTools;
         const localOnlyTools = coverageMapping.localOnlyTools;
         const nonEndpointTools = coverageMapping.nonEndpointTools;
@@ -104,7 +109,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           unmapped_operation_count: unmatched.length,
           unmapped_tool_count: unmatchedTools.length,
           coverage_percent: coverage,
-          tool_scope_count: tools.length,
+          tool_scope_count: coverageMapping.toolScopeCount,
           mapped_tool_count: coverageMapping.mappedToolCount,
           min_score: minScore,
           required_coverage_percent: requiredCoverage ?? null,
@@ -142,7 +147,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
             local_only_tool_count: localOnlyTools.length,
             non_endpoint_tool_count: nonEndpointTools.length,
             coverage_percent: coverage,
-            tool_scope_count: tools.length,
+            tool_scope_count: coverageMapping.toolScopeCount,
             mapped_tool_count: coverageMapping.mappedToolCount,
           },
           suggested_commands: options.suggestCommands

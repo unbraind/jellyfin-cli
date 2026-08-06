@@ -3409,19 +3409,36 @@ Output type: `openapi_research`
 Notes:
 - Useful for one-shot API discovery reports in CI/agent workflows.
 - Includes both `full_scope` and `read_only_scope` summaries in one payload.
+- The read-only tool population contains only commands marked `read_only_safe`; mutating tools are outside that scope.
 - Scope summaries separate unmatched operations, unmatched direct endpoint tools, local-only tools, and intentional non-endpoint tools. Their totals make the classification exhaustive and machine-checkable.
 - `--save <path>` persists the same payload to a JSON file and returns `saved_to` in stdout output.
 
+### schema versions
+
+Discover the current official stable and preview releases and validate that each exact OpenAPI
+artifact is available:
+
+```bash
+jf schema versions [--name <name>] [--format <format>]
+```
+
+Output type: `jellyfin_versions`
+
+The configured server comparison calls only its public system-info endpoint and sends no
+authentication. Official GitHub and OpenAPI requests likewise never receive Jellyfin credentials.
+The output includes exact resolved versions and executable argv arrays for `latest-stable` and
+`latest-preview` compatibility checks. Raw contracts remain in the owner-only OpenAPI cache.
+
 ### schema compatibility
 
-Compare exact official Jellyfin API versions or explicitly audit the live server contract:
+Compare exact or current official Jellyfin API versions, or explicitly audit the live contract:
 
 ```bash
 jf schema compatibility \
   [--name <name>] \
   [--endpoint <path>] \
   [--baseline official|live] \
-  [--target-version <version>] \
+  [--target-version <exact|latest-stable|latest-preview>] \
   [--allow-prerelease] \
   [--fail-on-breaking] \
   [--limit <number>] \
@@ -3430,7 +3447,9 @@ jf schema compatibility \
 
 The default `official` baseline uses the configured live server only to resolve its API version,
 then compares trusted official artifacts without forwarding authentication. `--baseline live`
-includes local plugin and server extensions. Preview artifact names require `--allow-prerelease`.
+includes local plugin and server extensions. Preview artifacts and `latest-preview` require
+`--allow-prerelease`. Moving selectors are resolved from Jellyfin's official GitHub releases and
+validated against the corresponding exact official OpenAPI artifact.
 `--fail-on-breaking` prints the structured `openapi_compatibility` result before exiting nonzero.
 
 Findings cover operation additions/removals, operation ID changes, parameters, required request

@@ -68,9 +68,15 @@ function buildCoverageSnapshot(
   minScore: number,
   includeUnmatched: boolean,
   unmatchedLimit: number,
+  readOnlyToolsOnly = false,
 ): CoverageSnapshot {
   const tools = generateCliToolSchemas(root, commandIntentFilter);
-  const coverageMapping = mapOpenApiCoverageToTools(operations, tools, minScore);
+  const coverageMapping = mapOpenApiCoverageToTools(
+    operations,
+    tools,
+    minScore,
+    readOnlyToolsOnly,
+  );
 
   const unmatched = operations.filter(
     (operation) => !coverageMapping.mappedOperationKeys.has(`${operation.method} ${operation.path}`),
@@ -87,7 +93,7 @@ function buildCoverageSnapshot(
     unmapped_operation_count: unmatched.length,
     unmapped_tool_count: coverageMapping.unmatchedTools.length,
     coverage_percent: coveragePercent,
-    tool_scope_count: tools.length,
+    tool_scope_count: coverageMapping.toolScopeCount,
     mapped_tool_count: coverageMapping.mappedToolCount,
     unmatched_operations_total: unmatched.length,
     unmatched_tools_total: coverageMapping.unmatchedTools.length,
@@ -183,6 +189,7 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
           minScore,
           includeUnmatched,
           limit,
+          true,
         );
 
         const data = {

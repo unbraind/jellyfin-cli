@@ -181,6 +181,39 @@ const representativeOutputs = {
       unmatched_by_tag: [],
     },
   }, 'openapi_research'),
+  jellyfin_versions: formatToon({
+    live_version: '10.11.11',
+    stable: {
+      version: '10.11.11',
+      tag: 'v10.11.11',
+      name: '10.11.11',
+      release_url: 'https://github.com/jellyfin/jellyfin/releases/tag/v10.11.11',
+      published_at: '2026-06-06T00:00:00Z',
+      prerelease: false,
+      openapi_available: true,
+      openapi_source_kind: 'official',
+    },
+    preview: {
+      version: '12.0-rc4',
+      tag: 'v12.0-rc4',
+      name: '12.0-rc4',
+      release_url: 'https://github.com/jellyfin/jellyfin/releases/tag/v12.0-rc4',
+      published_at: '2026-08-02T00:00:00Z',
+      prerelease: true,
+      openapi_available: true,
+      openapi_source_kind: 'cache',
+    },
+    aliases: {
+      latest_stable: '10.11.11',
+      latest_preview: '12.0-rc4',
+    },
+    compatibility_commands: {
+      stable: ['jf', 'schema', 'compatibility', '--target-version', 'latest-stable'],
+      preview: [
+        'jf', 'schema', 'compatibility', '--target-version', 'latest-preview', '--allow-prerelease',
+      ],
+    },
+  }, 'jellyfin_versions'),
 } as const;
 
 describe('TOON formatter schema contracts', () => {

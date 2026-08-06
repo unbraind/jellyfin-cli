@@ -56,6 +56,34 @@ export const MUTATING_VERBS = new Set([
   'split',
 ]);
 
+export const READ_ONLY_DENIED = new Set([
+  'library-notify media-updated',
+  'library-notify movies-added',
+  'library-notify movies-updated',
+  'library-notify series-added',
+  'library-notify series-updated',
+  'live-streams close',
+  'live-streams open',
+  'livetv-admin reset-tuner',
+  'playlists share',
+  'playlists unshare',
+  'plugins-ext infusesync checkpoint-sync',
+  'plugins-ext meilisearch reconnect',
+  'plugins-ext meilisearch reindex',
+  'plugins-ext telegram test',
+  'quickconnect authorize',
+  'quickconnect init',
+  'sessions general-command',
+  'sessions logout',
+  'sessions ping-playback',
+  'syncplay buffering',
+  'syncplay new',
+  'syncplay ping',
+  'syncplay ready',
+  'userdata dislike',
+  'users forgot-password',
+]);
+
 export const READ_ONLY_ALLOWED = new Set([
   'apikeys list',
   'artists get',
@@ -169,7 +197,6 @@ export const READ_ONLY_ALLOWED = new Set([
   'plugins list',
   'plugins-ext infusesync status',
   'plugins-ext meilisearch status',
-  'plugins-ext telegram test',
   'plugins-ext tmdb config',
   'quickconnect check',
   'quickconnect status',

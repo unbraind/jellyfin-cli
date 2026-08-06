@@ -182,6 +182,7 @@ The schema and live OpenAPI discovery commands are read-only:
 
 ```bash
 jf schema openapi --format toon
+jf schema versions --format toon
 jf schema research --include-unmatched --format toon
 jf schema coverage --format toon
 ```

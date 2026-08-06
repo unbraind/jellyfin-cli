@@ -42,6 +42,7 @@ describe('OpenAPI coverage tool classification', () => {
     );
 
     expect(result.mappedToolCount).toBe(1);
+    expect(result.toolScopeCount).toBe(7);
     expect(result.mappedOperationKeys).toEqual(new Set(['GET /System/Info']));
     expect(result.unmatchedTools).toEqual([]);
     expect(result.localOnlyTools).toEqual([{
@@ -59,6 +60,45 @@ describe('OpenAPI coverage tool classification', () => {
         read_only_safe: true,
         reason: 'openapi_orchestration',
       },
+    ]);
+  });
+
+  it('aligns a read-only operation scope with read-only-safe tools', () => {
+    const result = mapOpenApiCoverageToTools(
+      [SYSTEM_INFO_OPERATION],
+      [
+        tool('jf system info'),
+        tool('jf system restart', false),
+        tool('jf config get'),
+        tool('jf config set', false),
+        tool('jf api get'),
+        tool('jf api mutate', false),
+      ],
+      3,
+      true,
+    );
+
+    expect(result.toolScopeCount).toBe(3);
+    expect(result.mappedToolCount).toBe(1);
+    expect(result.unmatchedTools).toEqual([]);
+    expect(result.localOnlyTools.map(({ command }) => command)).toEqual(['jf config get']);
+    expect(result.nonEndpointTools.map(({ command }) => command)).toEqual(['jf api get']);
+    expect([
+      ...result.unmatchedTools,
+      ...result.localOnlyTools,
+      ...result.nonEndpointTools,
+    ].every((entry) => entry.read_only_safe)).toBe(true);
+  });
+
+  it('keeps explicitly denied command exceptions outside read-only tool scope', () => {
+    const result = mapOpenApiCoverageToTools([], [
+      tool('jf sessions logout', false),
+      tool('jf sessions list', true),
+    ], 3, true);
+
+    expect(result.toolScopeCount).toBe(1);
+    expect(result.unmatchedTools).toEqual([
+      { command: 'jf sessions list', read_only_safe: true, reason: 'no_openapi_match_above_min_score' },
     ]);
   });
 
