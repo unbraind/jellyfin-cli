@@ -1,6 +1,7 @@
 /** Reusable strict schema for a verified official Jellyfin release artifact. */
 const RELEASE_SCHEMA = {
   type: 'object',
+  additionalProperties: false,
   properties: {
     version: { type: 'string' },
     tag: { type: 'string' },
@@ -20,16 +21,19 @@ const RELEASE_SCHEMA = {
 /** Strict output contract for current official Jellyfin release discovery. */
 export const JELLYFIN_VERSIONS_SCHEMA = {
   type: 'object',
+  additionalProperties: false,
   properties: {
     type: { const: 'jellyfin_versions' },
     data: {
       type: 'object',
+      additionalProperties: false,
       properties: {
         live_version: { type: ['string', 'null'] },
         stable: RELEASE_SCHEMA,
         preview: { anyOf: [RELEASE_SCHEMA, { type: 'null' }] },
         aliases: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             latest_stable: { type: 'string' },
             latest_preview: { type: ['string', 'null'] },
@@ -38,6 +42,7 @@ export const JELLYFIN_VERSIONS_SCHEMA = {
         },
         compatibility_commands: {
           type: 'object',
+          additionalProperties: false,
           properties: {
             stable: { type: 'array', items: { type: 'string' } },
             preview: { type: ['array', 'null'], items: { type: 'string' } },

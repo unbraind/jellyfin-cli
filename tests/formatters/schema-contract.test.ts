@@ -227,6 +227,44 @@ describe('TOON formatter schema contracts', () => {
     });
   }
 
+  it('rejects undocumented fields throughout the Jellyfin versions contract', () => {
+    const schema = getSchema('jellyfin_versions');
+    const decoded = decode(representativeOutputs.jellyfin_versions);
+    const envelope = decoded as {
+      data: {
+        stable: Record<string, unknown>;
+        aliases: Record<string, unknown>;
+        compatibility_commands: Record<string, unknown>;
+      };
+    };
+    const candidates = [
+      { ...envelope, undocumented: true },
+      { ...envelope, data: { ...envelope.data, undocumented: true } },
+      {
+        ...envelope,
+        data: { ...envelope.data, stable: { ...envelope.data.stable, undocumented: true } },
+      },
+      {
+        ...envelope,
+        data: { ...envelope.data, aliases: { ...envelope.data.aliases, undocumented: true } },
+      },
+      {
+        ...envelope,
+        data: {
+          ...envelope.data,
+          compatibility_commands: {
+            ...envelope.data.compatibility_commands,
+            undocumented: true,
+          },
+        },
+      },
+    ];
+
+    for (const candidate of candidates) {
+      expect(validateJsonSchema(candidate, schema).valid).toBe(false);
+    }
+  });
+
   it('validates raw NDJSON event and summary records', () => {
     const schema = getSchema('event_stream_record');
     const event = validateJsonSchema({

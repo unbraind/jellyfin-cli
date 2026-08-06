@@ -162,4 +162,28 @@ describe('schema validate utils', () => {
     expect(constMismatch.valid).toBe(false);
     expect(constMismatch.errors[0]?.message).toContain('must equal constant');
   });
+
+  it('enforces forbidden and schema-constrained additional properties', () => {
+    const strict = validateJsonSchema(
+      { known: 'value', unexpected: true },
+      {
+        type: 'object',
+        properties: { known: { type: 'string' } },
+        additionalProperties: false,
+      },
+    );
+    expect(strict.valid).toBe(false);
+    expect(strict.errors).toContainEqual({
+      path: '$.unexpected',
+      message: 'is not an allowed property',
+    });
+
+    const constrained = {
+      type: 'object',
+      properties: {},
+      additionalProperties: { type: 'number' },
+    };
+    expect(validateJsonSchema({ breaking: 2 }, constrained).valid).toBe(true);
+    expect(validateJsonSchema({ breaking: 'two' }, constrained).valid).toBe(false);
+  });
 });

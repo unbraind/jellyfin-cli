@@ -15,6 +15,7 @@ type SchemaNode = {
   const?: unknown;
   required?: string[] | undefined;
   properties?: Record<string, SchemaNode> | undefined;
+  additionalProperties?: boolean | SchemaNode | undefined;
   items?: SchemaNode | undefined;
   oneOf?: SchemaNode[] | undefined;
   pattern?: string | undefined;
@@ -119,6 +120,15 @@ function validateNode(
       }
       const childPath = path === '$' ? `$.${key}` : `${path}.${key}`;
       errors.push(...validateNode(value[key], childSchema, rootSchema, childPath));
+    }
+    for (const [key, childValue] of Object.entries(value)) {
+      if (key in properties) continue;
+      const childPath = path === '$' ? `$.${key}` : `${path}.${key}`;
+      if (schema.additionalProperties === false) {
+        errors.push({ path: childPath, message: 'is not an allowed property' });
+      } else if (isObjectLike(schema.additionalProperties)) {
+        errors.push(...validateNode(childValue, schema.additionalProperties, rootSchema, childPath));
+      }
     }
   }
 
