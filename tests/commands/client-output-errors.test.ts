@@ -4,6 +4,7 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { parse as parseYaml } from 'yaml';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-client-errors-${Date.now()}`);
 const isolatedEnv: Record<string, string> = {
@@ -17,19 +18,10 @@ const isolatedEnv: Record<string, string> = {
 let server: Bun.Server | undefined;
 
 async function runCli(format: string): Promise<{ code: number; stdout: string; stderr: string }> {
-  const child = Bun.spawn([
-    'bun', 'run', 'src/cli.ts', '--format', format, 'clientlog', 'send', '--message', 'test',
-  ], {
-    env: { ...process.env, ...isolatedEnv, JELLYFIN_CONFIG_DIR: configDir },
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  return { code, stdout, stderr };
+  return runCliInProcess(
+    ['--format', format, 'clientlog', 'send', '--message', 'test'],
+    { ...isolatedEnv, JELLYFIN_CONFIG_DIR: configDir },
+  );
 }
 
 afterEach(() => {

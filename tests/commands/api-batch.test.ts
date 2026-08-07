@@ -7,6 +7,7 @@ import YAML from 'yaml';
 import { getSchema } from '../../src/commands/schema-defs.js';
 import { validateJsonSchema } from '../../src/utils/schema-validate.js';
 import { apiOperationDocument } from '../fixtures/api-operation.js';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-api-batch-${process.pid}`);
 const manifestPath = join(configDir, 'batch.json');
@@ -19,6 +20,14 @@ async function runCli(
   args: string[],
   stdin?: string,
 ): Promise<{ code: number; stdout: string; stderr: string }> {
+  if (stdin === undefined) {
+    return runCliInProcess(args, {
+      JELLYFIN_CONFIG_DIR: configDir,
+      JELLYFIN_SERVER_URL: '',
+      JELLYFIN_API_KEY: '',
+      JELLYFIN_READ_ONLY: '1',
+    });
+  }
   const child = Bun.spawn([...cli, ...args], {
     env: {
       ...process.env,

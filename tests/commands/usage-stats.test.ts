@@ -2,22 +2,13 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-usage-stats-${Date.now()}`);
 let server: Bun.Server | undefined;
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
-  const processResult = Bun.spawn(['bun', 'run', 'src/cli.ts', ...args], {
-    env: { ...process.env, JELLYFIN_CONFIG_DIR: configDir },
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(processResult.stdout).text(),
-    new Response(processResult.stderr).text(),
-    processResult.exited,
-  ]);
-  return { code, stdout, stderr };
+  return runCliInProcess(args, { JELLYFIN_CONFIG_DIR: configDir });
 }
 
 function writeConfig(): void {

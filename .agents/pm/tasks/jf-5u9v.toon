@@ -1,0 +1,124 @@
+id: jf-5u9v
+title: Attribute CLI integration coverage in-process
+description: Introduce a serialized in-process Commander test harness and migrate the existing portable command integration suites so their real production callbacks contribute to Vitest V8 coverage while preserving Bun and packaged black-box acceptance gates.
+type: Task
+status: closed
+priority: 0
+tags[5]: agents,cli,coverage,testing,vitest
+created_at: "2026-08-07T17:00:33.675Z"
+updated_at: "2026-08-07T17:15:59.197Z"
+closed_at: "2026-08-07T17:14:50.201Z"
+completed_at: "2026-08-07T17:14:50.201Z"
+author: codex-jellyfin-coverage-20260807
+estimated_minutes: 240
+acceptance_criteria: Existing command behavior tests execute through the production createProgram tree under Vitest without duplicated cases; Portable suite remains deterministic and materially faster; Four-axis coverage improves without exclusions ignore directives threshold weakening or coverage-only execution; Bun full tests compiled read-only E2E and release validation remain green
+goal: jf-mqpo
+value: Convert existing behavioral evidence into accurate source-level coverage instead of adding artificial tests.
+impact: Raises trustworthy command callback coverage and shortens the portable feedback loop.
+outcome: A reusable typed in-process CLI harness with measured four-axis improvement and documented remaining gaps.
+why_now: Subprocess execution is the dominant attribution gap blocking the canonical 100 percent coverage item.
+parent: jf-mkzh
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+resolution: "Centralized migrated command execution behind a typed dual-runtime harness: serialized production Commander execution under Vitest for V8 attribution and true subprocess execution under Bun for black-box runtime isolation."
+expected_result: "Existing command integration behavior contributes to authoritative V8 coverage without duplicated cases, ignored source, weakened thresholds, or loss of Bun and compiled live acceptance."
+actual_result: "Portable suite passed 1008 tests with 1 skip; V8 coverage increased from 44.06/45.14/54.43/43.83 to 59.08/67.93/63.48/59.38; Bun passed 1018 tests; compiled read-only live E2E passed 185 tests; release, security, package-consumer, and PM-owned acceptance gates passed."
+dependencies[2]{id,kind,created_at,author,source_kind,author_source}:
+  jf-fgfd,related_to,"2026-08-07T17:00:33.675Z",codex-jellyfin-coverage-20260807,explicit,asserted
+  jf-sylm,related_to,"2026-08-07T17:00:33.675Z",codex-jellyfin-coverage-20260807,explicit,asserted
+comments[6]{created_at,author,text}:
+  "2026-08-07T17:02:34.571Z",codex,"Coverage attribution implementation is complete for the existing command integration tranche. The serialized typed harness executes production Commander callbacks in-process and preserves stdout, stderr, exit, and environment isolation; stdin- and process-isolation-sensitive tests remain black-box subprocesses. Portable validation is 1008 pass, 1 skip in 12.27s. V8 coverage improved from 44.06/45.14/54.43/43.83 to 58.44/67.32/63.29/58.69 without exclusions, ignored files, synthetic source imports, or threshold reductions. The parent 100-percent feature remains open because command families and API wrappers still have visible gaps."
+  "2026-08-07T17:05:22.754Z",codex-jellyfin-coverage-20260807,"Bun-native regression gate initially exposed cross-file process-state contention in the in-process harness. The harness now uses its attributable in-process path only under Vitest and preserves the established subprocess boundary under Bun. Full Bun result: 1018 pass, 185 credential-gated skips, 0 fail in 45.21s. Fresh Vitest V8 result: 1008 pass, 1 skip; 59.08 statements, 67.93 branches, 63.48 functions, 59.38 lines in 11.68s."
+  "2026-08-07T17:09:35.278Z",codex-jellyfin-coverage-20260807,"Compiled live acceptance passed against the owner-local Jellyfin 10.11.11 instance with read-only mode forced: 185 pass, 0 fail in 130.86s. Evidence retained here is aggregate and contract-level only; credentials, identifiers, endpoints, and media payloads remain outside Git and PM. The repository release-validation pipeline also completed end to end, including build, dist smoke, package consumers, file length, tracked/history secret scans, and changelog consistency."
+  "2026-08-07T17:10:12.879Z",codex-jellyfin-coverage-20260807,"Supply-chain and security checks are green: Bun audit and npm production audit report zero vulnerabilities; Trivy high/critical filesystem scan reports zero vulnerabilities, secrets, or misconfigurations. The strict repository jscpd gate remains red at the existing broad baseline: 225 clones and 7.55 percent duplicated lines across src, tests, and scripts. This attribution task removes repeated CLI process execution implementations from the migrated suites but does not claim to resolve unrelated production and historical test duplication; that release-readiness debt remains governed by the quality parent."
+  "2026-08-07T17:15:14.348Z",codex-jellyfin-coverage-20260807,Generated CHANGELOG.md from 45 closed PM items with the exact latest pm CLI pin 2026.8.7; regeneration and consistency check both passed.
+  "2026-08-07T17:15:59.197Z",codex-jellyfin-coverage-20260807,"Final PM governance: graph audit is clean at 49 nodes and 140 edges; exact, fuzzy, and parent-scope duplicate audits found zero item candidates; tracker health, storage integrity, history drift, dependency references, command references, and closed-item resolution checks are clean; no item remains in progress. Strict metadata/file validation remains advisory for historical workspace debt (legacy metadata gaps, one stale blocker heuristic, and 110 tracked files not yet linked), not introduced by this task."
+notes[1]{created_at,author,text}:
+  "2026-08-07T17:10:22.772Z",codex-jellyfin-coverage-20260807,"Decision: keep Bun-native command suites on true subprocesses because Bun executes test files concurrently with isolated module queues; use the shared serialized in-process production tree only under Vitest, where one worker owns process-level capture. This preserves runtime acceptance semantics and accurate V8 attribution."
+learnings[1]{created_at,author,text}:
+  "2026-08-07T17:10:23.397Z",codex-jellyfin-coverage-20260807,A process-global capture harness can be deterministic inside one Vitest worker yet race across Bun test-file realms. Runtime-specific dispatch at the shared test boundary keeps Bun black-box evidence intact while letting Vitest attribute production callbacks.
+files[26]:
+  - path: CHANGELOG.md
+    scope: project
+    note: generated from closed PM evidence
+  - path: docs/api-research.md
+    scope: project
+  - path: docs/release-readiness.md
+    scope: project
+  - path: package.json
+    scope: project
+  - path: scripts/release/utils.mjs
+    scope: project
+  - path: tests/commands/api-batch.test.ts
+    scope: project
+  - path: tests/commands/api.test.ts
+    scope: project
+  - path: tests/commands/client-output-errors.test.ts
+    scope: project
+  - path: tests/commands/config.test.ts
+    scope: project
+  - path: tests/commands/events.test.ts
+    scope: project
+  - path: tests/commands/global-options.test.ts
+    scope: project
+  - path: tests/commands/help-global-options-all.test.ts
+    scope: project
+  - path: tests/commands/help-global-options.test.ts
+    scope: project
+  - path: tests/commands/items-options.test.ts
+    scope: project
+  - path: tests/commands/notifications.test.ts
+    scope: project
+  - path: tests/commands/schema-compatibility.test.ts
+    scope: project
+  - path: tests/commands/schema-research.test.ts
+    scope: project
+  - path: tests/commands/schema-suggest.test.ts
+    scope: project
+  - path: tests/commands/schema.test.ts
+    scope: project
+  - path: tests/commands/setup-env-file.test.ts
+    scope: project
+  - path: tests/commands/setup.test.ts
+    scope: project
+  - path: tests/commands/trickplay.test.ts
+    scope: project
+  - path: tests/commands/usage-stats.test.ts
+    scope: project
+  - path: tests/commands/years.test.ts
+    scope: project
+  - path: tests/setup/node-bun-compat.ts
+    scope: project
+    note: Node portable subprocess adapter
+  - path: tests/utils/run-cli-in-process.ts
+    scope: project
+    note: typed serialized in-process production CLI harness
+tests[6]:
+  - command: "bun run test:coverage:four"
+    scope: project
+  - command: "bun run validate:release"
+    scope: project
+  - command: git diff --check
+    scope: project
+  - command: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 JELLYFIN_TIMEOUT=120000 bun test tests/e2e/cli.test.ts
+    scope: project
+  - command: "bun run test:coverage:four"
+    path: package.json
+    scope: project
+    timeout_seconds: 1800
+    pm_context_mode: tracker
+  - command: "bun run test:portable"
+    path: package.json
+    scope: project
+    timeout_seconds: 300
+    pm_context_mode: tracker
+docs[2]:
+  - path: docs/api-research.md
+    scope: project
+  - path: docs/release-readiness.md
+    scope: project
+    note: coverage and test-layer contract
+close_reason: Implemented trustworthy CLI coverage attribution with dual-runtime isolation. All task acceptance gates passed; the parent 100-percent requirement remains open for visible command and API wrapper gaps.
+body: ""

@@ -7,9 +7,9 @@ import YAML from 'yaml';
 import { getSchema } from '../../src/commands/schema-defs.js';
 import { validateJsonSchema } from '../../src/utils/schema-validate.js';
 import { apiOperationDocument } from '../fixtures/api-operation.js';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-api-test-${process.pid}`);
-const cli = ['bun', 'run', 'src/cli.ts'];
 const CREATE_USER_BODY = '{"Name":"New user"}';
 const CREATE_USER_MUTATION_ARGS = [
   'api',
@@ -29,27 +29,16 @@ async function runCli(
   args: string[],
   env: Record<string, string> = {},
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  const process = Bun.spawn([...cli, ...args], {
-    env: {
-      ...globalThis.process.env,
-      JELLYFIN_CONFIG_DIR: configDir,
-      JELLYFIN_SERVER_URL: '',
-      JELLYFIN_API_KEY: '',
-      JELLYFIN_USERNAME: '',
-      JELLYFIN_PASSWORD: '',
-      JELLYFIN_USER_ID: '',
-      JELLYFIN_READ_ONLY: '',
-      ...env,
-    },
-    stdout: 'pipe',
-    stderr: 'pipe',
+  return runCliInProcess(args, {
+    JELLYFIN_CONFIG_DIR: configDir,
+    JELLYFIN_SERVER_URL: '',
+    JELLYFIN_API_KEY: '',
+    JELLYFIN_USERNAME: '',
+    JELLYFIN_PASSWORD: '',
+    JELLYFIN_USER_ID: '',
+    JELLYFIN_READ_ONLY: '',
+    ...env,
   });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(process.stdout).text(),
-    new Response(process.stderr).text(),
-    process.exited,
-  ]);
-  return { code, stdout, stderr };
 }
 
 beforeEach(() => {

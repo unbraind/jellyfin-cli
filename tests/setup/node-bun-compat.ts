@@ -87,7 +87,14 @@ if (typeof globalThis.Bun === 'undefined') {
       };
     },
     spawn(command, options = {}) {
-      const child = spawn(command[0] ?? '', command.slice(1), {
+      const isTypeScriptCli = command[0] === 'bun'
+        && command[1] === 'run'
+        && command[2] === 'src/cli.ts';
+      const executable = isTypeScriptCli ? process.execPath : (command[0] ?? '');
+      const args = isTypeScriptCli
+        ? ['--import', 'tsx', 'src/cli.ts', ...command.slice(3)]
+        : command.slice(1);
+      const child = spawn(executable, args, {
         env: options.env as NodeJS.ProcessEnv | undefined,
         stdio: [options.stdin ? 'pipe' : 'ignore', 'pipe', 'pipe'],
       });

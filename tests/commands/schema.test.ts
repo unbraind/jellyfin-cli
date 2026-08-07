@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-schema-test-${Date.now()}`);
 const cliCommand = ['bun', 'run', 'src/cli.ts'];
@@ -22,6 +23,17 @@ async function runCli(
   args: string[],
   env: Record<string, string | undefined> = {},
 ): Promise<{ code: number; stdout: string; stderr: string }> {
+  const needsClosedStdin = args[0] === 'schema'
+    && args[1] === 'validate'
+    && !args.includes('--input')
+    && !args.includes('--help');
+  if (!needsClosedStdin) {
+    return runCliInProcess(args, {
+      ...isolatedJellyfinEnv,
+      JELLYFIN_CONFIG_DIR: testConfigDir,
+      ...env,
+    });
+  }
   const proc = Bun.spawn([...cliCommand, ...args], {
     env: {
       ...process.env,

@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
-const cliCommand = ['bun', 'run', 'src/cli.ts'];
 const isolatedJellyfinEnv: Record<string, string> = {
   JELLYFIN_SERVER_URL: '',
   JELLYFIN_API_KEY: '',
@@ -14,22 +14,7 @@ const isolatedJellyfinEnv: Record<string, string> = {
 };
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
-  const proc = Bun.spawn([...cliCommand, ...args], {
-    env: {
-      ...process.env,
-      ...isolatedJellyfinEnv,
-    },
-    stdout: 'pipe',
-    stderr: 'pipe',
-  });
-
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-    proc.exited,
-  ]);
-
-  return { code, stdout, stderr };
+  return runCliInProcess(args, isolatedJellyfinEnv);
 }
 
 function parseTopLevelCommands(helpOutput: string): string[] {
