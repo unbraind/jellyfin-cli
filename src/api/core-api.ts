@@ -2,6 +2,7 @@ import type {
   AuthenticationResult, UserDto, SystemInfo, SessionInfo, QueryResult, SearchResult,
   BaseItemDto, ItemsQueryParams, LibraryVirtualFolder, ScheduledTaskInfo,
   PlaybackProgressInfo, PlaybackStopInfo, ActivityLogQueryResult,
+  ActivityLogQueryParams, ItemCollectionsQueryParams,
 } from '../types/index.js';
 import { ApiClientBase } from './base.js';
 import { JellyfinApiError, ChapterInfo, PlaybackInfoResponse } from './types.js';
@@ -210,8 +211,7 @@ export class CoreApi extends ApiClientBase {
    */
   async getItems(params?: ItemsQueryParams & { userId?: string }): Promise<QueryResult<BaseItemDto>> {
     const userId = params?.userId ?? this.userId;
-    const path = userId ? `/Users/${userId}/Items` : '/Items';
-    return this.request<QueryResult<BaseItemDto>>('GET', path, params as Record<string, unknown>);
+    return this.request<QueryResult<BaseItemDto>>('GET', '/Items', { ...params, userId });
   }
   /**
    * Retrieves or derives item without mutating Jellyfin state.
@@ -221,8 +221,7 @@ export class CoreApi extends ApiClientBase {
    */
   async getItem(itemId: string, userId?: string): Promise<BaseItemDto> {
     const uid = userId ?? this.userId;
-    if (uid) return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/${itemId}`);
-    return this.request<BaseItemDto>('GET', `/Items/${itemId}`);
+    return this.request<BaseItemDto>('GET', `/Items/${itemId}`, { userId: uid });
   }
   /**
    * Retrieves or derives latest items without mutating Jellyfin state.
@@ -236,7 +235,7 @@ export class CoreApi extends ApiClientBase {
   async getLatestItems(params?: { parentId?: string; limit?: number; fields?: string[]; userId?: string }): Promise<BaseItemDto[]> {
     const userId = params?.userId ?? this.userId;
     if (!userId) throw new JellyfinApiError('User ID required');
-    return this.request<BaseItemDto[]>('GET', `/Users/${userId}/Items/Latest`, params as Record<string, unknown>);
+    return this.request<BaseItemDto[]>('GET', '/Items/Latest', { ...params, userId });
   }
   /**
    * Retrieves or derives resume items without mutating Jellyfin state.
@@ -250,7 +249,24 @@ export class CoreApi extends ApiClientBase {
   async getResumeItems(params?: { parentId?: string; limit?: number; fields?: string[]; userId?: string }): Promise<QueryResult<BaseItemDto>> {
     const userId = params?.userId ?? this.userId;
     if (!userId) throw new JellyfinApiError('User ID required');
-    return this.request<QueryResult<BaseItemDto>>('GET', `/Users/${userId}/Items/Resume`, params as Record<string, unknown>);
+    return this.request<QueryResult<BaseItemDto>>('GET', '/UserItems/Resume', { ...params, userId });
+  }
+  /**
+   * Gets the collections that include an item through Jellyfin 12's additive API.
+   * @param itemId - The item whose containing collections should be returned.
+   * @param params - Optional user, pagination, and field controls.
+   * @returns The matching collection items.
+   */
+  async getItemCollections(
+    itemId: string,
+    params?: ItemCollectionsQueryParams,
+  ): Promise<QueryResult<BaseItemDto>> {
+    const userId = params?.userId ?? this.userId;
+    return this.request<QueryResult<BaseItemDto>>(
+      'GET',
+      `/Items/${itemId}/Collections`,
+      { ...params, userId },
+    );
   }
   /**
    * Retrieves or derives search hints without mutating Jellyfin state.
@@ -313,5 +329,5 @@ export class CoreApi extends ApiClientBase {
    * @param params.hasUserId - The has user id value required by this operation.
    * @returns - The typed get activity log result.
    */
-  async getActivityLog(params?: { startIndex?: number; limit?: number; minDate?: string; hasUserId?: boolean }): Promise<ActivityLogQueryResult> { return this.request<ActivityLogQueryResult>('GET', '/System/ActivityLog/Entries', params); }
+  async getActivityLog(params?: ActivityLogQueryParams): Promise<ActivityLogQueryResult> { return this.request<ActivityLogQueryResult>('GET', '/System/ActivityLog/Entries', { ...params }); }
 }

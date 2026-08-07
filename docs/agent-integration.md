@@ -227,6 +227,22 @@ execution time and then validated against the exact official OpenAPI artifact. T
 current without weakening prerelease opt-in. Discovery follows bounded GitHub pagination and
 rejects next-page links that leave the official API origin and releases path.
 
+### Jellyfin 12 additive controls
+
+The typed command surface includes the additive `12.0-rc4` contract while keeping stable defaults:
+
+```bash
+jf items collections ITEM_ID --fields Overview,Genres --format toon
+jf items list --audio-languages eng,deu --subtitle-languages fra --format json
+jf persons list --name-starts-with A --offset 0 --limit 50 --format toon
+jf system activity --severity Warning --sort DateCreated,Name --order Descending --format json
+```
+
+`items collections` requires Jellyfin 12 or later. The new filter flags are optional, so omitting
+them preserves the 10.11.11 request contract. Dedicated item reads use the canonical `/Items`,
+`/UserItems/Resume`, and item subresource routes with `userId` as a query parameter; agents should
+not construct removed legacy `/Users/{userId}/Items...` aliases.
+
 ## Exact Operation Execution
 
 Use typed commands first. When an endpoint has no ergonomic typed surface—or an agent needs a

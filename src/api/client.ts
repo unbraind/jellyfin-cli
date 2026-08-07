@@ -6,6 +6,7 @@ import type {
   RemoteImageInfo, ExternalIdInfo, ThemeMediaResult, RemoteSubtitleInfo, MediaSegment,
   LyricsInfo, CreateUserDto, UpdateUserPasswordDto, RemoteSearchResult,
   RemoteSearchQuery, UserView, UserViewGroupingOption, UtcTimeResponse,
+  PersonsQueryParams, TrailersQueryParams,
 } from '../types/index.js';
 import { JellyfinExtensions } from './client-ext.js';
 import { buildQueryString } from './types.js';
@@ -686,8 +687,9 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param playlistId - The playlist id value required by this operation.
    * @param ids - The ids value required by this operation.
    * @param userId - The stable Jellyfin user identifier.
+   * @param position - Optional insertion index supported by Jellyfin 12.
    */
-  async addToPlaylist(playlistId: string, ids: string[], userId?: string): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Items`, { ids: ids.join(','), userId: userId ?? this.userId }); }
+  async addToPlaylist(playlistId: string, ids: string[], userId?: string, position?: number): Promise<void> { await this.request<void>('POST', `/Playlists/${playlistId}/Items`, { ids, userId: userId ?? this.userId, position }); }
   /**
    * Performs the remove from playlist operation through the typed Jellyfin API boundary.
    * @param playlistId - The playlist id value required by this operation.
@@ -852,7 +854,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param params.limit - The limit value required by this operation.
    * @returns - The typed get persons result.
    */
-  async getPersons(params?: { parentId?: string; userId?: string; limit?: number }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Persons', { ...params, userId }); }
+  async getPersons(params?: PersonsQueryParams): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Persons', { ...params, userId }); }
   /**
    * Retrieves or derives artists without mutating Jellyfin state.
    * @param params - Optional request parameters forwarded to the Jellyfin endpoint.
@@ -912,7 +914,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param params.sortBy - The sort by value required by this operation.
    * @returns - The typed get trailers result.
    */
-  async getTrailers(params?: { userId?: string; limit?: number; startIndex?: number; sortBy?: string }): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Trailers', { ...params, userId }); }
+  async getTrailers(params?: TrailersQueryParams): Promise<QueryResult<BaseItemDto>> { const userId = params?.userId ?? this.userId; return this.request<QueryResult<BaseItemDto>>('GET', '/Trailers', { ...params, userId }); }
   /**
    * Retrieves or derives critic reviews without mutating Jellyfin state.
    * @param itemId - The item id value required by this operation.
@@ -924,7 +926,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param userId - The stable Jellyfin user identifier.
    * @returns - The normalized string representation.
    */
-  async getItemRootFolder(userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/Root`); }
+  async getItemRootFolder(userId?: string): Promise<BaseItemDto> { const uid = userId ?? this.userId; if (!uid) throw new JellyfinApiError('User ID required'); return this.request<BaseItemDto>('GET', '/Items/Root', { userId: uid }); }
   /**
    * Performs the set item content type operation through the typed Jellyfin API boundary.
    * @param itemId - The item id value required by this operation.
@@ -972,7 +974,7 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param itemId - The item id value required by this operation.
    * @returns - The normalized string representation.
    */
-  async getIntros(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/Intros`); }
+  async getIntros(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/Intros`, { userId: this.userId }); }
   /**
    * Retrieves or derives additional parts without mutating Jellyfin state.
    * @param itemId - The item id value required by this operation.
@@ -990,13 +992,13 @@ export class JellyfinApiClient extends JellyfinExtensions {
    * @param itemId - The item id value required by this operation.
    * @returns - The normalized string representation.
    */
-  async getSpecialFeatures(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/SpecialFeatures`); }
+  async getSpecialFeatures(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/SpecialFeatures`, { userId: this.userId }); }
   /**
    * Retrieves or derives local trailers without mutating Jellyfin state.
    * @param itemId - The item id value required by this operation.
    * @returns - The normalized string representation.
    */
-  async getLocalTrailers(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/LocalTrailers`); }
+  async getLocalTrailers(itemId: string): Promise<BaseItemDto[]> { return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/LocalTrailers`, { userId: this.userId }); }
   /**
    * Retrieves or derives ancestors without mutating Jellyfin state.
    * @param itemId - The item id value required by this operation.

@@ -34,6 +34,8 @@ type CoverageSnapshot = {
   local_only_tools_truncated: boolean;
   non_endpoint_tools_total: number;
   non_endpoint_tools_truncated: boolean;
+  version_unavailable_tools_total: number;
+  version_unavailable_tools_truncated: boolean;
   unmatched_by_tag_total: number;
   unmatched_by_tag: Array<{ tag: string; operations: number; sample_paths: string[] }>;
   unmatched_tools?: Array<{
@@ -51,6 +53,13 @@ type CoverageSnapshot = {
     read_only_safe: boolean;
     reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
   }>;
+  version_unavailable_tools?: Array<{
+    command: string;
+    read_only_safe: boolean;
+    reason: 'server_version_unavailable';
+    required_method: string;
+    required_path: string;
+  }>;
   unmatched_operations?: Array<{
     method: string;
     path: string;
@@ -61,6 +70,19 @@ type CoverageSnapshot = {
   }>;
 };
 
+/**
+ * Builds coverage metrics for a filtered operation scope while checking endpoint
+ * availability against the complete server contract.
+ * @param operations - Operations included in the requested coverage scope.
+ * @param commandIntentFilter - Optional CLI command-prefix filter.
+ * @param root - Root Commander tree used to derive tool schemas.
+ * @param minScore - Minimum fuzzy-match score for direct endpoint tools.
+ * @param includeUnmatched - Whether unmatched operation samples should be returned.
+ * @param unmatchedLimit - Maximum number of unmatched samples per category.
+ * @param readOnlyToolsOnly - Whether to exclude mutating CLI tools from the scope.
+ * @param availabilityOperations - Complete operations used for version checks.
+ * @returns A structured coverage snapshot for automation and agent workflows.
+ */
 function buildCoverageSnapshot(
   operations: OpenApiOperationEntry[],
   commandIntentFilter: string | undefined,
@@ -69,6 +91,7 @@ function buildCoverageSnapshot(
   includeUnmatched: boolean,
   unmatchedLimit: number,
   readOnlyToolsOnly = false,
+  availabilityOperations = operations,
 ): CoverageSnapshot {
   const tools = generateCliToolSchemas(root, commandIntentFilter);
   const coverageMapping = mapOpenApiCoverageToTools(
@@ -76,6 +99,7 @@ function buildCoverageSnapshot(
     tools,
     minScore,
     readOnlyToolsOnly,
+    availabilityOperations,
   );
 
   const unmatched = operations.filter(
@@ -102,11 +126,15 @@ function buildCoverageSnapshot(
     local_only_tools_truncated: coverageMapping.localOnlyTools.length > unmatchedLimit,
     non_endpoint_tools_total: coverageMapping.nonEndpointTools.length,
     non_endpoint_tools_truncated: coverageMapping.nonEndpointTools.length > unmatchedLimit,
+    version_unavailable_tools_total: coverageMapping.versionUnavailableTools.length,
+    version_unavailable_tools_truncated:
+      coverageMapping.versionUnavailableTools.length > unmatchedLimit,
     unmatched_by_tag_total: unmatchedByTag.length,
     unmatched_by_tag: unmatchedByTag,
     unmatched_tools: coverageMapping.unmatchedTools.slice(0, unmatchedLimit),
     local_only_tools: coverageMapping.localOnlyTools.slice(0, unmatchedLimit),
     non_endpoint_tools: coverageMapping.nonEndpointTools.slice(0, unmatchedLimit),
+    version_unavailable_tools: coverageMapping.versionUnavailableTools.slice(0, unmatchedLimit),
     unmatched_operations: includeUnmatched
       ? unmatched.slice(0, unmatchedLimit).map((operation) => ({
         method: operation.method,
@@ -181,6 +209,8 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
           minScore,
           includeUnmatched,
           limit,
+          false,
+          allOperations,
         );
         const readOnlyCoverage = buildCoverageSnapshot(
           readOnlyFilteredOperations,
@@ -190,6 +220,7 @@ export function attachSchemaResearchSubcommand(cmd: Command): void {
           includeUnmatched,
           limit,
           true,
+          allOperations,
         );
 
         const data = {

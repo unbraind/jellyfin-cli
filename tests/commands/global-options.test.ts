@@ -196,7 +196,7 @@ describe('global CLI option propagation', () => {
     mockServer = Bun.serve({
       port: 0,
       routes: {
-        '/Users/user-1/Items': Response.json({
+        '/Items': Response.json({
           Items: [
             { Id: 'item-1', Name: 'Movie A', Type: 'Movie' },
           ],

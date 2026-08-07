@@ -1,4 +1,5 @@
 import { Command } from 'commander';
+import { ITEM_SORT_FIELDS, type ItemSortField } from '../types/index.js';
 import { createApiClient, handleError } from './utils.js';
 
 /**
@@ -115,10 +116,16 @@ export function createDiscoverCommand(): Command {
         // Fall back to Items API with IncludeItemTypes=Trailer for servers without the plugin.
         let items;
         try {
+          const trailerSort = options.sort
+            ? [options.sort] as ItemSortField[]
+            : undefined;
+          if (trailerSort?.some((field) => !ITEM_SORT_FIELDS.includes(field))) {
+            throw new Error(`Invalid trailer sort field '${options.sort}'`);
+          }
           const result = await client.getTrailers({
             limit: parseInt(options.limit, 10),
             startIndex: parseInt(options.offset, 10),
-            sortBy: options.sort,
+            sortBy: trailerSort,
           });
           items = result.Items ?? [];
         } catch {

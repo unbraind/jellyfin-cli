@@ -76,10 +76,12 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           tools,
           minScore,
           Boolean(options.readOnlyOps),
+          allOperations,
         );
         const unmatchedTools = coverageMapping.unmatchedTools;
         const localOnlyTools = coverageMapping.localOnlyTools;
         const nonEndpointTools = coverageMapping.nonEndpointTools;
+        const versionUnavailableTools = coverageMapping.versionUnavailableTools;
 
         const unmatched = filteredOperations.filter(
           (operation) => !coverageMapping.mappedOperationKeys.has(`${operation.method} ${operation.path}`),
@@ -137,6 +139,9 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           non_endpoint_tools: nonEndpointTools.slice(0, limit),
           non_endpoint_tools_total: nonEndpointTools.length,
           non_endpoint_tools_truncated: nonEndpointTools.length > limit,
+          version_unavailable_tools: versionUnavailableTools.slice(0, limit),
+          version_unavailable_tools_total: versionUnavailableTools.length,
+          version_unavailable_tools_truncated: versionUnavailableTools.length > limit,
           unmatched_by_tag_total: unmatchedByTag.length,
           unmatched_by_tag: unmatchedByTag,
           summary: {
@@ -146,6 +151,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
             unmapped_tool_count: unmatchedTools.length,
             local_only_tool_count: localOnlyTools.length,
             non_endpoint_tool_count: nonEndpointTools.length,
+            version_unavailable_tool_count: versionUnavailableTools.length,
             coverage_percent: coverage,
             tool_scope_count: coverageMapping.toolScopeCount,
             mapped_tool_count: coverageMapping.mappedToolCount,

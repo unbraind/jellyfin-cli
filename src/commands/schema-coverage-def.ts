@@ -29,6 +29,18 @@ const OPERATION_SCHEMA = {
   required: ['method', 'path', 'operation_id', 'tags', 'read_only_safe', 'deprecated'],
 };
 
+const VERSION_UNAVAILABLE_TOOL_SCHEMA = {
+  type: 'object',
+  properties: {
+    command: { type: 'string' },
+    read_only_safe: { type: 'boolean' },
+    reason: { const: 'server_version_unavailable' },
+    required_method: { type: 'string' },
+    required_path: { type: 'string' },
+  },
+  required: ['command', 'read_only_safe', 'reason', 'required_method', 'required_path'],
+};
+
 const COVERAGE_SNAPSHOT_PROPERTIES = {
   operation_scope_count: { type: 'number' },
   mapped_operation_count: { type: 'number' },
@@ -45,9 +57,12 @@ const COVERAGE_SNAPSHOT_PROPERTIES = {
   local_only_tools_truncated: { type: 'boolean' },
   non_endpoint_tools_total: { type: 'number' },
   non_endpoint_tools_truncated: { type: 'boolean' },
+  version_unavailable_tools_total: { type: 'number' },
+  version_unavailable_tools_truncated: { type: 'boolean' },
   unmatched_tools: { type: 'array', items: TOOL_CLASSIFICATION_SCHEMA },
   local_only_tools: { type: 'array', items: TOOL_CLASSIFICATION_SCHEMA },
   non_endpoint_tools: { type: 'array', items: TOOL_CLASSIFICATION_SCHEMA },
+  version_unavailable_tools: { type: 'array', items: VERSION_UNAVAILABLE_TOOL_SCHEMA },
   unmatched_operations: { type: 'array', items: OPERATION_SCHEMA },
   unmatched_by_tag_total: { type: 'number' },
   unmatched_by_tag: {
@@ -79,9 +94,12 @@ const COVERAGE_SNAPSHOT_REQUIRED = [
   'local_only_tools_truncated',
   'non_endpoint_tools_total',
   'non_endpoint_tools_truncated',
+  'version_unavailable_tools_total',
+  'version_unavailable_tools_truncated',
   'unmatched_tools',
   'local_only_tools',
   'non_endpoint_tools',
+  'version_unavailable_tools',
   'unmatched_by_tag_total',
   'unmatched_by_tag',
 ];

@@ -77,6 +77,8 @@ export interface ItemsQueryParams {
   enableImages?: boolean;
   enableUserData?: boolean;
   fields?: string[];
+  audioLanguages?: string[];
+  subtitleLanguages?: string[];
 }
 
 /**

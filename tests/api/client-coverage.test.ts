@@ -146,7 +146,7 @@ describe('JellyfinApiClient - Coverage Completion', () => {
       const result = await client.getIntros('item-1');
       expect(result).toHaveLength(1);
       expect(mockFetch).toHaveBeenCalledWith(
-        expect.stringContaining('/Users/user-1/Items/item-1/Intros'),
+        expect.stringContaining('/Items/item-1/Intros?userId=user-1'),
         expect.anything()
       );
     });

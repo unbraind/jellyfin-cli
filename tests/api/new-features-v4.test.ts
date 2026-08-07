@@ -222,7 +222,7 @@ describe('JellyfinApiClient - New Features v4', () => {
       mockFetch.mockResolvedValueOnce(mockOk(root));
       const result = await client.getItemRootFolder();
       expect(result.Type).toBe('UserRootFolder');
-      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/Users/user-1/Items/Root'), expect.anything());
+      expect(mockFetch).toHaveBeenCalledWith(expect.stringContaining('/Items/Root?userId=user-1'), expect.anything());
     });
 
     it('should throw if no userId for root folder', async () => {

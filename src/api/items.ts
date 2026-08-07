@@ -1,6 +1,11 @@
 import { ApiClientBase } from './base.js';
 import { JellyfinApiError } from './types.js';
-import type { BaseItemDto, QueryResult, ItemsQueryParams } from '../types/index.js';
+import type {
+  BaseItemDto,
+  ItemCollectionsQueryParams,
+  ItemsQueryParams,
+  QueryResult,
+} from '../types/index.js';
 
 /**
  * Provides items api behavior for the Jellyfin client and command runtime.
@@ -13,8 +18,7 @@ export class ItemsApi extends ApiClientBase {
    */
   async getItems(params?: ItemsQueryParams & { userId?: string }): Promise<QueryResult<BaseItemDto>> {
     const userId = params?.userId ?? this.userId;
-    const path = userId ? `/Users/${userId}/Items` : '/Items';
-    return this.request<QueryResult<BaseItemDto>>('GET', path, params as Record<string, unknown>);
+    return this.request<QueryResult<BaseItemDto>>('GET', '/Items', { ...params, userId });
   }
 
   /**
@@ -25,10 +29,7 @@ export class ItemsApi extends ApiClientBase {
    */
   async getItem(itemId: string, userId?: string): Promise<BaseItemDto> {
     const uid = userId ?? this.userId;
-    if (uid) {
-      return this.request<BaseItemDto>('GET', `/Users/${uid}/Items/${itemId}`);
-    }
-    return this.request<BaseItemDto>('GET', `/Items/${itemId}`);
+    return this.request<BaseItemDto>('GET', `/Items/${itemId}`, { userId: uid });
   }
 
   /**
@@ -44,7 +45,7 @@ export class ItemsApi extends ApiClientBase {
     if (!userId) {
       throw new JellyfinApiError('User ID required for latest items');
     }
-    return this.request<BaseItemDto[]>('GET', `/Users/${userId}/Items/Latest`, params as Record<string, unknown>);
+    return this.request<BaseItemDto[]>('GET', '/Items/Latest', { ...params, userId });
   }
 
   /**
@@ -60,7 +61,25 @@ export class ItemsApi extends ApiClientBase {
     if (!userId) {
       throw new JellyfinApiError('User ID required for resume items');
     }
-    return this.request<QueryResult<BaseItemDto>>('GET', `/Users/${userId}/Items/Resume`, params as Record<string, unknown>);
+    return this.request<QueryResult<BaseItemDto>>('GET', '/UserItems/Resume', { ...params, userId });
+  }
+
+  /**
+   * Gets the collections that include an item through Jellyfin 12's additive API.
+   * @param itemId - The item whose containing collections should be returned.
+   * @param params - Optional user, pagination, and field controls.
+   * @returns The matching collection items.
+   */
+  async getItemCollections(
+    itemId: string,
+    params?: ItemCollectionsQueryParams,
+  ): Promise<QueryResult<BaseItemDto>> {
+    const userId = params?.userId ?? this.userId;
+    return this.request<QueryResult<BaseItemDto>>(
+      'GET',
+      `/Items/${itemId}/Collections`,
+      { ...params, userId },
+    );
   }
 
   /**
@@ -99,7 +118,7 @@ export class ItemsApi extends ApiClientBase {
    * @returns - The normalized string representation.
    */
   async getIntros(itemId: string): Promise<BaseItemDto[]> {
-    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/Intros`);
+    return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/Intros`, { userId: this.userId });
   }
 
   /**
@@ -117,7 +136,7 @@ export class ItemsApi extends ApiClientBase {
    * @returns - The normalized string representation.
    */
   async getSpecialFeatures(itemId: string): Promise<BaseItemDto[]> {
-    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/SpecialFeatures`);
+    return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/SpecialFeatures`, { userId: this.userId });
   }
 
   /**
@@ -126,7 +145,7 @@ export class ItemsApi extends ApiClientBase {
    * @returns - The normalized string representation.
    */
   async getLocalTrailers(itemId: string): Promise<BaseItemDto[]> {
-    return this.request<BaseItemDto[]>('GET', `/Users/${this.userId}/Items/${itemId}/LocalTrailers`);
+    return this.request<BaseItemDto[]>('GET', `/Items/${itemId}/LocalTrailers`, { userId: this.userId });
   }
 
   /**

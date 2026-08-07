@@ -37,7 +37,7 @@ describe('items list option handling', () => {
         if (url.pathname === '/Users') {
           return Response.json([{ Id: 'user-1', Name: 'steve', Policy: { IsAdministrator: true } }]);
         }
-        if (url.pathname === '/Users/user-1/Items') {
+        if (url.pathname === '/Items') {
           return Response.json({
             Items: [
               { Id: '1', Name: 'One' },

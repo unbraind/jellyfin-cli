@@ -294,9 +294,23 @@ jf system activity [options]
 | `--limit <number>` | Number of entries (default: 50) |
 | `--start <number>` | Start index (default: 0) |
 | `--min-date <date>` | Minimum date (ISO format) |
+| `--max-date <date>` | Maximum date (Jellyfin 12+) |
 | `--has-user` | Only show entries with user ID |
+| `--name <value>` | Filter by activity name (Jellyfin 12+) |
+| `--overview <value>` | Filter by overview text (Jellyfin 12+) |
+| `--short-overview <value>` | Filter by short overview (Jellyfin 12+) |
+| `--type <value>` | Filter by activity type (Jellyfin 12+) |
+| `--item <id>` | Filter by item ID (Jellyfin 12+) |
+| `--username <value>` | Filter by username (Jellyfin 12+) |
+| `--severity <level>` | Filter by log severity (Jellyfin 12+) |
+| `--sort <fields>` | ActivityLogSortBy fields, comma-separated (Jellyfin 12+) |
+| `--order <directions>` | `Ascending` or `Descending`, comma-separated (Jellyfin 12+) |
 
 Output type: `activity_log`
+
+Accepted activity sort fields are `Name`, `Overiew`, `ShortOverview`, `Type`, `DateCreated`,
+`Username`, and `LogSeverity`. `Overiew` preserves the spelling in Jellyfin 12's published wire
+contract.
 
 ### system time
 
@@ -428,6 +442,8 @@ jf items list [options]
 | `--types <types>` | Item types (comma-separated) |
 | `--genres <genres>` | Genres (comma-separated) |
 | `--years <years>` | Years (comma-separated) |
+| `--audio-languages <codes>` | Audio languages (comma-separated; Jellyfin 12+) |
+| `--subtitle-languages <codes>` | Subtitle languages (comma-separated; Jellyfin 12+) |
 | `--search <term>` | Search term |
 | `--limit <number>` | Limit (default: 50) |
 | `--offset <number>` | Offset (default: 0) |
@@ -449,6 +465,19 @@ jf items get <itemId> [-f format]
 ```
 
 Output type: `item`
+
+All dedicated item reads use the canonical user-as-query routes published by both Jellyfin
+10.11.11 and 12.0. This avoids legacy `/Users/{userId}/Items...` aliases removed in Jellyfin 12.
+
+### items collections
+
+List the collections that contain an item. This endpoint is available in Jellyfin 12 and later.
+
+```bash
+jf items collections <itemId> [--user <id>] [--limit <number>] [--offset <number>] [--fields <fields>]
+```
+
+Output type: `query_result`
 
 ### items latest
 
@@ -1293,7 +1322,7 @@ jf playlists create <name> [--items <ids>] [--media-type <type>]
 Add items to a playlist.
 
 ```bash
-jf playlists add <playlistId> <itemIds...>
+jf playlists add <playlistId> <itemIds...> [--position <index>]
 ```
 
 ### playlists remove
@@ -2812,8 +2841,11 @@ Output type: `message`
 Add items to a playlist.
 
 ```bash
-jf playlists add <playlistId> <itemIds...>
+jf playlists add <playlistId> <itemIds...> [--position <index>]
 ```
+
+`--position` inserts at a zero-based index on Jellyfin 12 and later. Omitting it preserves the
+stable append behavior.
 
 Output type: `message`
 
@@ -3381,6 +3413,7 @@ Notes:
 - `unmatched_tools` provides a deterministic sample of CLI commands that did not map above the active `--min-score`, with `reason` metadata for agent automation.
 - `local_only_tools` lists commands that intentionally operate only on local CLI state.
 - `non_endpoint_tools` prevents one-to-many OpenAPI orchestration, WebSocket transports, and optional plugin routes from being counted as direct endpoint gaps. Reasons are `openapi_orchestration`, `websocket_transport`, or `optional_plugin_api`.
+- `version_unavailable_tools` identifies direct commands whose required operation is absent from the inspected server contract. For example, Jellyfin 10.11 reports `jf items collections` with `server_version_unavailable`, while Jellyfin 12 maps it to `GET /Items/{itemId}/Collections`.
 
 ### schema suggest
 
@@ -4792,14 +4825,18 @@ Manage persons (actors, directors, writers, etc.).
 List all persons.
 
 ```bash
-jf persons list [--parent <id>] [--limit <number>] [--search <term>]
+jf persons list [--parent <id>] [--limit <number>] [--offset <number>] [--search <term>] [--name-starts-with <value>] [--name-less-than <value>] [--name-starts-with-or-greater <value>]
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--parent <id>` | Filter to a parent library |
 | `--limit <number>` | Maximum results (default: 100) |
-| `--search <term>` | Search by name (client-side filter) |
+| `--offset <number>` | Start index (default: 0) |
+| `--search <term>` | Search by name on the server |
+| `--name-starts-with <value>` | Filter names by prefix (Jellyfin 12+) |
+| `--name-less-than <value>` | Filter names before a value (Jellyfin 12+) |
+| `--name-starts-with-or-greater <value>` | Filter names at or after a prefix (Jellyfin 12+) |
 
 Output type: `items`
 
@@ -4846,17 +4883,26 @@ Browse trailers from a dedicated Trailers library (if configured on the server).
 List trailers from the Trailers library.
 
 ```bash
-jf trailers list [--limit <number>] [--offset <number>] [--sort <field>] [--order <dir>]
+jf trailers list [--limit <number>] [--offset <number>] [--sort <fields>] [--order <directions>] [--audio-languages <codes>] [--subtitle-languages <codes>]
 ```
 
 | Option | Description |
 |--------|-------------|
 | `--limit <number>` | Maximum results (default: 50) |
 | `--offset <number>` | Start index (default: 0) |
-| `--sort <field>` | Sort field (SortName, DateCreated, CommunityRating) |
-| `--order <dir>` | Sort order (Ascending, Descending) |
+| `--sort <fields>` | ItemSortBy fields, comma-separated |
+| `--order <directions>` | `Ascending` or `Descending`, comma-separated |
+| `--audio-languages <codes>` | Audio languages (comma-separated; Jellyfin 12+) |
+| `--subtitle-languages <codes>` | Subtitle languages (comma-separated; Jellyfin 12+) |
 
 Output type: `items`
+
+Accepted trailer sort fields are `Default`, `AiredEpisodeOrder`, `Album`, `AlbumArtist`, `Artist`,
+`DateCreated`, `OfficialRating`, `DatePlayed`, `PremiereDate`, `StartDate`, `SortName`, `Name`,
+`Random`, `Runtime`, `CommunityRating`, `ProductionYear`, `PlayCount`, `CriticRating`, `IsFolder`,
+`IsUnplayed`, `IsPlayed`, `SeriesSortName`, `VideoBitRate`, `AirTime`, `Studio`,
+`IsFavoriteOrLiked`, `DateLastContentAdded`, `SeriesDatePlayed`, `ParentIndexNumber`, and
+`IndexNumber`.
 
 ### trailers similar
 

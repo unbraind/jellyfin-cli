@@ -34,6 +34,17 @@ export type NonEndpointToolSummary = {
 };
 
 /**
+ * Represents a direct API tool whose operation is absent from the inspected server version.
+ */
+export type VersionUnavailableToolSummary = {
+  command: string;
+  read_only_safe: boolean;
+  reason: 'server_version_unavailable';
+  required_method: string;
+  required_path: string;
+};
+
+/**
  * Represents the coverage mapping result values accepted by the typed Jellyfin interface.
  */
 export type CoverageMappingResult = {
@@ -43,6 +54,7 @@ export type CoverageMappingResult = {
   unmatchedTools: UnmatchedToolSummary[];
   localOnlyTools: UnmatchedToolSummary[];
   nonEndpointTools: NonEndpointToolSummary[];
+  versionUnavailableTools: VersionUnavailableToolSummary[];
 };
 
 const LOCAL_ONLY_COMMANDS = new Set([
@@ -78,6 +90,10 @@ const NON_ENDPOINT_COMMAND_PREFIXES: ReadonlyArray<{
   { prefix: 'jf schema compatibility', reason: 'openapi_orchestration' },
 ];
 
+const VERSION_GATED_ENDPOINTS = new Map<string, { method: string; path: string }>([
+  ['jf items collections', { method: 'GET', path: '/Items/{itemId}/Collections' }],
+]);
+
 function isLocalOnlyCommand(command: string): boolean {
   return LOCAL_ONLY_COMMANDS.has(command);
 }
@@ -88,6 +104,7 @@ function isLocalOnlyCommand(command: string): boolean {
  * @param tools - The tools value required by this operation.
  * @param minScore - The min score value required by this operation.
  * @param readOnlyToolsOnly - Whether mutating CLI tools are outside the compared scope.
+ * @param availabilityOperations - The unfiltered server operations used for version availability.
  * @returns - The typed map open api coverage to tools result.
  */
 export function mapOpenApiCoverageToTools(
@@ -95,12 +112,14 @@ export function mapOpenApiCoverageToTools(
   tools: CliToolSchema[],
   minScore: number,
   readOnlyToolsOnly = false,
+  availabilityOperations = operations,
 ): CoverageMappingResult {
   const mappedOperationKeys = new Set<string>();
   let mappedToolCount = 0;
   const unmatchedTools: UnmatchedToolSummary[] = [];
   const localOnlyTools: UnmatchedToolSummary[] = [];
   const nonEndpointTools: NonEndpointToolSummary[] = [];
+  const versionUnavailableTools: VersionUnavailableToolSummary[] = [];
 
   const scopedTools = readOnlyToolsOnly ? tools.filter((tool) => tool.read_only_safe) : tools;
   for (const tool of scopedTools) {
@@ -121,6 +140,32 @@ export function mapOpenApiCoverageToTools(
         command: tool.command,
         read_only_safe: tool.read_only_safe,
         reason: nonEndpointReason,
+      });
+      continue;
+    }
+
+    const requiredEndpoint = VERSION_GATED_ENDPOINTS.get(tool.command);
+    if (requiredEndpoint) {
+      const operation = operations.find(
+        ({ method, path }) => method === requiredEndpoint.method && path === requiredEndpoint.path,
+      );
+      if (operation) {
+        mappedToolCount += 1;
+        mappedOperationKeys.add(`${operation.method} ${operation.path}`);
+        continue;
+      }
+      const availableOutsideScope = availabilityOperations.some(
+        ({ method, path }) => method === requiredEndpoint.method && path === requiredEndpoint.path,
+      );
+      if (availableOutsideScope) {
+        continue;
+      }
+      versionUnavailableTools.push({
+        command: tool.command,
+        read_only_safe: tool.read_only_safe,
+        reason: 'server_version_unavailable',
+        required_method: requiredEndpoint.method,
+        required_path: requiredEndpoint.path,
       });
       continue;
     }
@@ -164,6 +209,7 @@ export function mapOpenApiCoverageToTools(
     unmatchedTools,
     localOnlyTools,
     nonEndpointTools,
+    versionUnavailableTools,
   };
 }
 

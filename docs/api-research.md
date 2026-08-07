@@ -3,6 +3,20 @@
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
 
+## August 7 Jellyfin 12 Canonical Route and Query Refresh
+
+The exact `10.11.11` and `12.0-rc4` artifacts show that dedicated item reads must use `/Items`,
+`/Items/{itemId}`, `/Items/Latest`, `/UserItems/Resume`, `/Items/Root`, and canonical item
+subresources with `userId` in the query. Earlier CLI methods used undocumented
+`/Users/{userId}/Items...` aliases. Jellyfin 12 removes legacy API route middleware, so the typed
+client now uses only routes published by both official contracts.
+
+The preview adds one operation, `GetItemCollections`, plus 20 optional query parameters. Dedicated
+commands now expose the item-to-collection lookup, item/trailer language filters, server-side person
+filters and pagination, activity-log filtering/sorting, and playlist insertion position. Omitting
+the additive flags preserves stable request behavior. Synthetic preview-contract tests cover exact
+request paths and query serialization; the real 10.11.11 instance remains read-only.
+
 ## August 7 Semantic Read-Only Safety Refresh
 
 The live 10.11.11 OpenAPI document exposes eight installed-plugin maintenance actions as `GET`:
@@ -28,8 +42,8 @@ authentication, and emits ready-to-run compatibility argv. The compatibility com
 Release discovery follows every trusted GitHub pagination link with one overall timeout, rejects
 cross-origin or malformed next-page targets, and never forwards Jellyfin authentication.
 
-The same research pass corrected scope semantics: full coverage evaluates all `405` leaf tools,
-while read-only coverage evaluates only `250` tools classified safe under the global read-only
+The same research pass corrected scope semantics: full coverage evaluates all `406` leaf tools,
+while read-only coverage evaluates only `251` tools classified safe under the global read-only
 policy. Mutating commands no longer appear as unmatched against a GET/HEAD/OPTIONS-only operation
 set. This includes explicit safety exceptions for state-changing command names such as session
 logout, remote-control dispatch, playlist sharing, SyncPlay reports, and plugin maintenance that
@@ -74,6 +88,7 @@ Observed:
 - Intent-mapper coverage at a stricter diagnostic threshold (`min_score=8`): `71.1%` (`305/429`)
 - Full-scope unmatched direct endpoint tools at `min_score=3`: `0`
 - Intentional non-endpoint tools: `10` (OpenAPI orchestration, WebSocket, and optional notification API surfaces)
+- Version-unavailable tools: `1` (`jf items collections` requires Jellyfin 12+)
 - The strict-threshold gaps include many commands that are implemented and live-tested (for example
   artists, devices, genres, items, plugins, sessions, and users). The score is therefore a fuzzy
   naming diagnostic, not proof that an endpoint is implemented or absent.
@@ -217,9 +232,9 @@ bun run test:coverage:four
 
 Observed on 2026-08-07:
 
-- Portable Vitest: `1008` passing, `1` skipped, `0` failing in `11.68s`.
-- Four-axis V8 coverage: `59.08%` statements, `67.93%` branches, `63.48%` functions, and
-  `59.38%` lines. Before in-process attribution, the same suite reported `44.06%`, `45.14%`,
+- Portable Vitest: `1013` passing, `1` skipped, `0` failing in `28.73s`.
+- Four-axis V8 coverage: `59.61%` statements, `68.12%` branches, `63.85%` functions, and
+  `59.94%` lines. Before in-process attribution, the same suite reported `44.06%`, `45.14%`,
   `54.43%`, and `43.83%`, respectively.
 - Command integration tests now invoke the production Commander program in-process through the typed,
   serialized `tests/utils/run-cli-in-process.ts` harness. It captures the same stdout, stderr, exit,
@@ -313,17 +328,18 @@ Validation outcomes:
 
 ### Direct endpoints versus non-endpoint transports
 
-Coverage reports now keep four disjoint tool classes so agents do not invent work from false fuzzy
+Coverage reports now keep five disjoint tool classes so agents do not invent work from false fuzzy
 matches:
 
 - `mapped_tool_count`: commands with a direct OpenAPI operation match;
 - `unmatched_tools`: direct endpoint commands with no match above the requested score;
 - `local_only_tools`: configuration, setup, and schema utilities that do not contact an API;
 - `non_endpoint_tools`: API-related tools that intentionally have no one-to-one REST operation.
+- `version_unavailable_tools`: direct commands whose exact operation is absent from the inspected server version.
 
 The live full-scope result contains `375` direct mappings, `20` local tools, `10` non-endpoint
-tools, and `0` unmatched tools across `405` leaf commands. All `429` operations remain mapped.
-The read-only scope evaluates only the `250` read-only-safe tools; mutating tools are deliberately
+tools, `1` version-unavailable tool, and `0` unmatched tools across `406` leaf commands. All `429`
+stable operations remain mapped. The read-only scope evaluates only the `251` read-only-safe tools; mutating tools are deliberately
 outside that population, and every emitted read-only classification has `read_only_safe: true`.
 The live naming diagnostic maps `215` direct tools, classifies `19` local and `8` non-endpoint
 tools, and retains `8` safe direct commands for manual mapping review; operation coverage is
@@ -334,6 +350,7 @@ The non-endpoint reasons are stable machine values:
 - `openapi_orchestration` for `jf api *` and `jf schema compatibility`;
 - `websocket_transport` for `jf events *`;
 - `optional_plugin_api` for `jf notifications *`.
+- `server_version_unavailable` for a direct endpoint exposed by a newer Jellyfin contract but absent from the inspected server, including `jf items collections` on Jellyfin 10.11.
 
 The official Jellyfin `v10.11.11` server tree and the live OpenAPI document contain no notification
 controller/operations. Notification commands therefore remain an explicitly optional compatibility
