@@ -104,6 +104,7 @@ function isLocalOnlyCommand(command: string): boolean {
  * @param tools - The tools value required by this operation.
  * @param minScore - The min score value required by this operation.
  * @param readOnlyToolsOnly - Whether mutating CLI tools are outside the compared scope.
+ * @param availabilityOperations - The unfiltered server operations used for version availability.
  * @returns - The typed map open api coverage to tools result.
  */
 export function mapOpenApiCoverageToTools(
@@ -111,6 +112,7 @@ export function mapOpenApiCoverageToTools(
   tools: CliToolSchema[],
   minScore: number,
   readOnlyToolsOnly = false,
+  availabilityOperations = operations,
 ): CoverageMappingResult {
   const mappedOperationKeys = new Set<string>();
   let mappedToolCount = 0;
@@ -150,6 +152,12 @@ export function mapOpenApiCoverageToTools(
       if (operation) {
         mappedToolCount += 1;
         mappedOperationKeys.add(`${operation.method} ${operation.path}`);
+        continue;
+      }
+      const availableOutsideScope = availabilityOperations.some(
+        ({ method, path }) => method === requiredEndpoint.method && path === requiredEndpoint.path,
+      );
+      if (availableOutsideScope) {
         continue;
       }
       versionUnavailableTools.push({

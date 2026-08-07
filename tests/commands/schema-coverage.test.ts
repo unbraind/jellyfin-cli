@@ -94,6 +94,18 @@ describe('OpenAPI coverage tool classification', () => {
     expect(available.mappedToolCount).toBe(1);
     expect(available.mappedOperationKeys).toEqual(new Set(['GET /Items/{itemId}/Collections']));
     expect(available.versionUnavailableTools).toEqual([]);
+
+    const excludedByScope = mapOpenApiCoverageToTools(
+      [],
+      [tool('jf items collections')],
+      100,
+      false,
+      [collectionOperation],
+    );
+
+    expect(excludedByScope.mappedToolCount).toBe(0);
+    expect(excludedByScope.mappedOperationKeys).toEqual(new Set());
+    expect(excludedByScope.versionUnavailableTools).toEqual([]);
   });
 
   it('aligns a read-only operation scope with read-only-safe tools', () => {

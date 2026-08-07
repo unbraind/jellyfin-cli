@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[9]: agents,api,collections,filters,jellyfin-12,openapi,preview,read-only,toon
 created_at: "2026-08-07T18:13:45.030Z"
-updated_at: "2026-08-07T18:56:26.416Z"
+updated_at: "2026-08-07T19:06:34.840Z"
 assignee: codex-jellyfin-api-20260807
 author: codex-jellyfin-api-20260807
 estimated_minutes: 420
@@ -116,35 +116,65 @@ dependencies[17]:
     kind: verifies
     created_at: "2026-08-07T18:54:40.286Z"
     author: codex-jellyfin-api-20260807
-comments[4]{created_at,author,text}:
+comments[5]{created_at,author,text}:
   "2026-08-07T18:14:04.050Z",codex-jellyfin-api-20260807,"No credentials, endpoints, live identifiers, media inventories, raw schemas, or payloads may enter Git or PM. Live checks use JELLYFIN_READ_ONLY=1 and retain only aggregate contract evidence."
   "2026-08-07T18:47:38.492Z",codex-jellyfin-api-20260807,"Exact contract refinement: trailer and activity sort controls now use current literal unions, serialize as repeated array query values, and reject unknown fields/orders before any network request. The official ActivityLogSortBy value is intentionally spelled Overiew because that is the published 12.0-rc4 wire enum."
   "2026-08-07T18:53:57.559Z",codex-jellyfin-api-20260807,"PM dogfood finding filed after all-state GitHub duplicate search: unbraind/pm-cli#931 documents that pm test misclassifies every unrelated node dist/cli.js executable as the pm CLI. The false execution_context mismatch did not affect the linked Jellyfin test result; the assertion and command passed."
   "2026-08-07T18:56:25.676Z",codex-jellyfin-api-20260807,Draft PR #55 opened from exact implementation head 1d01223 with working main-branch links to this plan and append-only history. Review will run only after the PM linkage commit is pushed so every bot evaluates one current head.
-notes[1]{created_at,author,text,format,data{type,stable,preview,live_matches_stable,preview_added_operations,preview_added_optional_parameters,preview_removed_operations,privacy},event_type}:
-  "2026-08-07T18:14:04.465Z",codex-jellyfin-api-20260807,"{\"live_matches_stable\":true,\"preview\":\"12.0-rc4\",\"preview_added_operations\":1,\"preview_added_optional_parameters\":20,\"preview_removed_operations\":25,\"privacy\":\"sanitized\",\"stable\":\"10.11.11\",\"type\":\"contract_baseline\"}",json,contract_baseline,10.11.11,12.0-rc4,true,1,20,25,sanitized,contract_baseline
-files[21]{path,scope,note}:
+  "2026-08-07T19:06:34.271Z",codex-jellyfin-api-20260807,"PR #55 CodeRabbit produced four actionable findings before its rate-limit result. Verified all against the exact head: normalized comma-separated language/sort values; omitted hasUserId unless --has-user is supplied; restored global.fetch after API tests; and separated filtered coverage scope from full-contract version availability. Focused typecheck, lint, and 9 regression tests pass."
+notes[2]:
+  - created_at: "2026-08-07T18:14:04.465Z"
+    author: codex-jellyfin-api-20260807
+    text: "{\"live_matches_stable\":true,\"preview\":\"12.0-rc4\",\"preview_added_operations\":1,\"preview_added_optional_parameters\":20,\"preview_removed_operations\":25,\"privacy\":\"sanitized\",\"stable\":\"10.11.11\",\"type\":\"contract_baseline\"}"
+    format: json
+    data:
+      type: contract_baseline
+      stable: 10.11.11
+      preview: 12.0-rc4
+      live_matches_stable: true
+      preview_added_operations: 1
+      preview_added_optional_parameters: 20
+      preview_removed_operations: 25
+      privacy: sanitized
+    event_type: contract_baseline
+  - created_at: "2026-08-07T19:06:34.840Z"
+    author: codex-jellyfin-api-20260807
+    text: "{\"accepted\":4,\"decision\":\"Fix every finding including the auto-resolved filtered-scope defect; provider status is recorded as a limitation rather than approval.\",\"findings_total\":4,\"head_before\":\"3fef37821f27ead04044bb29ebcbef2308cbf1ce\",\"provider_status\":\"rate_limited_after_findings\",\"pull_request\":55,\"rejected\":0,\"reviewer\":\"coderabbitai\",\"type\":\"review_decision\"}"
+    format: json
+    data:
+      type: review_decision
+      pull_request: 55
+      head_before: 3fef37821f27ead04044bb29ebcbef2308cbf1ce
+      reviewer: coderabbitai
+      findings_total: 4
+      accepted: 4
+      rejected: 0
+      provider_status: rate_limited_after_findings
+      decision: Fix every finding including the auto-resolved filtered-scope defect; provider status is recorded as a limitation rather than approval.
+    event_type: review_decision
+files[22]{path,scope,note}:
+  src/api/client.ts,project,Canonical routes and typed preview parameter delegation
+  src/api/core-api.ts,project,Canonical item routes and additive collection and activity APIs
+  src/api/items.ts,project,Canonical item submodule routes and collection endpoint
+  src/api/playlists.ts,project,Optional playlist insertion position
+  src/commands/discover.ts,project,Validate and serialize trailer sort fields as current OpenAPI arrays
+  src/commands/items-collections.ts,project,Dedicated read-only item collection lookup
+  src/commands/items.ts,project,Item language flags and collection command attachment
+  src/commands/persons.ts,project,Server-side person filters
+  src/commands/playlists.ts,project,Validated playlist insertion position
+  src/commands/schema-coverage-command.ts,project,Version-unavailable coverage reporting
+  src/commands/schema-coverage-def.ts,project,Structured coverage schema contract
+  src/commands/schema-coverage.ts,project,Version-aware API coverage classification
+  src/commands/schema-research.ts,project,Version-unavailable research snapshot reporting
+  src/commands/system-activity.ts,project,Typed activity filters and sorting
+  src/commands/system.ts,project,Activity command extraction
+  src/commands/trailers.ts,project,Trailer language and sort controls
   src/types/api-queries.ts,project,Typed Jellyfin 12 additive query contracts
   src/types/common.ts,project,Item language filter contract
   src/types/index.ts,project,Public type exports
-  src/api/core-api.ts,project,Canonical item routes and additive collection and activity APIs
-  src/api/client.ts,project,Canonical routes and typed preview parameter delegation
-  src/api/items.ts,project,Canonical item submodule routes and collection endpoint
-  src/api/playlists.ts,project,Optional playlist insertion position
-  src/commands/items.ts,project,Item language flags and collection command attachment
-  src/commands/items-collections.ts,project,Dedicated read-only item collection lookup
-  src/commands/persons.ts,project,Server-side person filters
-  src/commands/trailers.ts,project,Trailer language and sort controls
-  src/commands/playlists.ts,project,Validated playlist insertion position
-  src/commands/system.ts,project,Activity command extraction
-  src/commands/system-activity.ts,project,Typed activity filters and sorting
-  src/commands/schema-coverage.ts,project,Version-aware API coverage classification
-  src/commands/schema-coverage-command.ts,project,Version-unavailable coverage reporting
-  src/commands/schema-research.ts,project,Version-unavailable research snapshot reporting
-  src/commands/schema-coverage-def.ts,project,Structured coverage schema contract
-  src/commands/discover.ts,project,Validate and serialize trailer sort fields as current OpenAPI arrays
   tests/api/jellyfin-12-preview.test.ts,project,Exact stable and preview API request contracts
   tests/commands/jellyfin-12-preview.test.ts,project,Production command tree flags formats and invalid-input acceptance
+  tests/commands/schema-coverage.test.ts,project,Filtered-scope version-availability regression coverage
 tests[6]:
   - command: "bun run check:file-length"
     scope: project
@@ -154,6 +184,10 @@ tests[6]:
     scope: project
     timeout_seconds: 1200
     note: Mandatory four-axis 100 percent coverage gate
+  - command: "bun run test:portable -- tests/api/jellyfin-12-preview.test.ts tests/commands/jellyfin-12-preview.test.ts tests/commands/schema-coverage.test.ts"
+    scope: project
+    timeout_seconds: 120
+    note: Focused API production-command and filtered-scope regressions from PR review
   - command: "bun run validate:release"
     scope: project
     timeout_seconds: 1800
@@ -169,11 +203,6 @@ tests[6]:
       full_scope.unmatched_tools_total: "0"
       full_scope.version_unavailable_tools_total: "1"
     note: Compiled privacy-safe live stable-server coverage acceptance
-  - command: bun test tests/api/jellyfin-12-preview.test.ts tests/commands/jellyfin-12-preview.test.ts
-    path: tests/api/jellyfin-12-preview.test.ts
-    scope: project
-    timeout_seconds: 120
-    note: Focused API and production command-tree preview contracts
 docs[6]{path,scope,note}:
   docs/agent-integration.md,project,Agent-safe version compatibility guidance
   docs/api-research.md,project,Official-current stable and preview research evidence

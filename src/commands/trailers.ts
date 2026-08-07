@@ -26,8 +26,8 @@ export function createTrailersCommand(): Command {
     .action(async (options) => {
       const { client, format, formatter } = await createApiClient(options);
       try {
-        const sortBy = options.sort?.split(',') as ItemSortField[] | undefined;
-        const sortOrder = options.order?.split(',') as SortOrder[] | undefined;
+        const sortBy = options.sort?.split(',').map((value: string) => value.trim()).filter(Boolean) as ItemSortField[] | undefined;
+        const sortOrder = options.order?.split(',').map((value: string) => value.trim()).filter(Boolean) as SortOrder[] | undefined;
         if (sortBy?.some((field) => !ITEM_SORT_FIELDS.includes(field))) {
           throw new Error(`Invalid trailer sort field '${options.sort}'`);
         }
@@ -39,8 +39,8 @@ export function createTrailersCommand(): Command {
           startIndex: parseNonNegativeInt(options.offset, 'Offset'),
           sortBy,
           sortOrder,
-          audioLanguages: options.audioLanguages?.split(','),
-          subtitleLanguages: options.subtitleLanguages?.split(','),
+          audioLanguages: options.audioLanguages?.split(',').map((value: string) => value.trim()).filter(Boolean),
+          subtitleLanguages: options.subtitleLanguages?.split(',').map((value: string) => value.trim()).filter(Boolean),
         });
         console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }

@@ -76,6 +76,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
           tools,
           minScore,
           Boolean(options.readOnlyOps),
+          allOperations,
         );
         const unmatchedTools = coverageMapping.unmatchedTools;
         const localOnlyTools = coverageMapping.localOnlyTools;

@@ -1,7 +1,8 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { JellyfinApiClient } from '../../src/api/client.js';
 
 const mockFetch = vi.fn();
+const originalFetch = global.fetch;
 global.fetch = mockFetch;
 
 function jsonResponse(data: unknown): Response {
@@ -17,6 +18,10 @@ beforeEach(() => {
 
 afterEach(() => {
   vi.clearAllMocks();
+});
+
+afterAll(() => {
+  global.fetch = originalFetch;
 });
 
 describe('Jellyfin 12 API compatibility', () => {

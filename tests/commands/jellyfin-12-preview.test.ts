@@ -61,8 +61,8 @@ describe('Jellyfin 12 preview command controls', () => {
         '--fields', 'Overview,Genres', '--format', 'json',
       ]));
       results.push(await runCli([
-        'items', 'list', '--audio-languages', 'eng,deu',
-        '--subtitle-languages', 'fra', '--format', 'json',
+        'items', 'list', '--audio-languages', 'eng, deu,',
+        '--subtitle-languages', 'fra, ', '--format', 'json',
       ]));
       results.push(await runCli([
         'persons', 'list', '--offset', '3', '--search', 'Alex',
@@ -70,14 +70,14 @@ describe('Jellyfin 12 preview command controls', () => {
         '--name-starts-with-or-greater', 'B', '--format', 'json',
       ]));
       results.push(await runCli([
-        'trailers', 'list', '--audio-languages', 'eng,deu',
-        '--subtitle-languages', 'fra', '--order', 'Descending', '--format', 'json',
+        'trailers', 'list', '--audio-languages', 'eng, deu,',
+        '--subtitle-languages', 'fra, ', '--order', 'Descending, ', '--format', 'json',
       ]));
       results.push(await runCli([
         'system', 'activity', '--max-date', '2026-08-07T12:00:00Z',
         '--name', 'Task', '--overview', 'done', '--short-overview', 'ok',
         '--type', 'ScheduledTask', '--item', 'item-1', '--username', 'steve',
-        '--severity', 'Warning', '--sort', 'DateCreated,Name', '--order', 'Descending',
+        '--severity', 'Warning', '--sort', 'DateCreated, Name', '--order', 'Descending, ',
         '--format', 'json',
       ]));
       results.push(await runCli([
@@ -97,10 +97,14 @@ describe('Jellyfin 12 preview command controls', () => {
       ]);
       expect(requests[0]?.searchParams.getAll('fields')).toEqual(['Overview', 'Genres']);
       expect(requests[1]?.searchParams.getAll('audioLanguages')).toEqual(['eng', 'deu']);
+      expect(requests[1]?.searchParams.getAll('subtitleLanguages')).toEqual(['fra']);
       expect(requests[2]?.searchParams.get('searchTerm')).toBe('Alex');
       expect(requests[3]?.searchParams.get('sortOrder')).toBe('Descending');
+      expect(requests[3]?.searchParams.getAll('audioLanguages')).toEqual(['eng', 'deu']);
+      expect(requests[3]?.searchParams.getAll('subtitleLanguages')).toEqual(['fra']);
       expect(requests[4]?.searchParams.get('severity')).toBe('Warning');
       expect(requests[4]?.searchParams.getAll('sortBy')).toEqual(['DateCreated', 'Name']);
+      expect(requests[4]?.searchParams.has('hasUserId')).toBe(false);
       expect(requests[5]?.searchParams.get('position')).toBe('4');
 
       const formatted = new Map<string, string>();

@@ -37,8 +37,8 @@ export function addSystemActivityCommand(command: Command): void {
       const { client, format } = await createApiClient(options);
       try {
         const severity = options.severity as ActivityLogSeverity | undefined;
-        const sortBy = options.sort?.split(',') as ActivityLogSortField[] | undefined;
-        const sortOrder = options.order?.split(',') as SortOrder[] | undefined;
+        const sortBy = options.sort?.split(',').map((value: string) => value.trim()).filter(Boolean) as ActivityLogSortField[] | undefined;
+        const sortOrder = options.order?.split(',').map((value: string) => value.trim()).filter(Boolean) as SortOrder[] | undefined;
         if (severity && !ACTIVITY_LOG_SEVERITIES.includes(severity)) {
           throw new Error(`Invalid severity '${options.severity}'`);
         }
@@ -53,7 +53,7 @@ export function addSystemActivityCommand(command: Command): void {
           startIndex: parseNonNegativeInt(options.start, 'Start index'),
           minDate: options.minDate,
           maxDate: options.maxDate,
-          hasUserId: options.hasUser,
+          hasUserId: options.hasUser ? true : undefined,
           name: options.name,
           overview: options.overview,
           shortOverview: options.shortOverview,
