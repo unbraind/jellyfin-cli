@@ -4,6 +4,7 @@
 
 ### Other
 
+- Expose Jellyfin 12 preview collection and query controls ([jf-707w](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-707w.toon))
 - Attribute CLI integration coverage in-process ([jf-5u9v](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-5u9v.toon))
 - Discover current Jellyfin contracts and correct agent API scope ([jf-einj](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-einj.toon))
 

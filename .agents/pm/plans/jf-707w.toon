@@ -2,12 +2,13 @@ id: jf-707w
 title: Expose Jellyfin 12 preview collection and query controls
 description: "Migrate dedicated item methods from undocumented legacy user-scoped aliases to canonical Jellyfin routes and implement the additive 12.0-rc4 API surface: item-to-collection lookup, language filters, server-side person filters, activity-log filters/sorting, and playlist insertion position, while retaining read-only stable 10.11.11 behavior."
 type: Plan
-status: in_progress
+status: closed
 priority: 0
 tags[9]: agents,api,collections,filters,jellyfin-12,openapi,preview,read-only,toon
 created_at: "2026-08-07T18:13:45.030Z"
-updated_at: "2026-08-07T19:06:34.840Z"
-assignee: codex-jellyfin-api-20260807
+updated_at: "2026-08-07T19:18:48.665Z"
+closed_at: "2026-08-07T19:18:47.866Z"
+completed_at: "2026-08-07T19:18:47.866Z"
 author: codex-jellyfin-api-20260807
 estimated_minutes: 420
 acceptance_criteria: "The GetItemCollections operation is available through a typed intuitive dedicated command with complete help and all output formats; New 12.0-rc4 item language, person, activity-log, and playlist position parameters are typed and exposed without changing stable defaults; Synthetic preview tests assert exact request contracts and structured outputs while compiled live 10.11.11 acceptance remains strictly read-only; Official-current docs, PM evidence, generated changelog, coverage, security, duplication, release, and review gates are recorded honestly"
@@ -23,6 +24,9 @@ risk: medium
 confidence: high
 sprint: jellyfin-12-preview
 release: unreleased
+resolution: "Delivered typed Jellyfin 12 additive query controls, canonical Jellyfin item routes, version-aware coverage classification, docs, schemas, and review fixes on PR #55; retained stable 10.11.11 compatibility and read-only safety."
+expected_result: "jf-cli exposes the researched Jellyfin 12 preview additions through intuitive typed commands, remains compatible with the current stable server, reports version-unavailable operations honestly, keeps private configuration outside Git, and is fully validated for manual publication."
+actual_result: "Implemented the sole preview-added collection operation plus all 20 additive query controls in scope, migrated legacy item aliases to official routes, passed 185/185 compiled live read-only E2E checks and complete release validation, mapped all 429 live operations with zero unexplained full-scope tools, resolved all four bot findings, and published nothing. Repo-wide historical coverage and duplication debt remain separately tracked in jf-mkzh and jf-lpki."
 dependencies[17]:
   - id: jf-0ea5
     kind: related
@@ -116,13 +120,14 @@ dependencies[17]:
     kind: verifies
     created_at: "2026-08-07T18:54:40.286Z"
     author: codex-jellyfin-api-20260807
-comments[5]{created_at,author,text}:
+comments[6]{created_at,author,text}:
   "2026-08-07T18:14:04.050Z",codex-jellyfin-api-20260807,"No credentials, endpoints, live identifiers, media inventories, raw schemas, or payloads may enter Git or PM. Live checks use JELLYFIN_READ_ONLY=1 and retain only aggregate contract evidence."
   "2026-08-07T18:47:38.492Z",codex-jellyfin-api-20260807,"Exact contract refinement: trailer and activity sort controls now use current literal unions, serialize as repeated array query values, and reject unknown fields/orders before any network request. The official ActivityLogSortBy value is intentionally spelled Overiew because that is the published 12.0-rc4 wire enum."
   "2026-08-07T18:53:57.559Z",codex-jellyfin-api-20260807,"PM dogfood finding filed after all-state GitHub duplicate search: unbraind/pm-cli#931 documents that pm test misclassifies every unrelated node dist/cli.js executable as the pm CLI. The false execution_context mismatch did not affect the linked Jellyfin test result; the assertion and command passed."
   "2026-08-07T18:56:25.676Z",codex-jellyfin-api-20260807,Draft PR #55 opened from exact implementation head 1d01223 with working main-branch links to this plan and append-only history. Review will run only after the PM linkage commit is pushed so every bot evaluates one current head.
   "2026-08-07T19:06:34.271Z",codex-jellyfin-api-20260807,"PR #55 CodeRabbit produced four actionable findings before its rate-limit result. Verified all against the exact head: normalized comma-separated language/sort values; omitted hasUserId unless --has-user is supplied; restored global.fetch after API tests; and separated filtered coverage scope from full-contract version availability. Focused typecheck, lint, and 9 regression tests pass."
-notes[2]:
+  "2026-08-07T19:15:35.813Z",codex-jellyfin-api-20260807,"Exact head 68f0203 live dogfood: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 JELLYFIN_TIMEOUT=120000 bun test tests/e2e/cli.test.ts passed 185/185 with 210 assertions in 147.39s against local Jellyfin 10.11.11. Actual compiled jf commands exercised canonical item routes and broad read surfaces; explicit safety cases proved mutating commands were blocked before requests."
+notes[3]:
   - created_at: "2026-08-07T18:14:04.465Z"
     author: codex-jellyfin-api-20260807
     text: "{\"live_matches_stable\":true,\"preview\":\"12.0-rc4\",\"preview_added_operations\":1,\"preview_added_optional_parameters\":20,\"preview_removed_operations\":25,\"privacy\":\"sanitized\",\"stable\":\"10.11.11\",\"type\":\"contract_baseline\"}"
@@ -152,6 +157,24 @@ notes[2]:
       provider_status: rate_limited_after_findings
       decision: Fix every finding including the auto-resolved filtered-scope defect; provider status is recorded as a limitation rather than approval.
     event_type: review_decision
+  - created_at: "2026-08-07T19:18:45.765Z"
+    author: codex-jellyfin-api-20260807
+    text: "{\"actions\":\"green\",\"coderabbit_confirmations\":4,\"coderabbit_full_review\":\"rate_limited\",\"cubic\":\"skipped\",\"gemini\":\"no_artifact\",\"greptile\":\"no_artifact\",\"head\":\"68f0203dbf3f33d834368a747b0e5471ecd1ff58\",\"pull_request\":55,\"sourcery\":\"quota_exhausted\",\"threads_resolved\":4,\"threads_total\":4,\"type\":\"exact_head_review\"}"
+    format: json
+    data:
+      type: exact_head_review
+      pull_request: 55
+      head: 68f0203dbf3f33d834368a747b0e5471ecd1ff58
+      actions: green
+      threads_total: 4
+      threads_resolved: 4
+      coderabbit_confirmations: 4
+      coderabbit_full_review: rate_limited
+      sourcery: quota_exhausted
+      greptile: no_artifact
+      gemini: no_artifact
+      cubic: skipped
+    event_type: exact_head_review
 files[22]{path,scope,note}:
   src/api/client.ts,project,Canonical routes and typed preview parameter delegation
   src/api/core-api.ts,project,Canonical item routes and additive collection and activity APIs
@@ -175,7 +198,7 @@ files[22]{path,scope,note}:
   tests/api/jellyfin-12-preview.test.ts,project,Exact stable and preview API request contracts
   tests/commands/jellyfin-12-preview.test.ts,project,Production command tree flags formats and invalid-input acceptance
   tests/commands/schema-coverage.test.ts,project,Filtered-scope version-availability regression coverage
-tests[6]:
+tests[7]:
   - command: "bun run check:file-length"
     scope: project
     timeout_seconds: 120
@@ -196,6 +219,10 @@ tests[6]:
     scope: project
     timeout_seconds: 120
     note: Zero duplication across newly introduced implementation and acceptance files
+  - command: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 JELLYFIN_TIMEOUT=120000 bun test tests/e2e/cli.test.ts
+    scope: project
+    timeout_seconds: 300
+    note: Compiled actual CLI against owner-local Jellyfin with enforced non-mutation guard
   - command: JELLYFIN_READ_ONLY=1 node dist/cli.js schema research --format json --limit 1
     scope: project
     timeout_seconds: 120
@@ -210,7 +237,8 @@ docs[6]{path,scope,note}:
   docs/README.md,project,Documentation index discoverability
   docs/release-readiness.md,project,Synthetic preview verification policy
   README.md,project,Top-level discoverability for collection and playlist controls
-plan_mode: executing
+close_reason: Jellyfin 12 preview controls and canonical stable routes implemented and production-validated without publishing
+plan_mode: completed
 plan_scope: "Typed dedicated CLI/API support for additive 12.0-rc4 operations and parameters, with stable-safe defaults, schemas, documentation, synthetic preview acceptance, and sanitized live 10.11.11 regression evidence."
 plan_harness: codex
 plan_resume_context: "Official 10.11.11 stable and 12.0-rc4 preview contracts verified; configured live server is 10.11.11. Implement only additive preview surfaces, never mutate live Jellyfin, and keep private artifacts under ~/.jellyfin-cli."
@@ -284,8 +312,9 @@ plan_steps[7]:
   - id: plan-step-007
     order: 7
     title: "Publish PR, process every exact-head bot artifact, merge, and close PM lineage"
-    status: in_progress
+    status: completed
     created_at: "2026-08-07T18:13:45.020Z"
-    updated_at: "2026-08-07T18:54:24.335Z"
-    evidence: "Preparing exact implementation and PM evidence for commit, PR, exact-head CI, and bot review."
+    updated_at: "2026-08-07T19:18:46.683Z"
+    evidence: "PR #55 exact head 68f0203 passed all Actions; four CodeRabbit findings were fixed, individually acknowledged, independently confirmed, reacted to, and resolved. Full release validation and PM-linked live compiled E2E passed. Provider limitations are recorded. Final PM/changelog-only closeout commit remains before merge."
+    completed_at: "2026-08-07T19:18:46.683Z"
 body: ""
