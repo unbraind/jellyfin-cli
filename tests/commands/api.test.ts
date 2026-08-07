@@ -10,8 +10,18 @@ import { apiOperationDocument } from '../fixtures/api-operation.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-api-test-${process.pid}`);
 const cli = ['bun', 'run', 'src/cli.ts'];
+const CREATE_USER_BODY = '{"Name":"New user"}';
+const CREATE_USER_MUTATION_ARGS = [
+  'api',
+  'mutate',
+  'CreateUser',
+  '--confirm',
+  '--body-json',
+  CREATE_USER_BODY,
+];
 let server: Bun.Server;
 let mutationCount = 0;
+let stateChangingReadCount = 0;
 let lastMutationBody = '';
 let lastMutationContentType = '';
 
@@ -44,6 +54,7 @@ async function runCli(
 
 beforeEach(() => {
   mutationCount = 0;
+  stateChangingReadCount = 0;
   lastMutationBody = '';
   lastMutationContentType = '';
   server = Bun.serve({
@@ -59,6 +70,10 @@ beforeEach(() => {
       const url = new URL(request.url);
       if (url.pathname === '/Users') {
         return Response.json([{ Id: 'user-1', Name: 'Test user' }]);
+      }
+      if (url.pathname === '/meilisearch/reindex') {
+        stateChangingReadCount += 1;
+        return Response.json({ accepted: true });
       }
       if (url.pathname === '/Users/New' && request.method === 'POST') {
         mutationCount += 1;
@@ -232,26 +247,20 @@ describe('api command', () => {
   it('rejects unsafe method routing, invalid bodies, and response overflow', async () => {
     const unsafe = await runCli(['api', 'get', 'CreateUser']);
     expect(unsafe.code).toBe(1);
-    expect(unsafe.stderr).toContain('expected GET, HEAD, or OPTIONS');
+    expect(unsafe.stderr).toContain('expected a read-only operation');
+
+    const unsafeGet = await runCli(['api', 'get', 'Reindex']);
+    expect(unsafeGet.code).toBe(1);
+    expect(unsafeGet.stderr).toContain('classified as state-changing');
+    expect(stateChangingReadCount).toBe(0);
 
     const invalidBody = await runCli([
-      'api',
-      'mutate',
-      'CreateUser',
-      '--confirm',
-      '--body-json',
-      '{',
+      'api', 'mutate', 'CreateUser', '--confirm', '--body-json', '{',
     ]);
     expect(invalidBody.code).toBe(1);
     expect(invalidBody.stderr).toContain('valid JSON');
 
-    const overflow = await runCli([
-      'api',
-      'get',
-      'GetBinary',
-      '--max-bytes',
-      '3',
-    ]);
+    const overflow = await runCli(['api', 'get', 'GetBinary', '--max-bytes', '3']);
     expect(overflow.code).toBe(1);
     expect(overflow.stderr).toContain('exceeds --max-bytes');
   });
@@ -263,32 +272,33 @@ describe('api command', () => {
 
     const blocked = await runCli([
       '--read-only',
-      'api',
-      'mutate',
-      'CreateUser',
-      '--confirm',
-      '--body-json',
-      '{"Name":"New user"}',
+      ...CREATE_USER_MUTATION_ARGS,
     ]);
     expect(blocked.code).toBe(1);
     expect(blocked.stderr).toContain('blocked by read-only mode');
     expect(mutationCount).toBe(0);
+
+    const blockedUnsafeGet = await runCli([
+      '--read-only',
+      'api',
+      'mutate',
+      'Reindex',
+      '--confirm',
+    ]);
+    expect(blockedUnsafeGet.code).toBe(1);
+    expect(blockedUnsafeGet.stderr).toContain('blocked by read-only mode');
+    expect(stateChangingReadCount).toBe(0);
   });
 
   it('executes confirmed mutations against an isolated test server only', async () => {
     const result = await runCli([
       '--format',
       'json',
-      'api',
-      'mutate',
-      'CreateUser',
-      '--confirm',
-      '--body-json',
-      '{"Name":"New user"}',
+      ...CREATE_USER_MUTATION_ARGS,
     ]);
     expect(result.code).toBe(0);
     expect(mutationCount).toBe(1);
-    expect(lastMutationBody).toBe('{"Name":"New user"}');
+    expect(lastMutationBody).toBe(CREATE_USER_BODY);
     expect(lastMutationContentType).toBe('application/json');
     expect(JSON.parse(result.stdout)).toMatchObject({
       operation_id: 'CreateUser',

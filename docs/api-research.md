@@ -1,7 +1,22 @@
-# Jellyfin API Research (Validated August 6, 2026)
+# Jellyfin API Research (Validated August 7, 2026)
 
 This document captures the latest live Jellyfin API discovery and CLI coverage verification for
 `jellyfin-cli`.
+
+## August 7 Semantic Read-Only Safety Refresh
+
+The live 10.11.11 OpenAPI document exposes eight installed-plugin maintenance actions as `GET`:
+Meilisearch reconnect and reindex, Telegram notifier testing, user-usage backup load/save, and
+user-usage add/prune/remove. Their HTTP method alone is therefore not a safe execution contract.
+
+Exact operation resolution now combines method semantics with fail-closed path exceptions. Those
+eight operations report `read_only_safe: false`; `jf api get` and `jf api batch` reject them before
+the target request; `jf api mutate ... --confirm` remains blocked by global read-only mode. Isolated
+loopback tests verify zero target requests for both exact and batch rejection paths.
+
+The refreshed live scope contains `249` semantically read-only operations. All `249` map at the
+compatibility threshold, while full scope remains `429/429` with no unmatched direct endpoint
+tools. Raw server contracts and responses remain outside Git and PM evidence.
 
 ## August 6 Current-Contract Discovery Refresh
 
@@ -34,7 +49,7 @@ mutating Jellyfin data.
 
 ## Verification Scope
 
-- Verification date: **August 6, 2026**
+- Verification date: **August 7, 2026**
 - Server used: local Jellyfin **10.11.11**
 - Auth source: `~/.jellyfin-cli/settings.json` and `JELLYFIN_*` env vars
 - Auth aliases supported: `JF_*` (`JF_SERVER_URL`, `JF_API_KEY`, `JF_USER`, `JF_PASSWORD`, `JF_USER_ID`, `JF_TIMEOUT`, `JF_FORMAT`)
@@ -71,9 +86,9 @@ The live 10.11.11 document declares a unique, non-empty `operationId` for all `4
 `jf api inspect|get|mutate` now resolves those identifiers exactly and validates declared path/query
 parameters, request-body presence, and request content types before execution.
 
-- `257` operations use read-only-safe `GET`, `HEAD`, or `OPTIONS` methods and can run through
-  `jf api get`.
-- Non-read-only operations require `jf api mutate ... --confirm`.
+- `249` operations are semantically read-only and can run through `jf api get`.
+- Non-read-only methods and the eight known state-changing plugin `GET` routes require
+  `jf api mutate ... --confirm`.
 - Global read-only mode blocks `api mutate` before any request.
 - Exact inspection merges path- and operation-level parameters and exposes types, formats,
   constraints, defaults, examples, bounded body schemas, response contracts, security alternatives,
@@ -304,7 +319,8 @@ The read-only scope evaluates only the `250` read-only-safe tools; mutating tool
 outside that population, and every emitted read-only classification has `read_only_safe: true`.
 The live naming diagnostic maps `215` direct tools, classifies `19` local and `8` non-endpoint
 tools, and retains `8` safe direct commands for manual mapping review; operation coverage is
-`255/257` (`99.22%`). These lexical gaps do not make mutating commands eligible for live tests.
+`249/249` (`100%`). The unmatched tool intents do not make mutating commands eligible for live
+tests.
 The non-endpoint reasons are stable machine values:
 
 - `openapi_orchestration` for `jf api *` and `jf schema compatibility`;

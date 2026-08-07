@@ -164,9 +164,10 @@ async function executeOperation(
   try {
     const resolved = await resolveOperation(operationId, options);
     if (resolved.operation.readOnlySafe !== expectedReadOnly) {
-      const expected = expectedReadOnly ? 'GET, HEAD, or OPTIONS' : 'a mutating HTTP method';
+      const classification = resolved.operation.readOnlySafe ? 'read-only' : 'state-changing';
+      const expected = expectedReadOnly ? 'a read-only operation' : 'a state-changing operation';
       throw new Error(
-        `Operation ${resolved.operation.operationId} uses ${resolved.operation.method}; expected ${expected}`,
+        `Operation ${resolved.operation.operationId} is classified as ${classification}; expected ${expected}`,
       );
     }
 
@@ -240,7 +241,7 @@ export function createApiCommand(): Command {
 
   addExecutionOptions(
     cmd.command('get <operationId>')
-      .description('Execute an exact GET, HEAD, or OPTIONS operation'),
+      .description('Execute an exact semantically read-only OpenAPI operation'),
   ).action(async function (
     this: Command,
     operationId: string,

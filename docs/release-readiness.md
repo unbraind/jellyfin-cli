@@ -160,8 +160,9 @@ For full-scope coverage, require `unmatched_tools_total: 0` independently from o
 Do not count `local_only_tools` or `non_endpoint_tools` as missing REST work; the latter carries an
 explicit OpenAPI orchestration, WebSocket, or optional-plugin reason.
 
-The `read_only_scope` tool population must contain only `read_only_safe: true` entries. Mutating
-commands are outside that scope rather than being mislabeled as unmatched against GET/HEAD/OPTIONS.
+The `read_only_scope` tool population must contain only `read_only_safe: true` entries. The
+classification combines HTTP semantics with exact exceptions for plugin `GET` routes that mutate
+server state, so generic API execution cannot bypass the global read-only policy.
 
 ```bash
 jf schema research --include-unmatched --require-coverage 100 --format json \

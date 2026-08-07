@@ -1,5 +1,6 @@
 import type { JellyfinConfig } from '../types/index.js';
 import { LOW_SIGNAL_TOKENS, isReadOnlyIntent } from './openapi-intent.js';
+import { isOpenApiOperationReadOnlySafe } from './openapi-safety.js';
 import { tokenizeIntentValue, tokenizePathValue } from './openapi-tokenize.js';
 import {
   fetchOpenApiDocument,
@@ -104,10 +105,6 @@ export function summarizeOpenApi(document: OpenApiDocument): Omit<OpenApiStats, 
   };
 }
 
-function isReadOnlyMethod(method: string): boolean {
-  return method === 'GET' || method === 'HEAD' || method === 'OPTIONS';
-}
-
 /**
  * Retrieves or derives extract open api operations without mutating Jellyfin state.
  * @param document - The validated OpenAPI document to inspect.
@@ -131,7 +128,7 @@ export function extractOpenApiOperations(document: OpenApiDocument): OpenApiOper
         summary: operation?.summary,
         tags: operation?.tags ?? [],
         deprecated: operation?.deprecated ?? false,
-        readOnlySafe: isReadOnlyMethod(method),
+        readOnlySafe: isOpenApiOperationReadOnlySafe(method, path),
       });
     }
   }

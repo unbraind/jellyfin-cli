@@ -30,7 +30,7 @@ export function attachSchemaCoverageSubcommand(cmd: Command): void {
     .option('--method <method>', 'Filter operations by HTTP method')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
-    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--read-only-ops', 'Filter to semantically read-only safe operations')
     .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--limit <number>', 'Unmatched operation sample limit', '50')
     .option('--command-prefix <prefix>', 'Limit command intents to a CLI command prefix (e.g. "items")')

@@ -67,7 +67,14 @@ describe('API batch manifests', () => {
       requests: [{ id: 'mutation', operation_id: 'CreateUser' }],
     }, 25);
     expect(() => prepareApiBatch(apiOperationDocument, requests))
-      .toThrow('only GET, HEAD, and OPTIONS are allowed');
+      .toThrow('classified state-changing');
+
+    const stateChangingGet = parseApiBatchManifest({
+      version: 1,
+      requests: [{ id: 'plugin-mutation', operation_id: 'Reindex' }],
+    }, 25);
+    expect(() => prepareApiBatch(apiOperationDocument, stateChangingGet))
+      .toThrow('GET /meilisearch/reindex');
   });
 
   it('validates path and query values against the OpenAPI operation', () => {

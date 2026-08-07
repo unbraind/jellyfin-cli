@@ -1,4 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import type { Mock } from 'vitest';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -12,12 +13,20 @@ import {
   matchOperationsForCommandIntent,
   summarizeOpenApi,
 } from '../../src/utils/openapi.js';
+import { isOpenApiOperationReadOnlySafe } from '../../src/utils/openapi-safety.js';
 
 const CONFIG = {
   serverUrl: 'http://127.0.0.1:8096',
   apiKey: 'test-key',
   timeout: 5000,
 };
+
+function rejectLocalSchemaCandidates(fetchMock: Mock): void {
+  fetchMock
+    .mockResolvedValueOnce(new Response('failed', { status: 500 }))
+    .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+    .mockResolvedValueOnce(new Response('missing', { status: 404 }));
+}
 
 describe('openapi utils', () => {
   const originalFetch = globalThis.fetch;
@@ -88,6 +97,42 @@ describe('openapi utils', () => {
         readOnlySafe: false,
       },
     ]);
+  });
+
+  it('keeps state-changing plugin GET routes outside read-only operation scope', () => {
+    const operations = extractOpenApiOperations({
+      paths: {
+        '/meilisearch/reindex': { get: { operationId: 'Reindex' } },
+        '/user_usage_stats/user_manage/prune': { get: { operationId: 'PruneUnknownUsers' } },
+        '/meilisearch/status': { get: { operationId: 'GetStatus' } },
+      },
+    });
+
+    expect(operations.map(({ operationId, readOnlySafe }) => ({ operationId, readOnlySafe })))
+      .toEqual([
+        { operationId: 'Reindex', readOnlySafe: false },
+        { operationId: 'GetStatus', readOnlySafe: true },
+        { operationId: 'PruneUnknownUsers', readOnlySafe: false },
+      ]);
+  });
+
+  it('fails closed for every known state-changing plugin GET contract', () => {
+    const stateChangingGetPaths = [
+      '/meilisearch/reconnect',
+      '/meilisearch/reindex',
+      '/TelegramNotifierApi/TestNotifier',
+      '/user_usage_stats/load_backup',
+      '/user_usage_stats/save_backup',
+      '/user_usage_stats/user_manage/add',
+      '/user_usage_stats/user_manage/prune',
+      '/user_usage_stats/user_manage/remove',
+    ];
+
+    expect(stateChangingGetPaths.every((path) =>
+      !isOpenApiOperationReadOnlySafe('get', path))).toBe(true);
+    expect(isOpenApiOperationReadOnlySafe('GET', '/MEILISEARCH/REINDEX')).toBe(false);
+    expect(isOpenApiOperationReadOnlySafe('POST', '/System/Info/Public')).toBe(false);
+    expect(isOpenApiOperationReadOnlySafe('GET', '/System/Info/Public')).toBe(true);
   });
 
   it('filters operations by method, tag, path prefix, and search', () => {
@@ -225,10 +270,9 @@ describe('openapi utils', () => {
       info: { version: '10.11.11' },
       paths: { '/System/Ping': { get: { tags: ['System'] } } },
     };
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+    const fetchMock = vi.fn();
+    rejectLocalSchemaCandidates(fetchMock);
+    fetchMock
       .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }))
       .mockResolvedValueOnce(Response.json(officialDocument));
     globalThis.fetch = fetchMock as unknown as typeof fetch;
@@ -246,11 +290,9 @@ describe('openapi utils', () => {
     expect(fetchMock.mock.calls[3]?.[1]?.headers).toBeUndefined();
     expect(fetchMock.mock.calls[4]?.[1]?.headers).toBeUndefined();
 
-    fetchMock.mockReset()
-      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
-      .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }));
+    fetchMock.mockReset();
+    rejectLocalSchemaCandidates(fetchMock);
+    fetchMock.mockResolvedValueOnce(Response.json({ Version: '10.11.11' }));
     const cachedResult = await fetchOpenApiDocument(CONFIG);
     expect(cachedResult.sourceKind).toBe('cache');
     expect(cachedResult.document).toEqual(officialDocument);
@@ -266,10 +308,9 @@ describe('openapi utils', () => {
       join(cacheDir, 'jellyfin-openapi-10.11.11.json'),
       JSON.stringify({ info: { version: '10.10.0' }, paths: { '/Cached': { get: {} } } }),
     );
-    const fetchMock = vi.fn()
-      .mockResolvedValueOnce(new Response('failed', { status: 500 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
-      .mockResolvedValueOnce(new Response('missing', { status: 404 }))
+    const fetchMock = vi.fn();
+    rejectLocalSchemaCandidates(fetchMock);
+    fetchMock
       .mockResolvedValueOnce(Response.json({ Version: '10.11.11' }))
       .mockResolvedValueOnce(Response.json({
         info: { version: '10.10.0' },

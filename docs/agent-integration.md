@@ -240,6 +240,11 @@ The CLI rejects unknown operation IDs, undeclared query/path parameters, missing
 unsupported request content types, and oversized responses. Binary responses are base64-encoded
 inside the normal structured envelope.
 
+Safety is semantic rather than method-only. Some optional plugins publish maintenance, backup,
+user-management, or notifier actions as `GET`; `api inspect` classifies those exact contracts as
+`read_only_safe: false`, `api get` and `api batch` reject them before execution, and only
+`api mutate ... --confirm` can select them. Global read-only mode still blocks that mutation path.
+
 The inspection response is the canonical request-construction contract for agents. It includes
 merged path- and operation-level parameters, bounded recursive schema metadata, declared request
 content types, response status/content types, security alternatives, and an
@@ -262,10 +267,10 @@ printf '%s' '{
 }' | jf api batch --stdin --dry-run --format toon
 ```
 
-Remove `--dry-run` after inspecting the resolved plan. Batches accept only read-only HTTP methods,
-preserve input order and caller IDs, reuse one authenticated client, and enforce request-count,
-per-response, and aggregate byte ceilings. One invalid manifest entry prevents every network
-operation. Runtime HTTP failures are returned per request and make the process exit nonzero.
+Remove `--dry-run` after inspecting the resolved plan. Batches accept only semantically read-only
+operations, preserve input order and caller IDs, reuse one authenticated client, and enforce
+request-count, per-response, and aggregate byte ceilings. One invalid manifest entry prevents every
+network operation. Runtime HTTP failures are returned per request and make the process exit nonzero.
 
 Mutations are intentionally separate:
 

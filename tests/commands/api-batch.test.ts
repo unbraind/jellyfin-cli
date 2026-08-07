@@ -13,6 +13,7 @@ const manifestPath = join(configDir, 'batch.json');
 const cli = ['bun', 'run', 'src/cli.ts'];
 let server: Bun.Server;
 let operationRequests = 0;
+let stateChangingReadRequests = 0;
 
 async function runCli(
   args: string[],
@@ -40,6 +41,7 @@ async function runCli(
 
 beforeEach(() => {
   operationRequests = 0;
+  stateChangingReadRequests = 0;
   server = Bun.serve({
     port: 0,
     routes: {
@@ -50,6 +52,10 @@ beforeEach(() => {
         return new Response(Uint8Array.from([0, 1, 2, 3]), {
           headers: { 'content-type': 'application/octet-stream' },
         });
+      },
+      '/meilisearch/reindex': () => {
+        stateChangingReadRequests += 1;
+        return Response.json({ accepted: true });
       },
     },
   });
@@ -174,8 +180,17 @@ describe('api batch command', () => {
     }));
     const mutation = await runCli(['api', 'batch', '--file', manifestPath]);
     expect(mutation.code).toBe(1);
-    expect(mutation.stderr).toContain('only GET, HEAD, and OPTIONS are allowed');
+    expect(mutation.stderr).toContain('classified state-changing');
     expect(operationRequests).toBe(0);
+
+    writeFileSync(manifestPath, JSON.stringify({
+      version: 1,
+      requests: [{ id: 'plugin-mutation', operation_id: 'Reindex' }],
+    }));
+    const stateChangingGet = await runCli(['api', 'batch', '--file', manifestPath]);
+    expect(stateChangingGet.code).toBe(1);
+    expect(stateChangingGet.stderr).toContain('GET /meilisearch/reindex');
+    expect(stateChangingReadRequests).toBe(0);
 
     const ambiguous = await runCli([
       'api',

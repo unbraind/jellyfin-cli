@@ -2,11 +2,13 @@ id: jf-einj
 title: Discover current Jellyfin contracts and correct agent API scope
 description: "Add authoritative current stable and preview Jellyfin contract discovery, support moving target aliases in compatibility analysis, refresh official TOON and PM release tooling, and make read-only API research scope only read-only-safe tools."
 type: Plan
-status: blocked
+status: in_progress
 priority: 0
 tags[12]: agents,api,compatibility,coverage,jellyfin-10.11.11,jellyfin-12,openapi,read-only,release,research,toon,typescript
 created_at: "2026-08-06T17:49:39.419Z"
-updated_at: "2026-08-07T06:05:40.418Z"
+updated_at: "2026-08-07T06:50:40.109Z"
+assignee: codex-jellyfin-api-20260807-closeout
+claim_principal: codex-jellyfin-api-20260807-closeout
 author: codex-jellyfin-api-20260806
 estimated_minutes: 720
 acceptance_criteria: "jf schema versions reports current official stable and preview releases with validated artifact identities and deterministic compatibility commands; schema compatibility accepts latest-stable and latest-preview aliases while preserving explicit prerelease opt-in and never forwarding Jellyfin credentials; read_only_scope excludes mutating tools from tool_scope_count and unmatched tool evidence; TOON, pm-cli, and pm-changelog use latest available compatible versions and all output schemas/formats validate; all nested help and docs are current; focused, full release, privacy, PM, packaged, and compiled live read-only gates pass; no package is published"
@@ -22,8 +24,7 @@ risk: high
 confidence: high
 sprint: jellyfin-10.11.11-to-12
 release: next-manual-release
-blocked_reason: "External GitHub branch-protection gate: the current PR head requires an independent approval. All executable checks are green and zero review threads remain; author bypass is not authorized."
-unblock_note: Final CodeRabbit pass produced a valid strict-output-schema finding; resume to enforce undocumented-field rejection before returning to external protected-branch gates.
+unblock_note: "The user explicitly authorized merge after exact-head checks and bot review convergence; enforce-admin protection does not apply to the authenticated maintainer, so the prior approval-only hold is no longer terminal."
 dependencies[11]{id,kind,created_at,author,source_kind,author_source}:
   jf-36oy,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-644n,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
@@ -36,7 +37,7 @@ dependencies[11]{id,kind,created_at,author,source_kind,author_source}:
   jf-rjox,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-snok,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-tike,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
-comments[14]{created_at,author,text}:
+comments[16]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Reviewed complete all-status PM metadata, active comments/notes/learnings, prior API/compatibility/coverage/format plans, official latest releases, live 10.11.11 schema, help, dependencies, and sanitized research output before creation; no duplicate current-version discovery or read-only scope correction item exists."
   "2026-08-06T18:02:37.684Z",codex-jellyfin-api-20260806,"Implementation checkpoint: schema versions and dynamic compatibility aliases are operational; read-only coverage reports the correct 275-tool safe scope instead of comparing 405 total tools to GET/HEAD operations. No Jellyfin mutation was performed and no credentials were written to the repository."
   "2026-08-06T18:13:31.277Z",codex-jellyfin-api-20260806,"Quality checkpoint: release suite, 996-test portable suite, 184-command live read-only suite, dependency audits, Trivy, secret/history scans, current-file zero duplication, PM graph/duplicate/health/storage checks all pass. Repository-wide coverage is 43.76/44.86/54.37/43.51 and legacy jscpd remains red; those pre-existing mandates stay canonical and open as jf-mkzh and jf-lpki."
@@ -51,12 +52,15 @@ comments[14]{created_at,author,text}:
   "2026-08-07T05:34:47.380Z",codex-jellyfin-api-20260807,"Live rerun discovery: the original WebSocket acceptance required an ambient KeepAlive within 15 seconds and intermittently failed with a valid duration_reached/event_count=0 result. Two direct probes confirmed server event timing is nondeterministic. Updated the live test to request the official periodic sessions subscription, accept either a bounded duration or count stop, and validate a Sessions record when one arrives; deterministic transport decoding/event delivery remains fully asserted by the synthetic WebSocket integration suite. Focused PM-linked live acceptance now passes without weakening production behavior or generating server mutations."
   "2026-08-07T05:53:47.253Z",codex-jellyfin-api-20260807,"Exact-head review pass accepted two CodeRabbit findings: the managed-extension file annotation now matches pm-changelog 2026.8.7, and JSON Schema object validation uses own-property checks plus applies strict additionalProperties rules to object union types. Focused schema/formatter regression suite passes 26/26 with typecheck, lint, and diff checks green."
   "2026-08-07T06:02:36.723Z",codex-jellyfin-api-20260807,"Final exact-head inventory for 36b8cc2: Quality Gates, npm Compatibility, Secret Scanning, semantic title, commit subject, both CodeQL analyzers, and CodeRabbit status pass; Cubic and Sourcery are neutral/skipped provider outcomes; Greptile and Gemini did not respond to repeated triggers; zero unresolved threads remain. Merge is correctly blocked only by required independent approval, so the item is blocked and the active claim is released without publishing or bypassing protection."
+  "2026-08-07T06:35:06.361Z",codex-jellyfin-api-20260807-closeout,"Semantic safety checkpoint: live aggregate research is 429/429 full scope and 249/249 semantically read-only operations. Exact inspection routes the plugin Reindex GET to mutate; api get rejects it with exit 1. Only public operation/path facts and aggregate counts are retained; credentials, server URL, raw schema, and payloads remain owner-local."
+  "2026-08-07T06:45:39.848Z",codex-jellyfin-api-20260807-closeout,"Final local quality refresh: validate:release passes; compiled live read-only CLI passes 185/185; semantic safety focused suite passes 65/65; changed implementation/test tranche is 0.00% duplicated and all 159 source files remain within 300 code lines. Honest repository baselines are 43.87/44.99/54.37/43.61 coverage and 227 legacy clone groups at 8.01%; canonical open quality items jf-mkzh and jf-lpki remain open and are not falsely claimed complete."
 notes[1]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Privacy boundary: credentials, server URL, user/server/media IDs, raw live schemas, and payloads remain in environment variables or owner-only ~/.jellyfin-cli. Git and PM retain only public release facts, contract counts, commands, synthetic fixtures, and aggregate outcomes."
-learnings[2]{created_at,author,text}:
+learnings[3]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,A 100 percent operation mapping score does not make read-only tool coverage truthful when mutating tools remain in the compared tool population; operation and tool scope must be aligned before graph or agent conclusions.
   "2026-08-07T05:34:47.727Z",codex-jellyfin-api-20260807,"Live WebSocket acceptance must prove authenticated connection, subscription, bounds, privacy, and event shape without assuming ambient/control traffic arrives in a fixed window; deterministic delivery semantics belong in the transport-adapter integration test."
-files[25]:
+  "2026-08-07T06:35:07.233Z",codex-jellyfin-api-20260807-closeout,OpenAPI GET cannot be assumed non-mutating when optional plugins violate HTTP semantics; agent-safe execution needs one shared semantic classifier and fail-before-target-request tests for exact and batch paths.
+files[36]:
   - path: .agents/pm/extensions/.managed-extensions.json
     scope: project
     note: managed pm-changelog 2026.8.7 metadata
@@ -130,7 +134,40 @@ files[25]:
     note: non-verb mutation regression coverage
   - path: tests/utils/schema-validate.test.ts
     scope: project
-tests[10]:
+  - path: src/utils/openapi-safety.ts
+    scope: project
+    note: single semantic OpenAPI safety classifier
+  - path: src/utils/openapi.ts
+    scope: project
+    note: catalog and research safety projection
+  - path: src/utils/api-operation.ts
+    scope: project
+    note: exact operation safety projection
+  - path: src/utils/api-batch.ts
+    scope: project
+    note: semantic batch preflight rejection
+  - path: src/commands/api.ts
+    scope: project
+    note: exact get and mutate routing diagnostics
+  - path: tests/fixtures/api-operation.ts
+    scope: project
+    note: synthetic state-changing GET contract
+  - path: tests/utils/openapi.test.ts
+    scope: project
+    note: complete eight-path classifier regression
+  - path: tests/utils/api-operation.test.ts
+    scope: project
+    note: exact resolver semantic safety regression
+  - path: tests/utils/api-batch.test.ts
+    scope: project
+    note: batch preflight semantic safety regression
+  - path: tests/commands/api.test.ts
+    scope: project
+    note: zero-request exact CLI safety regression
+  - path: tests/commands/api-batch.test.ts
+    scope: project
+    note: zero-request batch CLI safety regression
+tests[12]:
   - command: "bun run check:duplicates"
     scope: project
     timeout_seconds: 600
@@ -143,6 +180,10 @@ tests[10]:
     scope: project
     timeout_seconds: 1800
     note: complete release readiness suite
+  - command: bun test tests/utils/api-operation.test.ts tests/utils/openapi.test.ts tests/utils/api-batch.test.ts tests/commands/api.test.ts tests/commands/api-batch.test.ts tests/commands/schema-coverage.test.ts tests/commands/schema-research.test.ts
+    scope: project
+    timeout_seconds: 180
+    note: semantic GET mutation safety and scope regression
   - command: bun test tests/utils/jellyfin-releases.test.ts tests/commands/schema-coverage.test.ts tests/commands/schema-compatibility.test.ts tests/commands/schema-research.test.ts tests/formatters/schema-contract.test.ts tests/commands/help-global-options-all.test.ts
     scope: project
     timeout_seconds: 120
@@ -157,6 +198,10 @@ tests[10]:
     scope: project
     timeout_seconds: 120
     note: zero duplication for newly introduced release and safety files
+  - command: bunx jscpd src/utils/openapi-safety.ts src/utils/openapi.ts src/utils/api-operation.ts src/utils/api-batch.ts src/commands/api.ts tests/utils/openapi.test.ts tests/utils/api-operation.test.ts tests/utils/api-batch.test.ts tests/commands/api.test.ts tests/commands/api-batch.test.ts --threshold 0 --exit-code 1
+    scope: project
+    timeout_seconds: 120
+    note: zero duplication across semantic safety implementation and regression tranche
   - command: JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts
     scope: project
     timeout_seconds: 1200
@@ -179,19 +224,23 @@ docs[8]{path,scope,note}:
 plan_mode: executing
 plan_scope: "Official Jellyfin release/OpenAPI discovery, version aliases, stable/preview compatibility evidence, read-only tool scoping, TOON 4.1.1, schemas/help/docs/tests, release and PR closeout; live Jellyfin validation remains strictly read-only."
 plan_harness: codex
-plan_validation[6]{text,command,expected}:
+plan_validation[8]{text,command,expected}:
   Focused and live acceptance suites pass,PM-linked focused test plus JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,36 focused tests and 184 live compiled CLI tests pass with no Jellyfin mutations
   Release readiness suite passes,"bun run validate:release",version type lint tests build smoke package secrets history and changelog gates all pass
   Dependency and repository security scans pass,bun audit; npm audit; trivy fs with vulnerability secret and misconfiguration scanners at HIGH and CRITICAL,Zero vulnerabilities secrets or misconfigurations
   PM graph duplicate health and storage contracts pass,pm graph audit; pm duplicates all statuses; pm health --full --strict-exit; focused pm validate --strict-exit,Zero graph findings zero duplicate clusters healthy tracker and no storage integrity warnings
   Exact artifact validation fails before any live or official network access,bun test tests/commands/schema-compatibility.test.ts tests/utils/jellyfin-releases.test.ts,Unsafe identifiers fail immediately and dynamic aliases preserve explicit preview opt-in
   Final compiled CLI read-only acceptance passes,JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,185 tests pass including version discovery and non-verb mutation denial
-plan_decisions[1]{ts,author,decision,rationale,evidence}:
+  "Semantic state-changing GET guard passes focused unit, CLI integration, batch-preflight, scope, and live inspection checks",bun test tests/utils/api-operation.test.ts tests/utils/openapi.test.ts tests/utils/api-batch.test.ts tests/commands/api.test.ts tests/commands/api-batch.test.ts tests/commands/schema-coverage.test.ts tests/commands/schema-research.test.ts; compiled read-only jf api inspect/get Reindex,All focused tests pass; live inspect reports read_only_safe false and invocation mutate; api get exits nonzero without executing the operation
+  "Full exact local release, live, changed-file duplication, coverage baseline, and source-length gates refreshed after semantic safety implementation","bun run validate:release; JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts; bun run test:coverage:four; changed-file jscpd threshold 0; bun run check:file-length","Release suite and 185 live reads pass, changed tranche has zero clones, every source file is under 300 code lines, and repository-wide debt is reported without closing jf-mkzh or jf-lpki"
+plan_decisions[2]{ts,author,decision,rationale,evidence}:
   "2026-08-06T18:02:35.789Z",codex-jellyfin-api-20260806,Discover release channels from the official Jellyfin GitHub release feed and validate each selected version against the official repository OpenAPI artifact before exposing it.,This avoids hard-coded moving versions while keeping server credentials isolated from public artifact requests.,Unit assertions verify no Jellyfin authorization headers reach GitHub; live command verifies both artifacts.
-plan_discoveries[3]{ts,author,text}:
+  "2026-08-07T06:35:03.063Z",codex-jellyfin-api-20260807-closeout,Classify exact OpenAPI operations with HTTP semantics plus fail-closed path exceptions for known state-changing GET contracts.,"The server contract's declared HTTP method is insufficient evidence of non-mutation; one shared classifier must govern catalog, exact get/mutate routing, batch preflight, research scope, and agent metadata.",Compiled live inspection reports Reindex as GET with read_only_safe=false and invocation mutate; jf api get rejects it before the target request. Synthetic exact and batch servers assert zero target requests across all eight exception classifications.
+plan_discoveries[4]{ts,author,text}:
   "2026-08-06T18:02:36.655Z",codex-jellyfin-api-20260806,"The stable local server and latest official stable release are 10.11.11; latest official preview is 12.0-rc4. Comparing stable to preview reports 39 breaking, 129 review, and 26 nonbreaking changes."
   "2026-08-06T18:13:30.692Z",codex-jellyfin-api-20260806,pm-cli 2026.8.6 extends the merge fence with a non-merge rule for managed extension contents and a key-level JSON exception for .managed-extensions.json; pm merge install applied and validated the current contract.
   "2026-08-06T18:18:19.590Z",codex-jellyfin-api-20260806,"Aligned scoping revealed 25 state-changing commands with nonstandard names were mislabeled read-only-safe, including session logout, remote-control dispatch, playlist sharing, SyncPlay reports, and plugin maintenance. An explicit deny-before-allow policy now blocks them and removes them from agent tool scope."
+  "2026-08-07T06:35:02.138Z",codex-jellyfin-api-20260807-closeout,"Live 10.11.11 contract inspection found eight installed-plugin state changes declared as GET: Meilisearch reconnect/reindex, Telegram notifier test, user-usage backup load/save, and user-management add/prune/remove. Method-only exact API routing could therefore bypass read-only intent."
 plan_steps[6]:
   - id: plan-step-001
     order: 1
@@ -236,9 +285,8 @@ plan_steps[6]:
   - id: plan-step-006
     order: 6
     title: Publish PR and converge exact-head CI and every bot review artifact
-    status: blocked
+    status: in_progress
     created_at: "2026-08-06T17:49:39.413Z"
-    updated_at: "2026-08-07T06:02:34.703Z"
-    evidence: "PR #53 exact head 36b8cc2 has all required CI, CodeQL, secret, npm, title, and commit checks green; zero unresolved review threads; all actionable CodeRabbit findings fixed, acknowledged, reacted to, and resolved; Greptile/Gemini triggers produced no provider response."
-    blocked_reason: GitHub branch protection requires an independent approving review; the authenticated PR author cannot self-approve and no safe bypass is authorized.
+    updated_at: "2026-08-07T06:50:40.109Z"
+    evidence: "New semantic read-only safety tranche is locally complete: exact release gate, 185 compiled live reads, 65 focused regressions, 0.00% changed-file duplication, rich PM evidence, and privacy checks pass. Ready to push a fresh PR head and restart exact-head CI and bot review."
 body: ""

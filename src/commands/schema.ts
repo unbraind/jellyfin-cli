@@ -66,7 +66,7 @@ export function createSchemaCommand(): Command {
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
-    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--read-only-ops', 'Filter to semantically read-only safe operations')
     .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')

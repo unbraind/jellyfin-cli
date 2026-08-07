@@ -3183,8 +3183,8 @@ Output type: `api_operation`
 
 ### api get
 
-Execute an exact read-only operation. Only OpenAPI operations using `GET`, `HEAD`, or `OPTIONS` are
-accepted.
+Execute an exact read-only operation. OpenAPI operations using `GET`, `HEAD`, or `OPTIONS` are
+accepted unless their exact path is a known state-changing plugin contract.
 
 ```bash
 jf api get <operationId> \
@@ -3212,8 +3212,9 @@ jf api batch (--file <manifest.json> | --stdin) \
 
 The manifest must contain `version: 1` and a non-empty `requests` array. Each request requires a
 unique caller `id` and an exact `operation_id`; optional `path_params` and `query` objects use
-OpenAPI-declared names. All requests are resolved and validated before execution, and any method
-other than `GET`, `HEAD`, or `OPTIONS` rejects the entire manifest before an API request is made.
+OpenAPI-declared names. All requests are resolved and validated before execution. A non-read-only
+method or known state-changing plugin `GET` rejects the entire manifest before an API request is
+made.
 
 `--dry-run` returns output type `api_batch_plan`. Execution returns `api_batch_response` with
 ordered results, per-request status or structured error, byte counts, and aggregate success/failure

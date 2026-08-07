@@ -27,6 +27,14 @@ describe('exact OpenAPI operation contracts', () => {
     });
   });
 
+  it('classifies known state-changing GET contracts as unsafe', () => {
+    expect(resolveApiOperation(apiOperationDocument, 'Reindex')).toMatchObject({
+      method: 'GET',
+      pathTemplate: '/meilisearch/reindex',
+      readOnlySafe: false,
+    });
+  });
+
   it('rejects empty, unknown, and duplicate operation IDs', () => {
     expect(() => resolveApiOperation(apiOperationDocument, '')).toThrow('must not be empty');
     expect(() => resolveApiOperation(apiOperationDocument, 'Missing')).toThrow('Unknown OpenAPI operation ID');

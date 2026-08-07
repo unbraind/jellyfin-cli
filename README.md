@@ -76,7 +76,7 @@ jf sessions play SESSION_ID ITEM_ID
 - **Startup Diagnostics**: `jf setup startup` reports startup wizard state in structured output
 - **Startup Wizard Configuration**: `jf setup update-configuration` updates `/Startup/Configuration`
 - **Diagnostics**: `jf config doctor` for agent-safe health checks
-- **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` to block mutating commands
+- **Read-Only Guard**: global `--read-only` or `JELLYFIN_READ_ONLY=1` blocks mutating commands and known state-changing plugin `GET` contracts
 - **Bounded API Batches**: preflight and execute ordered read-only operation manifests in one process
 - **Real-Time Events**: bounded WebSocket watches with filters, read subscriptions, TOON aggregates,
   and opt-in NDJSON streaming
@@ -207,7 +207,7 @@ jf system info --format raw
 - `jf schema suggest` - Generate candidate CLI command patterns from OpenAPI intent matches or coverage gaps
 - `jf schema compatibility` - Compare exact or current official API versions, or audit live/plugin drift
 - `jf api inspect <operationId>` - Inspect typed inputs, bodies, responses, security, and an argv template
-- `jf api get <operationId>` - Execute a validated GET/HEAD/OPTIONS operation
+- `jf api get <operationId>` - Execute a semantically read-only OpenAPI operation
 - `jf api batch --file <manifest.json>` - Preflight and execute a bounded read-only operation batch
 - `jf api mutate <operationId> --confirm` - Execute a validated mutation (blocked by `--read-only`)
 - `jf events types` - List the Jellyfin 10.11 WebSocket event and subscription catalog
@@ -658,7 +658,7 @@ Batch manifests are strict JSON objects with `version: 1` and a non-empty `reque
 ```
 
 Every request is resolved and validated before the first target-operation request. Batch execution accepts
-only `GET`, `HEAD`, and `OPTIONS`, preserves manifest order and caller IDs, reuses one authenticated
+only semantically read-only operations, preserves manifest order and caller IDs, reuses one authenticated
 client, returns structured per-request failures, and exits nonzero if any request fails. Use
 `--stdin` for pipelines; exactly one of `--file` or `--stdin` is required. Manifests are limited to
 25 requests by default (configurable up to 100) and one MiB of input.
