@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[9]: agents,api,collections,filters,jellyfin-12,openapi,preview,read-only,toon
 created_at: "2026-08-07T18:13:45.030Z"
-updated_at: "2026-08-07T18:55:01.648Z"
+updated_at: "2026-08-07T18:56:26.416Z"
 assignee: codex-jellyfin-api-20260807
 author: codex-jellyfin-api-20260807
 estimated_minutes: 420
@@ -116,10 +116,11 @@ dependencies[17]:
     kind: verifies
     created_at: "2026-08-07T18:54:40.286Z"
     author: codex-jellyfin-api-20260807
-comments[3]{created_at,author,text}:
+comments[4]{created_at,author,text}:
   "2026-08-07T18:14:04.050Z",codex-jellyfin-api-20260807,"No credentials, endpoints, live identifiers, media inventories, raw schemas, or payloads may enter Git or PM. Live checks use JELLYFIN_READ_ONLY=1 and retain only aggregate contract evidence."
   "2026-08-07T18:47:38.492Z",codex-jellyfin-api-20260807,"Exact contract refinement: trailer and activity sort controls now use current literal unions, serialize as repeated array query values, and reject unknown fields/orders before any network request. The official ActivityLogSortBy value is intentionally spelled Overiew because that is the published 12.0-rc4 wire enum."
   "2026-08-07T18:53:57.559Z",codex-jellyfin-api-20260807,"PM dogfood finding filed after all-state GitHub duplicate search: unbraind/pm-cli#931 documents that pm test misclassifies every unrelated node dist/cli.js executable as the pm CLI. The false execution_context mismatch did not affect the linked Jellyfin test result; the assertion and command passed."
+  "2026-08-07T18:56:25.676Z",codex-jellyfin-api-20260807,Draft PR #55 opened from exact implementation head 1d01223 with working main-branch links to this plan and append-only history. Review will run only after the PM linkage commit is pushed so every bot evaluates one current head.
 notes[1]{created_at,author,text,format,data{type,stable,preview,live_matches_stable,preview_added_operations,preview_added_optional_parameters,preview_removed_operations,privacy},event_type}:
   "2026-08-07T18:14:04.465Z",codex-jellyfin-api-20260807,"{\"live_matches_stable\":true,\"preview\":\"12.0-rc4\",\"preview_added_operations\":1,\"preview_added_optional_parameters\":20,\"preview_removed_operations\":25,\"privacy\":\"sanitized\",\"stable\":\"10.11.11\",\"type\":\"contract_baseline\"}",json,contract_baseline,10.11.11,12.0-rc4,true,1,20,25,sanitized,contract_baseline
 files[21]{path,scope,note}:
@@ -184,8 +185,9 @@ plan_mode: executing
 plan_scope: "Typed dedicated CLI/API support for additive 12.0-rc4 operations and parameters, with stable-safe defaults, schemas, documentation, synthetic preview acceptance, and sanitized live 10.11.11 regression evidence."
 plan_harness: codex
 plan_resume_context: "Official 10.11.11 stable and 12.0-rc4 preview contracts verified; configured live server is 10.11.11. Implement only additive preview surfaces, never mutate live Jellyfin, and keep private artifacts under ~/.jellyfin-cli."
-plan_validation[1]{text,command,expected}:
+plan_validation[2]{text,command,expected}:
   Canonical PM-linked quality and live gate run,pm test jf-707w --run --progress with five measurements,All six linked commands pass; coverage shortfall remains measured against 100 percent; stable live contract reports zero full-scope unmatched tools and one version-unavailable preview command
+  Draft PR published with PM links and full sanitized verification summary,gh pr create --draft --base main --head agent/jellyfin-12-preview-api-controls,"PR #55 exists with semantic title, no private details, non-publishing scope, exact gates, and durable main-branch PM links"
 plan_decisions[2]{ts,author,decision,rationale,evidence}:
   "2026-08-07T18:14:03.638Z",codex-jellyfin-api-20260807,Implement additive preview capabilities behind optional dedicated flags and commands while preserving stable request shapes when those options are omitted.,The configured production server is stable 10.11.11 and must not be mutated; additive optional controls can be verified synthetically against the exact preview contract without destabilizing current users.,"Official v10.11.11 and v12.0-rc4 releases plus exact OpenAPI compatibility summary: 1 added operation, 20 optional parameters, 25 removed operations."
   "2026-08-07T18:47:37.995Z",codex-jellyfin-api-20260807,Represent OpenAPI enum arrays with exported literal unions and reject invalid activity/trailer sort values before network execution.,The preview contract defines sortBy and sortOrder as arrays of closed enums; stringly typed scalar forwarding would violate the exact request schema and defer actionable errors to the server.,"Official 12.0-rc4 ItemSortBy, ActivityLogSortBy, SortOrder, and LogLevel component schemas plus focused zero-request invalid-input tests."
