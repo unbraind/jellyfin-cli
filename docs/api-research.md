@@ -200,10 +200,11 @@ The full live E2E suite (`tests/e2e/cli.test.ts`) was executed against the local
 read-only-safe coverage patterns:
 
 ```bash
-JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts
+JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 JELLYFIN_TIMEOUT=120000 \
+  bun test tests/e2e/cli.test.ts
 ```
 
-Latest compiled-binary run result (2026-07-23): `177` passing, `0` failing in `144.36s`.
+Latest compiled-binary run result (2026-08-07): `185` passing, `0` failing in `130.86s`.
 
 ## Full Test + Coverage Validation
 
@@ -214,18 +215,23 @@ bun run test:coverage
 bun run test:coverage:four
 ```
 
-Observed on 2026-07-23:
+Observed on 2026-08-07:
 
-- Bun: `915` passing, `177` credential-dependent skips, `0` failing.
-- Vitest: `906` passing, `0` failing; `38.24%` statements, `37.38%` branches, `50.00%`
-  functions, and `37.90%` lines.
-- `tests/setup/node-bun-compat.ts` provides typed Node adapters for the test harness's
-  `Bun.spawn` and `Bun.serve` boundaries. The live E2E suite remains a separate Bun gate because
-  subprocess execution is intentionally black-box and does not contribute attributable parent-process
-  coverage.
+- Portable Vitest: `1008` passing, `1` skipped, `0` failing in `11.68s`.
+- Four-axis V8 coverage: `59.08%` statements, `67.93%` branches, `63.48%` functions, and
+  `59.38%` lines. Before in-process attribution, the same suite reported `44.06%`, `45.14%`,
+  `54.43%`, and `43.83%`, respectively.
+- Command integration tests now invoke the production Commander program in-process through the typed,
+  serialized `tests/utils/run-cli-in-process.ts` harness. It captures the same stdout, stderr, exit,
+  and environment boundaries while allowing V8 to attribute the exercised production paths.
+- Tests that require a real stdin stream or true process isolation remain subprocess tests. The live
+  E2E suite also remains a separate compiled-binary Bun gate so it continues to provide black-box
+  behavior proof.
+- No coverage exclusions, ignored files, synthetic source imports, or threshold reductions were added.
 
-The repository-wide `100/100/100/100` requirement is not yet met. It remains a release-blocking,
-priority-zero tracked feature; no lower baseline should be described as complete coverage.
+The repository-wide `100/100/100/100` requirement is not yet met. Untested command families and API
+wrapper modules remain visible in the report. The gap remains a release-blocking, priority-zero tracked
+feature; no lower baseline should be described as complete coverage.
 
 ## Help UX Verification
 

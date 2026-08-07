@@ -70,7 +70,13 @@ separately and is not yet satisfied. Until that gate is implemented and green, t
 not be interpreted as permission to publish. Current measurements and runtime limitations are
 recorded in [Jellyfin API Research](api-research.md).
 
-Run `bun run test:coverage:four` to produce the authoritative four-dimension diagnostic report.
+Run `bun run test:coverage:four` to produce the authoritative four-dimension diagnostic report. The
+2026-08-07 report is `59.08%` statements, `67.93%` branches, `63.48%` functions, and `59.38%` lines;
+the command remains diagnostic until all four dimensions reach `100%` and the thresholds can be
+enforced without exclusions. Eligible portable Vitest command integration tests use the production
+CLI program in-process for attributable white-box proof. Bun-native suites and tests that require
+closed stdin or process isolation remain subprocess tests, while the compiled live E2E gate remains
+a separate black-box check.
 
 ## 4) Run live read-only CLI E2E checks
 

@@ -4,22 +4,16 @@ import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { parse as parseYaml } from 'yaml';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const configDir = join(tmpdir(), `jellyfin-cli-notifications-${Date.now()}`);
 let server: Bun.Server | undefined;
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
-  const child = Bun.spawn(['bun', 'run', 'src/cli.ts', ...args], {
-    env: { ...process.env, JELLYFIN_CONFIG_DIR: configDir, JELLYFIN_READ_ONLY: '' },
-    stdout: 'pipe',
-    stderr: 'pipe',
+  return runCliInProcess(args, {
+    JELLYFIN_CONFIG_DIR: configDir,
+    JELLYFIN_READ_ONLY: '',
   });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  return { code, stdout, stderr };
 }
 
 function writeConfig(): void {

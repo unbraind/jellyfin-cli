@@ -4,9 +4,9 @@ import YAML from 'yaml';
 import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-events-test-${Date.now()}`);
-const cliCommand = ['bun', 'run', 'src/cli.ts'];
 const isolatedEnv: Record<string, string> = {
   JELLYFIN_SERVER_URL: '',
   JELLYFIN_API_KEY: '',
@@ -21,21 +21,10 @@ const isolatedEnv: Record<string, string> = {
 let mockServer: Bun.Server<undefined> | undefined;
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
-  const child = Bun.spawn([...cliCommand, ...args], {
-    env: {
-      ...process.env,
-      ...isolatedEnv,
-      JELLYFIN_CONFIG_DIR: testConfigDir,
-    },
-    stdout: 'pipe',
-    stderr: 'pipe',
+  return runCliInProcess(args, {
+    ...isolatedEnv,
+    JELLYFIN_CONFIG_DIR: testConfigDir,
   });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(child.stdout).text(),
-    new Response(child.stderr).text(),
-    child.exited,
-  ]);
-  return { code, stdout, stderr };
 }
 
 function writeSettings(serverUrl = 'http://127.0.0.1:1'): void {

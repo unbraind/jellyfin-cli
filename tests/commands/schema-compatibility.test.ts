@@ -6,32 +6,21 @@ import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { getSchema } from '../../src/commands/schema-defs.js';
 import { validateJsonSchema } from '../../src/utils/schema-validate.js';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-schema-compatibility-${Date.now()}`);
-const cliCommand = ['bun', 'run', 'src/cli.ts'];
 let mockServer: Bun.Server | undefined;
 
 async function runCli(args: string[]): Promise<{ code: number; stdout: string; stderr: string }> {
-  const proc = Bun.spawn([...cliCommand, ...args], {
-    env: {
-      ...process.env,
-      JELLYFIN_CONFIG_DIR: testConfigDir,
-      JELLYFIN_SERVER_URL: '',
-      JELLYFIN_API_KEY: '',
-      JELLYFIN_USERNAME: '',
-      JELLYFIN_PASSWORD: '',
-      JELLYFIN_USER_ID: '',
-      JELLYFIN_READ_ONLY: '1',
-    },
-    stdout: 'pipe',
-    stderr: 'pipe',
+  return runCliInProcess(args, {
+    JELLYFIN_CONFIG_DIR: testConfigDir,
+    JELLYFIN_SERVER_URL: '',
+    JELLYFIN_API_KEY: '',
+    JELLYFIN_USERNAME: '',
+    JELLYFIN_PASSWORD: '',
+    JELLYFIN_USER_ID: '',
+    JELLYFIN_READ_ONLY: '1',
   });
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-    proc.exited,
-  ]);
-  return { code, stdout, stderr };
 }
 
 function writeFixture(

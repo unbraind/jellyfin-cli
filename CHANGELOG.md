@@ -4,6 +4,7 @@
 
 ### Other
 
+- Attribute CLI integration coverage in-process ([jf-5u9v](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-5u9v.toon))
 - Discover current Jellyfin contracts and correct agent API scope ([jf-einj](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-einj.toon))
 
 ## 2026.8.6 - 2026-08-06

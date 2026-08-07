@@ -2,9 +2,9 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
+import { runCliInProcess } from '../utils/run-cli-in-process.js';
 
 const testConfigDir = join(tmpdir(), `jellyfin-cli-setup-env-file-test-${Date.now()}`);
-const cliCommand = ['bun', 'run', 'src/cli.ts'];
 const isolatedJellyfinEnv: Record<string, string> = {
   JELLYFIN_SERVER_URL: '',
   JELLYFIN_API_KEY: '',
@@ -21,24 +21,11 @@ async function runCli(
   args: string[],
   env: Record<string, string | undefined> = {},
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  const proc = Bun.spawn([...cliCommand, ...args], {
-    env: {
-      ...process.env,
-      ...isolatedJellyfinEnv,
-      JELLYFIN_CONFIG_DIR: testConfigDir,
-      ...env,
-    },
-    stdout: 'pipe',
-    stderr: 'pipe',
+  return runCliInProcess(args, {
+    ...isolatedJellyfinEnv,
+    JELLYFIN_CONFIG_DIR: testConfigDir,
+    ...env,
   });
-
-  const [stdout, stderr, code] = await Promise.all([
-    new Response(proc.stdout).text(),
-    new Response(proc.stderr).text(),
-    proc.exited,
-  ]);
-
-  return { code, stdout, stderr };
 }
 
 afterEach(() => {
