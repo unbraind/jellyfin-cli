@@ -186,4 +186,27 @@ describe('schema validate utils', () => {
     expect(validateJsonSchema({ breaking: 2 }, constrained).valid).toBe(true);
     expect(validateJsonSchema({ breaking: 'two' }, constrained).valid).toBe(false);
   });
+
+  it('enforces additional properties for inherited names and object union types', () => {
+    const strictObjectUnion = {
+      type: ['object', 'null'],
+      properties: { known: { type: 'string' } },
+      additionalProperties: false,
+    };
+
+    const inheritedName = validateJsonSchema({ known: 'value', constructor: 'unexpected' }, strictObjectUnion);
+    expect(inheritedName.valid).toBe(false);
+    expect(inheritedName.errors).toContainEqual({
+      path: '$.constructor',
+      message: 'is not an allowed property',
+    });
+
+    const unionExtra = validateJsonSchema({ known: 'value', unexpected: true }, strictObjectUnion);
+    expect(unionExtra.valid).toBe(false);
+    expect(unionExtra.errors).toContainEqual({
+      path: '$.unexpected',
+      message: 'is not an allowed property',
+    });
+    expect(validateJsonSchema(null, strictObjectUnion).valid).toBe(true);
+  });
 });

@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[12]: agents,api,compatibility,coverage,jellyfin-10.11.11,jellyfin-12,openapi,read-only,release,research,toon,typescript
 created_at: "2026-08-06T17:49:39.419Z"
-updated_at: "2026-08-07T05:34:47.727Z"
+updated_at: "2026-08-07T05:54:15.402Z"
 assignee: codex-jellyfin-api-20260807
 claim_principal: codex-jellyfin-api-20260807
 author: codex-jellyfin-api-20260806
@@ -38,7 +38,7 @@ dependencies[11]{id,kind,created_at,author,source_kind,author_source}:
   jf-rjox,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-snok,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
   jf-tike,related,"2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"cli:create:dep",detected
-comments[12]{created_at,author,text}:
+comments[13]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Reviewed complete all-status PM metadata, active comments/notes/learnings, prior API/compatibility/coverage/format plans, official latest releases, live 10.11.11 schema, help, dependencies, and sanitized research output before creation; no duplicate current-version discovery or read-only scope correction item exists."
   "2026-08-06T18:02:37.684Z",codex-jellyfin-api-20260806,"Implementation checkpoint: schema versions and dynamic compatibility aliases are operational; read-only coverage reports the correct 275-tool safe scope instead of comparing 405 total tools to GET/HEAD operations. No Jellyfin mutation was performed and no credentials were written to the repository."
   "2026-08-06T18:13:31.277Z",codex-jellyfin-api-20260806,"Quality checkpoint: release suite, 996-test portable suite, 184-command live read-only suite, dependency audits, Trivy, secret/history scans, current-file zero duplication, PM graph/duplicate/health/storage checks all pass. Repository-wide coverage is 43.76/44.86/54.37/43.51 and legacy jscpd remains red; those pre-existing mandates stay canonical and open as jf-mkzh and jf-lpki."
@@ -51,36 +51,87 @@ comments[12]{created_at,author,text}:
   "2026-08-07T05:16:00.186Z",codex-jellyfin-api-20260807,"Resumed from the documented external gate after verifying all 48 items, 601 history entries, the 48-node/137-edge graph, zero duplicate clusters across all statuses, current PM 2026.8.6, clean worktree, and PR #53 exact branch identity. CodeQL has since completed successfully; this turn will refresh official/live contracts, privacy-safe settings, exact-head tests, review inventory, and remaining protected-branch gates without creating a duplicate item."
   "2026-08-07T05:19:03.277Z",codex-jellyfin-api-20260807,"Latest-tooling refresh: official npm metadata now reports pm-changelog 2026.8.7 while pm-cli remains 2026.8.6. Upgraded the managed package through pm upgrade, verified activation/doctor health, and aligned the release pipeline exact pin. During this PM-native workflow, package manage rejected universal JSON/lean controls despite being read-only diagnostics; exhaustive open/closed issue searches found no duplicate, so upstream pm-cli issue #925 records the sanitized defect and workaround."
   "2026-08-07T05:34:47.380Z",codex-jellyfin-api-20260807,"Live rerun discovery: the original WebSocket acceptance required an ambient KeepAlive within 15 seconds and intermittently failed with a valid duration_reached/event_count=0 result. Two direct probes confirmed server event timing is nondeterministic. Updated the live test to request the official periodic sessions subscription, accept either a bounded duration or count stop, and validate a Sessions record when one arrives; deterministic transport decoding/event delivery remains fully asserted by the synthetic WebSocket integration suite. Focused PM-linked live acceptance now passes without weakening production behavior or generating server mutations."
+  "2026-08-07T05:53:47.253Z",codex-jellyfin-api-20260807,"Exact-head review pass accepted two CodeRabbit findings: the managed-extension file annotation now matches pm-changelog 2026.8.7, and JSON Schema object validation uses own-property checks plus applies strict additionalProperties rules to object union types. Focused schema/formatter regression suite passes 26/26 with typecheck, lint, and diff checks green."
 notes[1]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,"Privacy boundary: credentials, server URL, user/server/media IDs, raw live schemas, and payloads remain in environment variables or owner-only ~/.jellyfin-cli. Git and PM retain only public release facts, contract counts, commands, synthetic fixtures, and aggregate outcomes."
 learnings[2]{created_at,author,text}:
   "2026-08-06T17:49:39.419Z",codex-jellyfin-api-20260806,A 100 percent operation mapping score does not make read-only tool coverage truthful when mutating tools remain in the compared tool population; operation and tool scope must be aligned before graph or agent conclusions.
   "2026-08-07T05:34:47.727Z",codex-jellyfin-api-20260807,"Live WebSocket acceptance must prove authenticated connection, subscription, bounds, privacy, and event shape without assuming ambient/control traffic arrives in a fixed window; deterministic delivery semantics belong in the transport-adapter integration test."
-files[23]{path,scope,note}:
-  .agents/pm/extensions/.managed-extensions.json,project,managed pm-changelog 2026.8.6 metadata
-  .gitattributes,project,latest PM managed-extension merge fence
-  bun.lock,project,TOON dependency lock
-  package-lock.json,project,npm interoperability lock
-  package.json,project,TOON and PM tooling pins
-  scripts/release/utils.mjs,project,release tooling pins
-  src/commands/schema-compatibility.ts,project,dynamic version selector integration
-  src/commands/schema-coverage-command.ts,project,coverage scope projection
-  src/commands/schema-coverage.ts,project,read-only-safe tool scoping
-  src/commands/schema-defs.ts,project,schema registry
-  src/commands/schema-research.ts,project,research scope projection
-  src/commands/schema-versions-def.ts,project,strict output schema
-  src/commands/schema-versions.ts,project,agent-facing version discovery command
-  src/commands/schema.ts,project,command registration
-  src/utils/jellyfin-releases.ts,project,official release discovery and safe version probing
-  src/utils/read-only-guard.ts,project,deny-before-allow safety enforcement
-  src/utils/read-only-policy.ts,project,explicit state-changing command deny policy
-  tests/commands/schema-coverage.test.ts,project,read-only tool scope regression coverage
-  tests/commands/schema.test.ts,project,agent tool safety metadata regression coverage
-  tests/e2e/cli.test.ts,project,live versions acceptance coverage
-  tests/formatters/schema-contract.test.ts,project,TOON schema validation coverage
-  tests/utils/jellyfin-releases.test.ts,project,release discovery privacy and selector unit coverage
-  tests/utils/read-only-guard.test.ts,project,non-verb mutation regression coverage
-tests[9]:
+files[25]:
+  - path: .agents/pm/extensions/.managed-extensions.json
+    scope: project
+    note: managed pm-changelog 2026.8.7 metadata
+  - path: .gitattributes
+    scope: project
+    note: latest PM managed-extension merge fence
+  - path: bun.lock
+    scope: project
+    note: TOON dependency lock
+  - path: package-lock.json
+    scope: project
+    note: npm interoperability lock
+  - path: package.json
+    scope: project
+    note: TOON and PM tooling pins
+  - path: scripts/release/utils.mjs
+    scope: project
+    note: release tooling pins
+  - path: src/commands/schema-compatibility.ts
+    scope: project
+    note: dynamic version selector integration
+  - path: src/commands/schema-coverage-command.ts
+    scope: project
+    note: coverage scope projection
+  - path: src/commands/schema-coverage.ts
+    scope: project
+    note: read-only-safe tool scoping
+  - path: src/commands/schema-defs.ts
+    scope: project
+    note: schema registry
+  - path: src/commands/schema-research.ts
+    scope: project
+    note: research scope projection
+  - path: src/commands/schema-versions-def.ts
+    scope: project
+    note: strict output schema
+  - path: src/commands/schema-versions.ts
+    scope: project
+    note: agent-facing version discovery command
+  - path: src/commands/schema.ts
+    scope: project
+    note: command registration
+  - path: src/utils/jellyfin-releases.ts
+    scope: project
+    note: official release discovery and safe version probing
+  - path: src/utils/read-only-guard.ts
+    scope: project
+    note: deny-before-allow safety enforcement
+  - path: src/utils/read-only-policy.ts
+    scope: project
+    note: explicit state-changing command deny policy
+  - path: src/utils/schema-validate.ts
+    scope: project
+  - path: tests/commands/schema-coverage.test.ts
+    scope: project
+    note: read-only tool scope regression coverage
+  - path: tests/commands/schema.test.ts
+    scope: project
+    note: agent tool safety metadata regression coverage
+  - path: tests/e2e/cli.test.ts
+    scope: project
+    note: live versions acceptance coverage
+  - path: tests/formatters/schema-contract.test.ts
+    scope: project
+    note: TOON schema validation coverage
+  - path: tests/utils/jellyfin-releases.test.ts
+    scope: project
+    note: release discovery privacy and selector unit coverage
+  - path: tests/utils/read-only-guard.test.ts
+    scope: project
+    note: non-verb mutation regression coverage
+  - path: tests/utils/schema-validate.test.ts
+    scope: project
+tests[10]:
   - command: "bun run check:duplicates"
     scope: project
     timeout_seconds: 600
@@ -101,6 +152,8 @@ tests[9]:
     scope: project
     timeout_seconds: 180
     note: read-only runtime and agent metadata safety regression
+  - command: bun test tests/utils/schema-validate.test.ts tests/formatters/schema-contract.test.ts
+    scope: project
   - command: bunx jscpd src/utils/jellyfin-releases.ts src/commands/schema-versions.ts src/commands/schema-versions-def.ts src/utils/read-only-policy.ts src/utils/read-only-guard.ts tests/utils/jellyfin-releases.test.ts tests/utils/read-only-guard.test.ts --threshold 0 --exit-code 1
     scope: project
     timeout_seconds: 120

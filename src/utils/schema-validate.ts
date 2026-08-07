@@ -104,10 +104,12 @@ function validateNode(
 
   const errors: ValidationError[] = [];
 
-  if (schema.type === 'object' && isObjectLike(value)) {
+  const objectTypeAllowed =
+    schema.type === 'object' || (Array.isArray(schema.type) && schema.type.includes('object'));
+  if (objectTypeAllowed && isObjectLike(value)) {
     if (schema.required) {
       for (const key of schema.required) {
-        if (!(key in value)) {
+        if (!Object.prototype.hasOwnProperty.call(value, key)) {
           errors.push({ path: path === '$' ? `$.${key}` : `${path}.${key}`, message: 'is required' });
         }
       }
@@ -115,14 +117,14 @@ function validateNode(
 
     const properties = schema.properties ?? {};
     for (const [key, childSchema] of Object.entries(properties)) {
-      if (!(key in value)) {
+      if (!Object.prototype.hasOwnProperty.call(value, key)) {
         continue;
       }
       const childPath = path === '$' ? `$.${key}` : `${path}.${key}`;
       errors.push(...validateNode(value[key], childSchema, rootSchema, childPath));
     }
     for (const [key, childValue] of Object.entries(value)) {
-      if (key in properties) continue;
+      if (Object.prototype.hasOwnProperty.call(properties, key)) continue;
       const childPath = path === '$' ? `$.${key}` : `${path}.${key}`;
       if (schema.additionalProperties === false) {
         errors.push({ path: childPath, message: 'is not an allowed property' });
