@@ -46,6 +46,47 @@ describe('official Jellyfin release discovery', () => {
     expect(fetcher.mock.calls[0]?.[1]?.headers).not.toHaveProperty('X-Emby-Token');
   });
 
+  it('follows trusted GitHub pagination until a stable release is found', async () => {
+    const secondPageUrl = 'https://api.github.com/repositories/161012019/releases?per_page=100&page=2';
+    const fetcher = vi.fn()
+      .mockResolvedValueOnce(Response.json([RELEASES[0]], {
+        headers: { Link: `<${secondPageUrl}>; rel="next"` },
+      }))
+      .mockResolvedValueOnce(Response.json([RELEASES[1]]));
+
+    const result = await discoverJellyfinReleases(5000, fetcher);
+
+    expect(result.stable.version).toBe('10.11.11');
+    expect(result.preview?.version).toBe('12.0-rc4');
+    expect(fetcher).toHaveBeenCalledTimes(2);
+    expect(fetcher.mock.calls[1]?.[0]).toBe(secondPageUrl);
+    expect(fetcher.mock.calls[1]?.[1]?.headers).not.toHaveProperty('X-Emby-Token');
+  });
+
+  it('rejects cross-origin release pagination links', async () => {
+    const fetcher = vi.fn().mockResolvedValue(Response.json(RELEASES, {
+      headers: { Link: '<https://example.com/releases?page=2>; rel="next"' },
+    }));
+    await expect(discoverJellyfinReleases(5000, fetcher))
+      .rejects.toThrow('unsafe pagination URL');
+  });
+
+  it('bounds release pagination and rejects invalid next links', async () => {
+    const samePageUrl = 'https://api.github.com/repos/jellyfin/jellyfin/releases?page=2';
+    const loopingFetcher = vi.fn().mockImplementation(() => Promise.resolve(Response.json([], {
+      headers: { Link: `<${samePageUrl}>; rel="next"` },
+    })));
+    await expect(discoverJellyfinReleases(5000, loopingFetcher))
+      .rejects.toThrow('exceeded 20 pages');
+    expect(loopingFetcher).toHaveBeenCalledTimes(20);
+
+    const invalidLinkFetcher = vi.fn().mockResolvedValue(Response.json(RELEASES, {
+      headers: { Link: '<not a URL>; rel="next"' },
+    }));
+    await expect(discoverJellyfinReleases(5000, invalidLinkFetcher))
+      .rejects.toThrow('invalid pagination URL');
+  });
+
   it('fails closed for transport and malformed release payloads', async () => {
     await expect(discoverJellyfinReleases(5000, vi.fn().mockResolvedValue(
       new Response('limited', { status: 403 }),

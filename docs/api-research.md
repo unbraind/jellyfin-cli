@@ -25,6 +25,8 @@ matches it, and `12.0-rc4` is the current opt-in preview. `jf schema versions` n
 identities at execution time, validates both exact OpenAPI artifacts without forwarding local
 authentication, and emits ready-to-run compatibility argv. The compatibility command accepts
 `latest-stable` and `latest-preview` selectors so agent workflows do not fossilize an old RC.
+Release discovery follows every trusted GitHub pagination link with one overall timeout, rejects
+cross-origin or malformed next-page targets, and never forwards Jellyfin authentication.
 
 The same research pass corrected scope semantics: full coverage evaluates all `405` leaf tools,
 while read-only coverage evaluates only `250` tools classified safe under the global read-only

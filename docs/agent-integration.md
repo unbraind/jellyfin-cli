@@ -224,7 +224,8 @@ documents stay under `~/.jellyfin-cli/cache/openapi`.
 
 `latest-stable` and `latest-preview` are resolved from Jellyfin's official GitHub releases at
 execution time and then validated against the exact official OpenAPI artifact. This keeps automation
-current without weakening prerelease opt-in.
+current without weakening prerelease opt-in. Discovery follows bounded GitHub pagination and
+rejects next-page links that leave the official API origin and releases path.
 
 ## Exact Operation Execution
 

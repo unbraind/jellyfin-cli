@@ -281,12 +281,11 @@ describe('api command', () => {
     const blockedUnsafeGet = await runCli([
       '--read-only',
       'api',
-      'mutate',
+      'get',
       'Reindex',
-      '--confirm',
     ]);
     expect(blockedUnsafeGet.code).toBe(1);
-    expect(blockedUnsafeGet.stderr).toContain('blocked by read-only mode');
+    expect(blockedUnsafeGet.stderr).toContain('classified as state-changing');
     expect(stateChangingReadCount).toBe(0);
   });
 

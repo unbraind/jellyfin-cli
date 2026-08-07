@@ -1,7 +1,13 @@
 import type { JellyfinConfig } from '../types/index.js';
 import { validateOfficialOpenApiArtifactVersion } from './openapi-source.js';
 
-const RELEASES_URL = 'https://api.github.com/repos/jellyfin/jellyfin/releases?per_page=30';
+const RELEASES_URL = 'https://api.github.com/repos/jellyfin/jellyfin/releases?per_page=100';
+// GitHub canonicalizes Link targets to Jellyfin's immutable repository-ID route.
+const RELEASES_PATHS = new Set([
+  '/repos/jellyfin/jellyfin/releases',
+  '/repositories/161012019/releases',
+]);
+const MAX_RELEASE_PAGES = 20;
 const VERSION_PATTERN = /^v?(\d+\.\d+(?:\.\d+)?(?:-(?:alpha|beta|rc)\d+)?)$/i;
 
 type GitHubRelease = {
@@ -67,22 +73,54 @@ export async function discoverJellyfinReleases(
   timeoutMs = 30000,
   fetcher: typeof fetch = fetch,
 ): Promise<JellyfinReleaseChannels> {
-  const response = await fetcher(RELEASES_URL, {
-    headers: {
-      Accept: 'application/vnd.github+json',
-      'User-Agent': 'jellyfin-cli',
-      'X-GitHub-Api-Version': '2022-11-28',
-    },
-    signal: AbortSignal.timeout(Math.max(5000, Math.min(60000, timeoutMs))),
-  });
-  if (!response.ok) {
-    throw new Error(`Official Jellyfin release discovery failed: HTTP ${response.status}`);
+  const releases: JellyfinRelease[] = [];
+  const signal = AbortSignal.timeout(Math.max(5000, Math.min(60000, timeoutMs)));
+  let pageUrl: string | undefined = RELEASES_URL;
+  let pageCount = 0;
+
+  while (pageUrl) {
+    pageCount += 1;
+    if (pageCount > MAX_RELEASE_PAGES) {
+      throw new Error(`Official Jellyfin release discovery exceeded ${MAX_RELEASE_PAGES} pages`);
+    }
+    const response = await fetcher(pageUrl, {
+      headers: {
+        Accept: 'application/vnd.github+json',
+        'User-Agent': 'jellyfin-cli',
+        'X-GitHub-Api-Version': '2022-11-28',
+      },
+      signal,
+    });
+    if (!response.ok) {
+      throw new Error(`Official Jellyfin release discovery failed: HTTP ${response.status}`);
+    }
+    const payload: unknown = await response.json();
+    if (!Array.isArray(payload)) {
+      throw new Error('Official Jellyfin release discovery returned an invalid payload');
+    }
+    releases.push(...payload.map(parseRelease)
+      .filter((value): value is JellyfinRelease => Boolean(value)));
+
+    const nextLink = response.headers.get('link')
+      ?.split(',')
+      .map((value) => /^\s*<([^>]+)>;\s*rel="([^"]+)"\s*$/.exec(value))
+      .find((match) => match?.[2]?.split(/\s+/).includes('next'))?.[1];
+    if (!nextLink) {
+      pageUrl = undefined;
+      continue;
+    }
+    let nextUrl: URL;
+    try {
+      nextUrl = new URL(nextLink);
+    } catch {
+      throw new Error('Official Jellyfin release discovery returned an invalid pagination URL');
+    }
+    if (nextUrl.origin !== 'https://api.github.com' || !RELEASES_PATHS.has(nextUrl.pathname)) {
+      throw new Error('Official Jellyfin release discovery returned an unsafe pagination URL');
+    }
+    pageUrl = nextUrl.toString();
   }
-  const payload: unknown = await response.json();
-  if (!Array.isArray(payload)) {
-    throw new Error('Official Jellyfin release discovery returned an invalid payload');
-  }
-  const releases = payload.map(parseRelease).filter((value): value is JellyfinRelease => Boolean(value));
+
   const stable = releases.find((release) => !release.prerelease);
   if (!stable) throw new Error('Official Jellyfin release discovery found no stable release');
   return { stable, preview: releases.find((release) => release.prerelease) ?? null };
