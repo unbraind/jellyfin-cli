@@ -712,6 +712,13 @@ describe('schema tools command', () => {
     expect(result.stdout).toContain('read_only_safe: false');
   });
 
+  it('marks explicit mutating command exceptions as not read-only-safe', async () => {
+    const result = await runCli(['schema', 'tools', '--command', 'sessions logout', '--limit', '5']);
+    expect(result.code).toBe(0);
+    expect(result.stdout).toContain('command: jf sessions logout');
+    expect(result.stdout).toContain('read_only_safe: false');
+  });
+
   it('matches command prefixes on complete path segments', async () => {
     const result = await runCli(['schema', 'tools', '--command', 'api', '--limit', '10']);
     expect(result.code).toBe(0);

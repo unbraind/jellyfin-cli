@@ -42,7 +42,7 @@ export function attachSchemaSuggestSubcommand(cmd: Command): void {
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
-    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--read-only-ops', 'Filter to semantically read-only safe operations')
     .option('--min-score <number>', 'Minimum operation intent score used by gap mapping mode', '3')
     .option('--limit <number>', 'Suggestion list limit', '20')
     .action(async function (this: Command, options: SuggestActionOptions) {

@@ -162,7 +162,7 @@ export function prepareApiBatch(
     const operation = resolveApiOperation(document, request.operationId);
     if (!operation.readOnlySafe) {
       throw new Error(
-        `Batch request ${request.id} uses ${operation.method}; only GET, HEAD, and OPTIONS are allowed`,
+        `Batch request ${request.id} is classified state-changing (${operation.method} ${operation.pathTemplate})`,
       );
     }
     return {

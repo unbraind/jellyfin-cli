@@ -141,6 +141,7 @@ jf config doctor --validate-formats --require-connected --require-auth --require
 jf schema openapi --include-paths --method GET --for-command "items list" --limit 25
 jf schema openapi --endpoint /api-docs/openapi.json --read-only-ops --limit 25
 jf schema research --include-unmatched --require-coverage 100 --limit 20
+jf schema versions --format json
 jf schema tools --command system --limit 10
 jf schema coverage --method GET --command-prefix system --min-score 3 --require-coverage 100 --limit 20
 jf schema suggest --for-command "users list" --limit 10
@@ -158,6 +159,10 @@ repository.
 For full-scope coverage, require `unmatched_tools_total: 0` independently from operation coverage.
 Do not count `local_only_tools` or `non_endpoint_tools` as missing REST work; the latter carries an
 explicit OpenAPI orchestration, WebSocket, or optional-plugin reason.
+
+The `read_only_scope` tool population must contain only `read_only_safe: true` entries. The
+classification combines HTTP semantics with exact exceptions for plugin `GET` routes that mutate
+server state, so generic API execution cannot bypass the global read-only policy.
 
 ```bash
 jf schema research --include-unmatched --require-coverage 100 --format json \

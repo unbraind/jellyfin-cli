@@ -56,6 +56,16 @@ describe('read-only guard', () => {
     expect(isCommandBlockedInReadOnly('videos merge-versions')).toBe(true);
   });
 
+  it('blocks mutating commands whose names do not contain policy verbs', () => {
+    expect(isCommandBlockedInReadOnly('sessions general-command')).toBe(true);
+    expect(isCommandBlockedInReadOnly('sessions logout')).toBe(true);
+    expect(isCommandBlockedInReadOnly('live-streams open')).toBe(true);
+    expect(isCommandBlockedInReadOnly('playlists share')).toBe(true);
+    expect(isCommandBlockedInReadOnly('plugins-ext telegram test')).toBe(true);
+    expect(isCommandBlockedInReadOnly('syncplay ready')).toBe(true);
+    expect(isCommandBlockedInReadOnly('users forgot-password')).toBe(true);
+  });
+
   it('returns false for empty command paths', () => {
     expect(isCommandBlockedInReadOnly('')).toBe(false);
   });

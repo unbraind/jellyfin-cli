@@ -2,10 +2,10 @@ import { Command } from 'commander';
 import { formatOutput } from '../formatters/index.js';
 import { getConfig } from '../utils/config.js';
 import { compareOpenApiDocuments } from '../utils/openapi-compatibility.js';
+import { resolveJellyfinVersionSelector } from '../utils/jellyfin-releases.js';
 import {
   fetchOfficialOpenApiDocument,
   fetchOpenApiDocumentWithOptions,
-  validateOfficialOpenApiArtifactVersion,
 } from '../utils/openapi-source.js';
 import { parsePositiveInteger, resolveOutputFormat, type FormatOptions } from './schema-utils.js';
 
@@ -32,7 +32,7 @@ export function attachSchemaCompatibilitySubcommand(cmd: Command): void {
     .option('--name <name>', 'Server name')
     .option('--endpoint <path>', 'Preferred live OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--baseline <source>', 'Baseline contract: official or live', 'official')
-    .option('--target-version <version>', 'Exact official target artifact (defaults to live API version)')
+    .option('--target-version <version>', 'Exact artifact or latest-stable/latest-preview (defaults to live API version)')
     .option('--allow-prerelease', 'Allow an explicitly named alpha, beta, or RC target artifact')
     .option('--fail-on-breaking', 'Exit nonzero after output when breaking compatibility changes exist')
     .option('--limit <number>', 'Maximum detailed changes to include', '50')
@@ -46,12 +46,13 @@ export function attachSchemaCompatibilitySubcommand(cmd: Command): void {
       }
 
       try {
-        if (options.targetVersion !== undefined) {
-          validateOfficialOpenApiArtifactVersion(
+        const requestedTargetVersion = options.targetVersion
+          ? await resolveJellyfinVersionSelector(
+            config,
             options.targetVersion,
             options.allowPrerelease,
-          );
-        }
+          )
+          : undefined;
         const baseline = await fetchOpenApiDocumentWithOptions(config, {
           endpointPath: options.endpoint,
         });
@@ -63,7 +64,7 @@ export function attachSchemaCompatibilitySubcommand(cmd: Command): void {
         const baselineResult = options.baseline === 'live'
           ? baseline
           : await fetchOfficialOpenApiDocument(config, liveApiVersion);
-        const targetArtifactVersion = options.targetVersion ?? liveApiVersion;
+        const targetArtifactVersion = requestedTargetVersion ?? liveApiVersion;
         if (!targetArtifactVersion) throw new Error('Live OpenAPI document does not declare an API version');
         const target = await fetchOfficialOpenApiDocument(config, targetArtifactVersion, {
           allowPrerelease: options.allowPrerelease,

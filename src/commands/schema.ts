@@ -16,6 +16,7 @@ import { attachSchemaResearchSubcommand } from './schema-research.js';
 import { attachSchemaCoverageSubcommand } from './schema-coverage-command.js';
 import { attachSchemaSuggestSubcommand } from './schema-suggest.js';
 import { attachSchemaCompatibilitySubcommand } from './schema-compatibility.js';
+import { attachSchemaVersionsSubcommand } from './schema-versions.js';
 
 /**
  * Builds the schema command tree with validated options and actions.
@@ -45,6 +46,7 @@ export function createSchemaCommand(): Command {
   attachSchemaCoverageSubcommand(cmd);
   attachSchemaSuggestSubcommand(cmd);
   attachSchemaCompatibilitySubcommand(cmd);
+  attachSchemaVersionsSubcommand(cmd);
 
   cmd
     .command('list')
@@ -64,7 +66,7 @@ export function createSchemaCommand(): Command {
     .option('--path-prefix <prefix>', 'Filter operations by path prefix')
     .option('--tag <tag>', 'Filter operations by exact tag')
     .option('--search <text>', 'Filter operations by path/summary/operationId/tags text')
-    .option('--read-only-ops', 'Filter to read-only safe operations (GET/HEAD/OPTIONS)')
+    .option('--read-only-ops', 'Filter to semantically read-only safe operations')
     .option('--endpoint <path>', 'Preferred OpenAPI path (e.g. /api-docs/openapi.json)')
     .option('--for-command <path>', 'Infer likely operations for a CLI command path')
     .option('--limit <number>', 'Path operation list limit', '50')

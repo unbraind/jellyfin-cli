@@ -42,7 +42,7 @@
     "smoke:npx": "sh -c 'PKG=\"$(npm pack --silent)\" && npm exec --yes --package \"./$PKG\" jf -- --version && rm -f \"$PKG\"'",
     "smoke:bunx": "node scripts/smoke-bunx.mjs",
     "changelog:pm:install": "node scripts/release/ensure-pm-changelog.mjs",
-    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.8.5 -- pm --pm-path .agents/pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
+    "changelog:pm": "bun run changelog:pm:install && npm exec --yes --package @unbrained/pm-cli@2026.8.6 -- pm --pm-path .agents/pm changelog generate --output CHANGELOG.md --title Changelog --mode replace --all-release-tags --status closed --item-url-base https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm",
     "changelog:pm:check": "node scripts/release/check-changelog.mjs",
     "test:release": "node --test scripts/release/release.test.mjs",
     "release:notes": "node scripts/release/generate-release-notes.mjs",
@@ -73,7 +73,7 @@
     "node": ">=22.13.0"
   },
   "dependencies": {
-    "@toon-format/toon": "4.0.0",
+    "@toon-format/toon": "4.1.1",
     "chalk": "^5.6.2",
     "commander": "^15.0.0",
     "yaml": "^2.9.0"

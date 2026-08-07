@@ -176,6 +176,7 @@ The local server is the primary contract source:
 
 ```bash
 jf schema openapi --include-paths --limit 50 --format json
+jf schema versions --format json
 jf schema research --include-unmatched --limit 100 --format json
 jf schema coverage --read-only-ops --include-unmatched --limit 100 --format json
 ```
@@ -199,11 +200,13 @@ implementation tasks from the latter two lists.
 
 ## Version Compatibility
 
-Before an upgrade, compare the configured server's official core version with the candidate:
+Before an upgrade, discover and compare the configured server's official core version with the
+current candidate:
 
 ```bash
+jf schema versions --format toon
 jf schema compatibility \
-  --target-version 12.0-rc3 \
+  --target-version latest-preview \
   --allow-prerelease \
   --fail-on-breaking \
   --format toon
@@ -213,11 +216,16 @@ The default baseline is the exact official artifact matching the live server's d
 This keeps plugin-provided operations out of core upgrade findings. Use `--baseline live` only when
 you intentionally want a server/plugin drift audit.
 
-The report separates artifact identity (for example, `12.0-rc3`) from the OpenAPI document version
+The report separates artifact identity (for example, `12.0-rc4`) from the OpenAPI document version
 (`12.0.0`) and classifies removed operations, operation ID changes, parameter requiredness and
 schema changes, request content types, response statuses, and component schemas. Prerelease
 artifacts require explicit opt-in. Official downloads never receive server credentials, and cached
 documents stay under `~/.jellyfin-cli/cache/openapi`.
+
+`latest-stable` and `latest-preview` are resolved from Jellyfin's official GitHub releases at
+execution time and then validated against the exact official OpenAPI artifact. This keeps automation
+current without weakening prerelease opt-in. Discovery follows bounded GitHub pagination and
+rejects next-page links that leave the official API origin and releases path.
 
 ## Exact Operation Execution
 
@@ -232,6 +240,11 @@ jf api get GetUserById --path-param userId=USER_ID --format toon
 The CLI rejects unknown operation IDs, undeclared query/path parameters, missing required inputs,
 unsupported request content types, and oversized responses. Binary responses are base64-encoded
 inside the normal structured envelope.
+
+Safety is semantic rather than method-only. Some optional plugins publish maintenance, backup,
+user-management, or notifier actions as `GET`; `api inspect` classifies those exact contracts as
+`read_only_safe: false`, `api get` and `api batch` reject them before execution, and only
+`api mutate ... --confirm` can select them. Global read-only mode still blocks that mutation path.
 
 The inspection response is the canonical request-construction contract for agents. It includes
 merged path- and operation-level parameters, bounded recursive schema metadata, declared request
@@ -255,10 +268,10 @@ printf '%s' '{
 }' | jf api batch --stdin --dry-run --format toon
 ```
 
-Remove `--dry-run` after inspecting the resolved plan. Batches accept only read-only HTTP methods,
-preserve input order and caller IDs, reuse one authenticated client, and enforce request-count,
-per-response, and aggregate byte ceilings. One invalid manifest entry prevents every network
-operation. Runtime HTTP failures are returned per request and make the process exit nonzero.
+Remove `--dry-run` after inspecting the resolved plan. Batches accept only semantically read-only
+operations, preserve input order and caller IDs, reuse one authenticated client, and enforce
+request-count, per-response, and aggregate byte ceilings. One invalid manifest entry prevents every
+network operation. Runtime HTTP failures are returned per request and make the process exit nonzero.
 
 Mutations are intentionally separate:
 

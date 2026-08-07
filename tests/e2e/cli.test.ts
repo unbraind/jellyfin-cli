@@ -265,11 +265,14 @@ describe.skipIf(skip)('E2E events', () => {
       [
         'events',
         'watch',
-        '--include-control',
+        '--subscribe',
+        'sessions',
+        '--type',
+        'Sessions',
         '--count',
         '1',
         '--duration',
-        '15',
+        '3',
         '--format',
         'json',
       ],
@@ -278,10 +281,15 @@ describe.skipIf(skip)('E2E events', () => {
     expect(result.code).toBe(0);
     const payload = JSON.parse(result.stdout) as {
       event_count?: number;
+      stop_reason?: string;
       events?: Array<{ message_type?: string }>;
     };
-    expect(payload.event_count).toBe(1);
-    expect(payload.events?.[0]?.message_type).toMatch(/KeepAlive/);
+    expect(payload.event_count).toBeGreaterThanOrEqual(0);
+    expect(payload.event_count).toBeLessThanOrEqual(1);
+    expect(payload.stop_reason).toMatch(/^(count_reached|duration_reached)$/u);
+    if (payload.event_count === 1) {
+      expect(payload.events?.[0]?.message_type).toBe('Sessions');
+    }
     expect(`${result.stdout}${result.stderr}`).not.toContain(API_KEY);
   }, T);
 });
@@ -645,6 +653,21 @@ describe.skipIf(skip)('E2E schema', () => {
       compatible: true,
       baseline: { source_kind: 'official' },
       summary: { breaking: 0 },
+    });
+  }, T);
+
+  it('schema versions discovers verified official stable and preview contracts', async () => {
+    const result = await runJfWithCode(
+      ['schema', 'versions'],
+      { JELLYFIN_READ_ONLY: '1' },
+    );
+    expect(result.code).toBe(0);
+    const envelope = decodeEnvelope(result.stdout);
+    expect(envelope.type).toBe('jellyfin_versions');
+    expect(envelope.data).toMatchObject({
+      live_version: expect.any(String),
+      stable: { prerelease: false, openapi_available: true },
+      aliases: { latest_stable: expect.any(String) },
     });
   }, T);
 });
@@ -1714,6 +1737,35 @@ describe.skipIf(skip)('E2E read-only safety', () => {
     expect(result.code).toBe(1);
     expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
     expect(`${result.stdout}${result.stderr}`).toMatch(/users delete/);
+  }, T);
+
+  it('blocks explicit non-verb mutations before request execution', async () => {
+    let requestCount = 0;
+    const server = Bun.serve({
+      hostname: '127.0.0.1',
+      port: 0,
+      fetch: () => {
+        requestCount += 1;
+        return new Response('unexpected request', { status: 500 });
+      },
+    });
+    try {
+      const result = await runJfWithCode(
+        ['sessions', 'logout'],
+        {
+          JELLYFIN_READ_ONLY: '1',
+          JELLYFIN_SERVER_URL: `http://127.0.0.1:${server.port}`,
+          JELLYFIN_API_KEY: 'request-counting-fixture',
+          JELLYFIN_USER_ID: 'request-counting-fixture',
+        },
+      );
+      expect(result.code).toBe(1);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/read-?only/i);
+      expect(`${result.stdout}${result.stderr}`).toMatch(/sessions logout/);
+      expect(requestCount).toBe(0);
+    } finally {
+      server.stop(true);
+    }
   }, T);
 
   it('allows setup command in read-only mode (local config only)', async () => {

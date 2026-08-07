@@ -1,4 +1,5 @@
 import type { OpenApiDocument } from './openapi-source.js';
+import { isOpenApiOperationReadOnlySafe } from './openapi-safety.js';
 
 const HTTP_METHODS = new Set([
   'get',
@@ -140,7 +141,7 @@ export function resolveApiOperation(
           ? operation.tags.filter((tag): tag is string => typeof tag === 'string')
           : [],
         deprecated: operation.deprecated === true,
-        readOnlySafe: method === 'GET' || method === 'HEAD' || method === 'OPTIONS',
+        readOnlySafe: isOpenApiOperationReadOnlySafe(method, pathTemplate),
         parameters: resolveApiOperationParameters(
           (pathItem as Record<string, unknown>).parameters,
           operation.parameters,

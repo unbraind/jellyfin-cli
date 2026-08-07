@@ -59,6 +59,9 @@ export const apiOperationDocument = {
     '/Binary': {
       get: { operationId: 'GetBinary', tags: ['Image'] },
     },
+    '/meilisearch/reindex': {
+      get: { operationId: 'Reindex', tags: ['Meilisearch'] },
+    },
     '/Audio/{itemId}/Lyrics': {
       post: {
         operationId: 'UploadLyrics',
