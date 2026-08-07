@@ -61,6 +61,39 @@ describe('OpenAPI coverage tool classification', () => {
         reason: 'openapi_orchestration',
       },
     ]);
+    expect(result.versionUnavailableTools).toEqual([]);
+  });
+
+  it('distinguishes a version-gated endpoint from unexplained mapping gaps', () => {
+    const unavailable = mapOpenApiCoverageToTools([], [tool('jf items collections')], 3);
+
+    expect(unavailable.unmatchedTools).toEqual([]);
+    expect(unavailable.versionUnavailableTools).toEqual([{
+      command: 'jf items collections',
+      read_only_safe: true,
+      reason: 'server_version_unavailable',
+      required_method: 'GET',
+      required_path: '/Items/{itemId}/Collections',
+    }]);
+
+    const collectionOperation: OpenApiOperationEntry = {
+      method: 'GET',
+      path: '/Items/{itemId}/Collections',
+      operationId: 'GetItemCollections',
+      summary: 'Gets collections containing an item',
+      tags: ['Collection'],
+      deprecated: false,
+      readOnlySafe: true,
+    };
+    const available = mapOpenApiCoverageToTools(
+      [collectionOperation],
+      [tool('jf items collections')],
+      100,
+    );
+
+    expect(available.mappedToolCount).toBe(1);
+    expect(available.mappedOperationKeys).toEqual(new Set(['GET /Items/{itemId}/Collections']));
+    expect(available.versionUnavailableTools).toEqual([]);
   });
 
   it('aligns a read-only operation scope with read-only-safe tools', () => {

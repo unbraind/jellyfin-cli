@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
+import { parseNonNegativeInt, parsePositiveInt } from './number-options.js';
 
 /**
  * Builds the persons command tree with validated options and actions.
@@ -14,19 +15,24 @@ export function createPersonsCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--parent <id>', 'Parent library ID')
     .option('--limit <number>', 'Maximum results', '100')
-    .option('--search <term>', 'Search by name')
+    .option('--offset <number>', 'Start index', '0')
+    .option('--search <term>', 'Search by name on the server')
+    .option('--name-starts-with <value>', 'Filter names by prefix (Jellyfin 12+)')
+    .option('--name-less-than <value>', 'Filter names before this value (Jellyfin 12+)')
+    .option('--name-starts-with-or-greater <value>', 'Filter names at or after this prefix (Jellyfin 12+)')
     .action(async (options) => {
       const { client, format, formatter } = await createApiClient(options);
       try {
         const result = await client.getPersons({
           parentId: options.parent,
-          limit: parseInt(options.limit, 10),
+          limit: parsePositiveInt(options.limit, 'Limit'),
+          startIndex: parseNonNegativeInt(options.offset, 'Offset'),
+          searchTerm: options.search,
+          nameStartsWith: options.nameStartsWith,
+          nameLessThan: options.nameLessThan,
+          nameStartsWithOrGreater: options.nameStartsWithOrGreater,
         });
-        const items = result.Items ?? [];
-        const filtered = options.search
-          ? items.filter((p) => p.Name?.toLowerCase().includes(options.search.toLowerCase()))
-          : items;
-        console.log(formatter.formatItems(filtered));
+        console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }
     });
 

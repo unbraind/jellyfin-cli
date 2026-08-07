@@ -10,6 +10,7 @@ import {
 } from './utils.js';
 import type { ItemsQueryParams } from '../types/index.js';
 import { addMetadataCommands } from './items-metadata.js';
+import { addItemCollectionsCommand } from './items-collections.js';
 import { parseNonNegativeInt, parsePositiveInt } from './number-options.js';
 
 /**
@@ -25,6 +26,8 @@ export function createItemsCommand(): Command {
     .option('--types <types>', 'Item types (comma-separated)')
     .option('--genres <genres>', 'Genres (comma-separated)')
     .option('--years <years>', 'Years (comma-separated)')
+    .option('--audio-languages <codes>', 'Audio languages (comma-separated; Jellyfin 12+)')
+    .option('--subtitle-languages <codes>', 'Subtitle languages (comma-separated; Jellyfin 12+)')
     .option('--search <term>', 'Search term')
     .option('--limit <number>', 'Limit', '50')
     .option('--offset <number>', 'Offset', '0')
@@ -44,6 +47,8 @@ export function createItemsCommand(): Command {
           includeItemTypes: options.types?.split(','),
           genres: options.genres?.split(','),
           years: options.years?.split(',').map((y: string) => parseInt(y, 10)),
+          audioLanguages: options.audioLanguages?.split(','),
+          subtitleLanguages: options.subtitleLanguages?.split(','),
           searchTerm: options.search,
           limit,
           startIndex: offset,
@@ -314,6 +319,7 @@ export function createItemsCommand(): Command {
     });
 
   addMetadataCommands(cmd);
+  addItemCollectionsCommand(cmd);
 
   return cmd;
 }

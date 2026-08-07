@@ -1,6 +1,7 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
 import { formatMessage, formatSystemInfo, formatToon } from './utils.js';
+import { addSystemActivityCommand } from './system-activity.js';
 
 /**
  * Builds the system command tree with validated options and actions.
@@ -162,26 +163,7 @@ export function createSystemCommand(): Command {
       } catch (err) { handleError(err, format); }
     });
 
-  cmd
-    .command('activity')
-    .description('Get activity log')
-    .option('-f, --format <format>', 'Output format')
-    .option('--limit <number>', 'Number of entries', '50')
-    .option('--start <number>', 'Start index', '0')
-    .option('--min-date <date>', 'Minimum date (ISO format)')
-    .option('--has-user', 'Only show entries with user ID')
-    .action(async (options) => {
-      const { client, format } = await createApiClient(options);
-      try {
-        const result = await client.getActivityLog({
-          limit: parseInt(options.limit, 10),
-          startIndex: parseInt(options.start, 10),
-          minDate: options.minDate,
-          hasUserId: options.hasUser,
-        });
-        console.log(formatToon(result.Items ?? [], format, 'activity_log'));
-      } catch (err) { handleError(err, format); }
-    });
+  addSystemActivityCommand(cmd);
 
   cmd
     .command('time')

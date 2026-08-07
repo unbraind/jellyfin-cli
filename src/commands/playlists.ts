@@ -1,5 +1,6 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
+import { parseNonNegativeInt } from './number-options.js';
 
 /**
  * Builds the playlists command tree with validated options and actions.
@@ -49,10 +50,14 @@ export function createPlaylistsCommand(): Command {
     .command('add <playlistId> <itemIds...>')
     .description('Add items to a playlist')
     .option('-f, --format <format>', 'Output format')
+    .option('--position <index>', 'Insert at a zero-based position (Jellyfin 12+)')
     .action(async (playlistId, itemIds, options) => {
       const { client, format, formatter } = await createApiClient(options);
       try {
-        await client.addToPlaylist(playlistId, itemIds);
+        const position = options.position === undefined
+          ? undefined
+          : parseNonNegativeInt(options.position, 'Position');
+        await client.addToPlaylist(playlistId, itemIds, undefined, position);
         console.log(formatter.formatMessage('Items added to playlist'));
       } catch (err) {
         handleError(err, format);

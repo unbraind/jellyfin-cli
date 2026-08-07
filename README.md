@@ -295,6 +295,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 
 - `jf items list` - List items
 - `jf items get <itemId>` - Get item by ID
+- `jf items collections <itemId>` - List collections containing an item (Jellyfin 12+)
 - `jf items latest` - Get latest items
 - `jf items resume` - Get resume items
 - `jf items search <term>` - Search for items
@@ -382,7 +383,7 @@ Mutating operations are blocked with a structured Toon error while read operatio
 ### Playlists
 
 - `jf playlists create <name>` - Create a playlist
-- `jf playlists add <playlistId> <itemIds...>` - Add items
+- `jf playlists add <playlistId> <itemIds...> [--position <index>]` - Add or position items
 - `jf playlists remove <playlistId> <entryIds...>` - Remove items
 - `jf playlists items <playlistId>` - List playlist items
 - `jf playlists delete <playlistId>` - Delete a playlist

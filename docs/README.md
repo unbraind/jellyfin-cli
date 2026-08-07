@@ -337,6 +337,7 @@ Notes:
 | `jf items list` | List items with filters |
 | `jf items search <term>` | Search for items |
 | `jf items get <itemId>` | Get item details |
+| `jf items collections <itemId>` | List collections containing an item (Jellyfin 12+) |
 | `jf items root` | Get root virtual folder |
 | `jf items critic-reviews <itemId>` | Get critic reviews |
 | `jf items download-url <itemId>` | Get download URL |

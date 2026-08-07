@@ -1,5 +1,12 @@
 import { Command } from 'commander';
 import { createApiClient, handleError } from './utils.js';
+import { parseNonNegativeInt, parsePositiveInt } from './number-options.js';
+import {
+  ITEM_SORT_FIELDS,
+  SORT_ORDERS,
+  type ItemSortField,
+  type SortOrder,
+} from '../types/index.js';
 
 /**
  * Builds the trailers command tree with validated options and actions.
@@ -12,15 +19,28 @@ export function createTrailersCommand(): Command {
     .option('-f, --format <format>', 'Output format')
     .option('--limit <number>', 'Maximum results', '50')
     .option('--offset <number>', 'Start index', '0')
-    .option('--sort <field>', 'Sort field (e.g. SortName, DateCreated, CommunityRating)')
-    .option('--order <dir>', 'Sort order (Ascending, Descending)')
+    .option('--sort <fields>', 'ItemSortBy fields (comma-separated)')
+    .option('--order <directions>', 'Ascending or Descending (comma-separated)')
+    .option('--audio-languages <codes>', 'Audio languages (comma-separated; Jellyfin 12+)')
+    .option('--subtitle-languages <codes>', 'Subtitle languages (comma-separated; Jellyfin 12+)')
     .action(async (options) => {
       const { client, format, formatter } = await createApiClient(options);
       try {
+        const sortBy = options.sort?.split(',') as ItemSortField[] | undefined;
+        const sortOrder = options.order?.split(',') as SortOrder[] | undefined;
+        if (sortBy?.some((field) => !ITEM_SORT_FIELDS.includes(field))) {
+          throw new Error(`Invalid trailer sort field '${options.sort}'`);
+        }
+        if (sortOrder?.some((order) => !SORT_ORDERS.includes(order))) {
+          throw new Error(`Invalid sort order '${options.order}'`);
+        }
         const result = await client.getTrailers({
-          limit: parseInt(options.limit, 10),
-          startIndex: parseInt(options.offset, 10),
-          sortBy: options.sort,
+          limit: parsePositiveInt(options.limit, 'Limit'),
+          startIndex: parseNonNegativeInt(options.offset, 'Offset'),
+          sortBy,
+          sortOrder,
+          audioLanguages: options.audioLanguages?.split(','),
+          subtitleLanguages: options.subtitleLanguages?.split(','),
         });
         console.log(formatter.formatItems(result.Items ?? []));
       } catch (err) { handleError(err, format); }

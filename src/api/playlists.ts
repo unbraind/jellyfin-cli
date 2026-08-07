@@ -34,9 +34,14 @@ export class PlaylistsApi extends ApiClientBase {
    * @param playlistId - The playlist id value required by this operation.
    * @param ids - The ids value required by this operation.
    * @param userId - The stable Jellyfin user identifier.
+   * @param position - Optional insertion index supported by Jellyfin 12.
    */
-  async addToPlaylist(playlistId: string, ids: string[], userId?: string): Promise<void> {
-    await this.request<void>('POST', `/Playlists/${playlistId}/Items`, { ids: ids.join(','), userId: userId ?? this.userId });
+  async addToPlaylist(playlistId: string, ids: string[], userId?: string, position?: number): Promise<void> {
+    await this.request<void>('POST', `/Playlists/${playlistId}/Items`, {
+      ids,
+      userId: userId ?? this.userId,
+      position,
+    });
   }
 
   /**

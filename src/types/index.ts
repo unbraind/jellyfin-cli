@@ -14,6 +14,22 @@ export type { LibraryVirtualFolder, LibraryOptions, AllowEmbeddedSubtitles, Medi
 export type { ScheduledTaskInfo, TaskState, TaskResult, TaskCompletionStatus, TaskTriggerInfo, DayOfWeek } from './tasks.js';
 export type { PlaybackProgressInfo, PlayMethod, PlaybackStopInfo } from './playback.js';
 export type { SearchHint, SearchResult, QueryResult, ItemsQueryParams, ApiError } from './common.js';
+export type {
+  ActivityLogQueryParams,
+  ActivityLogSeverity,
+  ActivityLogSortField,
+  ItemCollectionsQueryParams,
+  ItemSortField,
+  PersonsQueryParams,
+  SortOrder,
+  TrailersQueryParams,
+} from './api-queries.js';
+export {
+  ACTIVITY_LOG_SEVERITIES,
+  ACTIVITY_LOG_SORT_FIELDS,
+  ITEM_SORT_FIELDS,
+  SORT_ORDERS,
+} from './api-queries.js';
 export type { LiveTvInfo, LiveTvServiceInfo, PlaylistCreationResult, RecommendationDto, RecommendationType, SimilarItemResult } from './media.js';
 
 export type { PluginInfo, PluginStatus, PluginStatusInfo, RepositoryInfo, PluginInstallationCancelled } from './plugins.js';

@@ -71,7 +71,7 @@ not be interpreted as permission to publish. Current measurements and runtime li
 recorded in [Jellyfin API Research](api-research.md).
 
 Run `bun run test:coverage:four` to produce the authoritative four-dimension diagnostic report. The
-2026-08-07 report is `59.08%` statements, `67.93%` branches, `63.48%` functions, and `59.38%` lines;
+2026-08-07 report is `59.61%` statements, `68.12%` branches, `63.85%` functions, and `59.94%` lines;
 the command remains diagnostic until all four dimensions reach `100%` and the thresholds can be
 enforced without exclusions. Eligible portable Vitest command integration tests use the production
 CLI program in-process for attributable white-box proof. Bun-native suites and tests that require
@@ -125,6 +125,16 @@ jf-cli --format yaml system info \
 
 These commands are read-only and verify that key output formats remain machine-parseable.
 The `--help` checks above ensure global flags are discoverable from every command surface.
+
+Jellyfin 12 preview-only request controls are exercised against an isolated synthetic server, not
+the owner's stable media server:
+
+```bash
+bun test tests/api/jellyfin-12-preview.test.ts tests/commands/jellyfin-12-preview.test.ts
+```
+
+This gate verifies canonical item routes, `GetItemCollections`, item/trailer language filters,
+person and activity filters, and playlist insertion position without modifying live data.
 
 The automated output-contract suite additionally exercises every bound command formatter method in
 all six formats and statically rejects direct TOON imports/calls from command handlers:

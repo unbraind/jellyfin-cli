@@ -34,6 +34,8 @@ type CoverageSnapshot = {
   local_only_tools_truncated: boolean;
   non_endpoint_tools_total: number;
   non_endpoint_tools_truncated: boolean;
+  version_unavailable_tools_total: number;
+  version_unavailable_tools_truncated: boolean;
   unmatched_by_tag_total: number;
   unmatched_by_tag: Array<{ tag: string; operations: number; sample_paths: string[] }>;
   unmatched_tools?: Array<{
@@ -50,6 +52,13 @@ type CoverageSnapshot = {
     command: string;
     read_only_safe: boolean;
     reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
+  }>;
+  version_unavailable_tools?: Array<{
+    command: string;
+    read_only_safe: boolean;
+    reason: 'server_version_unavailable';
+    required_method: string;
+    required_path: string;
   }>;
   unmatched_operations?: Array<{
     method: string;
@@ -102,11 +111,15 @@ function buildCoverageSnapshot(
     local_only_tools_truncated: coverageMapping.localOnlyTools.length > unmatchedLimit,
     non_endpoint_tools_total: coverageMapping.nonEndpointTools.length,
     non_endpoint_tools_truncated: coverageMapping.nonEndpointTools.length > unmatchedLimit,
+    version_unavailable_tools_total: coverageMapping.versionUnavailableTools.length,
+    version_unavailable_tools_truncated:
+      coverageMapping.versionUnavailableTools.length > unmatchedLimit,
     unmatched_by_tag_total: unmatchedByTag.length,
     unmatched_by_tag: unmatchedByTag,
     unmatched_tools: coverageMapping.unmatchedTools.slice(0, unmatchedLimit),
     local_only_tools: coverageMapping.localOnlyTools.slice(0, unmatchedLimit),
     non_endpoint_tools: coverageMapping.nonEndpointTools.slice(0, unmatchedLimit),
+    version_unavailable_tools: coverageMapping.versionUnavailableTools.slice(0, unmatchedLimit),
     unmatched_operations: includeUnmatched
       ? unmatched.slice(0, unmatchedLimit).map((operation) => ({
         method: operation.method,
