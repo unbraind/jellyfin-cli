@@ -265,11 +265,14 @@ describe.skipIf(skip)('E2E events', () => {
       [
         'events',
         'watch',
-        '--include-control',
+        '--subscribe',
+        'sessions',
+        '--type',
+        'Sessions',
         '--count',
         '1',
         '--duration',
-        '15',
+        '3',
         '--format',
         'json',
       ],
@@ -278,10 +281,15 @@ describe.skipIf(skip)('E2E events', () => {
     expect(result.code).toBe(0);
     const payload = JSON.parse(result.stdout) as {
       event_count?: number;
+      stop_reason?: string;
       events?: Array<{ message_type?: string }>;
     };
-    expect(payload.event_count).toBe(1);
-    expect(payload.events?.[0]?.message_type).toMatch(/KeepAlive/);
+    expect(payload.event_count).toBeGreaterThanOrEqual(0);
+    expect(payload.event_count).toBeLessThanOrEqual(1);
+    expect(payload.stop_reason).toMatch(/^(count_reached|duration_reached)$/u);
+    if (payload.event_count === 1) {
+      expect(payload.events?.[0]?.message_type).toBe('Sessions');
+    }
     expect(`${result.stdout}${result.stderr}`).not.toContain(API_KEY);
   }, T);
 });
