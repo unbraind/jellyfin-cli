@@ -6,7 +6,7 @@ status: closed
 priority: 0
 tags[5]: agents,cli,coverage,testing,vitest
 created_at: "2026-08-07T17:00:33.675Z"
-updated_at: "2026-08-07T17:15:59.197Z"
+updated_at: "2026-08-07T17:31:32.848Z"
 closed_at: "2026-08-07T17:14:50.201Z"
 completed_at: "2026-08-07T17:14:50.201Z"
 author: codex-jellyfin-coverage-20260807
@@ -28,13 +28,15 @@ actual_result: "Portable suite passed 1008 tests with 1 skip; V8 coverage increa
 dependencies[2]{id,kind,created_at,author,source_kind,author_source}:
   jf-fgfd,related_to,"2026-08-07T17:00:33.675Z",codex-jellyfin-coverage-20260807,explicit,asserted
   jf-sylm,related_to,"2026-08-07T17:00:33.675Z",codex-jellyfin-coverage-20260807,explicit,asserted
-comments[6]{created_at,author,text}:
+comments[8]{created_at,author,text}:
   "2026-08-07T17:02:34.571Z",codex,"Coverage attribution implementation is complete for the existing command integration tranche. The serialized typed harness executes production Commander callbacks in-process and preserves stdout, stderr, exit, and environment isolation; stdin- and process-isolation-sensitive tests remain black-box subprocesses. Portable validation is 1008 pass, 1 skip in 12.27s. V8 coverage improved from 44.06/45.14/54.43/43.83 to 58.44/67.32/63.29/58.69 without exclusions, ignored files, synthetic source imports, or threshold reductions. The parent 100-percent feature remains open because command families and API wrappers still have visible gaps."
   "2026-08-07T17:05:22.754Z",codex-jellyfin-coverage-20260807,"Bun-native regression gate initially exposed cross-file process-state contention in the in-process harness. The harness now uses its attributable in-process path only under Vitest and preserves the established subprocess boundary under Bun. Full Bun result: 1018 pass, 185 credential-gated skips, 0 fail in 45.21s. Fresh Vitest V8 result: 1008 pass, 1 skip; 59.08 statements, 67.93 branches, 63.48 functions, 59.38 lines in 11.68s."
   "2026-08-07T17:09:35.278Z",codex-jellyfin-coverage-20260807,"Compiled live acceptance passed against the owner-local Jellyfin 10.11.11 instance with read-only mode forced: 185 pass, 0 fail in 130.86s. Evidence retained here is aggregate and contract-level only; credentials, identifiers, endpoints, and media payloads remain outside Git and PM. The repository release-validation pipeline also completed end to end, including build, dist smoke, package consumers, file length, tracked/history secret scans, and changelog consistency."
   "2026-08-07T17:10:12.879Z",codex-jellyfin-coverage-20260807,"Supply-chain and security checks are green: Bun audit and npm production audit report zero vulnerabilities; Trivy high/critical filesystem scan reports zero vulnerabilities, secrets, or misconfigurations. The strict repository jscpd gate remains red at the existing broad baseline: 225 clones and 7.55 percent duplicated lines across src, tests, and scripts. This attribution task removes repeated CLI process execution implementations from the migrated suites but does not claim to resolve unrelated production and historical test duplication; that release-readiness debt remains governed by the quality parent."
   "2026-08-07T17:15:14.348Z",codex-jellyfin-coverage-20260807,Generated CHANGELOG.md from 45 closed PM items with the exact latest pm CLI pin 2026.8.7; regeneration and consistency check both passed.
   "2026-08-07T17:15:59.197Z",codex-jellyfin-coverage-20260807,"Final PM governance: graph audit is clean at 49 nodes and 140 edges; exact, fuzzy, and parent-scope duplicate audits found zero item candidates; tracker health, storage integrity, history drift, dependency references, command references, and closed-item resolution checks are clean; no item remains in progress. Strict metadata/file validation remains advisory for historical workspace debt (legacy metadata gaps, one stale blocker heuristic, and 110 tracked files not yet linked), not introduced by this task."
+  "2026-08-07T17:27:30.666Z",codex-jellyfin-coverage-20260807,"CodeRabbit review follow-up: removed the duplicate coverage test link and retained the metadata-rich tracker-context entry. Fixed schema validate stdin routing so global options may precede the command and --input=value remains recognized; converted the existing empty-input test into the global-option regression instead of duplicating behavior."
+  "2026-08-07T17:31:32.848Z",codex-jellyfin-coverage-20260807,"Post-review validation passed: focused schema suite 28/28 under Bun and Vitest; full validate:release passed; portable suite 1008 pass and 1 skip; Bun suite 1018 pass and 185 credential-gated skips; four-axis coverage remains 59.08/67.93/63.48/59.38. Documentation now states the exact live timeout and eligible-Vitest versus Bun/stdin/process-isolation boundaries."
 notes[1]{created_at,author,text}:
   "2026-08-07T17:10:22.772Z",codex-jellyfin-coverage-20260807,"Decision: keep Bun-native command suites on true subprocesses because Bun executes test files concurrently with isolated module queues; use the shared serialized in-process production tree only under Vitest, where one worker owns process-level capture. This preserves runtime acceptance semantics and accurate V8 attribution."
 learnings[1]{created_at,author,text}:
@@ -95,9 +97,7 @@ files[26]:
   - path: tests/utils/run-cli-in-process.ts
     scope: project
     note: typed serialized in-process production CLI harness
-tests[6]:
-  - command: "bun run test:coverage:four"
-    scope: project
+tests[5]:
   - command: "bun run validate:release"
     scope: project
   - command: git diff --check

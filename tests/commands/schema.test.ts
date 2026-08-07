@@ -23,9 +23,11 @@ async function runCli(
   args: string[],
   env: Record<string, string | undefined> = {},
 ): Promise<{ code: number; stdout: string; stderr: string }> {
-  const needsClosedStdin = args[0] === 'schema'
-    && args[1] === 'validate'
-    && !args.includes('--input')
+  const schemaValidateIndex = args.findIndex(
+    (argument, index) => argument === 'schema' && args[index + 1] === 'validate',
+  );
+  const needsClosedStdin = schemaValidateIndex !== -1
+    && !args.some((argument) => argument === '--input' || argument.startsWith('--input='))
     && !args.includes('--help');
   if (!needsClosedStdin) {
     return runCliInProcess(args, {
@@ -878,7 +880,7 @@ describe('schema validate command', () => {
   });
 
   it('returns error when no stdin or --input data is provided', async () => {
-    const result = await runCli(['schema', 'validate', 'user']);
+    const result = await runCli(['--format', 'json', 'schema', 'validate', 'user']);
     expect(result.code).toBe(1);
     expect(result.stderr).toContain('Validation input is empty');
   });

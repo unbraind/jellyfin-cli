@@ -200,7 +200,8 @@ The full live E2E suite (`tests/e2e/cli.test.ts`) was executed against the local
 read-only-safe coverage patterns:
 
 ```bash
-JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 bun test tests/e2e/cli.test.ts
+JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 JELLYFIN_TIMEOUT=120000 \
+  bun test tests/e2e/cli.test.ts
 ```
 
 Latest compiled-binary run result (2026-08-07): `185` passing, `0` failing in `130.86s`.
