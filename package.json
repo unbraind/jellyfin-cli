@@ -85,7 +85,7 @@
     "eslint": "^10.8.0",
     "eslint-plugin-jsdoc": "63.2.2",
     "globals": "^17.9.0",
-    "jscpd": "5.0.12",
+    "jscpd": "5.0.14",
     "tsx": "^4.23.8",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.66.0",
