@@ -2,13 +2,11 @@ id: jf-mkzh
 title: Enforce 100 percent repository-wide test coverage
 description: "Replace the legacy 59 percent command-layer ratchet with a mandatory, non-bypassable 100 percent threshold for statements, branches, functions, and lines across every source file. Coverage must come from meaningful unit, integration, functional, acceptance, smoke, dogfood, performance, white-box, black-box, and read-only live E2E tests; exclusions and artificial execution-only tests are not acceptable."
 type: Feature
-status: in_progress
+status: open
 priority: 0
 tags[5]: active-ratchet,coverage,quality,roadmap,testing
 created_at: "2026-07-16T17:00:03.971Z"
-updated_at: "2026-08-09T21:33:45.760Z"
-assignee: codex-jellyfin-api-20260809
-claim_principal: codex-jellyfin-api-20260809
+updated_at: "2026-08-09T21:56:36.116Z"
 author: codex
 estimated_minutes: 1440
 acceptance_criteria: "Statements, branches, functions, and lines each measure exactly 100 percent across all source code; Coverage thresholds are enforced globally and per-file in every release and pull-request gate; Tests assert observable behavior and failure paths without coverage-only no-op execution or duplicated cases; Read-only live E2E, packaged-binary smoke, acceptance, performance, and dogfood suites are mandatory documented gates; Coverage cannot be reduced through ignore directives, source exclusions, or threshold changes without explicit governance failure"
@@ -40,7 +38,7 @@ dependencies[4]:
     kind: related_to
     created_at: "2026-07-21T19:50:13.328Z"
     author: codex-jellyfin
-comments[15]{created_at,author,text}:
+comments[16]{created_at,author,text}:
   "2026-07-21T19:16:04.867Z",codex-jellyfin,Highest-priority requirement accepted. Current Bun coverage reports only functions and lines; evaluating LCOV/four-dimension enforcement and coverage capture for command subprocesses before selecting the non-cheatable gate.
   "2026-07-21T19:52:49.060Z",codex-jellyfin,Coverage remains the principal release blocker. Bun coverage reports 58.83% lines and 44.93% functions; Vitest can express all four 100% thresholds but its Node runtime currently fails 254 tests across 14 Bun-specific suites using Bun.spawn or Bun.serve. No artificial exclusions or mocked coverage inflation will be accepted.
   "2026-07-21T20:04:29.442Z",codex-jellyfin,"Latest post-change coverage run: 901 pass, 177 live-only skips, 0 fail; 58.64% lines and 44.56% functions. Command callbacks execute primarily in subprocess acceptance tests and are not attributed to the parent Bun coverage profile, which is the dominant instrumentation gap."
@@ -56,6 +54,7 @@ comments[15]{created_at,author,text}:
   "2026-08-07T16:39:28.264Z",codex-jellyfin-coverage-20260807,"2026-08-07 run started after reading all 48 full PM items, the 601-entry lineage summarized by the prior closeout, current 48-node/137-edge graph, active blockers, release state, and all-status duplicate audit. This run claims only jf-mkzh; jf-lpki remains open and blocked. First decision is to measure missing coverage by production file and solve child-process attribution without ignore directives, exclusions, threshold weakening, or execution-only tests."
   "2026-08-09T21:26:45.132Z",codex-jellyfin-api-20260809,"2026-08-09 implementation cycle: refreshed all-status PM inventory, complete active hierarchy, dependency graph, prior API/coverage plans, current Git/PR state, PM npm latest (2026.8.9), and official Jellyfin releases. This item is the sole actively claimed work because genuine 100/100/100/100 coverage is the canonical remaining release blocker and is directly coupled to safe API enhancement. I will measure current uncovered production paths, pair coverage with meaningful contract behavior, keep live validation strictly read-only, and preserve honest repo-wide totals."
   "2026-08-09T21:33:28.866Z",codex-jellyfin-api-20260809,"Live 10.11.11 research found official read-only operation coverage at 249/249 but eight safe tools were left for manual fuzzy review. Five are wrapper names for documented GET operations; two use supported legacy routes omitted from the official OpenAPI; setup validate is multi-operation orchestration. Implemented exact wrapper contracts plus explicit non-endpoint reasons, eliminating read-only unmatched tools from 8 to 0 without increasing claimed operation coverage or making any live mutation."
+  "2026-08-09T21:56:34.214Z",codex-jellyfin-api-20260809,"This exact-mapping tranche passed, but the repository-wide four-axis coverage goal remains incomplete at 59.70% statements, 68.25% branches, 64.01% functions, and 60.03% lines. Returning jf-mkzh to open and releasing the claim so only actively worked items remain in progress."
 notes[7]:
   - created_at: "2026-07-16T17:00:03.971Z"
     author: codex

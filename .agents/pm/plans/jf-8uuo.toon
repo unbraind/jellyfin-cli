@@ -2,12 +2,13 @@ id: jf-8uuo
 title: Make read-only tool-to-OpenAPI contracts exact
 description: "Replace fuzzy-only agent coverage mappings for wrapper and undocumented Jellyfin routes with explicit, semantically safe contracts; expose the exact mappings through schema tools, retain truthful non-OpenAPI classifications, and verify against official stable/preview plus the owner-local read-only server."
 type: Plan
-status: in_progress
+status: closed
 priority: 0
 tags[7]: agents,api,coverage,openapi,read-only,tool-schema,typescript
 created_at: "2026-08-09T21:35:35.900Z"
-updated_at: "2026-08-09T21:53:04.447Z"
-assignee: codex-jellyfin-api-20260809
+updated_at: "2026-08-09T21:57:37.868Z"
+closed_at: "2026-08-09T21:56:32.428Z"
+completed_at: "2026-08-09T21:56:32.428Z"
 author: codex-jellyfin-api-20260809
 estimated_minutes: 180
 acceptance_criteria: "Official stable and preview releases are refreshed from authoritative sources; Full and read-only operation coverage remain 100 percent while read-only unmatched tools fall from 8 to 0; Exact wrapper matches never select a mutating operation and appear in schema tools --openapi-match; Undocumented REST and orchestration routes are explicitly classified for agents; All source files remain below 300 LOC and strict TypeScript, lint, tests, docs, changelog, secrets, package, and read-only live gates pass"
@@ -23,6 +24,9 @@ reviewer: maintainer
 risk: high
 confidence: high
 sprint: jellyfin-10.11.11
+resolution: "Replaced fuzzy-only wrapper attribution with explicit method/path contracts, added truthful non-OpenAPI classifications, expanded behavior tests and docs, and resolved both review findings."
+expected_result: All 251 read-only-safe tools are classified without unexplained mappings; exact wrappers select only their intended GET operations; full and read-only OpenAPI operation coverage remains complete.
+actual_result: "Live read-only research reports 220 mapped, 19 local, 11 non-endpoint, 1 version-unavailable, and 0 unmatched tools; operation coverage is 249/249; exact-head checks passed and review threads are resolved."
 dependencies[14]:
   - id: jf-36oy
     kind: related
@@ -148,10 +152,13 @@ docs[3]{path,scope}:
   docs/api-research.md,project
   docs/api.md,project
   docs/release-readiness.md,project
-plan_mode: executing
+close_reason: "Implemented explicit, method-safe OpenAPI contracts for read-only wrapper commands; classified supported legacy REST and orchestration surfaces truthfully; reduced read-only unmatched tools from 8 to 0 while preserving 249/249 operation coverage; passed focused, release, packaging, secrets, PM, and compiled read-only live gates; exact-head PR #56 checks green and all actionable review findings resolved."
+plan_mode: completed
 plan_scope: Agent-facing OpenAPI mapping and read-only coverage classification only; no server mutation or release publication.
 plan_harness: codex
 plan_resume_context: "Implementation and full validation are complete: exact read-only wrapper mappings use safe GET operations, all focused and release gates pass, compiled read-only live acceptance passes 185/185 with 210 assertions, and live schema research reports 0 unmatched tools. Remaining work is exact-head review feedback closure, green checks, merge, and no-publish verification; jf-mkzh remains open because aggregate source coverage is 59.70/68.25/64.01/60.03 rather than 100%."
+plan_validation[1]{text,command,expected}:
+  "Exact-head 29cb2a1 GitHub inventory: all required Actions checks passed; both first-round CodeRabbit findings were fixed and confirmed in-thread; CodeRabbit and Sourcery re-review attempts were quota-limited; Gemini and Greptile produced no review artifact after explicit exact-head requests. Provider silence/limits are recorded as limitations, not approvals.","gh pr checks 56 --watch --interval 20 && bun run reviews:inventory -- --pr 56 --repo unbraind/jellyfin-cli",All required checks green; no unresolved actionable review threads
 plan_steps[4]:
   - id: plan-step-001
     order: 1
@@ -189,8 +196,9 @@ plan_steps[4]:
   - id: plan-step-004
     order: 4
     title: Ship through exact-head GitHub checks and bot review
-    status: in_progress
+    status: completed
     created_at: "2026-08-09T21:35:35.888Z"
-    updated_at: "2026-08-09T21:42:57.927Z"
-    evidence: Preparing intentional commit and PR with exact-head checks and thread-aware bot review inventory.
+    updated_at: "2026-08-09T21:56:31.561Z"
+    evidence: "PR #56 exact head 29cb2a1: all required Actions checks green; two actionable CodeRabbit findings fixed in 29cb2a1 and confirmed in resolved threads; every bot artifact reacted to by usefulness and findings answered; unavailable/silent providers recorded as limitations."
+    completed_at: "2026-08-09T21:56:31.561Z"
 body: "## Privacy and safety\\nCredentials, server URL, identifiers, raw schemas, and payloads stay outside Git and PM. Live execution uses JELLYFIN_READ_ONLY=1.\\n\\n## Quality boundary\\nThis plan improves contract correctness and measured coverage but does not close jf-mkzh unless genuine repository-wide 100/100/100/100 is achieved."
