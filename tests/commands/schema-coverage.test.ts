@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest';
-import { mapOpenApiCoverageToTools } from '../../src/commands/schema-coverage.js';
+import {
+  mapOpenApiCoverageToTools,
+  matchOpenApiOperationsForTool,
+} from '../../src/commands/schema-coverage.js';
 import type { OpenApiOperationEntry } from '../../src/utils/openapi.js';
 import type { CliToolSchema } from '../../src/utils/tool-schema.js';
 
@@ -37,12 +40,15 @@ describe('OpenAPI coverage tool classification', () => {
         tool('jf events watch'),
         tool('jf notifications list'),
         tool('jf schema compatibility'),
+        tool('jf setup validate'),
+        tool('jf packages installing'),
+        tool('jf tasks triggers'),
       ],
       3,
     );
 
     expect(result.mappedToolCount).toBe(1);
-    expect(result.toolScopeCount).toBe(7);
+    expect(result.toolScopeCount).toBe(10);
     expect(result.mappedOperationKeys).toEqual(new Set(['GET /System/Info']));
     expect(result.unmatchedTools).toEqual([]);
     expect(result.localOnlyTools).toEqual([{
@@ -60,8 +66,85 @@ describe('OpenAPI coverage tool classification', () => {
         read_only_safe: true,
         reason: 'openapi_orchestration',
       },
+      { command: 'jf setup validate', read_only_safe: true, reason: 'openapi_orchestration' },
+      {
+        command: 'jf packages installing',
+        read_only_safe: true,
+        reason: 'undocumented_rest_api',
+      },
+      {
+        command: 'jf tasks triggers',
+        read_only_safe: true,
+        reason: 'undocumented_rest_api',
+      },
     ]);
     expect(result.versionUnavailableTools).toEqual([]);
+  });
+
+  it('uses explicit wrapper contracts instead of unsafe fuzzy operation matches', () => {
+    const operations: OpenApiOperationEntry[] = [
+      {
+        method: 'GET',
+        path: '/Items',
+        operationId: 'GetItems',
+        summary: 'Gets items',
+        tags: ['Items'],
+        deprecated: false,
+        readOnlySafe: true,
+      },
+      {
+        method: 'DELETE',
+        path: '/Items',
+        operationId: 'DeleteItems',
+        summary: 'Deletes items',
+        tags: ['Library'],
+        deprecated: false,
+        readOnlySafe: false,
+      },
+      {
+        method: 'GET',
+        path: '/Items/{itemId}',
+        operationId: 'GetItem',
+        summary: 'Gets an item',
+        tags: ['Items'],
+        deprecated: false,
+        readOnlySafe: true,
+      },
+      {
+        method: 'GET',
+        path: '/Users/{userId}',
+        operationId: 'GetUserById',
+        summary: 'Gets a user',
+        tags: ['User'],
+        deprecated: false,
+        readOnlySafe: true,
+      },
+    ];
+
+    expect(matchOpenApiOperationsForTool(operations, 'jf collections list', 999)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/Items', matchedOn: ['explicit_contract'] }),
+    ]);
+    expect(matchOpenApiOperationsForTool(operations, 'jf collections get', 999)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/Items/{itemId}' }),
+    ]);
+    expect(matchOpenApiOperationsForTool(operations, 'jf favorites list', 999)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/Items' }),
+    ]);
+    expect(matchOpenApiOperationsForTool(operations, 'jf users config', 999)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/Users/{userId}' }),
+    ]);
+    expect(matchOpenApiOperationsForTool(operations, 'jf users policy', 999)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/Users/{userId}' }),
+    ]);
+    expect(matchOpenApiOperationsForTool(operations, 'jf collections list', 999)[0]?.readOnlySafe)
+      .toBe(true);
+  });
+
+  it('falls back to scored intent matching for tools without an explicit contract', () => {
+    expect(matchOpenApiOperationsForTool([SYSTEM_INFO_OPERATION], 'jf system info', 3)).toEqual([
+      expect.objectContaining({ method: 'GET', path: '/System/Info' }),
+    ]);
+    expect(matchOpenApiOperationsForTool([SYSTEM_INFO_OPERATION], 'jf quantum flux', 3)).toEqual([]);
   });
 
   it('distinguishes a version-gated endpoint from unexplained mapping gaps', () => {

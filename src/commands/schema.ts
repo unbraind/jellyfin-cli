@@ -17,6 +17,7 @@ import { attachSchemaCoverageSubcommand } from './schema-coverage-command.js';
 import { attachSchemaSuggestSubcommand } from './schema-suggest.js';
 import { attachSchemaCompatibilitySubcommand } from './schema-compatibility.js';
 import { attachSchemaVersionsSubcommand } from './schema-versions.js';
+import { matchOpenApiOperationsForTool } from './schema-coverage.js';
 
 /**
  * Builds the schema command tree with validated options and actions.
@@ -158,7 +159,7 @@ export function createSchemaCommand(): Command {
     .option('--endpoint <path>', 'Preferred OpenAPI path for --openapi-match (e.g. /api-docs/openapi.json)')
     .option('--openapi-match', 'Attach inferred OpenAPI operation candidates per tool')
     .option('--openapi-match-limit <number>', 'OpenAPI matches to include per tool when --openapi-match is enabled', '3')
-    .option('--min-score <number>', 'Minimum OpenAPI match score for --openapi-match', '3')
+    .option('--min-score <number>', 'Minimum inferred OpenAPI match score for --openapi-match', '3')
     .option('--limit <number>', 'Schema list limit', '500')
     .action(async function (this: Command, options: FormatOptions & Record<string, unknown>) {
       const outputFormat = resolveOutputFormat(this, options);
@@ -203,9 +204,11 @@ export function createSchemaCommand(): Command {
           });
           const openApiOperations = extractOpenApiOperations(openApiResult.document);
           tools = sourceTools.map((tool) => {
-            const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
-            const matches = matchOperationsForCommandIntent(openApiOperations, commandIntent)
-              .filter((candidate) => candidate.score >= minScore)
+            const matches = matchOpenApiOperationsForTool(
+              openApiOperations,
+              tool.command,
+              minScore,
+            )
               .slice(0, openApiMatchLimit)
               .map((candidate) => ({
                 method: candidate.method,

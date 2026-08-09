@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Other
+
+- Make read-only tool-to-OpenAPI contracts exact ([jf-8uuo](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-8uuo.toon))
+
 ## 2026.8.8 - 2026-08-08
 
 ### Other

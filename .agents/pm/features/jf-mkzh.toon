@@ -6,7 +6,7 @@ status: open
 priority: 0
 tags[5]: active-ratchet,coverage,quality,roadmap,testing
 created_at: "2026-07-16T17:00:03.971Z"
-updated_at: "2026-08-07T17:00:42.722Z"
+updated_at: "2026-08-09T21:56:36.116Z"
 author: codex
 estimated_minutes: 1440
 acceptance_criteria: "Statements, branches, functions, and lines each measure exactly 100 percent across all source code; Coverage thresholds are enforced globally and per-file in every release and pull-request gate; Tests assert observable behavior and failure paths without coverage-only no-op execution or duplicated cases; Read-only live E2E, packaged-binary smoke, acceptance, performance, and dogfood suites are mandatory documented gates; Coverage cannot be reduced through ignore directives, source exclusions, or threshold changes without explicit governance failure"
@@ -38,7 +38,7 @@ dependencies[4]:
     kind: related_to
     created_at: "2026-07-21T19:50:13.328Z"
     author: codex-jellyfin
-comments[13]{created_at,author,text}:
+comments[16]{created_at,author,text}:
   "2026-07-21T19:16:04.867Z",codex-jellyfin,Highest-priority requirement accepted. Current Bun coverage reports only functions and lines; evaluating LCOV/four-dimension enforcement and coverage capture for command subprocesses before selecting the non-cheatable gate.
   "2026-07-21T19:52:49.060Z",codex-jellyfin,Coverage remains the principal release blocker. Bun coverage reports 58.83% lines and 44.93% functions; Vitest can express all four 100% thresholds but its Node runtime currently fails 254 tests across 14 Bun-specific suites using Bun.spawn or Bun.serve. No artificial exclusions or mocked coverage inflation will be accepted.
   "2026-07-21T20:04:29.442Z",codex-jellyfin,"Latest post-change coverage run: 901 pass, 177 live-only skips, 0 fail; 58.64% lines and 44.56% functions. Command callbacks execute primarily in subprocess acceptance tests and are not attributed to the parent Bun coverage profile, which is the dominant instrumentation gap."
@@ -52,25 +52,84 @@ comments[13]{created_at,author,text}:
   "2026-08-06T18:30:28.097Z",codex-jellyfin-api-20260806,"Final 2026-08-06 jf-einj measurement after read-only safety regressions: 999 portable tests passed with 1 skip; statements 43.78%, branches 44.87%, functions 54.37%, and lines 43.53%. The repository-wide 100/100/100/100 mandate remains open."
   "2026-08-07T05:28:00.519Z",codex-jellyfin-api-20260807,"2026-08-07 exact jf-einj measurement: 1001 portable tests passed with 1 intentional skip; statements 43.85%, branches 45.01%, functions 54.37%, lines 43.59%. The four-axis command exits zero because thresholds are not yet configured, so the non-bypassable 100/100/100/100 acceptance gate remains open and must not be represented as green."
   "2026-08-07T16:39:28.264Z",codex-jellyfin-coverage-20260807,"2026-08-07 run started after reading all 48 full PM items, the 601-entry lineage summarized by the prior closeout, current 48-node/137-edge graph, active blockers, release state, and all-status duplicate audit. This run claims only jf-mkzh; jf-lpki remains open and blocked. First decision is to measure missing coverage by production file and solve child-process attribution without ignore directives, exclusions, threshold weakening, or execution-only tests."
-notes[5]{created_at,author,text}:
-  "2026-07-16T17:00:03.971Z",codex,"Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
-  "2026-07-21T19:13:34.272Z",codex-jellyfin,"Baseline measured with bun test --coverage on 2026-07-21: 898 pass, 177 skipped, 0 fail; 44.93% functions and 58.83% lines. Bun's text reporter exposes only functions/lines, so the mandatory gate must use a four-dimension instrumenter and per-file thresholds while preserving Bun compatibility."
-  "2026-07-21T19:52:50.098Z",codex-jellyfin,"Decision: retain this feature in progress until genuine 100/100/100/100 source coverage is demonstrated. The next implementation step is a runtime-neutral test process/server harness plus exact branch inventory, not threshold weakening."
-  "2026-07-22T04:41:09.309Z",codex-jellyfin,"Quality rule: coverage work must assert observable behavior and failure paths; no ignore directives, artificial execution-only cases, or duplicated tests."
-  "2026-08-07T16:39:28.770Z",codex-jellyfin-coverage-20260807,"Privacy boundary: live credentials, server URL, user/server/media identifiers, raw OpenAPI documents, and payloads stay in environment variables or owner-only ~/.jellyfin-cli. Live tests run only with JELLYFIN_READ_ONLY=1; production code must reject mutations before target requests."
+  "2026-08-09T21:26:45.132Z",codex-jellyfin-api-20260809,"2026-08-09 implementation cycle: refreshed all-status PM inventory, complete active hierarchy, dependency graph, prior API/coverage plans, current Git/PR state, PM npm latest (2026.8.9), and official Jellyfin releases. This item is the sole actively claimed work because genuine 100/100/100/100 coverage is the canonical remaining release blocker and is directly coupled to safe API enhancement. I will measure current uncovered production paths, pair coverage with meaningful contract behavior, keep live validation strictly read-only, and preserve honest repo-wide totals."
+  "2026-08-09T21:33:28.866Z",codex-jellyfin-api-20260809,"Live 10.11.11 research found official read-only operation coverage at 249/249 but eight safe tools were left for manual fuzzy review. Five are wrapper names for documented GET operations; two use supported legacy routes omitted from the official OpenAPI; setup validate is multi-operation orchestration. Implemented exact wrapper contracts plus explicit non-endpoint reasons, eliminating read-only unmatched tools from 8 to 0 without increasing claimed operation coverage or making any live mutation."
+  "2026-08-09T21:56:34.214Z",codex-jellyfin-api-20260809,"This exact-mapping tranche passed, but the repository-wide four-axis coverage goal remains incomplete at 59.70% statements, 68.25% branches, 64.01% functions, and 60.03% lines. Returning jf-mkzh to open and releasing the claim so only actively worked items remain in progress."
+notes[7]:
+  - created_at: "2026-07-16T17:00:03.971Z"
+    author: codex
+    text: "Baseline from bun test --coverage on 2026-07-16: 888 pass,177 credential-dependent E2E skip,44.69% functions,59.26% lines; changed session formatter 100% functions and lines."
+  - created_at: "2026-07-21T19:13:34.272Z"
+    author: codex-jellyfin
+    text: "Baseline measured with bun test --coverage on 2026-07-21: 898 pass, 177 skipped, 0 fail; 44.93% functions and 58.83% lines. Bun's text reporter exposes only functions/lines, so the mandatory gate must use a four-dimension instrumenter and per-file thresholds while preserving Bun compatibility."
+  - created_at: "2026-07-21T19:52:50.098Z"
+    author: codex-jellyfin
+    text: "Decision: retain this feature in progress until genuine 100/100/100/100 source coverage is demonstrated. The next implementation step is a runtime-neutral test process/server harness plus exact branch inventory, not threshold weakening."
+  - created_at: "2026-07-22T04:41:09.309Z"
+    author: codex-jellyfin
+    text: "Quality rule: coverage work must assert observable behavior and failure paths; no ignore directives, artificial execution-only cases, or duplicated tests."
+  - created_at: "2026-08-07T16:39:28.770Z"
+    author: codex-jellyfin-coverage-20260807
+    text: "Privacy boundary: live credentials, server URL, user/server/media identifiers, raw OpenAPI documents, and payloads stay in environment variables or owner-only ~/.jellyfin-cli. Live tests run only with JELLYFIN_READ_ONLY=1; production code must reject mutations before target requests."
+  - created_at: "2026-08-09T21:26:45.645Z"
+    author: codex-jellyfin-api-20260809
+    text: "{\"constraints\":[\"no coverage exclusions or ignore directives\",\"no synthetic import-only tests\",\"no live Jellyfin mutation\",\"private config only under ~/.jellyfin-cli\",\"no release publication\"],\"date\":\"2026-08-09\",\"decision\":\"Reuse canonical coverage feature rather than create a duplicate roadmap item\",\"kind\":\"decision\",\"rationale\":\"All API discovery, structured output, setup, official version discovery, generic operation execution, and Jellyfin 12 preview controls already have closed linked plans; repository-wide genuine coverage remains open and blocks static-analysis/docstring enforcement.\"}"
+    format: json
+    data:
+      kind: decision
+      date: 2026-08-09
+      decision: Reuse canonical coverage feature rather than create a duplicate roadmap item
+      rationale: "All API discovery, structured output, setup, official version discovery, generic operation execution, and Jellyfin 12 preview controls already have closed linked plans; repository-wide genuine coverage remains open and blocks static-analysis/docstring enforcement."
+      constraints[5]: no coverage exclusions or ignore directives,no synthetic import-only tests,no live Jellyfin mutation,private config only under ~/.jellyfin-cli,no release publication
+  - created_at: "2026-08-09T21:33:29.437Z"
+    author: codex-jellyfin-api-20260809
+    text: "{\"after\":{\"full_operation_coverage\":\"429/429\",\"read_only_operation_coverage\":\"249/249\",\"read_only_unmatched_tools\":0},\"before\":{\"full_operation_coverage\":\"429/429\",\"read_only_operation_coverage\":\"249/249\",\"read_only_unmatched_tools\":8},\"exact_wrappers\":{\"jf collections get\":\"GET /Items/{itemId}\",\"jf collections list\":\"GET /Items\",\"jf favorites list\":\"GET /Items\",\"jf users config\":\"GET /Users/{userId}\",\"jf users policy\":\"GET /Users/{userId}\"},\"kind\":\"api_contract_decision\",\"live_version\":\"10.11.11\",\"non_endpoint\":{\"jf packages installing\":\"undocumented_rest_api\",\"jf setup validate\":\"openapi_orchestration\",\"jf tasks triggers\":\"undocumented_rest_api\"},\"official_preview\":\"12.0-rc4\",\"official_stable\":\"10.11.11\",\"privacy\":\"No URL, credential, server identity, payload, or raw OpenAPI document persisted.\"}"
+    format: json
+    data:
+      kind: api_contract_decision
+      official_stable: 10.11.11
+      official_preview: 12.0-rc4
+      live_version: 10.11.11
+      before:
+        full_operation_coverage: 429/429
+        read_only_operation_coverage: 249/249
+        read_only_unmatched_tools: 8
+      after:
+        full_operation_coverage: 429/429
+        read_only_operation_coverage: 249/249
+        read_only_unmatched_tools: 0
+      exact_wrappers:
+        "jf collections list": GET /Items
+        "jf collections get": "GET /Items/{itemId}"
+        "jf favorites list": GET /Items
+        "jf users config": "GET /Users/{userId}"
+        "jf users policy": "GET /Users/{userId}"
+      non_endpoint:
+        "jf packages installing": undocumented_rest_api
+        "jf tasks triggers": undocumented_rest_api
+        "jf setup validate": openapi_orchestration
+      privacy: "No URL, credential, server identity, payload, or raw OpenAPI document persisted."
 learnings[2]{created_at,author,text}:
   "2026-07-21T20:04:30.337Z",codex-jellyfin,"Bun 1.3.11 exposes text and LCOV reporters but only native line/function threshold dimensions; Vitest exposes four dimensions but does not merge Bun child-process coverage automatically. Reaching the governed target requires in-process command execution or an explicit child-profile merge, followed by real missing-branch tests."
   "2026-07-22T04:50:17.571Z",codex-jellyfin,Bun subprocess acceptance tests provide strong black-box behavior proof but child execution is not attributed to parent coverage. Keep them mandatory and separate; use typed Node-compatible harnesses plus in-process command tests for deterministic four-metric attribution.
-files[3]{path,scope}:
+files[9]{path,scope}:
   package.json,project
+  src/commands/schema-coverage-def.ts,project
+  src/commands/schema-coverage.ts,project
+  src/commands/schema-research.ts,project
+  src/commands/schema.ts,project
+  tests/commands/schema-coverage.test.ts,project
+  tests/commands/schema.test.ts,project
   tests/setup/node-bun-compat.ts,project
   vitest.config.ts,project
-tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
+tests[5]{command,path,scope,timeout_seconds,pm_context_mode}:
   "bun run test:coverage",package.json,project,1200,tracker
   "bun run test:coverage:four",package.json,project,300,tracker
   "bun run test:portable",package.json,project,300,tracker
   JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,package.json,project,1200,tracker
-docs[2]{path,scope}:
+  bun test tests/commands/schema-coverage.test.ts tests/commands/schema.test.ts tests/commands/schema-research.test.ts,tests/commands/schema-coverage.test.ts,project,300,tracker
+docs[3]{path,scope}:
   docs/api-research.md,project
+  docs/api.md,project
   docs/release-readiness.md,project
 body: ""

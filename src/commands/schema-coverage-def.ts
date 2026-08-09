@@ -10,6 +10,7 @@ const TOOL_CLASSIFICATION_SCHEMA = {
         'openapi_orchestration',
         'websocket_transport',
         'optional_plugin_api',
+        'undocumented_rest_api',
       ],
     },
   },

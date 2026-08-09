@@ -71,7 +71,7 @@ not be interpreted as permission to publish. Current measurements and runtime li
 recorded in [Jellyfin API Research](api-research.md).
 
 Run `bun run test:coverage:four` to produce the authoritative four-dimension diagnostic report. The
-2026-08-07 report is `59.61%` statements, `68.12%` branches, `63.85%` functions, and `59.94%` lines;
+2026-08-09 report is `59.70%` statements, `68.25%` branches, `64.01%` functions, and `60.03%` lines;
 the command remains diagnostic until all four dimensions reach `100%` and the thresholds can be
 enforced without exclusions. Eligible portable Vitest command integration tests use the production
 CLI program in-process for attributable white-box proof. Bun-native suites and tests that require

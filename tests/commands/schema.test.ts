@@ -761,6 +761,10 @@ describe('schema tools command', () => {
               '/System/Ping': {
                 get: { tags: ['System'], operationId: 'GetPingSystem', summary: 'Ping' },
               },
+              '/Items': {
+                get: { tags: ['Items'], operationId: 'GetItems', summary: 'Gets items' },
+                delete: { tags: ['Library'], operationId: 'DeleteItems', summary: 'Deletes items' },
+              },
             },
           }),
           { headers: { 'content-type': 'application/json' } },
@@ -804,6 +808,23 @@ describe('schema tools command', () => {
     expect(result.stdout).toContain('openapi_matches[2]:');
     expect(result.stdout).toContain('method: GET');
     expect(result.stdout).toContain('path: /System/Info');
+
+    const explicitContract = await runCli([
+      'schema',
+      'tools',
+      '--command',
+      'collections list',
+      '--limit',
+      '1',
+      '--openapi-match',
+      '--min-score',
+      '99',
+    ]);
+    expect(explicitContract.code).toBe(0);
+    expect(explicitContract.stdout).toContain('path: /Items');
+    expect(explicitContract.stdout).toContain('score: 100');
+    expect(explicitContract.stdout).toContain('explicit_contract');
+    expect(explicitContract.stdout).not.toContain('method: DELETE');
   });
 
   it('returns error for --openapi-match when no server is configured', async () => {

@@ -1,4 +1,8 @@
-import { matchOperationsForCommandIntent, type OpenApiOperationEntry } from '../utils/openapi.js';
+import {
+  matchOperationsForCommandIntent,
+  type CommandOperationMatch,
+  type OpenApiOperationEntry,
+} from '../utils/openapi.js';
 import type { CliToolSchema } from '../utils/tool-schema.js';
 
 /**
@@ -30,7 +34,11 @@ export type UnmatchedToolSummary = {
 export type NonEndpointToolSummary = {
   command: string;
   read_only_safe: boolean;
-  reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
+  reason:
+    | 'openapi_orchestration'
+    | 'websocket_transport'
+    | 'optional_plugin_api'
+    | 'undocumented_rest_api';
 };
 
 /**
@@ -90,12 +98,53 @@ const NON_ENDPOINT_COMMAND_PREFIXES: ReadonlyArray<{
   { prefix: 'jf schema compatibility', reason: 'openapi_orchestration' },
 ];
 
+const NON_ENDPOINT_COMMANDS = new Map<string, NonEndpointToolSummary['reason']>([
+  ['jf packages installing', 'undocumented_rest_api'],
+  ['jf setup validate', 'openapi_orchestration'],
+  ['jf tasks triggers', 'undocumented_rest_api'],
+]);
+
+const EXACT_OPENAPI_ENDPOINTS = new Map<string, { method: string; path: string }>([
+  ['jf collections get', { method: 'GET', path: '/Items/{itemId}' }],
+  ['jf collections list', { method: 'GET', path: '/Items' }],
+  ['jf favorites list', { method: 'GET', path: '/Items' }],
+  ['jf users config', { method: 'GET', path: '/Users/{userId}' }],
+  ['jf users policy', { method: 'GET', path: '/Users/{userId}' }],
+]);
+
 const VERSION_GATED_ENDPOINTS = new Map<string, { method: string; path: string }>([
   ['jf items collections', { method: 'GET', path: '/Items/{itemId}/Collections' }],
 ]);
 
 function isLocalOnlyCommand(command: string): boolean {
   return LOCAL_ONLY_COMMANDS.has(command);
+}
+
+/**
+ * Matches a concrete CLI tool to official OpenAPI operations, honoring explicit wrapper contracts
+ * before falling back to intent similarity.
+ * @param operations - The official operations available in the inspected contract scope.
+ * @param command - The full `jf ...` command path.
+ * @param minScore - The minimum similarity score for inferred fallback matches.
+ * @returns Exact or inferred operation matches ordered by confidence.
+ */
+export function matchOpenApiOperationsForTool(
+  operations: OpenApiOperationEntry[],
+  command: string,
+  minScore: number,
+): CommandOperationMatch[] {
+  const exactEndpoint = EXACT_OPENAPI_ENDPOINTS.get(command);
+  if (exactEndpoint) {
+    const exactOperation = operations.find(
+      ({ method, path }) => method === exactEndpoint.method && path === exactEndpoint.path,
+    );
+    return exactOperation ? [{ ...exactOperation, score: 100, matchedOn: ['explicit_contract'] }] : [];
+  }
+
+  const commandIntent = command.replace(/^jf\s+/i, '').trim();
+  return matchOperationsForCommandIntent(operations, commandIntent).filter(
+    (candidate) => candidate.score >= minScore,
+  );
 }
 
 /**
@@ -132,9 +181,10 @@ export function mapOpenApiCoverageToTools(
       continue;
     }
 
-    const nonEndpointReason = NON_ENDPOINT_COMMAND_PREFIXES.find(
-      ({ prefix }) => tool.command.startsWith(prefix),
-    )?.reason;
+    const nonEndpointReason = NON_ENDPOINT_COMMANDS.get(tool.command) ??
+      NON_ENDPOINT_COMMAND_PREFIXES.find(
+        ({ prefix }) => tool.command.startsWith(prefix),
+      )?.reason;
     if (nonEndpointReason) {
       nonEndpointTools.push({
         command: tool.command,
@@ -170,10 +220,7 @@ export function mapOpenApiCoverageToTools(
       continue;
     }
 
-    const commandIntent = tool.command.replace(/^jf\s+/i, '').trim();
-    const matches = matchOperationsForCommandIntent(operations, commandIntent).filter(
-      (candidate) => candidate.score >= minScore,
-    );
+    const matches = matchOpenApiOperationsForTool(operations, tool.command, minScore);
     if (matches.length === 0) {
       unmatchedTools.push({
         command: tool.command,
