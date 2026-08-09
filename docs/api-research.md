@@ -87,7 +87,7 @@ Observed:
 - Intent-mapper coverage at the compatibility threshold (`min_score=3`): `100%` (`429/429`)
 - Intent-mapper coverage at a stricter diagnostic threshold (`min_score=8`): `71.1%` (`305/429`)
 - Full-scope unmatched direct endpoint tools at `min_score=3`: `0`
-- Intentional non-endpoint tools: `10` (OpenAPI orchestration, WebSocket, and optional notification API surfaces)
+- Intentional non-endpoint tools: `13` (OpenAPI orchestration, WebSocket, optional notification APIs, and typed legacy REST routes omitted from the official OpenAPI)
 - Version-unavailable tools: `1` (`jf items collections` requires Jellyfin 12+)
 - The strict-threshold gaps include many commands that are implemented and live-tested (for example
   artists, devices, genres, items, plugins, sessions, and users). The score is therefore a fuzzy
@@ -342,8 +342,8 @@ tools, `1` version-unavailable tool, and `0` unmatched tools across `406` leaf c
 stable operations remain mapped. The read-only scope evaluates only the `251` read-only-safe tools; mutating tools are deliberately
 outside that population, and every emitted read-only classification has `read_only_safe: true`.
 The live naming diagnostic maps `220` direct tools, classifies `19` local and `11` non-endpoint
-tools, and retains `0` safe direct commands for manual mapping review; operation coverage is
-`249/249` (`100%`).
+tools, identifies `1` version-unavailable tool, and retains `0` safe direct commands for manual
+mapping review; operation coverage is `249/249` (`100%`).
 The non-endpoint reasons are stable machine values:
 
 - `openapi_orchestration` for `jf api *` and `jf schema compatibility`;
@@ -351,7 +351,10 @@ The non-endpoint reasons are stable machine values:
 - `optional_plugin_api` for `jf notifications *`.
 - `undocumented_rest_api` for typed legacy REST routes that the running server supports but its
   official OpenAPI omits, currently package-installation status and scheduled-task triggers.
-- `server_version_unavailable` for a direct endpoint exposed by a newer Jellyfin contract but absent from the inspected server, including `jf items collections` on Jellyfin 10.11.
+
+The separate version-unavailable reason is `server_version_unavailable`: a direct endpoint exposed
+by a newer Jellyfin contract but absent from the inspected server, including
+`jf items collections` on Jellyfin 10.11.
 
 Read-only coverage uses explicit transport contracts for wrapper commands whose human-facing names
 do not resemble their shared OpenAPI operation: collection listing and favorites both use

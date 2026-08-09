@@ -6,7 +6,7 @@ status: in_progress
 priority: 0
 tags[7]: agents,api,coverage,openapi,read-only,tool-schema,typescript
 created_at: "2026-08-09T21:35:35.900Z"
-updated_at: "2026-08-09T21:42:57.928Z"
+updated_at: "2026-08-09T21:53:04.447Z"
 assignee: codex-jellyfin-api-20260809
 author: codex-jellyfin-api-20260809
 estimated_minutes: 180
@@ -96,10 +96,42 @@ dependencies[14]:
     kind: verifies
     created_at: "2026-08-09T21:36:24.841Z"
     author: codex-jellyfin-api-20260809
-comments[1]{created_at,author,text}:
+comments[2]{created_at,author,text}:
   "2026-08-09T21:42:56.500Z",codex-jellyfin-api-20260809,"Blocking PM-linked validation passed: focused contract suite 39/39, validate:release (Bun unit/integration 1015 pass + 1 intentional skip, portable 65 files/1015 pass + 1 skip, release tests, typecheck, lint, build, LOC, secrets tracked/history, pack dry-run, npx, bunx, changelog check), compiled read-only live E2E 185/185 with 210 assertions, and four-axis diagnostic 59.70/68.25/64.01/60.03. The canonical jf-mkzh goal remains open because repository-wide 100/100/100/100 is not met."
-notes[1]{created_at,author,text,format,data{kind,focused{tests,failed},portable{files,tests,skipped,failed},live_read_only{tests,assertions,failed,compiled_cli},coverage{statements,branches,functions,lines,threshold_enforced},release_validation{passed,published},privacy}}:
-  "2026-08-09T21:42:56.934Z",codex-jellyfin-api-20260809,"{\"coverage\":{\"branches\":68.25,\"functions\":64.01,\"lines\":60.03,\"statements\":59.7,\"threshold_enforced\":false},\"focused\":{\"failed\":0,\"tests\":39},\"kind\":\"validation_receipt\",\"live_read_only\":{\"assertions\":210,\"compiled_cli\":true,\"failed\":0,\"tests\":185},\"portable\":{\"failed\":0,\"files\":65,\"skipped\":1,\"tests\":1015},\"privacy\":\"Only redacted contract-level totals retained.\",\"release_validation\":{\"passed\":true,\"published\":false}}",json,validation_receipt,39,0,65,1015,1,0,185,210,0,true,59.7,68.25,64.01,60.03,false,true,false,Only redacted contract-level totals retained.
+  "2026-08-09T21:53:04.013Z",codex-jellyfin-api,"CodeRabbit found two documentation/context consistency issues in the first exact-head review: stale resume context and incomplete accounting of 251 read-only tools plus conflation of version-unavailable with non-endpoint reasons. Updated the resume context and documentation to preserve disjoint totals and reason semantics; rerunning gates before the next exact-head review round."
+notes[2]:
+  - created_at: "2026-08-09T21:42:56.934Z"
+    author: codex-jellyfin-api-20260809
+    text: "{\"coverage\":{\"branches\":68.25,\"functions\":64.01,\"lines\":60.03,\"statements\":59.7,\"threshold_enforced\":false},\"focused\":{\"failed\":0,\"tests\":39},\"kind\":\"validation_receipt\",\"live_read_only\":{\"assertions\":210,\"compiled_cli\":true,\"failed\":0,\"tests\":185},\"portable\":{\"failed\":0,\"files\":65,\"skipped\":1,\"tests\":1015},\"privacy\":\"Only redacted contract-level totals retained.\",\"release_validation\":{\"passed\":true,\"published\":false}}"
+    format: json
+    data:
+      kind: validation_receipt
+      focused:
+        tests: 39
+        failed: 0
+      portable:
+        files: 65
+        tests: 1015
+        skipped: 1
+        failed: 0
+      live_read_only:
+        tests: 185
+        assertions: 210
+        failed: 0
+        compiled_cli: true
+      coverage:
+        statements: 59.7
+        branches: 68.25
+        functions: 64.01
+        lines: 60.03
+        threshold_enforced: false
+      release_validation:
+        passed: true
+        published: false
+      privacy: Only redacted contract-level totals retained.
+  - created_at: "2026-08-09T21:53:04.447Z"
+    author: codex-jellyfin-api
+    text: "Review decision: keep server_version_unavailable separate from non_endpoint reasons because it represents a real direct operation absent only from the inspected server version. Read-only accounting is explicitly 220 mapped + 19 local + 11 non-endpoint + 1 version-unavailable = 251."
 files[6]{path,scope}:
   src/commands/schema-coverage-def.ts,project
   src/commands/schema-coverage.ts,project
@@ -119,7 +151,7 @@ docs[3]{path,scope}:
 plan_mode: executing
 plan_scope: Agent-facing OpenAPI mapping and read-only coverage classification only; no server mutation or release publication.
 plan_harness: codex
-plan_resume_context: "Official stable 10.11.11 and preview 12.0-rc4; live 10.11.11. Five wrapper commands need exact GET mappings; two supported legacy routes are absent from official OpenAPI; setup validate is orchestration. Implementation and focused tests already pass; complete full validation, PR review, merge, and no-publish proof."
+plan_resume_context: "Implementation and full validation are complete: exact read-only wrapper mappings use safe GET operations, all focused and release gates pass, compiled read-only live acceptance passes 185/185 with 210 assertions, and live schema research reports 0 unmatched tools. Remaining work is exact-head review feedback closure, green checks, merge, and no-publish verification; jf-mkzh remains open because aggregate source coverage is 59.70/68.25/64.01/60.03 rather than 100%."
 plan_steps[4]:
   - id: plan-step-001
     order: 1
