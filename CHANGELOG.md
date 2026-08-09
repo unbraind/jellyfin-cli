@@ -5,6 +5,11 @@
 ### Other
 
 - Make read-only tool-to-OpenAPI contracts exact ([jf-8uuo](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-8uuo.toon))
+
+## 2026.8.8 - 2026-08-08
+
+### Other
+
 - Expose Jellyfin 12 preview collection and query controls ([jf-707w](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-707w.toon))
 - Attribute CLI integration coverage in-process ([jf-5u9v](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/tasks/jf-5u9v.toon))
 - Discover current Jellyfin contracts and correct agent API scope ([jf-einj](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/plans/jf-einj.toon))
