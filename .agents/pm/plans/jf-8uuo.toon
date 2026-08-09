@@ -1,0 +1,164 @@
+id: jf-8uuo
+title: Make read-only tool-to-OpenAPI contracts exact
+description: "Replace fuzzy-only agent coverage mappings for wrapper and undocumented Jellyfin routes with explicit, semantically safe contracts; expose the exact mappings through schema tools, retain truthful non-OpenAPI classifications, and verify against official stable/preview plus the owner-local read-only server."
+type: Plan
+status: in_progress
+priority: 0
+tags[7]: agents,api,coverage,openapi,read-only,tool-schema,typescript
+created_at: "2026-08-09T21:35:35.900Z"
+updated_at: "2026-08-09T21:42:57.928Z"
+assignee: codex-jellyfin-api-20260809
+author: codex-jellyfin-api-20260809
+estimated_minutes: 180
+acceptance_criteria: "Official stable and preview releases are refreshed from authoritative sources; Full and read-only operation coverage remain 100 percent while read-only unmatched tools fall from 8 to 0; Exact wrapper matches never select a mutating operation and appear in schema tools --openapi-match; Undocumented REST and orchestration routes are explicitly classified for agents; All source files remain below 300 LOC and strict TypeScript, lint, tests, docs, changelog, secrets, package, and read-only live gates pass"
+definition_of_ready: All-status PM inventory and duplicate search complete; official/live contracts available; owner-local read-only profile validated.
+goal: jf-mqpo
+objective: jf-gn5j
+value: Give agents deterministic API provenance instead of unsafe fuzzy guesses.
+impact: Prevents read-only tools from being paired with mutating OpenAPI operations and removes false roadmap gaps.
+outcome: Zero unexplained read-only tool mappings with exact contract evidence.
+why_now: Live research exposed eight remaining manual mappings while repository-wide coverage is the release blocker.
+parent: jf-gn5j
+reviewer: maintainer
+risk: high
+confidence: high
+sprint: jellyfin-10.11.11
+dependencies[14]:
+  - id: jf-36oy
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-707w
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-935b
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-einj
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-gn5j
+    kind: parent
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-mkzh
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-mqpo
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-snok
+    kind: related
+    created_at: "2026-08-09T21:35:35.900Z"
+    author: codex-jellyfin-api-20260809
+    source_kind: "cli:create:dep"
+    author_source: detected
+  - id: jf-einj
+    kind: discovered_from
+    created_at: "2026-08-09T21:36:20.991Z"
+    author: codex-jellyfin-api-20260809
+  - id: jf-707w
+    kind: discovered_from
+    created_at: "2026-08-09T21:36:21.598Z"
+    author: codex-jellyfin-api-20260809
+  - id: jf-mkzh
+    kind: implements
+    created_at: "2026-08-09T21:36:22.280Z"
+    author: codex-jellyfin-api-20260809
+  - id: jf-snok
+    kind: implements
+    created_at: "2026-08-09T21:36:23.137Z"
+    author: codex-jellyfin-api-20260809
+  - id: jf-935b
+    kind: verifies
+    created_at: "2026-08-09T21:36:24.027Z"
+    author: codex-jellyfin-api-20260809
+  - id: jf-36oy
+    kind: verifies
+    created_at: "2026-08-09T21:36:24.841Z"
+    author: codex-jellyfin-api-20260809
+comments[1]{created_at,author,text}:
+  "2026-08-09T21:42:56.500Z",codex-jellyfin-api-20260809,"Blocking PM-linked validation passed: focused contract suite 39/39, validate:release (Bun unit/integration 1015 pass + 1 intentional skip, portable 65 files/1015 pass + 1 skip, release tests, typecheck, lint, build, LOC, secrets tracked/history, pack dry-run, npx, bunx, changelog check), compiled read-only live E2E 185/185 with 210 assertions, and four-axis diagnostic 59.70/68.25/64.01/60.03. The canonical jf-mkzh goal remains open because repository-wide 100/100/100/100 is not met."
+notes[1]{created_at,author,text,format,data{kind,focused{tests,failed},portable{files,tests,skipped,failed},live_read_only{tests,assertions,failed,compiled_cli},coverage{statements,branches,functions,lines,threshold_enforced},release_validation{passed,published},privacy}}:
+  "2026-08-09T21:42:56.934Z",codex-jellyfin-api-20260809,"{\"coverage\":{\"branches\":68.25,\"functions\":64.01,\"lines\":60.03,\"statements\":59.7,\"threshold_enforced\":false},\"focused\":{\"failed\":0,\"tests\":39},\"kind\":\"validation_receipt\",\"live_read_only\":{\"assertions\":210,\"compiled_cli\":true,\"failed\":0,\"tests\":185},\"portable\":{\"failed\":0,\"files\":65,\"skipped\":1,\"tests\":1015},\"privacy\":\"Only redacted contract-level totals retained.\",\"release_validation\":{\"passed\":true,\"published\":false}}",json,validation_receipt,39,0,65,1015,1,0,185,210,0,true,59.7,68.25,64.01,60.03,false,true,false,Only redacted contract-level totals retained.
+files[6]{path,scope}:
+  src/commands/schema-coverage-def.ts,project
+  src/commands/schema-coverage.ts,project
+  src/commands/schema-research.ts,project
+  src/commands/schema.ts,project
+  tests/commands/schema-coverage.test.ts,project
+  tests/commands/schema.test.ts,project
+tests[4]{command,path,scope,timeout_seconds,pm_context_mode}:
+  bun test tests/commands/schema-coverage.test.ts tests/commands/schema.test.ts tests/commands/schema-research.test.ts,tests/commands/schema-coverage.test.ts,project,300,tracker
+  "bun run validate:release",package.json,project,1200,tracker
+  JELLYFIN_READ_ONLY=1 JELLYFIN_E2E_USE_DIST=1 bun test tests/e2e/cli.test.ts,tests/e2e/cli.test.ts,project,1200,tracker
+  "bun run test:coverage:four",vitest.config.ts,project,300,tracker
+docs[3]{path,scope}:
+  docs/api-research.md,project
+  docs/api.md,project
+  docs/release-readiness.md,project
+plan_mode: executing
+plan_scope: Agent-facing OpenAPI mapping and read-only coverage classification only; no server mutation or release publication.
+plan_harness: codex
+plan_resume_context: "Official stable 10.11.11 and preview 12.0-rc4; live 10.11.11. Five wrapper commands need exact GET mappings; two supported legacy routes are absent from official OpenAPI; setup validate is orchestration. Implementation and focused tests already pass; complete full validation, PR review, merge, and no-publish proof."
+plan_steps[4]:
+  - id: plan-step-001
+    order: 1
+    title: Research official and live contracts without persisting private data
+    status: completed
+    created_at: "2026-08-09T21:35:35.888Z"
+    updated_at: "2026-08-09T21:36:21.598Z"
+    evidence: "Authoritative GitHub releases: stable 10.11.11, preview 12.0-rc4. Owner-local live server: 10.11.11. Official/live OpenAPI: 429 total, 249 semantically read-only. No private values or raw artifacts persisted."
+    completed_at: "2026-08-09T21:36:05.625Z"
+    linked_items[2]{id,kind,note}:
+      jf-einj,discovered_from,Current contract discovery and semantic read-only classifier foundation
+      jf-707w,discovered_from,Stable/preview discovery and version-gated endpoint semantics
+  - id: plan-step-002
+    order: 2
+    title: Implement exact wrapper and truthful non-endpoint classifications
+    status: completed
+    created_at: "2026-08-09T21:35:35.888Z"
+    updated_at: "2026-08-09T21:36:24.027Z"
+    evidence: Five wrapper commands now resolve exact documented GET operations before fuzzy matching; packages installing and tasks triggers are undocumented_rest_api; setup validate is openapi_orchestration. Live read-only research reports full unmatched=0 and read-only unmatched=0.
+    completed_at: "2026-08-09T21:36:06.073Z"
+    linked_items[3]{id,kind,note}:
+      jf-mkzh,implements,Behavior-focused exact mapping tests reduce canonical coverage debt
+      jf-snok,implements,Extends agent tool schema OpenAPI enrichment with explicit provenance
+      jf-935b,verifies,Refines non-OpenAPI classifications with zero-unmatched live proof
+  - id: plan-step-003
+    order: 3
+    title: "Validate focused, full, live read-only, format, and package gates"
+    status: completed
+    created_at: "2026-08-09T21:35:35.888Z"
+    updated_at: "2026-08-09T21:42:57.412Z"
+    evidence: "PM-linked focused, validate:release, compiled JELLYFIN_READ_ONLY live E2E, and four-axis coverage commands passed. 1015 portable tests plus 1 intentional skip; live 185/185 and 210 assertions; coverage 59.70/68.25/64.01/60.03 remains an explicit repository blocker."
+    completed_at: "2026-08-09T21:42:57.412Z"
+    linked_items[1]{id,kind,note}:
+      jf-36oy,verifies,Structured output schemas retain the new machine-readable reason
+  - id: plan-step-004
+    order: 4
+    title: Ship through exact-head GitHub checks and bot review
+    status: in_progress
+    created_at: "2026-08-09T21:35:35.888Z"
+    updated_at: "2026-08-09T21:42:57.927Z"
+    evidence: Preparing intentional commit and PR with exact-head checks and thread-aware bot review inventory.
+body: "## Privacy and safety\\nCredentials, server URL, identifiers, raw schemas, and payloads stay outside Git and PM. Live execution uses JELLYFIN_READ_ONLY=1.\\n\\n## Quality boundary\\nThis plan improves contract correctness and measured coverage but does not close jf-mkzh unless genuine repository-wide 100/100/100/100 is achieved."

@@ -219,7 +219,7 @@ JELLYFIN_E2E_USE_DIST=1 JELLYFIN_READ_ONLY=1 JELLYFIN_TIMEOUT=120000 \
   bun test tests/e2e/cli.test.ts
 ```
 
-Latest compiled-binary run result (2026-08-07): `185` passing, `0` failing in `130.86s`.
+Latest compiled-binary run result (2026-08-09): `185` passing, `0` failing in `165.66s`.
 
 ## Full Test + Coverage Validation
 
@@ -230,11 +230,11 @@ bun run test:coverage
 bun run test:coverage:four
 ```
 
-Observed on 2026-08-07:
+Observed on 2026-08-09:
 
-- Portable Vitest: `1013` passing, `1` skipped, `0` failing in `28.73s`.
-- Four-axis V8 coverage: `59.61%` statements, `68.12%` branches, `63.85%` functions, and
-  `59.94%` lines. Before in-process attribution, the same suite reported `44.06%`, `45.14%`,
+- Portable Vitest: `1015` passing, `1` skipped, `0` failing in `11.85s`.
+- Four-axis V8 coverage: `59.70%` statements, `68.25%` branches, `64.01%` functions, and
+  `60.03%` lines. Before in-process attribution, the same suite reported `44.06%`, `45.14%`,
   `54.43%`, and `43.83%`, respectively.
 - Command integration tests now invoke the production Commander program in-process through the typed,
   serialized `tests/utils/run-cli-in-process.ts` harness. It captures the same stdout, stderr, exit,
@@ -334,23 +334,32 @@ matches:
 - `mapped_tool_count`: commands with a direct OpenAPI operation match;
 - `unmatched_tools`: direct endpoint commands with no match above the requested score;
 - `local_only_tools`: configuration, setup, and schema utilities that do not contact an API;
-- `non_endpoint_tools`: API-related tools that intentionally have no one-to-one REST operation.
+- `non_endpoint_tools`: API-related tools that intentionally have no one-to-one official OpenAPI operation;
 - `version_unavailable_tools`: direct commands whose exact operation is absent from the inspected server version.
 
-The live full-scope result contains `375` direct mappings, `20` local tools, `10` non-endpoint
+The live full-scope result contains `372` direct mappings, `20` local tools, `13` non-endpoint
 tools, `1` version-unavailable tool, and `0` unmatched tools across `406` leaf commands. All `429`
 stable operations remain mapped. The read-only scope evaluates only the `251` read-only-safe tools; mutating tools are deliberately
 outside that population, and every emitted read-only classification has `read_only_safe: true`.
-The live naming diagnostic maps `215` direct tools, classifies `19` local and `8` non-endpoint
-tools, and retains `8` safe direct commands for manual mapping review; operation coverage is
-`249/249` (`100%`). The unmatched tool intents do not make mutating commands eligible for live
-tests.
+The live naming diagnostic maps `220` direct tools, classifies `19` local and `11` non-endpoint
+tools, and retains `0` safe direct commands for manual mapping review; operation coverage is
+`249/249` (`100%`).
 The non-endpoint reasons are stable machine values:
 
 - `openapi_orchestration` for `jf api *` and `jf schema compatibility`;
 - `websocket_transport` for `jf events *`;
 - `optional_plugin_api` for `jf notifications *`.
+- `undocumented_rest_api` for typed legacy REST routes that the running server supports but its
+  official OpenAPI omits, currently package-installation status and scheduled-task triggers.
 - `server_version_unavailable` for a direct endpoint exposed by a newer Jellyfin contract but absent from the inspected server, including `jf items collections` on Jellyfin 10.11.
+
+Read-only coverage uses explicit transport contracts for wrapper commands whose human-facing names
+do not resemble their shared OpenAPI operation: collection listing and favorites both use
+`GET /Items`, collection details use `GET /Items/{itemId}`, and user policy/configuration reads use
+`GET /Users/{userId}`. This prevents the agent-facing mapper from accepting a higher-scoring mutating
+operation merely because it shares command tokens. `setup validate` is classified as OpenAPI
+orchestration because it combines public system info, authenticated system info, OpenAPI discovery,
+local configuration, and formatter validation rather than representing one REST operation.
 
 The official Jellyfin `v10.11.11` server tree and the live OpenAPI document contain no notification
 controller/operations. Notification commands therefore remain an explicitly optional compatibility

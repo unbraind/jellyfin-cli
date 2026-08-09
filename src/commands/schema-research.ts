@@ -17,7 +17,11 @@ import {
   resolveOutputFormat,
   type FormatOptions,
 } from './schema-utils.js';
-import { mapOpenApiCoverageToTools, summarizeOperationsByTag } from './schema-coverage.js';
+import {
+  mapOpenApiCoverageToTools,
+  summarizeOperationsByTag,
+  type NonEndpointToolSummary,
+} from './schema-coverage.js';
 
 type CoverageSnapshot = {
   operation_scope_count: number;
@@ -48,11 +52,7 @@ type CoverageSnapshot = {
     read_only_safe: boolean;
     reason: 'no_openapi_match_above_min_score' | 'local_only_command';
   }>;
-  non_endpoint_tools?: Array<{
-    command: string;
-    read_only_safe: boolean;
-    reason: 'openapi_orchestration' | 'websocket_transport' | 'optional_plugin_api';
-  }>;
+  non_endpoint_tools?: NonEndpointToolSummary[];
   version_unavailable_tools?: Array<{
     command: string;
     read_only_safe: boolean;

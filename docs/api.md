@@ -3393,7 +3393,7 @@ jf schema tools [--command <prefix>] [--name <name>] [--endpoint <path>] [--open
 Output type: `tool_schemas`
 
 Notes:
-- `--openapi-match` enriches each exported tool entry with ranked endpoint candidates (`openapi_matches`) from the live Jellyfin OpenAPI document.
+- `--openapi-match` enriches each exported tool entry with ranked endpoint candidates (`openapi_matches`) from the live Jellyfin OpenAPI document. Known wrapper commands use exact contracts marked by `matched_on: [explicit_contract]`; `--min-score` applies to inferred fallback candidates.
 - `--name` / `--endpoint` use the same server resolution behavior as other schema OpenAPI commands.
 
 ### schema coverage
@@ -3412,7 +3412,7 @@ Notes:
 - `unmatched_operations` provides a deterministic sample for roadmap planning.
 - `unmatched_tools` provides a deterministic sample of CLI commands that did not map above the active `--min-score`, with `reason` metadata for agent automation.
 - `local_only_tools` lists commands that intentionally operate only on local CLI state.
-- `non_endpoint_tools` prevents one-to-many OpenAPI orchestration, WebSocket transports, and optional plugin routes from being counted as direct endpoint gaps. Reasons are `openapi_orchestration`, `websocket_transport`, or `optional_plugin_api`.
+- `non_endpoint_tools` prevents one-to-many OpenAPI orchestration, WebSocket transports, optional plugin routes, and typed legacy REST routes omitted from the official schema from being counted as direct endpoint gaps. Reasons are `openapi_orchestration`, `websocket_transport`, `optional_plugin_api`, or `undocumented_rest_api`.
 - `version_unavailable_tools` identifies direct commands whose required operation is absent from the inspected server contract. For example, Jellyfin 10.11 reports `jf items collections` with `server_version_unavailable`, while Jellyfin 12 maps it to `GET /Items/{itemId}/Collections`.
 
 ### schema suggest
