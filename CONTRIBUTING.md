@@ -6,6 +6,10 @@ Thanks for contributing.
 
 Use Node.js 22.13 or newer and Bun 1.3.11 or newer.
 
+On Linux and macOS, tests also require Python 3 available as `python3` for the
+real-terminal credential-entry regression fixture (standard library only).
+Windows skips this Unix PTY fixture; the other setup tests still run.
+
 ```bash
 bun install
 bun run dev --help
