@@ -62,7 +62,9 @@ def run_case(runtime, mode, redirected=False, alias=False):
         with tempfile.TemporaryFile() as stdout:
             args = runtime + ["setup"] + (["wizard"] if alias else []) + [
                 "--server", f"http://127.0.0.1:{server.server_port}",
-                "--output-format", "json", "--timeout", "1000", "--format", "json"]
+                "--format", "json"]
+            if not alias:
+                args += ["--output-format", "json", "--timeout", "1000"]
             proc = subprocess.Popen(args, stdin=slave, stdout=stdout if redirected else slave,
                                     stderr=slave, env=env)
 
@@ -117,6 +119,10 @@ def run_case(runtime, mode, redirected=False, alias=False):
                 path = os.path.join(home, "settings.json")
                 if mode in ("interrupt", "eof", "empty"):
                     assert code != 0 and not os.path.exists(path), f"Cancellation saved credentials in {mode}"
+                    if mode != "empty":
+                        assert code == 130, f"Wrong cancellation exit status in {mode}"
+                        assert b'"error": "Setup cancelled."' in output
+                        assert b"AbortError" not in output and b"Unhandled rejection" not in output
                 else:
                     assert code == 0, f"Setup failed in {mode}: {code}"
                     with open(path, encoding="utf-8") as saved:

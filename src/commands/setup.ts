@@ -199,12 +199,18 @@ async function runSetup(thisCommand: Command, options: SetupCommandOptions): Pro
   }
 
   if (!apiKey && !username && !password && isInteractive) {
-    const authMethod = await prompt('Authentication method [1] Username/Password [2] API Key (1/2): ');
-    if (authMethod === '2') {
-      apiKey = await prompt('Enter API Key: ', true);
-    } else {
-      username = await prompt('Enter Username: ');
-      password = await prompt('Enter Password: ', true);
+    try {
+      const authMethod = await prompt('Authentication method [1] Username/Password [2] API Key (1/2): ');
+      if (authMethod === '2') {
+        apiKey = await prompt('Enter API Key: ', true);
+      } else {
+        username = await prompt('Enter Username: ');
+        password = await prompt('Enter Password: ', true);
+      }
+    } catch (error) {
+      if (!(error instanceof Error) || error.name !== 'AbortError') throw error;
+      console.error(formatOutput({ error: 'Setup cancelled.' }, runtimeFormat, 'error'));
+      process.exit(130);
     }
   }
 
