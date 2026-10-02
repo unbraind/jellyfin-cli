@@ -42,7 +42,7 @@ jf config get
 ```
 
 Interactive API-key and password prompts suppress terminal echo, including when
-standard output is redirected. Ctrl+C, or Ctrl+D on an empty input line, aborts
+standard output is redirected. At these credential prompts, Ctrl+C, or Ctrl+D on an empty input line, aborts
 the wizard without saving configuration and restores normal terminal input before
 the process exits with status 130 and a structured cancellation message. Avoid putting real
 credentials in command-line arguments, where shell history and process listings
