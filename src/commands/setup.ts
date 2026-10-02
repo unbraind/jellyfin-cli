@@ -52,14 +52,25 @@ class MutedOutput extends Writable {
 async function prompt(question: string, hidden = false): Promise<string> {
   if (hidden) {
     const hiddenOutput = new MutedOutput();
-    const rl = readline.createInterface({ input, output: hiddenOutput });
-    process.stdout.write(question);
+    // The wrapper has no isTTY flag. Select terminal mode from stdin so
+    // readline disables kernel echo even when stdout is redirected.
+    const wasRaw = input.isRaw;
+    const rl = readline.createInterface({ input, output: hiddenOutput, terminal: input.isTTY });
+    const controller = new AbortController();
+    const cancel = (): void => controller.abort();
+    rl.once('SIGINT', cancel);
+    rl.once('close', cancel);
     hiddenOutput.setMuted(true);
-    const answer = await rl.question('');
-    hiddenOutput.setMuted(false);
-    process.stdout.write('\n');
-    rl.close();
-    return answer;
+    try {
+      process.stdout.write(question);
+      return await rl.question('', { signal: controller.signal });
+    } finally {
+      rl.removeListener('SIGINT', cancel);
+      rl.removeListener('close', cancel);
+      rl.close();
+      if (input.isTTY && input.isRaw !== wasRaw) input.setRawMode(wasRaw ?? false);
+      process.stdout.write('\n');
+    }
   } else {
     const rl = readline.createInterface({ input, output });
     const answer = await rl.question(question);

@@ -1,5 +1,11 @@
 # Changelog
 
+## Unreleased
+
+### Fixed
+
+- Keep interactive setup credentials out of terminal output ([jf-secret-tty](https://github.com/unbraind/jellyfin-cli/blob/main/.agents/pm/issues/jf-secret-tty.toon))
+
 ## 2026.8.8 - 2026-08-08
 
 ### Other

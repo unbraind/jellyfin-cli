@@ -33,13 +33,20 @@ Never place real credentials in repository files.
 # Generate API key from Jellyfin Dashboard
 # Dashboard > API Keys > Create
 
-# Configure with API key
-jf setup --server https://your-server:8096 --api-key YOUR_API_KEY
+# Configure interactively, then select API Key and enter it at the hidden prompt
+jf setup --server https://your-server:8096
 
 # API keys are masked in output
 jf config get
 # Output: server/user metadata only (secret values never shown)
 ```
+
+Interactive API-key and password prompts suppress terminal echo, including when
+standard output is redirected. Ctrl+C, or Ctrl+D on an empty input line, cancels
+credential entry without saving a partial value and restores normal terminal input. Avoid putting real
+credentials in command-line arguments, where shell history and process listings
+may expose them. Non-interactive automation can use the environment configuration
+below or a protected configuration file.
 
 ### Using Environment Variables
 
