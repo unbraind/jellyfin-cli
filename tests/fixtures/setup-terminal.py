@@ -64,9 +64,11 @@ def run_case(runtime, mode, redirected=False, alias=False):
         bin_dir = os.path.join(home, "bin")
         os.mkdir(bin_dir)
         gh = os.path.join(bin_dir, "gh")
+        gh_calls_path = os.path.join(home, "gh-calls")
         with open(gh, "w", encoding="utf-8") as stub:
-            stub.write("#!/bin/sh\nexit 1\n")
+            stub.write('#!/bin/sh\nprintf "%s\\n" "$@" >> "$SETUP_TERMINAL_ISOLATED_GH_LOG"\nexit 1\n')
         os.chmod(gh, 0o755)
+        env["SETUP_TERMINAL_ISOLATED_GH_LOG"] = gh_calls_path
         env["PATH"] = bin_dir + os.pathsep + env.get("PATH", os.defpath)
         env.update(HOME=home, JELLYFIN_CONFIG_DIR=home, NO_PROXY="127.0.0.1,localhost")
         with tempfile.TemporaryFile() as stdout:
@@ -129,6 +131,14 @@ def run_case(runtime, mode, redirected=False, alias=False):
                 final = termios.tcgetattr(slave)
                 mask = termios.ECHO | termios.ICANON | termios.ISIG
                 assert final[3] & mask == initial[3] & mask, f"Terminal not restored in {mode}"
+                gh_calls = []
+                if os.path.exists(gh_calls_path):
+                    with open(gh_calls_path, encoding="utf-8") as logged:
+                        gh_calls = logged.read().splitlines()
+                # Only successful TTY setup reaches the hook. The isolated gh
+                # reports unavailable, so auth/API commands must never follow.
+                expected_gh_calls = ["--version"] if mode in ("key", "password") and not redirected else []
+                assert gh_calls == expected_gh_calls, f"Unexpected isolated gh arguments in {mode}: {gh_calls!r}"
                 path = os.path.join(home, "settings.json")
                 if mode in ("interrupt", "eof", "empty"):
                     assert code != 0 and not os.path.exists(path), f"Cancellation saved credentials in {mode}"

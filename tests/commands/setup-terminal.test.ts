@@ -8,11 +8,11 @@ it.skipIf(process.platform === 'win32')('keeps setup credentials hidden in a rea
     ? [process.execPath, 'src/cli.ts']
     : [process.execPath, '--import', 'tsx', 'src/cli.ts'];
   const hostBin = mkdtempSync(join(tmpdir(), 'jf-terminal-host-gh-'));
-  const ghCalls = join(hostBin, 'calls');
+  const hostGhCalls = join(hostBin, 'calls');
   try {
-    // Reproduce release CI: gh is authenticated, but the repo is not starred.
-    // The fixture must shadow this command rather than waiting at the star
-    // prompt, calling GitHub, or using any real host credentials.
+    // Model an authenticated host like release CI, where this would prompt.
+    // This tests host isolation, not the authenticated star flow: the fixture
+    // shadows this command with an observable stub that reports unavailable.
     writeFileSync(join(hostBin, 'gh'), [
       '#!/bin/sh',
       'printf "called\\n" >> "$SETUP_TERMINAL_GH_LOG"',
@@ -29,7 +29,7 @@ it.skipIf(process.platform === 'win32')('keeps setup credentials hidden in a rea
         ...process.env,
         PATH: `${hostBin}${delimiter}${process.env.PATH ?? ''}`,
         GH_TOKEN: 'synthetic-github-token',
-        SETUP_TERMINAL_GH_LOG: ghCalls,
+        SETUP_TERMINAL_GH_LOG: hostGhCalls,
       },
       stdout: 'pipe',
       stderr: 'pipe',
@@ -42,7 +42,7 @@ it.skipIf(process.platform === 'win32')('keeps setup credentials hidden in a rea
     expect(stderr).toBe('');
     expect(code).toBe(0);
     expect(stdout).toContain('6 terminal cases passed');
-    expect(existsSync(ghCalls)).toBe(false);
+    expect(existsSync(hostGhCalls)).toBe(false);
   } finally {
     rmSync(hostBin, { recursive: true, force: true });
   }
