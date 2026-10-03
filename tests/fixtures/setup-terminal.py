@@ -57,7 +57,19 @@ def run_case(runtime, mode, redirected=False, alias=False):
     terminal_output = bytearray()
     with tempfile.TemporaryDirectory(prefix="jf-terminal-") as home:
         env = {key: value for key, value in os.environ.items()
-               if not key.startswith(("JELLYFIN_", "JF_"))}
+               if not key.startswith(("JELLYFIN_", "JF_", "GH_", "GITHUB_"))}
+        # Setup's post-action star hook must not use the host's gh credentials
+        # or open another prompt in this credential-entry regression fixture.
+        # A PATH-local stub also prevents access to gh's saved login state.
+        bin_dir = os.path.join(home, "bin")
+        os.mkdir(bin_dir)
+        gh = os.path.join(bin_dir, "gh")
+        gh_calls_path = os.path.join(home, "gh-calls")
+        with open(gh, "w", encoding="utf-8") as stub:
+            stub.write('#!/bin/sh\nprintf "%s\\n" "$@" >> "$SETUP_TERMINAL_ISOLATED_GH_LOG"\nexit 1\n')
+        os.chmod(gh, 0o755)
+        env["SETUP_TERMINAL_ISOLATED_GH_LOG"] = gh_calls_path
+        env["PATH"] = bin_dir + os.pathsep + env.get("PATH", os.defpath)
         env.update(HOME=home, JELLYFIN_CONFIG_DIR=home, NO_PROXY="127.0.0.1,localhost")
         with tempfile.TemporaryFile() as stdout:
             args = runtime + ["setup"] + (["wizard"] if alias else []) + [
@@ -110,12 +122,23 @@ def run_case(runtime, mode, redirected=False, alias=False):
                 deadline = time.monotonic() + 15
                 while proc.poll() is None and time.monotonic() < deadline:
                     capture()
-                code = proc.wait(timeout=1)
+                try:
+                    code = proc.wait(timeout=1)
+                except subprocess.TimeoutExpired as error:
+                    raise AssertionError(f"CLI did not exit in {mode}: {capture()!r}") from error
                 output = capture()
                 assert secret.encode() not in output, f"Credential echoed in {mode}"
                 final = termios.tcgetattr(slave)
                 mask = termios.ECHO | termios.ICANON | termios.ISIG
                 assert final[3] & mask == initial[3] & mask, f"Terminal not restored in {mode}"
+                gh_calls = []
+                if os.path.exists(gh_calls_path):
+                    with open(gh_calls_path, encoding="utf-8") as logged:
+                        gh_calls = logged.read().splitlines()
+                # Only successful TTY setup reaches the hook. The isolated gh
+                # reports unavailable, so auth/API commands must never follow.
+                expected_gh_calls = ["--version"] if mode in ("key", "password") and not redirected else []
+                assert gh_calls == expected_gh_calls, f"Unexpected isolated gh arguments in {mode}: {gh_calls!r}"
                 path = os.path.join(home, "settings.json")
                 if mode in ("interrupt", "eof", "empty"):
                     assert code != 0 and not os.path.exists(path), f"Cancellation saved credentials in {mode}"
